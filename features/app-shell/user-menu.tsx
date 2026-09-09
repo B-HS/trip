@@ -1,0 +1,60 @@
+'use client'
+
+import { LogOutIcon } from 'lucide-react'
+import type { FC } from 'react'
+import { cn } from '@/shared/lib/utils'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/shared/ui/dropdown-menu'
+import { ThemeToggle } from '@/shared/ui/theme-toggle'
+
+type UserMenuProps = {
+    name: string
+    email: string
+    username: string | null
+    image: string | null
+    isCollapsed: boolean
+    onSignOut: () => void
+}
+
+export const UserMenu: FC<UserMenuProps> = ({ name, email, username, image, isCollapsed, onSignOut }) => (
+    <div className={cn('flex h-12 shrink-0 items-center px-3', isCollapsed && 'justify-center px-0')}>
+        <DropdownMenu>
+            <DropdownMenuTrigger
+                className={cn(
+                    'flex h-9 w-full items-center gap-2 rounded-none px-0 text-left text-sm font-medium text-sidebar-foreground outline-none',
+                    'hover:text-sidebar-accent-foreground focus-visible:ring-3 focus-visible:ring-sidebar-ring',
+                    isCollapsed && 'justify-center',
+                )}
+                aria-label='계정 메뉴 열기'>
+                <Avatar size='sm'>
+                    {image && <AvatarImage src={image} alt='' />}
+                    <AvatarFallback>{name.slice(0, 1)}</AvatarFallback>
+                </Avatar>
+                {!isCollapsed && <span className='truncate'>{name}</span>}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className='w-56' align='start' side='top' sideOffset={8}>
+                <DropdownMenuLabel className='flex flex-col gap-0.5'>
+                    <span className='truncate font-medium'>{username ?? name}</span>
+                    <span className='truncate text-xs font-normal text-muted-foreground'>{email}</span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <div className='flex items-center justify-between gap-2 px-2 py-1.5 text-sm'>
+                    <span>테마</span>
+                    <ThemeToggle variant='outline' />
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={onSignOut}>
+                    <LogOutIcon />
+                    로그아웃
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    </div>
+)

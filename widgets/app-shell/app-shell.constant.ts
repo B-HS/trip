@@ -1,0 +1,9 @@
+export const SIDEBAR_COOKIE_NAME = 'trip_sidebar_state'
+export const SIDEBAR_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 7
+export const SIDEBAR_STATE_COLLAPSED = 'collapsed'
+export const SIDEBAR_STATE_EXPANDED = 'expanded'
+export const SIDEBAR_WIDTH = 256
+export const SIDEBAR_WIDTH_ICON = 48
+export const SIDEBAR_WIDTH_MOBILE = 288
+export const SIDEBAR_TOGGLE_KEY = 'b'
+export const SIDEBAR_COLLAPSE_DURATION = 0.2

@@ -32,15 +32,15 @@ drizzle/                마이그레이션 산출물(커밋)
 
 ## 3. 라우트·렌더링
 
-| 경로 | 렌더 | 비고 |
-|---|---|---|
-| `/` | 로그아웃: 정적 인트로(Surface B, 3D 히어로) / 로그인: `redirect('/trips')` | 세션은 서버에서 확인 |
-| `/login`, `/signup` | 정적 셸 + 클라이언트 폼 | 로그인 상태면 `/trips` 로 |
-| `/s/[slug]` | ISR(`cacheLife` + `cacheTag('trip:share:<slug>')`), 체크·메모 없음(읽기 전용) | `isPublic` 인 트립만 |
-| `/trips` | 동적. 서버 프리페치 → `HydrationBoundary` → 위젯 `useQuery` | 목록 헤더에 3D 지구본(전 트립 경로) |
-| `/trips/new` | 동적. 생성 폼(기본 정보 + "오사카 예시로 채우기") | 생성 후 `/trips/[id]/edit` |
-| `/trips/[id]` | 동적. 뷰어(원본 HTML 재현) + 사용자별 체크·메모 | 멤버(owner/editor/viewer)만 |
-| `/trips/[id]/edit` | 동적. 탭형 구조화 편집기 | owner/editor 만 |
+| 경로                | 렌더                                                                          | 비고                                |
+| ------------------- | ----------------------------------------------------------------------------- | ----------------------------------- |
+| `/`                 | 로그아웃: 정적 인트로(Surface B, 3D 히어로) / 로그인: `redirect('/trips')`    | 세션은 서버에서 확인                |
+| `/login`, `/signup` | 정적 셸 + 클라이언트 폼                                                       | 로그인 상태면 `/trips` 로           |
+| `/s/[slug]`         | ISR(`cacheLife` + `cacheTag('trip:share:<slug>')`), 체크·메모 없음(읽기 전용) | `isPublic` 인 트립만                |
+| `/trips`            | 동적. 서버 프리페치 → `HydrationBoundary` → 위젯 `useQuery`                   | 목록 헤더에 3D 지구본(전 트립 경로) |
+| `/trips/new`        | 동적. 생성 폼(기본 정보 + "오사카 예시로 채우기")                             | 생성 후 `/trips/[id]/edit`          |
+| `/trips/[id]`       | 동적. 뷰어(원본 HTML 재현) + 사용자별 체크·메모                               | 멤버(owner/editor/viewer)만         |
+| `/trips/[id]/edit`  | 동적. 탭형 구조화 편집기                                                      | owner/editor 만                     |
 
 - `proxy.ts`(Next 16 미들웨어)가 `/trips/:path*` 를 세션 쿠키(`trip.session_token`) 존재로 1차 게이팅 → 없으면 `/login?next=…`. 실제 인가는 서버(action·route·page)에서 재확인.
 - 인증 페이지는 `await connection()` 없이도 `headers()` 사용으로 동적.
@@ -54,17 +54,17 @@ drizzle/                마이그레이션 산출물(커밋)
 
 ## 5. 데이터 계층 (`entities/trip/`)
 
-| 파일 | 역할 |
-|---|---|
-| `trip.type.ts` | 스키마 `$inferSelect` 기반 타입 + 관계 포함 뷰 타입(`TripDetail`, `TripSummary`) |
-| `trip.validate.ts` | zod 입력 스키마(생성·수정·각 하위 엔티티·템플릿 JSON). `z.infer` 로 입력 타입 유도 |
+| 파일                 | 역할                                                                                                                                                              |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `trip.type.ts`       | 스키마 `$inferSelect` 기반 타입 + 관계 포함 뷰 타입(`TripDetail`, `TripSummary`)                                                                                  |
+| `trip.validate.ts`   | zod 입력 스키마(생성·수정·각 하위 엔티티·템플릿 JSON). `z.infer` 로 입력 타입 유도                                                                                |
 | `trip.repository.ts` | drizzle 쿼리(server-only). 읽기: `findTripDetail(tripId)`, `findTripSummaries(userId)`, `findPublicTrip(slug)`, 사용자 상태 읽기. 쓰기: 트랜잭션 단위 도메인 동작 |
-| `trip.access.ts` | `getTripRole(tripId, userId)` / `assertTripAccess(tripId, userId, 'view' \| 'edit' \| 'own')` |
-| `trip.cache.ts` | `'use cache'` 래퍼 + `cacheTag`: `trip:list:<userId>`, `trip:<tripId>`, `trip:share:<slug>` |
-| `trip.action.ts` | `'use server'` 변경 액션(입력 zod 재검증 → 세션·인가 → repository → `updateTag`/`revalidateTag`) |
-| `trip.api.ts` | 클라이언트 `clientFetch` 래퍼(`/api/trips/...`) |
-| `trip.query.ts` | `'use client'` — `QUERY_KEY` + `queryOptions` 팩토리 + `useQuery`/`useMutation` 훅. mutation 은 server action 호출, `onSuccess` 무효화·toast |
-| `user-state.*` | 사용자별 체크·메모: `entities/user-state/` 동일 구조 |
+| `trip.access.ts`     | `getTripRole(tripId, userId)` / `assertTripAccess(tripId, userId, 'view' \| 'edit' \| 'own')`                                                                     |
+| `trip.cache.ts`      | `'use cache'` 래퍼 + `cacheTag`: `trip:list:<userId>`, `trip:<tripId>`, `trip:share:<slug>`                                                                       |
+| `trip.action.ts`     | `'use server'` 변경 액션(입력 zod 재검증 → 세션·인가 → repository → `updateTag`/`revalidateTag`)                                                                  |
+| `trip.api.ts`        | 클라이언트 `clientFetch` 래퍼(`/api/trips/...`)                                                                                                                   |
+| `trip.query.ts`      | `'use client'` — `QUERY_KEY` + `queryOptions` 팩토리 + `useQuery`/`useMutation` 훅. mutation 은 server action 호출, `onSuccess` 무효화·toast                      |
+| `user-state.*`       | 사용자별 체크·메모: `entities/user-state/` 동일 구조                                                                                                              |
 
 - 쿼리 키: `shared/constant/query-key.ts` 의 `QUERY_KEY` 중앙관리(`TRIP.LIST`, `TRIP.DETAIL(id)`, `TRIP.SHARE(slug)`, `USER_STATE.TRIP(id)`).
 - 서버 컴포넌트 프리페치: `getQueryClient()` → `prefetchQuery(tripDetailQueryOptions(id))`(queryFn 은 서버에서 repository 직접 호출하는 서버용 옵션) → `HydrationBoundary`. 클라이언트 훅은 `/api/trips/...` 를 호출.
@@ -72,12 +72,12 @@ drizzle/                마이그레이션 산출물(커밋)
 
 ## 6. 인가 규칙
 
-| 역할 | 조회 | 체크·메모 | 편집 | 멤버·공유 관리 | 삭제 |
-|---|---|---|---|---|---|
-| owner | O | O | O | O | O |
-| editor | O | O | O | X | X |
-| viewer | O | O | X | X | X |
-| 공개 링크 방문자 | `/s/[slug]` 만 | X | X | X | X |
+| 역할             | 조회           | 체크·메모 | 편집 | 멤버·공유 관리 | 삭제 |
+| ---------------- | -------------- | --------- | ---- | -------------- | ---- |
+| owner            | O              | O         | O    | O              | O    |
+| editor           | O              | O         | O    | X              | X    |
+| viewer           | O              | O         | X    | X              | X    |
+| 공개 링크 방문자 | `/s/[slug]` 만 | X         | X    | X              | X    |
 
 ## 7. 사용자별 상태
 
@@ -97,7 +97,7 @@ drizzle/                마이그레이션 산출물(커밋)
 
 ## 10. 오사카 템플릿
 
-`shared/constant/template/osaka.ts` — `TripTemplate`(zod `tripTemplateSchema` 로 검증되는 순수 데이터). 원본 HTML 을 **전수** 이식(7일·66행·16경로·9예매·4정보섹션). 사용처: `scripts/seed.ts`(`SEED_OWNER_EMAIL` 사용자에게 생성), `/trips/new` 의 "오사카 예시로 채우기", JSON 내보내기/가져오기(같은 스키마).
+`shared/constant/template/osaka.ts` — `TripTemplate`(zod `tripTemplateSchema` 로 검증되는 순수 데이터). 원본 HTML 을 **전수** 이식(7일·65행·16경로·9예매·4정보섹션). 사용처: `scripts/seed.ts`(`SEED_OWNER_EMAIL` 사용자에게 생성), `/trips/new` 의 "오사카 예시로 채우기", JSON 내보내기/가져오기(같은 스키마).
 
 ## 11. 검증
 

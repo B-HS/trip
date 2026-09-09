@@ -25,3 +25,5 @@
 - 1: `create-next-app` 은 `.env` 가 있는 디렉터리를 거부해 스크래치패드에 생성 후 복사(README.md·CLAUDE.md·AGENTS.md 는 복사하지 않음).
 - 3: drizzle `isConfig` 버그로 `{ client, mode }` 설정이 클라이언트로 오인됨 → migrate 스크립트는 `logger: false` 동봉. DB 는 MySQL 9.6, 스키마 `trip`.
 - 4(변경): 사용자 추가 지시로 OAuth 제거, 이메일·비밀번호 + username 로그인.
+- git: 커밋 가드 훅이 `main` 직접 커밋을 차단 → 첫 커밋(스캐폴딩)만 main, 이후 `feat/trip-app` 브랜치에서 자동 커밋. main 머지는 사용자 지시 시.
+- 위임(Workflow 1, Opus): A 데이터 계층(entities/trip·user-state·api 라우트·seed) / B 오사카 템플릿 상수 / C1 3D·모션 프리미티브·인트로·404 / C2 인증 페이지·공개 레이아웃·앱 셸. 메인은 정본(스키마·auth·env·레이아웃·토큰) 담당.

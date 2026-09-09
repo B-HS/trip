@@ -2,6 +2,7 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { nextCookies } from 'better-auth/next-js'
 import { username } from 'better-auth/plugins'
+import { acceptPendingInvitesForUser } from '@/shared/db/accept-invites'
 import { getDb } from '@/shared/db/client'
 import { account, session, user, verification } from '@/shared/db/schema/auth'
 import { getEnv } from '@/shared/lib/env'
@@ -24,6 +25,15 @@ const createAuth = () => {
             maxPasswordLength: PASSWORD_MAX_LENGTH,
         },
         session: { expiresIn: SESSION_MAX_AGE_SECONDS, updateAge: SESSION_UPDATE_AGE_SECONDS },
+        databaseHooks: {
+            user: {
+                create: {
+                    after: async (createdUser) => {
+                        await acceptPendingInvitesForUser({ id: createdUser.id, email: createdUser.email })
+                    },
+                },
+            },
+        },
         advanced: { cookiePrefix: AUTH_COOKIE_PREFIX },
         plugins: [username({ minUsernameLength: USERNAME_MIN_LENGTH, maxUsernameLength: USERNAME_MAX_LENGTH }), nextCookies()],
     })
