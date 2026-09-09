@@ -42,16 +42,19 @@
     - [x] 4-2. Workflow(ADR-0031, run `wf_896d6110-973`, 에이전트 8·51분, 리뷰 17건 → 적용 14·오탐 1·범위 밖 2): API 사실 확인(Sonnet, node_modules 1차 출처) → `shared/lib` 확장 목록·서버 렌더·sanitize·문서 검증 + 테스트(Opus max) → `features/editor` 에디터 UI + 테스트(Opus max) → 리뷰 3렌즈 보안·컨벤션·FSD(Opus high) → 확정 지적 수정(Opus max)
     - [x] 4-3. 메인 검증(typecheck·lint·prettier·test 305·build 통과, 범위 밖 지적 2건은 메인이 처리: `UPLOAD_DISABLED_HINT` shared 승격·ARCHITECTURE §2·§12) → ADR-0027 구현 메모 → 문서 헤더 갱신 → 커밋 → push·prod 머지(화면 미연결, ADR-0031)
     - [ ] 4-4. 로드맵 6(ADR-0028 + 구현 세부 ADR-0032)
-        - [ ] 4-4a. Workflow A: 사실 확인(Sonnet) → 데이터 계층(스키마·마이그레이션 0006·entities·액션·쿼리·admin 플러그인·set-admin, Opus max) → 리뷰 2렌즈(Opus high) → 수정 → 메인: SQL 검토·`bun run db:migrate`·커밋
+        - [x] 4-4a. Workflow A(`wf_82e6e3fc-3bc`, 에이전트 5·49분, 리뷰 15건 → 적용 11·범위 밖 2·시그니처 유지 1) → 마이그레이션 0006 적용(이력 7행·테이블 32·게시판 3행) → `c152820`: 사실 확인(Sonnet) → 데이터 계층(스키마·마이그레이션 0006·entities·액션·쿼리·admin 플러그인·set-admin, Opus max) → 리뷰 2렌즈(Opus high) → 수정 → 메인: SQL 검토·`bun run db:migrate`·커밋
         - [ ] 4-4b. Workflow B: UI-A(프레임·홈·인트로 섹션·탐색·`/s/[slug]` 이동·좋아요·셸·proxy, 메인 트리) ∥ UI-B(게시판·글·댓글·채택·에디터 연결·프로필, 워크트리) → 메인 patch 이식
         - [ ] 4-4c. Workflow C: 리뷰 4렌즈 → 수정 → 메인 검증(typecheck·lint·prettier·test·build) → 브라우저 실측(에디터 ADR-0027 포함, 라이트·다크) → ARCHITECTURE·data-model·roadmap·ADR 추기 → 커밋·push·prod 머지
-- [ ] 5단계. 로드맵 4 AI(ADR-0029: Vercel Queues, 자기 키만, AES-GCM, `APP_ENCRYPTION_KEY` 없이 구현 후 키 등록 시 테스트)
-- [ ] 6단계. 로드맵 10 SEO·GEO·JSON-LD·Analytics·Speed Insights(ADR-0030)
+    - [ ] 4-5. 로드맵 6 확장(ADR-0033 §3): 마이그레이션 0007(soft delete·신고·차단·원장 revoked), 채택 변경·취소(+포인트 회수), 댓글 수정, 신고·`/admin/reports`·밴, 사용자 간 차단, 사용자명 변경
+- [ ] 5단계. i18n ko·ja·en(ADR-0033 §4): next-intl, 프리픽스 as-needed, 쿠키, 언어 전환 셀, 전 문구·검증·toast·메타데이터 카탈로그화, 날짜·숫자 locale 포맷
+- [ ] 6단계. 인증 확장(ADR-0033 §2): Naver·GitHub OAuth, 이메일 인증(Cloudflare mail worker, 리서치 후), 약관·동의(`docs/legal/` ko→ja·en, korean-law-mcp)
+- [ ] 7단계. 로드맵 4 AI(ADR-0029: Vercel Queues, 자기 키만, AES-GCM, `APP_ENCRYPTION_KEY` 없이 구현 후 키 등록 시 테스트)
+- [ ] 8단계. 로드맵 10 SEO·GEO·JSON-LD·Analytics·Speed Insights(ADR-0030, hreflang·locale 별 sitemap 포함)
 
 ## 미착수
 
 - [ ] QA 잔여: 모바일 Sheet 닫힘 포커스 복귀, 편집기 검증 오류 문구 한국어화(사용자가 직접 본 뒤 결정), 일정 종류 `key` 입력란 노출 여부, R2 설정 후 이미지 업로드
-- [ ] 로드맵 3 OSM(보류), 7 의 OAuth·이메일 인증·약관(보류)
+- [x] 로드맵 3 OSM 은 제거(ADR-0033 §1), 7 의 OAuth·이메일 인증·약관은 6단계로 착수(ADR-0033 §2)
 - [ ] 사용자 작업: `.env`·Vercel 환경변수에 `APP_ENCRYPTION_KEY`·`R2_ACCOUNT_ID`·`R2_ACCESS_KEY_ID`·`R2_SECRET_ACCESS_KEY`·`R2_BUCKET`·`R2_PUBLIC_BASE_URL` 추가, `.env.example` 에 이름 추가(AI 는 `.env*` 접근 불가), R2 커스텀 도메인 연결, Vercel CLI 링크(`vercel link`, Queues 로컬 개발용)
 
 ### 진행 메모
