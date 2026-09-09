@@ -2,7 +2,17 @@ import { relations } from 'drizzle-orm'
 import { boolean, date, index, int, mysqlEnum, primaryKey, text, timestamp, uniqueIndex, varchar } from 'drizzle-orm/mysql-core'
 import { user } from '@/shared/db/schema/auth'
 import { tripTable } from '@/shared/db/table'
-import { BOOKING_PRIORITIES, FLIGHT_DIRECTIONS, INFO_BLOCK_KINDS, MEMBER_ROLES, SCHEDULE_KINDS } from '@/shared/constant/trip'
+import {
+    BOOKING_PRIORITIES,
+    FLIGHT_DIRECTIONS,
+    INFO_BLOCK_KINDS,
+    MEMBER_ROLES,
+    SCHEDULE_KIND_BUFFER_LABEL_MAX_LENGTH,
+    SCHEDULE_KIND_COLOR_TOKENS,
+    SCHEDULE_KIND_KEY_MAX_LENGTH,
+    SCHEDULE_KIND_LABEL_MAX_LENGTH,
+    SCHEDULE_KIND_LEGEND_LABEL_MAX_LENGTH,
+} from '@/shared/constant/trip'
 
 const id = () =>
     varchar('id', { length: 36 })
@@ -206,6 +216,23 @@ export const tripRoute = tripTable(
     (table) => [index('route_day_id_idx').on(table.dayId)],
 )
 
+export const tripScheduleKind = tripTable(
+    'schedule_kind',
+    {
+        id: id(),
+        tripId: varchar('trip_id', { length: 36 })
+            .notNull()
+            .references(() => trip.id, { onDelete: 'cascade' }),
+        key: varchar('key', { length: SCHEDULE_KIND_KEY_MAX_LENGTH }).notNull(),
+        label: varchar('label', { length: SCHEDULE_KIND_LABEL_MAX_LENGTH }).notNull(),
+        legendLabel: varchar('legend_label', { length: SCHEDULE_KIND_LEGEND_LABEL_MAX_LENGTH }).notNull(),
+        colorToken: mysqlEnum('color_token', SCHEDULE_KIND_COLOR_TOKENS).notNull().default('muted'),
+        bufferLabel: varchar('buffer_label', { length: SCHEDULE_KIND_BUFFER_LABEL_MAX_LENGTH }),
+        sortOrder: int('sort_order').notNull().default(0),
+    },
+    (table) => [index('schedule_kind_trip_id_idx').on(table.tripId), uniqueIndex('schedule_kind_trip_key_idx').on(table.tripId, table.key)],
+)
+
 export const tripScheduleItem = tripTable(
     'schedule_item',
     {
@@ -216,12 +243,14 @@ export const tripScheduleItem = tripTable(
         sortOrder: int('sort_order').notNull().default(0),
         timeLabel: varchar('time_label', { length: 40 }).notNull(),
         title: varchar('title', { length: 200 }).notNull(),
-        kind: mysqlEnum('kind', SCHEDULE_KINDS).notNull().default('planned'),
+        kindId: varchar('kind_id', { length: 36 })
+            .notNull()
+            .references(() => tripScheduleKind.id, { onDelete: 'restrict' }),
         note: varchar('note', { length: 300 }),
         bufferNote: varchar('buffer_note', { length: 80 }),
         mapQuery: varchar('map_query', { length: 200 }),
     },
-    (table) => [index('schedule_item_day_id_idx').on(table.dayId)],
+    (table) => [index('schedule_item_day_id_idx').on(table.dayId), index('schedule_item_kind_id_idx').on(table.kindId)],
 )
 
 export const tripDayNote = tripTable(
@@ -357,6 +386,7 @@ export const tripRelations = relations(trip, ({ one, many }) => ({
     flights: many(tripFlight),
     lodgings: many(tripLodging),
     sidebarLinks: many(tripSidebarLink),
+    scheduleKinds: many(tripScheduleKind),
     days: many(tripDay),
     bookings: many(tripBooking),
     infoSections: many(tripInfoSection),
@@ -410,8 +440,14 @@ export const tripRouteRelations = relations(tripRoute, ({ one }) => ({
     day: one(tripDay, { fields: [tripRoute.dayId], references: [tripDay.id] }),
 }))
 
+export const tripScheduleKindRelations = relations(tripScheduleKind, ({ one, many }) => ({
+    trip: one(trip, { fields: [tripScheduleKind.tripId], references: [trip.id] }),
+    scheduleItems: many(tripScheduleItem),
+}))
+
 export const tripScheduleItemRelations = relations(tripScheduleItem, ({ one, many }) => ({
     day: one(tripDay, { fields: [tripScheduleItem.dayId], references: [tripDay.id] }),
+    kind: one(tripScheduleKind, { fields: [tripScheduleItem.kindId], references: [tripScheduleKind.id] }),
     checks: many(tripScheduleCheck),
 }))
 

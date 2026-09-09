@@ -29,6 +29,17 @@ describe('오사카 템플릿 스키마', () => {
         expect(parsed.verifiedOn).toBe('2026-09-09')
     })
 
+    test('기본 일정 종류 3가지를 담는다', () => {
+        expect(parsed.scheduleKinds.map((kind) => kind.key)).toEqual(['planned', 'confirmed', 'target'])
+        expect(parsed.scheduleKinds.map((kind) => kind.colorToken)).toEqual(['muted', 'success', 'warning'])
+        expect(parsed.scheduleKinds[1]?.legendLabel).toBe('항공편·공식 셔틀')
+    })
+
+    test('모든 일정 항목이 종류 목록의 키를 가리킨다', () => {
+        const keys = new Set(parsed.scheduleKinds.map((kind) => kind.key))
+        expect(scheduleItems.every((item) => keys.has(item.kind))).toBe(true)
+    })
+
     test('사이드바 소개 문구와 링크는 비어 있다', () => {
         expect(parsed.sidebarNote).toBeNull()
         expect(parsed.sidebarLinks).toEqual([])

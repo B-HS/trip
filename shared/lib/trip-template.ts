@@ -2,9 +2,17 @@ import { z } from 'zod'
 import { COUNTRY_CODES } from '@/shared/constant/countries'
 import {
     BOOKING_PRIORITIES,
+    DEFAULT_SCHEDULE_KIND_KEY,
+    DEFAULT_SCHEDULE_KINDS,
     FLIGHT_DIRECTIONS,
     INFO_BLOCK_KINDS,
-    SCHEDULE_KINDS,
+    SCHEDULE_KIND_BUFFER_LABEL_MAX_LENGTH,
+    SCHEDULE_KIND_COLOR_TOKENS,
+    SCHEDULE_KIND_KEY_MAX_LENGTH,
+    SCHEDULE_KIND_KEY_PATTERN,
+    SCHEDULE_KIND_LABEL_MAX_LENGTH,
+    SCHEDULE_KIND_LEGEND_LABEL_MAX_LENGTH,
+    SCHEDULE_KIND_MIN_COUNT,
     TRIP_DESTINATION_CITY_MAX_LENGTH,
     TRIP_LENGTH_MAX,
     TRIP_LENGTH_MIN,
@@ -13,6 +21,13 @@ import {
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 const HTTP_URL_PATTERN = /^https?:\/\//
 const SIDEBAR_LINK_URL_ISSUE = '링크는 http 또는 https 주소여야 합니다.'
+const SCHEDULE_KIND_KEY_ISSUE = '종류 키는 영문 소문자·숫자·하이픈만 쓸 수 있습니다.'
+
+export const SCHEDULE_KIND_DUPLICATE_ISSUE = { message: '일정 종류 키가 중복됩니다.', path: ['scheduleKinds'] }
+
+export const SCHEDULE_KIND_REFERENCE_ISSUE = { message: '일정 항목이 목록에 없는 종류를 가리킵니다.', path: ['days'] }
+
+export const hasUniqueScheduleKindKeys = (kinds: Array<{ key: string }>) => new Set(kinds.map((kind) => kind.key)).size === kinds.length
 
 const optionalText = (max: number) => z.string().trim().max(max).nullable().default(null)
 const optionalUrl = z.url().max(500).nullable().default(null)
@@ -74,10 +89,18 @@ export const tripTemplateRouteSchema = z.object({
     formula: optionalText(255),
 })
 
+export const tripTemplateScheduleKindSchema = z.object({
+    key: z.string().trim().min(1).max(SCHEDULE_KIND_KEY_MAX_LENGTH).regex(SCHEDULE_KIND_KEY_PATTERN, SCHEDULE_KIND_KEY_ISSUE),
+    label: z.string().trim().min(1).max(SCHEDULE_KIND_LABEL_MAX_LENGTH),
+    legendLabel: z.string().trim().min(1).max(SCHEDULE_KIND_LEGEND_LABEL_MAX_LENGTH),
+    colorToken: z.enum(SCHEDULE_KIND_COLOR_TOKENS).default('muted'),
+    bufferLabel: optionalText(SCHEDULE_KIND_BUFFER_LABEL_MAX_LENGTH),
+})
+
 export const tripTemplateScheduleItemSchema = z.object({
     timeLabel: z.string().trim().min(1).max(40),
     title: z.string().trim().min(1).max(200),
-    kind: z.enum(SCHEDULE_KINDS).default('planned'),
+    kind: z.string().trim().min(1).max(SCHEDULE_KIND_KEY_MAX_LENGTH).default(DEFAULT_SCHEDULE_KIND_KEY),
     note: optionalText(300),
     bufferNote: optionalText(80),
     mapQuery: optionalText(200),
@@ -152,12 +175,21 @@ export const tripTemplateFieldsSchema = z.object({
     flights: z.array(tripTemplateFlightSchema).default([]),
     lodgings: z.array(tripTemplateLodgingSchema).default([]),
     sidebarLinks: z.array(tripTemplateSidebarLinkSchema).default([]),
+    scheduleKinds: z.array(tripTemplateScheduleKindSchema).min(SCHEDULE_KIND_MIN_COUNT).default(DEFAULT_SCHEDULE_KINDS),
     days: z.array(tripTemplateDaySchema).default([]),
     bookings: z.array(tripTemplateBookingSchema).default([]),
     infoSections: z.array(tripTemplateInfoSectionSchema).default([]),
 })
 
-export const tripTemplateSchema = tripTemplateFieldsSchema.refine(hasPairedTripLength, TRIP_LENGTH_ISSUE)
+const hasKnownScheduleKinds = (value: { scheduleKinds: Array<{ key: string }>; days: Array<{ scheduleItems: Array<{ kind: string }> }> }) => {
+    const keys = new Set(value.scheduleKinds.map((kind) => kind.key))
+    return value.days.every((day) => day.scheduleItems.every((item) => keys.has(item.kind)))
+}
+
+export const tripTemplateSchema = tripTemplateFieldsSchema
+    .refine(hasPairedTripLength, TRIP_LENGTH_ISSUE)
+    .refine((value) => hasUniqueScheduleKindKeys(value.scheduleKinds), SCHEDULE_KIND_DUPLICATE_ISSUE)
+    .refine(hasKnownScheduleKinds, SCHEDULE_KIND_REFERENCE_ISSUE)
 
 export const parseTripTemplateJson = (text: string) => {
     try {

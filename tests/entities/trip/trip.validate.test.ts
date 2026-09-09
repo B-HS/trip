@@ -9,6 +9,7 @@ import {
     infoSectionListSchema,
     memberInviteSchema,
     memberRoleSchema,
+    scheduleKindListSchema,
     shareSettingsSchema,
     sidebarSchema,
     tripBasicsFormSchema,
@@ -18,6 +19,7 @@ import {
 } from '@/entities/trip/trip.validate'
 
 const TRIP_ID = '3f1a2b6c-4d5e-4f70-8a9b-0c1d2e3f4a5b'
+const KIND_ID = '8c7d6e5f-4a3b-4c2d-9e8f-1a2b3c4d5e6f'
 const DAY_MEMO_MAX_LENGTH = 4000
 const CITY_MAX_LENGTH = 80
 
@@ -132,14 +134,25 @@ describe('dayInputSchema', () => {
         expect(parsed.notes).toEqual([])
     })
 
-    test('일정 항목의 기본 종류는 planned 다', () => {
+    test('일정 항목은 종류 id 를 그대로 담는다', () => {
         const parsed = dayInputSchema.parse({
             date: '2026-10-01',
             shortLabel: '1일차',
             title: '도착',
-            scheduleItems: [{ timeLabel: '16:10', title: '인천 출발' }],
+            scheduleItems: [{ timeLabel: '16:10', title: '인천 출발', kindId: KIND_ID }],
         })
-        expect(parsed.scheduleItems[0]?.kind).toBe('planned')
+        expect(parsed.scheduleItems[0]?.kindId).toBe(KIND_ID)
+    })
+
+    test('일정 항목의 종류 id 가 uuid 가 아니면 실패한다', () => {
+        expect(() =>
+            dayInputSchema.parse({
+                date: '2026-10-01',
+                shortLabel: '1일차',
+                title: '도착',
+                scheduleItems: [{ timeLabel: '16:10', title: '인천 출발', kindId: 'planned' }],
+            }),
+        ).toThrow()
     })
 
     test('이동 시간이 음수면 실패한다', () => {
@@ -247,5 +260,29 @@ describe('dayMemoSchema / tripIdSchema / dayIdListSchema', () => {
     test('날짜 순서 목록은 비어 있을 수 없다', () => {
         expect(() => dayIdListSchema.parse([])).toThrow()
         expect(dayIdListSchema.parse([TRIP_ID])).toEqual([TRIP_ID])
+    })
+})
+
+describe('scheduleKindListSchema', () => {
+    const kind = { key: 'planned', label: '계획', legendLabel: '계획 일정', bufferLabel: null }
+
+    test('색 토큰이 없으면 muted 로 채운다', () => {
+        expect(scheduleKindListSchema.parse([kind])[0]?.colorToken).toBe('muted')
+    })
+
+    test('목록이 비어 있으면 실패한다', () => {
+        expect(() => scheduleKindListSchema.parse([])).toThrow()
+    })
+
+    test('키가 중복되면 실패한다', () => {
+        expect(() => scheduleKindListSchema.parse([kind, { ...kind, label: '계획 2' }])).toThrow()
+    })
+
+    test('키에 대문자가 들어가면 실패한다', () => {
+        expect(() => scheduleKindListSchema.parse([{ ...kind, key: 'Planned' }])).toThrow()
+    })
+
+    test('색 토큰이 팔레트에 없으면 실패한다', () => {
+        expect(() => scheduleKindListSchema.parse([{ ...kind, colorToken: 'pink' }])).toThrow()
     })
 })

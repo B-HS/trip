@@ -3,9 +3,9 @@
 import { ExternalLinkIcon } from 'lucide-react'
 import { motion, type Variants } from 'motion/react'
 import type { FC } from 'react'
-import type { TripScheduleItem } from '@/entities/trip/trip.type'
+import type { TripScheduleItem, TripScheduleKind } from '@/entities/trip/trip.type'
 import { SCHEDULE_KIND_BADGE_CLASS } from '@/features/trip-viewer/trip-viewer-kind'
-import { SCHEDULE_BUFFER_LABEL, SCHEDULE_KIND_LABEL, buildMapUrl } from '@/shared/constant/trip'
+import { buildMapUrl } from '@/shared/constant/trip'
 import { MOTION_EASE_STANDARD, MOTION_FADE_DURATION } from '@/shared/lib/motion'
 import { cn } from '@/shared/lib/utils'
 import { Badge } from '@/shared/ui/badge'
@@ -28,19 +28,22 @@ const ROW_VARIANTS: Variants = {
 
 type ScheduleRowProps = {
     item: TripScheduleItem
+    kind?: TripScheduleKind
     isCompleted: boolean
     isCheckable: boolean
     onToggle?: (checked: boolean) => void
 }
 
-export const ScheduleRow: FC<ScheduleRowProps> = ({ item, isCompleted, isCheckable, onToggle }) => {
+export const ScheduleRow: FC<ScheduleRowProps> = ({ item, kind, isCompleted, isCheckable, onToggle }) => {
     const checkboxId = `schedule-check-${item.id}`
-    const bufferLabel = item.bufferNote ?? SCHEDULE_BUFFER_LABEL[item.kind]
+    const bufferLabel = item.bufferNote ?? kind?.bufferLabel ?? null
     const content = (
         <>
             <strong className='block text-sm leading-snug font-medium break-keep'>{item.title}</strong>
             {item.note && <span className='mt-1 block text-xs break-keep text-muted-foreground'>{item.note}</span>}
-            <span className='mt-1 inline-block bg-muted px-1.5 py-0.5 text-2xs font-medium text-muted-foreground'>{bufferLabel}</span>
+            {bufferLabel !== null && (
+                <span className='mt-1 inline-block bg-muted px-1.5 py-0.5 text-2xs font-medium text-muted-foreground'>{bufferLabel}</span>
+            )}
         </>
     )
 
@@ -52,9 +55,11 @@ export const ScheduleRow: FC<ScheduleRowProps> = ({ item, isCompleted, isCheckab
                 transition={ROW_TRANSITION}>
                 <div className='flex flex-col items-start gap-1.5 bg-card p-3'>
                     <time className={cn('font-mono text-xs font-medium tabular-nums', isCompleted && 'line-through')}>{item.timeLabel}</time>
-                    <Badge variant='secondary' className={cn(ROW_ACTION_CLASS, 'border-0', SCHEDULE_KIND_BADGE_CLASS[item.kind])}>
-                        {SCHEDULE_KIND_LABEL[item.kind]}
-                    </Badge>
+                    {kind !== undefined && (
+                        <Badge variant='secondary' className={cn(ROW_ACTION_CLASS, 'border-0', SCHEDULE_KIND_BADGE_CLASS[kind.colorToken])}>
+                            {kind.label}
+                        </Badge>
+                    )}
                 </div>
                 <div className='flex min-w-0 gap-px bg-background'>
                     <div className='flex min-w-0 flex-1 items-start gap-3 bg-card p-3'>

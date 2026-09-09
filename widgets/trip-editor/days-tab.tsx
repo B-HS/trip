@@ -56,7 +56,14 @@ export const DaysTab: FC<TripEditorTabProps> = ({ tripId, detail, onSaved }) => 
                 onReorder={(dayIds) => reorderDays.mutate(dayIds)}
                 isPending={deleteDay.isPending || reorderDays.isPending}
             />
-            <DayForm key={formKey} heading={heading} defaultValues={defaultValues} onSubmit={handleSubmit} isPending={saveDay.isPending} />
+            <DayForm
+                key={formKey}
+                heading={heading}
+                scheduleKinds={detail.scheduleKinds}
+                defaultValues={defaultValues}
+                onSubmit={handleSubmit}
+                isPending={saveDay.isPending}
+            />
         </div>
     )
 }

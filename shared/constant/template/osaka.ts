@@ -1,3 +1,4 @@
+import { DEFAULT_SCHEDULE_KINDS } from '@/shared/constant/trip'
 import type { TripTemplateInput } from '@/shared/lib/trip-template'
 
 export const OSAKA_TRIP_TEMPLATE = {
@@ -55,6 +56,7 @@ export const OSAKA_TRIP_TEMPLATE = {
         },
     ],
     sidebarLinks: [],
+    scheduleKinds: DEFAULT_SCHEDULE_KINDS,
     days: [
         {
             date: '2026-10-01',

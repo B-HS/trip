@@ -3,6 +3,8 @@ import type { SavedDay } from '@/entities/trip/trip.type'
 import type { DayValues } from '@/entities/trip/trip.validate'
 import { toSavedDayValues } from '@/features/trip-editor/day-saved-values'
 
+const KIND_ID = '8c7d6e5f-4a3b-4c2d-9e8f-1a2b3c4d5e6f'
+
 const values = {
     date: '2026-10-01',
     shortLabel: '10.01',
@@ -19,8 +21,8 @@ const values = {
     facts: [{ label: '숙소', value: '난바' }],
     routes: [{ origin: 'KIX', destination: '난바', minutes: 45, pathText: null, formula: null }],
     scheduleItems: [
-        { timeLabel: '09:00', title: '출발', kind: 'planned', note: null, bufferNote: null, mapQuery: null },
-        { timeLabel: '12:00', title: '점심', kind: 'planned', note: null, bufferNote: null, mapQuery: null },
+        { timeLabel: '09:00', title: '출발', kindId: KIND_ID, note: null, bufferNote: null, mapQuery: null },
+        { timeLabel: '12:00', title: '점심', kindId: KIND_ID, note: null, bufferNote: null, mapQuery: null },
     ],
     notes: [{ leading: null, linkLabel: null, linkUrl: null, trailing: null }],
 } satisfies DayValues

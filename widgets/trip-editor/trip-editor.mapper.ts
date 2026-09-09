@@ -6,6 +6,7 @@ import type {
     FlightInput,
     InfoSectionInput,
     LodgingInput,
+    ScheduleKindInput,
     ShareSettingsInput,
     SidebarInput,
     TripBasicsInput,
@@ -74,6 +75,19 @@ export const toSidebarDefaults = (detail: TripDetail) =>
         links: detail.sidebarLinks.map((link) => ({ id: link.id, label: link.label, url: link.url, description: link.description })),
     }) satisfies SidebarInput
 
+export const toKindsDefaults = (detail: TripDetail) =>
+    detail.scheduleKinds.map(
+        (kind) =>
+            ({
+                id: kind.id,
+                key: kind.key,
+                label: kind.label,
+                legendLabel: kind.legendLabel,
+                colorToken: kind.colorToken,
+                bufferLabel: kind.bufferLabel,
+            }) satisfies ScheduleKindInput,
+    )
+
 export const toBookingDefaults = (detail: TripDetail) =>
     detail.bookings.map(
         (booking) =>
@@ -135,7 +149,7 @@ export const toDayDefaults = (day: TripDayDetail) =>
             id: item.id,
             timeLabel: item.timeLabel,
             title: item.title,
-            kind: item.kind,
+            kindId: item.kindId,
             note: item.note,
             bufferNote: item.bufferNote,
             mapQuery: item.mapQuery,

@@ -3,9 +3,10 @@
 import { CalendarOffIcon } from 'lucide-react'
 import { AnimatePresence, motion, type Variants } from 'motion/react'
 import type { FC } from 'react'
-import type { TripDayDetail } from '@/entities/trip/trip.type'
+import type { TripDayDetail, TripScheduleKind } from '@/entities/trip/trip.type'
 import { ScheduleRow } from '@/features/trip-viewer/schedule-row'
 import { formatDayNumber, formatRatio, toPercent } from '@/features/trip-viewer/trip-viewer-format'
+import { toScheduleKindMap } from '@/features/trip-viewer/trip-viewer-kind'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { cn } from '@/shared/lib/utils'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/shared/ui/accordion'
@@ -26,6 +27,7 @@ const TIMELINE_VARIANTS: Variants = {
 
 type DayPanelProps = {
     day: TripDayDetail
+    scheduleKinds: readonly TripScheduleKind[]
     dayIndex: number
     panelId: string
     checkedItemIds: readonly string[]
@@ -42,6 +44,7 @@ type DayPanelProps = {
 
 export const DayPanel: FC<DayPanelProps> = ({
     day,
+    scheduleKinds,
     dayIndex,
     panelId,
     checkedItemIds,
@@ -55,6 +58,7 @@ export const DayPanel: FC<DayPanelProps> = ({
     onRequestReset,
     onMemoChange,
 }) => {
+    const kindById = toScheduleKindMap(scheduleKinds)
     const checkedIds = new Set(checkedItemIds)
     const completedCount = day.scheduleItems.filter((item) => checkedIds.has(item.id)).length
     const visibleItems = isHideCompleted && !isPrintLayout ? day.scheduleItems.filter((item) => !checkedIds.has(item.id)) : day.scheduleItems
@@ -163,6 +167,7 @@ export const DayPanel: FC<DayPanelProps> = ({
                             <ScheduleRow
                                 key={item.id}
                                 item={item}
+                                kind={kindById.get(item.kindId)}
                                 isCompleted={checkedIds.has(item.id)}
                                 isCheckable={isCheckable && !isPrintLayout}
                                 onToggle={(checked) => onToggleItem?.(item.id, checked)}

@@ -1,7 +1,9 @@
 import { z } from 'zod'
-import { TRIP_DESTINATION_MIN_COUNT } from '@/shared/constant/trip'
+import { SCHEDULE_KIND_MAX_COUNT, SCHEDULE_KIND_MIN_COUNT, TRIP_DESTINATION_MIN_COUNT } from '@/shared/constant/trip'
 import {
     hasPairedTripLength,
+    hasUniqueScheduleKindKeys,
+    SCHEDULE_KIND_DUPLICATE_ISSUE,
     TRIP_LENGTH_ISSUE,
     tripTemplateBookingSchema,
     tripTemplateDayFactSchema,
@@ -15,6 +17,7 @@ import {
     tripTemplateLodgingSchema,
     tripTemplateRouteSchema,
     tripTemplateScheduleItemSchema,
+    tripTemplateScheduleKindSchema,
     tripTemplateSidebarLinkSchema,
 } from '@/shared/lib/trip-template'
 
@@ -34,6 +37,7 @@ const tripBasicsFieldsSchema = tripTemplateFieldsSchema.omit({
     flights: true,
     lodgings: true,
     sidebarLinks: true,
+    scheduleKinds: true,
     days: true,
     bookings: true,
     infoSections: true,
@@ -76,9 +80,21 @@ export const infoBlockInputSchema = tripTemplateInfoBlockSchema.extend({ id: opt
 export const infoSectionInputSchema = tripTemplateInfoSectionSchema.extend({ id: optionalId, blocks: z.array(infoBlockInputSchema).default([]) })
 export const infoSectionListSchema = z.array(infoSectionInputSchema)
 
+export const scheduleKindInputSchema = tripTemplateScheduleKindSchema.extend({ id: optionalId })
+export const scheduleKindListSchema = z
+    .array(scheduleKindInputSchema)
+    .min(SCHEDULE_KIND_MIN_COUNT, '일정 종류를 한 가지 이상 남겨 주세요.')
+    .max(SCHEDULE_KIND_MAX_COUNT, `일정 종류는 최대 ${SCHEDULE_KIND_MAX_COUNT}가지까지 만들 수 있습니다.`)
+    .refine(hasUniqueScheduleKindKeys, SCHEDULE_KIND_DUPLICATE_ISSUE)
+
+export const scheduleKindsSaveSchema = z.object({
+    kinds: scheduleKindListSchema,
+    replacements: z.record(z.uuid(), z.uuid()).default({}),
+})
+
 export const dayFactInputSchema = tripTemplateDayFactSchema.extend({ id: optionalId })
 export const routeInputSchema = tripTemplateRouteSchema.extend({ id: optionalId })
-export const scheduleItemInputSchema = tripTemplateScheduleItemSchema.extend({ id: optionalId })
+export const scheduleItemInputSchema = tripTemplateScheduleItemSchema.omit({ kind: true }).extend({ id: optionalId, kindId: z.uuid() })
 export const dayNoteInputSchema = tripTemplateDayNoteSchema.extend({ id: optionalId })
 
 export const dayInputSchema = tripTemplateDaySchema.extend({
@@ -133,6 +149,11 @@ export type InfoBlockValues = z.output<typeof infoBlockInputSchema>
 export type InfoSectionInput = z.input<typeof infoSectionInputSchema>
 export type InfoSectionValues = z.output<typeof infoSectionInputSchema>
 export type InfoSectionListInput = z.input<typeof infoSectionListSchema>
+export type ScheduleKindInput = z.input<typeof scheduleKindInputSchema>
+export type ScheduleKindValues = z.output<typeof scheduleKindInputSchema>
+export type ScheduleKindListInput = z.input<typeof scheduleKindListSchema>
+export type ScheduleKindsSaveInput = z.input<typeof scheduleKindsSaveSchema>
+export type ScheduleKindsSaveValues = z.output<typeof scheduleKindsSaveSchema>
 export type DayFactValues = z.output<typeof dayFactInputSchema>
 export type RouteValues = z.output<typeof routeInputSchema>
 export type ScheduleItemValues = z.output<typeof scheduleItemInputSchema>

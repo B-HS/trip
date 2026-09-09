@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { OSAKA_TRIP_TEMPLATE } from '@/shared/constant/template/osaka'
+import { DEFAULT_SCHEDULE_KINDS } from '@/shared/constant/trip'
 import { parseTripTemplateJson } from '@/shared/lib/trip-template'
 
 const JSON_INDENT = 4
@@ -25,6 +26,28 @@ describe('parseTripTemplateJson', () => {
         const parsed = parseTripTemplateJson(JSON.stringify(template))
         expect(parsed?.sidebarNote).toBe('예매 링크를 모아 두었습니다.')
         expect(parsed?.sidebarLinks[0]?.label).toBe('공식 예매')
+    })
+
+    test('일정 종류를 생략하면 기본 3가지로 채운다', () => {
+        const { scheduleKinds, ...template } = OSAKA_TRIP_TEMPLATE
+        expect(scheduleKinds.length).toBe(DEFAULT_SCHEDULE_KINDS.length)
+        expect(parseTripTemplateJson(JSON.stringify(template))?.scheduleKinds.map((kind) => kind.key)).toEqual(
+            DEFAULT_SCHEDULE_KINDS.map((kind) => kind.key),
+        )
+    })
+
+    test('일정 종류가 비어 있으면 null 을 반환한다', () => {
+        expect(parseTripTemplateJson(JSON.stringify({ ...OSAKA_TRIP_TEMPLATE, scheduleKinds: [] }))).toBeNull()
+    })
+
+    test('일정 종류 키가 중복되면 null 을 반환한다', () => {
+        const scheduleKinds = [...DEFAULT_SCHEDULE_KINDS, { ...DEFAULT_SCHEDULE_KINDS[0]!, label: '계획 2' }]
+        expect(parseTripTemplateJson(JSON.stringify({ ...OSAKA_TRIP_TEMPLATE, scheduleKinds }))).toBeNull()
+    })
+
+    test('일정 항목이 목록에 없는 종류를 가리키면 null 을 반환한다', () => {
+        const scheduleKinds = DEFAULT_SCHEDULE_KINDS.filter((kind) => kind.key !== 'confirmed')
+        expect(parseTripTemplateJson(JSON.stringify({ ...OSAKA_TRIP_TEMPLATE, scheduleKinds }))).toBeNull()
     })
 
     test('JSON 이 아니면 null 을 반환한다', () => {

@@ -1,4 +1,4 @@
-export const EDITOR_TABS = ['basics', 'sidebar', 'travel', 'days', 'bookings', 'info', 'share'] as const
+export const EDITOR_TABS = ['basics', 'sidebar', 'travel', 'kinds', 'days', 'bookings', 'info', 'share'] as const
 
 export type EditorTab = (typeof EDITOR_TABS)[number]
 
@@ -10,6 +10,7 @@ export const EDITOR_TAB_LABEL = {
     basics: '기본 정보',
     sidebar: '사이드바',
     travel: '항공·숙소',
+    kinds: '일정 종류',
     days: '날짜별 일정',
     bookings: '예매',
     info: '여행 정보',

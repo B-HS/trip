@@ -11,11 +11,13 @@ import type {
     InfoBlockValues,
     InfoSectionValues,
     LodgingValues,
+    ScheduleKindValues,
     ShareSettingsValues,
     SidebarValues,
     TripBasicsValues,
 } from '@/entities/trip/trip.validate'
 import { isCountryCode } from '@/shared/constant/countries'
+import { DEFAULT_SCHEDULE_KIND_KEY, DEFAULT_SCHEDULE_KINDS } from '@/shared/constant/trip'
 import { getDb } from '@/shared/db/client'
 import {
     trip,
@@ -27,6 +29,8 @@ import {
     tripInfoSection,
     tripLodging,
     tripMember,
+    tripScheduleItem,
+    tripScheduleKind,
     tripSidebarLink,
 } from '@/shared/db/schema/trip'
 import { ApiError } from '@/shared/lib/api-response'
@@ -206,6 +210,57 @@ const reconcileInfoSections = async (tx: TripTransaction, tripId: string, list: 
     }
 }
 
+const toScheduleKindValues = (kind: ScheduleKindValues | TripTemplate['scheduleKinds'][number], index: number) => ({
+    key: kind.key,
+    label: kind.label,
+    legendLabel: kind.legendLabel,
+    colorToken: kind.colorToken,
+    bufferLabel: kind.bufferLabel,
+    sortOrder: index,
+})
+
+const insertScheduleKinds = async (tx: TripTransaction, tripId: string, kinds: TripTemplate['scheduleKinds']) => {
+    const kindIdByKey = new Map<string, string>()
+    for (const [index, kind] of kinds.entries()) {
+        const id = crypto.randomUUID()
+        await tx.insert(tripScheduleKind).values({ ...toScheduleKindValues(kind, index), id, tripId })
+        kindIdByKey.set(kind.key, id)
+    }
+    return kindIdByKey
+}
+
+const replaceScheduleKindUsage = async (tx: TripTransaction, removableId: string, replacementId: string | undefined, keptIds: Set<string>) => {
+    const [used] = await tx.select({ id: tripScheduleItem.id }).from(tripScheduleItem).where(eq(tripScheduleItem.kindId, removableId)).limit(1)
+    if (used === undefined) return
+    if (replacementId === undefined || !keptIds.has(replacementId))
+        throw new ApiError('VALIDATION_ERROR', '삭제하는 일정 종류를 대신할 종류를 골라 주세요.')
+    await tx.update(tripScheduleItem).set({ kindId: replacementId }).where(eq(tripScheduleItem.kindId, removableId))
+}
+
+export const saveScheduleKinds = async (tripId: string, list: ScheduleKindValues[], replacements: Record<string, string>) => {
+    await getDb().transaction(async (tx) => {
+        const existing = await tx.select({ id: tripScheduleKind.id }).from(tripScheduleKind).where(eq(tripScheduleKind.tripId, tripId))
+        const existingIds = new Set(existing.map((row) => row.id))
+        const removable = removableIds(existing, list)
+        const keptIds = new Set<string>()
+        for (const [index, item] of list.entries()) {
+            const values = toScheduleKindValues(item, index)
+            const id = item.id
+            if (id !== undefined && existingIds.has(id)) {
+                await tx.update(tripScheduleKind).set(values).where(eq(tripScheduleKind.id, id))
+                keptIds.add(id)
+                continue
+            }
+            const insertedId = crypto.randomUUID()
+            await tx.insert(tripScheduleKind).values({ ...values, id: insertedId, tripId })
+            keptIds.add(insertedId)
+        }
+        for (const removableId of removable) await replaceScheduleKindUsage(tx, removableId, replacements[removableId], keptIds)
+        if (removable.length > 0) await tx.delete(tripScheduleKind).where(inArray(tripScheduleKind.id, removable))
+        await touchTrip(tx, tripId)
+    })
+}
+
 export const findTripSummariesForUser = async (userId: string) => {
     const db = getDb()
     const memberTripIds = db.select({ tripId: tripMember.tripId }).from(tripMember).where(eq(tripMember.userId, userId))
@@ -254,6 +309,7 @@ export const findTripDetail = async (tripId: string) => {
             flights: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
             lodgings: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
             sidebarLinks: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
+            scheduleKinds: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
             bookings: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
             infoSections: {
                 orderBy: (fields, { asc }) => [asc(fields.sortOrder)],
@@ -300,6 +356,7 @@ export const createTrip = async (ownerId: string, basics: TripBasicsValues, dest
     await getDb().transaction(async (tx) => {
         await tx.insert(trip).values({ ...toTripValues(basics), id, ownerId })
         await tx.insert(tripMember).values({ tripId: id, userId: ownerId, role: 'owner' })
+        await insertScheduleKinds(tx, id, DEFAULT_SCHEDULE_KINDS)
         await reconcileDestinations(tx, id, destinations)
     })
     return { id } satisfies CreatedTrip
@@ -314,7 +371,7 @@ export const createTripFromTemplate = async (ownerId: string, template: TripTemp
         await reconcileFlights(tx, id, template.flights)
         await reconcileLodgings(tx, id, template.lodgings)
         await reconcileSidebarLinks(tx, id, template.sidebarLinks)
-        await insertTemplateDays(tx, id, template.days)
+        await insertTemplateDays(tx, id, template.days, await insertScheduleKinds(tx, id, template.scheduleKinds))
         await reconcileBookings(tx, id, template.bookings)
         await reconcileInfoSections(tx, id, template.infoSections)
     })
@@ -332,7 +389,8 @@ export const replaceTripFromTemplate = async (tripId: string, template: TripTemp
         await reconcileLodgings(tx, tripId, template.lodgings)
         await reconcileSidebarLinks(tx, tripId, template.sidebarLinks)
         await tx.delete(tripDay).where(eq(tripDay.tripId, tripId))
-        await insertTemplateDays(tx, tripId, template.days)
+        await tx.delete(tripScheduleKind).where(eq(tripScheduleKind.tripId, tripId))
+        await insertTemplateDays(tx, tripId, template.days, await insertScheduleKinds(tx, tripId, template.scheduleKinds))
         await reconcileBookings(tx, tripId, template.bookings)
         await reconcileInfoSections(tx, tripId, template.infoSections)
     })
@@ -428,6 +486,7 @@ export const updateShareSettings = async (tripId: string, input: ShareSettingsVa
 export const exportTripTemplate = async (tripId: string) => {
     const detail = await findTripDetail(tripId)
     if (!detail) throw new ApiError('NOT_FOUND', '여행을 찾을 수 없습니다.')
+    const kindKeyById = new Map(detail.scheduleKinds.map((kind) => [kind.id, kind.key]))
     return {
         title: detail.title,
         eyebrow: detail.eyebrow,
@@ -469,6 +528,13 @@ export const exportTripTemplate = async (tripId: string) => {
             note: item.note,
         })),
         sidebarLinks: detail.sidebarLinks.map((link) => ({ label: link.label, url: link.url, description: link.description })),
+        scheduleKinds: detail.scheduleKinds.map((kind) => ({
+            key: kind.key,
+            label: kind.label,
+            legendLabel: kind.legendLabel,
+            colorToken: kind.colorToken,
+            bufferLabel: kind.bufferLabel,
+        })),
         days: detail.days.map((day) => ({
             date: day.date,
             shortLabel: day.shortLabel,
@@ -493,7 +559,7 @@ export const exportTripTemplate = async (tripId: string) => {
             scheduleItems: day.scheduleItems.map((item) => ({
                 timeLabel: item.timeLabel,
                 title: item.title,
-                kind: item.kind,
+                kind: kindKeyById.get(item.kindId) ?? DEFAULT_SCHEDULE_KIND_KEY,
                 note: item.note,
                 bufferNote: item.bufferNote,
                 mapQuery: item.mapQuery,

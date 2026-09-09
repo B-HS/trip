@@ -3,8 +3,9 @@ import { and, desc, eq, inArray } from 'drizzle-orm'
 import type { SavedDay, SavedRow, TripTransaction } from '@/entities/trip/trip.type'
 import type { DayFactValues, DayNoteValues, DayValues, RouteValues, ScheduleItemValues } from '@/entities/trip/trip.validate'
 import { getDb } from '@/shared/db/client'
-import { trip, tripDay, tripDayFact, tripDayNote, tripRoute, tripScheduleItem } from '@/shared/db/schema/trip'
+import { trip, tripDay, tripDayFact, tripDayNote, tripRoute, tripScheduleItem, tripScheduleKind } from '@/shared/db/schema/trip'
 import { ApiError } from '@/shared/lib/api-response'
+import type { TripTemplate } from '@/shared/lib/trip-template'
 
 const FIRST_DAY_INDEX = 0
 
@@ -86,7 +87,15 @@ const saveRoutes = async (tx: TripTransaction, dayId: string, items: RouteValues
     return savedIds
 }
 
-const saveScheduleItems = async (tx: TripTransaction, dayId: string, items: ScheduleItemValues[]) => {
+const assertTripScheduleKinds = async (tx: TripTransaction, tripId: string, items: ScheduleItemValues[]) => {
+    if (items.length === 0) return
+    const kinds = await tx.select({ id: tripScheduleKind.id }).from(tripScheduleKind).where(eq(tripScheduleKind.tripId, tripId))
+    const kindIds = new Set(kinds.map((kind) => kind.id))
+    if (items.some((item) => !kindIds.has(item.kindId))) throw new ApiError('VALIDATION_ERROR', '이 여행에 없는 일정 종류입니다.')
+}
+
+const saveScheduleItems = async (tx: TripTransaction, tripId: string, dayId: string, items: ScheduleItemValues[]) => {
+    await assertTripScheduleKinds(tx, tripId, items)
     const existing = await tx.select({ id: tripScheduleItem.id }).from(tripScheduleItem).where(eq(tripScheduleItem.dayId, dayId))
     const removable = removableIds(existing, items)
     if (removable.length > 0) await tx.delete(tripScheduleItem).where(inArray(tripScheduleItem.id, removable))
@@ -96,7 +105,7 @@ const saveScheduleItems = async (tx: TripTransaction, dayId: string, items: Sche
         const values = {
             timeLabel: item.timeLabel,
             title: item.title,
-            kind: item.kind,
+            kindId: item.kindId,
             note: item.note,
             bufferNote: item.bufferNote,
             mapQuery: item.mapQuery,
@@ -136,18 +145,27 @@ const saveDayNotes = async (tx: TripTransaction, dayId: string, items: DayNoteVa
     return savedIds
 }
 
-export const saveDayChildren = async (tx: TripTransaction, dayId: string, day: DayChildren) => ({
+export const saveDayChildren = async (tx: TripTransaction, tripId: string, dayId: string, day: DayChildren) => ({
     facts: toSavedRows(await saveFacts(tx, dayId, day.facts)),
     routes: toSavedRows(await saveRoutes(tx, dayId, day.routes)),
-    scheduleItems: toSavedRows(await saveScheduleItems(tx, dayId, day.scheduleItems)),
+    scheduleItems: toSavedRows(await saveScheduleItems(tx, tripId, dayId, day.scheduleItems)),
     notes: toSavedRows(await saveDayNotes(tx, dayId, day.notes)),
 })
 
-export const insertTemplateDays = async (tx: TripTransaction, tripId: string, days: Array<DayFields & DayChildren>) => {
+const resolveKindId = (kindIdByKey: Map<string, string>, key: string) => {
+    const kindId = kindIdByKey.get(key)
+    if (kindId === undefined) throw new ApiError('VALIDATION_ERROR', '일정 종류를 찾을 수 없습니다.')
+    return kindId
+}
+
+export const insertTemplateDays = async (tx: TripTransaction, tripId: string, days: TripTemplate['days'], kindIdByKey: Map<string, string>) => {
     for (const [dayIndex, day] of days.entries()) {
         const id = crypto.randomUUID()
         await tx.insert(tripDay).values({ ...toDayValues(day), id, tripId, dayIndex })
-        await saveDayChildren(tx, id, day)
+        await saveDayChildren(tx, tripId, id, {
+            ...day,
+            scheduleItems: day.scheduleItems.map(({ kind, ...item }) => ({ ...item, kindId: resolveKindId(kindIdByKey, kind) })),
+        })
     }
 }
 
@@ -178,7 +196,7 @@ const upsertDay = async (tx: TripTransaction, tripId: string, input: DayValues) 
 export const saveDay = async (tripId: string, input: DayValues) =>
     getDb().transaction(async (tx) => {
         const dayId = await upsertDay(tx, tripId, input)
-        const children = await saveDayChildren(tx, dayId, input)
+        const children = await saveDayChildren(tx, tripId, dayId, input)
         await touchTrip(tx, tripId)
         return { id: dayId, ...children } satisfies SavedDay
     })

@@ -1,7 +1,20 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 import { cleanup, render, screen } from '@testing-library/react'
-import type { TripDayDetail } from '@/entities/trip/trip.type'
+import type { TripDayDetail, TripScheduleKind } from '@/entities/trip/trip.type'
 import { DayPanel } from '@/features/trip-viewer/day-panel'
+
+const SCHEDULE_KINDS: TripScheduleKind[] = [
+    {
+        id: 'kind-1',
+        tripId: 'trip-1',
+        key: 'planned',
+        label: '계획',
+        legendLabel: '계획 일정',
+        colorToken: 'muted',
+        bufferLabel: '마지막 10분 여유',
+        sortOrder: 0,
+    },
+]
 
 const DAY: TripDayDetail = {
     id: 'day-1',
@@ -39,7 +52,7 @@ const DAY: TripDayDetail = {
             sortOrder: 0,
             timeLabel: '09:00~11:00',
             title: '히메지성',
-            kind: 'planned',
+            kindId: 'kind-1',
             note: null,
             bufferNote: null,
             mapQuery: 'Himeji Castle',
@@ -62,7 +75,17 @@ afterEach(cleanup)
 
 describe('DayPanel', () => {
     test('날짜 패널을 렌더한다', () => {
-        render(<DayPanel day={DAY} dayIndex={0} panelId='panel' checkedItemIds={['item-1']} isHideCompleted={false} isCheckable />)
+        render(
+            <DayPanel
+                day={DAY}
+                scheduleKinds={SCHEDULE_KINDS}
+                dayIndex={0}
+                panelId='panel'
+                checkedItemIds={['item-1']}
+                isHideCompleted={false}
+                isCheckable
+            />,
+        )
 
         expect(screen.getByRole('heading', { name: '히메지 · 키린 · 코베' })).toBeDefined()
         expect(screen.getByText('01')).toBeDefined()
@@ -74,14 +97,35 @@ describe('DayPanel', () => {
     })
 
     test('완료 숨기기 상태면 완료된 행을 숨긴다', () => {
-        render(<DayPanel day={DAY} dayIndex={0} panelId='panel' checkedItemIds={['item-1']} isHideCompleted isCheckable />)
+        render(
+            <DayPanel
+                day={DAY}
+                scheduleKinds={SCHEDULE_KINDS}
+                dayIndex={0}
+                panelId='panel'
+                checkedItemIds={['item-1']}
+                isHideCompleted
+                isCheckable
+            />,
+        )
 
         expect(screen.queryByRole('checkbox')).toBeNull()
         expect(screen.getByText('1 / 1 완료')).toBeDefined()
     })
 
     test('인쇄 레이아웃에서는 도구와 메모를 감춘다', () => {
-        render(<DayPanel day={DAY} dayIndex={0} panelId='panel' checkedItemIds={[]} isHideCompleted={false} isCheckable isPrintLayout />)
+        render(
+            <DayPanel
+                day={DAY}
+                scheduleKinds={SCHEDULE_KINDS}
+                dayIndex={0}
+                panelId='panel'
+                checkedItemIds={[]}
+                isHideCompleted={false}
+                isCheckable
+                isPrintLayout
+            />,
+        )
 
         expect(screen.queryByRole('button', { name: '완료 숨기기' })).toBeNull()
         expect(screen.queryByLabelText('이날 메모')).toBeNull()

@@ -20,3 +20,11 @@
 
 - presigned PUT 직접 업로드: 버킷 CORS 필요, 서버 검증 불가.
 - 앱 프록시로 비공개 버킷 서빙: 함수 호출 비용·지연이 이미지마다 생긴다.
+
+## 구현 메모 (2026-09-09, 세션 2 후반)
+
+- 업로드 라우트 인증은 `requireUser`(리다이렉트) 대신 `getServerSession` + `ApiError('UNAUTHORIZED')` 로 한다. fetch 기반 업로드에 리다이렉트가 오면 응답 파싱이 깨지기 때문이며, 기존 `app/api/trips/*` 라우트 패턴과 같다.
+- `getEnv()` 는 `R2_*` 빈 문자열을 미설정(undefined)으로 정규화한다(`.env.example` 을 복사한 상태에서 `z.url()` 이 전체 검증을 깨뜨리지 않도록).
+- `shared/lib/fetch.ts` 는 body 가 `FormData` 면 `Content-Type` 을 강제하지 않는다(multipart boundary 보존).
+- 트립 삭제 시 첨부 행은 FK cascade 로 사라지지만 R2 객체는 남는다(범위 밖, 후속 정리 스크립트 후보). `trip_upload` 행은 감사 기록으로 남기고 객체만 지운다.
+- `.env.example` 은 권한 설정상 AI 가 수정할 수 없어 사용자가 `R2_*` 5개와 `APP_ENCRYPTION_KEY` 이름을 직접 추가한다.

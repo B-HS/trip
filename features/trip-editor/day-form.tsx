@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
 import { useEffect, useRef, type FC } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
-import type { SavedDay } from '@/entities/trip/trip.type'
+import type { SavedDay, TripScheduleKind } from '@/entities/trip/trip.type'
 import { dayInputSchema, type DayInput, type DayValues } from '@/entities/trip/trip.validate'
 import { toSavedDayValues } from '@/features/trip-editor/day-saved-values'
 import { DayScheduleRow } from '@/features/trip-editor/day-schedule-row'
@@ -23,17 +23,19 @@ import { Textarea } from '@/shared/ui/textarea'
 
 const EMPTY_FACT = { label: '', value: '' } satisfies DayFactInput
 const EMPTY_ROUTE = { origin: '', destination: '', minutes: 0, pathText: null, formula: null } satisfies RouteInput
-const EMPTY_SCHEDULE = { timeLabel: '', title: '', kind: 'planned', note: null, bufferNote: null, mapQuery: null } satisfies ScheduleItemInput
+const toEmptySchedule = (kindId: string) =>
+    ({ timeLabel: '', title: '', kindId, note: null, bufferNote: null, mapQuery: null }) satisfies ScheduleItemInput
 const EMPTY_NOTE = { leading: null, linkLabel: null, linkUrl: null, trailing: null } satisfies DayNoteInput
 
 type DayFormProps = {
     heading: string
+    scheduleKinds: readonly TripScheduleKind[]
     defaultValues: DayInput
     onSubmit: (values: DayValues) => Promise<SavedDay | null>
     isPending: boolean
 }
 
-export const DayForm: FC<DayFormProps> = ({ heading, defaultValues, onSubmit, isPending }) => {
+export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValues, onSubmit, isPending }) => {
     const didResetRef = useRef(false)
     const form = useForm<DayInput, unknown, DayValues>({ resolver: zodResolver(dayInputSchema), defaultValues })
     const facts = useFieldArray({ control: form.control, name: 'facts', keyName: 'fieldKey' })
@@ -42,6 +44,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, defaultValues, onSubmit, is
     const notes = useFieldArray({ control: form.control, name: 'notes', keyName: 'fieldKey' })
 
     const { errors, isDirty } = form.formState
+    const firstKindId = scheduleKinds[0]?.id ?? ''
     const handleSubmit = form.handleSubmit(async (values) => {
         const saved = await onSubmit(values)
         if (saved !== null) form.reset(toSavedDayValues(values, saved))
@@ -277,7 +280,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, defaultValues, onSubmit, is
                     title='타임라인'
                     count={scheduleItems.fields.length}
                     action={
-                        <Button type='button' variant='cell' size='cell' onClick={() => scheduleItems.append(EMPTY_SCHEDULE)}>
+                        <Button type='button' variant='cell' size='cell' onClick={() => scheduleItems.append(toEmptySchedule(firstKindId))}>
                             <PlusIcon />
                             일정 추가
                         </Button>
@@ -292,7 +295,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, defaultValues, onSubmit, is
                                 index={index}
                                 removeLabel='일정 삭제'
                                 onRemove={() => scheduleItems.remove(index)}>
-                                <DayScheduleRow index={index} />
+                                <DayScheduleRow index={index} kinds={scheduleKinds} />
                             </SortableRow>
                         ))}
                     </SortableRows>

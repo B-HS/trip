@@ -212,7 +212,7 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
                                     panelId={DAY_PANEL_ID}
                                     onSelect={handleSelectDay}
                                 />
-                                <TripLegend />
+                                <TripLegend kinds={trip.scheduleKinds} />
                                 {trip.bufferPolicy && (
                                     <p className='bg-muted px-3 py-2 text-xs break-keep text-muted-foreground'>{trip.bufferPolicy}</p>
                                 )}
@@ -227,6 +227,7 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
                                     <DayPanel
                                         key={activeDay.id}
                                         day={activeDay}
+                                        scheduleKinds={trip.scheduleKinds}
                                         dayIndex={activeDayIndex}
                                         panelId={DAY_PANEL_ID}
                                         checkedItemIds={checkedScheduleIds}
@@ -266,6 +267,7 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
                     <DayPanel
                         key={day.id}
                         day={day}
+                        scheduleKinds={trip.scheduleKinds}
                         dayIndex={dayIndex}
                         panelId={`${DAY_PANEL_ID}-print-${day.id}`}
                         checkedItemIds={checkedScheduleIds}

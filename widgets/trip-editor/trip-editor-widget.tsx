@@ -15,6 +15,7 @@ import { BasicsTab } from '@/widgets/trip-editor/basics-tab'
 import { BookingsTab } from '@/widgets/trip-editor/bookings-tab'
 import { DaysTab } from '@/widgets/trip-editor/days-tab'
 import { InfoTab } from '@/widgets/trip-editor/info-tab'
+import { KindsTab } from '@/widgets/trip-editor/kinds-tab'
 import { ShareTab } from '@/widgets/trip-editor/share-tab'
 import { SidebarTab } from '@/widgets/trip-editor/sidebar-tab'
 import { TravelTab } from '@/widgets/trip-editor/travel-tab'
@@ -34,6 +35,7 @@ const TAB_COMPONENT = {
     basics: BasicsTab,
     sidebar: SidebarTab,
     travel: TravelTab,
+    kinds: KindsTab,
     days: DaysTab,
     bookings: BookingsTab,
     info: InfoTab,
@@ -72,6 +74,7 @@ export const TripEditorWidget: FC<TripEditorWidgetProps> = ({ tripId }) => {
         basics: undefined,
         sidebar: detail.sidebarLinks.length,
         travel: detail.flights.length + detail.lodgings.length,
+        kinds: detail.scheduleKinds.length,
         days: detail.days.length,
         bookings: detail.bookings.length,
         info: detail.infoSections.length,

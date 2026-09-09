@@ -4,24 +4,27 @@
 import { ExternalLinkIcon } from 'lucide-react'
 import { type FC } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
+import type { TripScheduleKind } from '@/entities/trip/trip.type'
 import type { DayInput, DayValues } from '@/entities/trip/trip.validate'
 import { EditorField } from '@/features/trip-editor/editor-field'
 import { EDITOR_INPUT_CLASS, EMPTY_TO_NULL } from '@/features/trip-editor/editor-form'
-import { buildMapUrl, SCHEDULE_BUFFER_LABEL, SCHEDULE_KIND_LABEL, SCHEDULE_KINDS } from '@/shared/constant/trip'
+import { buildMapUrl } from '@/shared/constant/trip'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { NativeSelect, NativeSelectOption } from '@/shared/ui/native-select'
 
 type DayScheduleRowProps = {
     index: number
+    kinds: readonly TripScheduleKind[]
 }
 
-export const DayScheduleRow: FC<DayScheduleRowProps> = ({ index }) => {
+export const DayScheduleRow: FC<DayScheduleRowProps> = ({ index, kinds }) => {
     const { control, register, formState } = useFormContext<DayInput, unknown, DayValues>()
-    const [kind, mapQuery] = useWatch({ control, name: [`scheduleItems.${index}.kind`, `scheduleItems.${index}.mapQuery`] })
+    const [kindId, mapQuery] = useWatch({ control, name: [`scheduleItems.${index}.kindId`, `scheduleItems.${index}.mapQuery`] })
 
     const errors = formState.errors.scheduleItems?.[index]
     const fieldId = `schedule-${index}`
+    const bufferPlaceholder = kinds.find((kind) => kind.id === kindId)?.bufferLabel ?? ''
     const mapUrl = mapQuery === null || mapQuery === undefined || mapQuery.trim() === '' ? null : buildMapUrl(mapQuery)
 
     return (
@@ -43,16 +46,16 @@ export const DayScheduleRow: FC<DayScheduleRowProps> = ({ index }) => {
                     {...register(`scheduleItems.${index}.title`)}
                 />
             </EditorField>
-            <EditorField label='구분' htmlFor={`${fieldId}-kind`} error={errors?.kind?.message}>
+            <EditorField label='구분' htmlFor={`${fieldId}-kind`} error={errors?.kindId?.message}>
                 <NativeSelect
                     id={`${fieldId}-kind`}
                     className='w-full'
                     size='sm'
-                    aria-invalid={!!errors?.kind}
-                    {...register(`scheduleItems.${index}.kind`)}>
-                    {SCHEDULE_KINDS.map((scheduleKind) => (
-                        <NativeSelectOption key={scheduleKind} value={scheduleKind}>
-                            {SCHEDULE_KIND_LABEL[scheduleKind]}
+                    aria-invalid={!!errors?.kindId}
+                    {...register(`scheduleItems.${index}.kindId`)}>
+                    {kinds.map((kind) => (
+                        <NativeSelectOption key={kind.id} value={kind.id}>
+                            {kind.label}
                         </NativeSelectOption>
                     ))}
                 </NativeSelect>
@@ -69,7 +72,7 @@ export const DayScheduleRow: FC<DayScheduleRowProps> = ({ index }) => {
                 <Input
                     id={`${fieldId}-buffer`}
                     className={EDITOR_INPUT_CLASS}
-                    placeholder={SCHEDULE_BUFFER_LABEL[kind ?? 'planned']}
+                    placeholder={bufferPlaceholder}
                     aria-invalid={!!errors?.bufferNote}
                     {...register(`scheduleItems.${index}.bufferNote`, EMPTY_TO_NULL)}
                 />

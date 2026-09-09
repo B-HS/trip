@@ -1,17 +1,52 @@
-export const SCHEDULE_KINDS = ['planned', 'confirmed', 'target'] as const
-export type ScheduleKind = (typeof SCHEDULE_KINDS)[number]
+export const SCHEDULE_KIND_COLOR_TOKENS = [
+    'muted',
+    'success',
+    'warning',
+    'destructive',
+    'chart-1',
+    'chart-2',
+    'chart-3',
+    'chart-4',
+    'chart-5',
+] as const
+export type ScheduleKindColorToken = (typeof SCHEDULE_KIND_COLOR_TOKENS)[number]
 
-export const SCHEDULE_KIND_LABEL = {
-    planned: '계획',
-    confirmed: '확정 시각',
-    target: '예매 목표',
-} as const satisfies Record<ScheduleKind, string>
+export const SCHEDULE_KIND_KEY_MAX_LENGTH = 40
+export const SCHEDULE_KIND_LABEL_MAX_LENGTH = 40
+export const SCHEDULE_KIND_LEGEND_LABEL_MAX_LENGTH = 80
+export const SCHEDULE_KIND_BUFFER_LABEL_MAX_LENGTH = 80
+export const SCHEDULE_KIND_MIN_COUNT = 1
+export const SCHEDULE_KIND_MAX_COUNT = 12
 
-export const SCHEDULE_BUFFER_LABEL = {
-    planned: '마지막 10분 여유',
-    confirmed: '전후 여유 10분',
-    target: '마지막 10분 여유',
-} as const satisfies Record<ScheduleKind, string>
+export const SCHEDULE_KIND_KEY_PATTERN = /^[a-z0-9-]+$/
+
+export type ScheduleKindDefinition = {
+    key: string
+    label: string
+    legendLabel: string
+    colorToken: ScheduleKindColorToken
+    bufferLabel: string | null
+}
+
+export const DEFAULT_SCHEDULE_KINDS: ScheduleKindDefinition[] = [
+    { key: 'planned', label: '계획', legendLabel: '계획 일정', colorToken: 'muted', bufferLabel: '마지막 10분 여유' },
+    { key: 'confirmed', label: '확정 시각', legendLabel: '항공편·공식 셔틀', colorToken: 'success', bufferLabel: '전후 여유 10분' },
+    { key: 'target', label: '예매 목표', legendLabel: '예매 목표·미확정', colorToken: 'warning', bufferLabel: '마지막 10분 여유' },
+]
+
+export const DEFAULT_SCHEDULE_KIND_KEY = 'planned'
+
+export const SCHEDULE_KIND_COLOR_TOKEN_LABEL = {
+    'muted': '기본 회색',
+    'success': '초록',
+    'warning': '노랑',
+    'destructive': '빨강',
+    'chart-1': '강조 1',
+    'chart-2': '강조 2',
+    'chart-3': '강조 3',
+    'chart-4': '강조 4',
+    'chart-5': '강조 5',
+} as const satisfies Record<ScheduleKindColorToken, string>
 
 export const BOOKING_PRIORITIES = ['p1', 'p2', 'p3', 'onsite'] as const
 export type BookingPriority = (typeof BOOKING_PRIORITIES)[number]

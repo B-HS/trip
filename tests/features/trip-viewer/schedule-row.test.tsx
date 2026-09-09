@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, mock, test } from 'bun:test'
 import { cleanup, render, screen } from '@testing-library/react'
 import type { PropsWithChildren } from 'react'
-import type { TripScheduleItem } from '@/entities/trip/trip.type'
+import type { TripScheduleItem, TripScheduleKind } from '@/entities/trip/trip.type'
 
 type MotionStubProps = PropsWithChildren<{ className?: string }>
 
@@ -21,16 +21,38 @@ const BASE_ITEM: TripScheduleItem = {
     sortOrder: 0,
     timeLabel: '09:00~11:00',
     title: '히메지성',
-    kind: 'confirmed',
+    kindId: 'kind-confirmed',
     note: '2시간, 코코엔 별도 관람 제외',
     bufferNote: null,
     mapQuery: 'Himeji Castle',
 }
 
-const renderRow = (item: TripScheduleItem, isCompleted = false, isCheckable = true) =>
+const CONFIRMED_KIND: TripScheduleKind = {
+    id: 'kind-confirmed',
+    tripId: 'trip-1',
+    key: 'confirmed',
+    label: '확정 시각',
+    legendLabel: '항공편·공식 셔틀',
+    colorToken: 'success',
+    bufferLabel: '전후 여유 10분',
+    sortOrder: 1,
+}
+
+const TARGET_KIND: TripScheduleKind = {
+    id: 'kind-target',
+    tripId: 'trip-1',
+    key: 'target',
+    label: '예매 목표',
+    legendLabel: '예매 목표·미확정',
+    colorToken: 'warning',
+    bufferLabel: '마지막 10분 여유',
+    sortOrder: 2,
+}
+
+const renderRow = (item: TripScheduleItem, isCompleted = false, isCheckable = true, kind: TripScheduleKind = CONFIRMED_KIND) =>
     render(
         <ul>
-            <ScheduleRow item={item} isCompleted={isCompleted} isCheckable={isCheckable} />
+            <ScheduleRow item={item} kind={kind} isCompleted={isCompleted} isCheckable={isCheckable} />
         </ul>,
     )
 
@@ -44,11 +66,17 @@ describe('ScheduleRow', () => {
         expect(screen.getByText('전후 여유 10분')).toBeDefined()
     })
 
-    test('bufferNote 가 있으면 기본 여유 문구를 덮어쓴다', () => {
-        renderRow({ ...BASE_ITEM, kind: 'target', bufferNote: '셔틀 시각 고정' })
+    test('bufferNote 가 있으면 종류의 여유 문구를 덮어쓴다', () => {
+        renderRow({ ...BASE_ITEM, kindId: TARGET_KIND.id, bufferNote: '셔틀 시각 고정' }, false, true, TARGET_KIND)
 
         expect(screen.getByText('예매 목표')).toBeDefined()
         expect(screen.getByText('셔틀 시각 고정')).toBeDefined()
+    })
+
+    test('종류에 여유 문구가 없고 bufferNote 도 없으면 여유 문구를 그리지 않는다', () => {
+        renderRow(BASE_ITEM, false, true, { ...CONFIRMED_KIND, bufferLabel: null })
+
+        expect(screen.queryByText('전후 여유 10분')).toBeNull()
     })
 
     test('mapQuery 로 지도 링크를 만든다', () => {

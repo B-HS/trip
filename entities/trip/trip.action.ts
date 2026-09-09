@@ -13,6 +13,7 @@ import {
     saveFlights,
     saveInfoSections,
     saveLodgings,
+    saveScheduleKinds,
     saveSidebar,
     saveTripBasics,
     updateShareSettings,
@@ -31,6 +32,7 @@ import {
     lodgingListSchema,
     memberInviteSchema,
     memberRoleSchema,
+    scheduleKindsSaveSchema,
     shareSettingsSchema,
     sidebarSchema,
     tripBasicsFormSchema,
@@ -43,6 +45,7 @@ import {
     type LodgingListInput,
     type MemberInviteInput,
     type MemberRoleInput,
+    type ScheduleKindsSaveInput,
     type ShareSettingsInput,
     type SidebarInput,
     type TripBasicsFormInput,
@@ -129,6 +132,18 @@ export const saveSidebarAction = async (tripId: string, input: SidebarInput) => 
         const id = tripIdSchema.parse(tripId)
         await assertTripAccess(id, user.id, 'edit')
         await saveSidebar(id, sidebarSchema.parse(input))
+        await expireTrip(id)
+        return { id }
+    })
+}
+
+export const saveScheduleKindsAction = async (tripId: string, input: ScheduleKindsSaveInput) => {
+    const user = await requireUser()
+    return runAction(async () => {
+        const id = tripIdSchema.parse(tripId)
+        await assertTripAccess(id, user.id, 'edit')
+        const { kinds, replacements } = scheduleKindsSaveSchema.parse(input)
+        await saveScheduleKinds(id, kinds, replacements)
         await expireTrip(id)
         return { id }
     })

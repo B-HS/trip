@@ -16,6 +16,7 @@ import type {
     tripMember,
     tripRoute,
     tripScheduleItem,
+    tripScheduleKind,
     tripSidebarLink,
 } from '@/shared/db/schema/trip'
 
@@ -29,6 +30,7 @@ export type TripDay = typeof tripDay.$inferSelect
 export type TripDayFact = typeof tripDayFact.$inferSelect
 export type TripRoute = typeof tripRoute.$inferSelect
 export type TripScheduleItem = typeof tripScheduleItem.$inferSelect
+export type TripScheduleKind = typeof tripScheduleKind.$inferSelect
 export type TripDayNote = typeof tripDayNote.$inferSelect
 export type TripBooking = typeof tripBooking.$inferSelect
 export type TripInfoSection = typeof tripInfoSection.$inferSelect
@@ -58,6 +60,7 @@ export type PublicTrip = TripRecord & {
     flights: TripFlight[]
     lodgings: TripLodging[]
     sidebarLinks: TripSidebarLink[]
+    scheduleKinds: TripScheduleKind[]
     days: TripDayDetail[]
     bookings: TripBooking[]
     infoSections: TripInfoSectionDetail[]

@@ -18,6 +18,7 @@ import {
     saveFlightsAction,
     saveInfoSectionsAction,
     saveLodgingsAction,
+    saveScheduleKindsAction,
     saveSidebarAction,
     saveTripBasicsAction,
     toggleFavoriteAction,
@@ -35,6 +36,7 @@ import type {
     LodgingListInput,
     MemberInviteInput,
     MemberRoleInput,
+    ScheduleKindsSaveInput,
     ShareSettingsInput,
     SidebarInput,
     TripBasicsFormInput,
@@ -166,6 +168,18 @@ export const useSaveSidebar = (tripId: string) => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
             toast.success('사이드바를 저장했습니다.')
+        },
+        onError: (error) => toast.error(error.message),
+    })
+}
+
+export const useSaveScheduleKinds = (tripId: string) => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: async (input: ScheduleKindsSaveInput) => unwrapActionResult(await saveScheduleKindsAction(tripId, input)),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
+            toast.success('일정 종류를 저장했습니다.')
         },
         onError: (error) => toast.error(error.message),
     })
