@@ -50,5 +50,6 @@
 
 - Vercel: 브랜치 `prod`(Pro 플랜), 환경변수 `DATABASE_URL`·`BETTER_AUTH_SECRET`·`BETTER_AUTH_URL`·`NEXT_PUBLIC_APP_URL`(+선택 `SEED_OWNER_EMAIL`). 락파일 v1(ADR-0013, 의존성 추가 시 `npx bun@1.3.14 install`).
 - DB: 공용 MySQL(로컬·prod 동일). 마이그레이션 0000~0005 적용됨. 마이그레이션이 컬럼을 지우면 이전 배포 코드가 깨지므로 적용과 push·배포를 연달아 한다.
+- 공개 페이지 캐시: `PublicTrip` 형태(컬럼·관계)가 바뀌면 `entities/trip/trip.cache.ts` 의 `PUBLIC_TRIP_CACHE_VERSION` 을 올린다. 로컬 `updateTag` 는 prod 데이터 캐시를 비우지 못하고, Vercel 데이터 캐시는 배포를 넘어 유지된다.
 - 검증 계정: tester@example.com / 사용자명 tester(오사카 예시 트립, 공개 slug `osaka-qa`), throwaway `qa_session2_204103@example.com`.
 - 에이전트 운용: 구현은 Opus 서브에이전트(메인 트리 1 + `isolation: worktree` 1 병렬). 워크트리 결과는 `git -C <wt> diff HEAD` patch 를 `git apply --3way` 로 이식하고 신규 파일은 복사, 마이그레이션은 메인에서 `bun run db:generate` 로 다시 생성. 끝난 워크트리는 `git worktree remove --force`(push 와 같은 명령에 두면 가드 훅이 `-f`·"fast-forward" 문자열을 force push 로 오인해 차단하므로 분리).
