@@ -1,0 +1,50 @@
+# 2026-09-09 — trip 프로젝트 스택·범위 합의
+
+> 사용자(Hyunseok Byun)가 첫 세션에서 확정한 결정. 이후 세션은 이 문서를 전제로 진행한다.
+
+## 제품 범위
+
+- `docs/osaka-trip-interactive.html`(정적 오사카 일정 페이지)을 로그인 기반 다중 트립 앱으로 재구현한다.
+- 라우트
+    - `/` 로그아웃 상태: 소개 페이지(Surface B, 3D 히어로). 로그인 상태: `/trips` 로 리다이렉트.
+    - `/login` 소셜 로그인(GitHub · Google).
+    - `/trips` 목록, `/trips/new` 생성, `/trips/[id]` 뷰어(원본 HTML 화면), `/trips/[id]/edit` 구조화 편집기, 삭제는 다이얼로그.
+    - `/s/[slug]` 공개 읽기 전용 공유 페이지(ISR).
+- 배포 도메인 `https://trip.gumyo.net`, Vercel 배포는 사용자가 직접. 레포 주소는 완성 후 사용자가 제공.
+
+## 결정 (질문 번호 = 첫 질문 묶음)
+
+| #   | 항목             | 결정                                                                                                           | 이유·비고                                                                                                               |
+| --- | ---------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 1   | 데이터 모델      | **B안 — 전부 구조화**(Markdown 필드 없음)                                                                      | 확장성·개발 정확성. 산문도 문단·불릿·링크 단위 행으로 저장                                                              |
+| 2   | 오사카 원본 반입 | 구조화 완료 후 **AI 가 데이터 투입**                                                                           | 사용자 없이 FK 를 만족할 수 없어 템플릿 상수 + 시드 스크립트 + 앱 내 "예시 트립 만들기" 로 제공                         |
+| 3   | 공유 범위        | **C안 — 공동편집자 초대 + 공개 읽기 전용 링크**                                                                | A+C 를 묻자 "그러면 C"                                                                                                  |
+| 4   | 체크·메모 저장   | **DB, 사용자별(trip × user)**                                                                                  | 기기 간 동기화. 활성 날짜·뷰는 URL 파라미터                                                                             |
+| 5   | 인증             | **better-auth 자체 운영, 이메일·비밀번호 회원가입/로그인 + `username` 플러그인(사용자명 로그인)**              | OAuth 없음(사용자 추가 지시 2026-09-09). b-hub(공유 백엔드) 사용하지 않음. 이 앱 단독. 이메일 인증 없음(메일 서버 없음) |
+| 6   | 프리픽스         | 테이블 **`trip_`**(auth 테이블 포함), 쿠키 **`cookiePrefix: 'trip'`**                                          | 같은 DB 의 타 프로젝트 테이블·세션 쿠키와 충돌 방지                                                                     |
+| 7   | 지도             | **임베드 없음.** 원본처럼 "지도 열기" 링크 → Google Maps 검색 URL 에 질의 자동 입력                            | API 키 불필요                                                                                                           |
+| 8   | 모션             | **`motion`(framer 후속) 을 최대한 활용.** 기본 틀은 DESIGN.md 이되 모션은 반드시 들어간다                      | DESIGN §7 의 "페이드만" 제약은 의도적으로 완화(디자인 변경으로 기록). `prefers-reduced-motion` 대응 유지                |
+| 9   | Three.js         | **메인 히어로뿐 아니라 사용 중 도움이 되는 곳 전부**                                                           | 인트로·로그인·목록 헤더·트립 상세 사이드바·빈 상태·공유 페이지·404 등. R3F + drei, 지연 로드·오프스크린 정지            |
+| 10  | 도구             | **bun** + **git**(main). 자동 커밋 ON(`git config llm-rules.auto-commit true`), push 는 레포 주소 수령 후 수동 | 컨벤션 기본 + Calendar 레포 동일                                                                                        |
+| 11  | DB               | **Turso → MySQL 로 변경.** 사용자가 `.env` 에 `DATABASE_URL` 을 미리 넣음. 스키마명 `trip`                     | drizzle-orm `mysql2` 드라이버, drizzle-kit `generate` + `migrate`(push 금지)                                            |
+
+## 전제(사용자 미반박 → 채택)
+
+- 스택: Next 16.3 · React 19.2 · Tailwind 4.3 · shadcn 4 · drizzle-orm 0.45 · better-auth 1.7 · TanStack Query 5 · zod 4 · react-hook-form 7 · motion 13 · three 0.186 + @react-three/fiber 9 + drei 10 · lucide-react · dayjs · sonner · next-themes · @dnd-kit.
+- TypeScript **5.9 고정**(7.0 은 도구 호환 미검증).
+- 테스트 러너 `bun test` + happy-dom + Testing Library.
+- 렌더링: `/` 정적, `/s/[slug]` ISR + `revalidateTag`, 인증 페이지 동적 + 서버 프리페치(`HydrationBoundary`).
+- UI 한국어 단일, 라이트·다크 지원, 웹폰트 없이 시스템 폰트(DESIGN §5-2), 인쇄 스타일 유지, 이모지 없음.
+- `.env` 는 사용자 지시로 AI 가 `echo >>` 로 키를 추가한다(컨벤션의 .env 접근 금지보다 사용자 지시 우선). 값을 읽거나 출력하지 않는다. 키: `DATABASE_URL`(사용자 제공) · `BETTER_AUTH_SECRET`(openssl 생성) · `BETTER_AUTH_URL` · `NEXT_PUBLIC_APP_URL` · `SEED_OWNER_EMAIL`.
+- README.md 는 지시 전까지 손대지 않는다.
+
+## DESIGN.md 대비 의도적 변경(기록)
+
+- §7-3 "오버레이는 즉시 열림" → shadcn 오버레이 애니메이션(`tw-animate-css`) 사용, 목록·전환에 `motion` 적용. 사용자 지시(8번).
+- §7 "슬라이드·스케일·stagger 금지" → 허용. 단 토큰(0.18s / 0.24s / `cubic-bezier(0.4,0,0.2,1)`)은 기본값으로 유지하고 `prefers-reduced-motion` 시 정적.
+- Surface B(공개 페이지)에 3D 캔버스 추가. Surface A 에도 보조적 3D(사이드바 미니 지구본 등) 추가.
+
+## 관련 문서
+
+- 작업 체크리스트: `docs/PROCESS.md`
+- 데이터 모델 상세: `docs/memory/data-model.md`(스키마 확정 시 작성)

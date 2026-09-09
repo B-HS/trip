@@ -1,0 +1,29 @@
+# 데이터 모델 — trip
+
+> 정본은 `shared/db/schema/{auth,trip}.ts`. 이 문서는 읽기용 요약이다. 모든 테이블은 `trip_` 프리픽스(`shared/db/table.ts` 의 `tripTable`).
+
+| 테이블 | 키 | 주요 컬럼 | 원본 HTML 대응 |
+|---|---|---|---|
+| `trip_user` | id | name, email(unique), username(unique), display_username, image | better-auth + username 플러그인 |
+| `trip_session` / `trip_account` / `trip_verification` | id | better-auth 표준 | 세션 쿠키 `trip.session_token` |
+| `trip_trip` | id | owner_id, title, eyebrow, destination, start_date, end_date, period_note, disclaimer, verified_on, buffer_policy, booking_note, footer_note, share_slug(unique), is_public | 사이드바 헤더·범례 문구·예매 소개·푸터 |
+| `trip_member` | (trip_id, user_id) | role(owner/editor/viewer) | 공동편집 |
+| `trip_invite` | id | trip_id, email, role, invited_by, accepted_at | 이메일 초대(가입 시 자동 수락) |
+| `trip_flight` | id | trip_id, sort_order, direction, label, depart_code/time/terminal, arrive_code/time/terminal, flight_number, note | 확정 항공편 |
+| `trip_lodging` | id | trip_id, name, name_local, address, access_note, check_in, check_out, url, note | 모든 날의 출발점 |
+| `trip_day` | id | trip_id, day_index(unique with trip), date, short_label, title, subtitle, overview, plan_headline, plan_note, closing_headline, closing_note, morning/afternoon/evening_summary | 날짜 탭·헤딩·개요·이동 계획·마무리 문단·전체 일정 표 |
+| `trip_day_fact` | id | day_id, label, value | "확인된 내용" 표 |
+| `trip_route` | id | day_id, origin, destination, minutes, path_text, formula | 이동 경로 블록 |
+| `trip_schedule_item` | id | day_id, time_label, title, kind(planned/confirmed/target), note, buffer_note, map_query | 타임라인 행(배지·여유·지도 열기) |
+| `trip_day_note` | id | day_id, leading, link_label, link_url, trailing | 타임라인 뒤 참고 목록 |
+| `trip_booking` | id | trip_id, title, when_label, priority(p1/p2/p3/onsite), link_label, link_url, action_note, plan_status | 예매 체크리스트 카드 |
+| `trip_info_section` | id | trip_id, title, is_default_open | 여행 정보 아코디언 |
+| `trip_info_block` | id | section_id, kind(paragraph/bullet/heading/day_table), emphasis, text, link_label, link_url | 아코디언 본문 |
+| `trip_schedule_check` | (schedule_item_id, user_id) | checked_at | 일정 완료 체크(사용자별) |
+| `trip_booking_check` | (booking_id, user_id) | checked_at | 예매 완료 체크(사용자별) |
+| `trip_day_memo` | (day_id, user_id) | content | 이날 메모(사용자별) |
+
+- 파생 렌더: 배지 라벨·여유 문구는 `kind` → `SCHEDULE_KIND_LABEL`/`SCHEDULE_BUFFER_LABEL`(`buffer_note` 가 있으면 우선). 지도 링크는 `buildMapUrl(map_query)`. 전체 일정 표는 `day.*_summary` 에서 생성.
+- 날짜는 `DATE`(string 모드, `YYYY-MM-DD`), 시각 라벨은 자유 문자열(원본이 "체크인 후" 같은 비정형 값을 쓴다).
+- 마이그레이션: `bun run db:generate` → `bun run db:migrate`(`drizzle/`, 이력 테이블 `trip___drizzle_migrations`). `drizzle-kit push` 금지.
+- drizzle 0.45 `isConfig` 는 `{ client, mode }` 만 있는 설정을 클라이언트로 오인한다 → 스키마 없이 쓸 때는 `logger: false` 를 함께 넘긴다(`scripts/migrate.ts`).
