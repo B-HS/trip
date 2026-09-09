@@ -1,3 +1,4 @@
+import { unstable_rethrow } from 'next/navigation'
 import { NextResponse } from 'next/server'
 import { getCachedTripList } from '@/entities/trip/trip.cache'
 import { errorResponseStatus, toErrorResponse } from '@/shared/lib/action-result'
@@ -10,6 +11,7 @@ export const GET = async () => {
         if (!session) throw new ApiError('UNAUTHORIZED')
         return NextResponse.json(successResponse(await getCachedTripList(session.user.id)))
     } catch (error) {
+        unstable_rethrow(error)
         const body = toErrorResponse(error)
         return NextResponse.json(body, { status: errorResponseStatus(body) })
     }

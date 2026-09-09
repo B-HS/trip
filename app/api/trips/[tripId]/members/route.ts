@@ -1,3 +1,4 @@
+import { unstable_rethrow } from 'next/navigation'
 import { NextResponse } from 'next/server'
 import { assertTripAccess } from '@/entities/trip/trip.access'
 import { findTripInvites, findTripMembers } from '@/entities/trip/trip.repository.members'
@@ -14,6 +15,7 @@ export const GET = async (request: Request, context: { params: Promise<{ tripId:
         const [members, invites] = await Promise.all([findTripMembers(tripId), findTripInvites(tripId)])
         return NextResponse.json(successResponse({ members, invites }))
     } catch (error) {
+        unstable_rethrow(error)
         const body = toErrorResponse(error)
         return NextResponse.json(body, { status: errorResponseStatus(body) })
     }

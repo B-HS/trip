@@ -1,3 +1,4 @@
+import { unstable_rethrow } from 'next/navigation'
 import { z } from 'zod'
 import {
     API_ERROR_MESSAGE,
@@ -22,6 +23,7 @@ export const runAction = async <T>(handler: () => Promise<T>): Promise<ApiRespon
     try {
         return successResponse(await handler())
     } catch (error) {
+        unstable_rethrow(error)
         return toErrorResponse(error)
     }
 }

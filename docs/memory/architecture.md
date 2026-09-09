@@ -21,7 +21,7 @@ shared/                 ui(shadcn)·lib·hooks·constant·db
   db/                   client.ts(풀 싱글턴) · table.ts(`trip_` creator) · schema/{auth,trip}.ts · schema.ts(합성 객체)
   lib/                  env.ts(getEnv) · auth.ts(getAuth) · auth-client.ts · session.ts · query-client.ts · query-provider.tsx · utils.ts(cn) · motion.ts
   constant/             trip.ts(enum 상수·라벨) · auth.ts · site.ts · query.ts · airports.ts · template/osaka.ts
-  ui/                   shadcn 컴포넌트 + theme-provider · three/(R3F 캔버스) · motion/(모션 프리미티브)
+  ui/                   shadcn 전 컴포넌트(55개, 손으로 만들기 전에 먼저 찾아 쓴다) + theme-provider · three/(R3F 캔버스) · motion/(모션 프리미티브)
 tests/                  bun test 미러 구조(entities/features/shared)
 scripts/                migrate.ts · seed.ts
 drizzle/                마이그레이션 산출물(커밋)

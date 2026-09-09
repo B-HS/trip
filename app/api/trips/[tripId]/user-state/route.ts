@@ -1,3 +1,4 @@
+import { unstable_rethrow } from 'next/navigation'
 import { NextResponse } from 'next/server'
 import { assertTripAccess } from '@/entities/trip/trip.access'
 import { findTripUserState } from '@/entities/user-state/user-state.repository'
@@ -13,6 +14,7 @@ export const GET = async (request: Request, context: { params: Promise<{ tripId:
         await assertTripAccess(tripId, session.user.id, 'view')
         return NextResponse.json(successResponse(await findTripUserState(tripId, session.user.id)))
     } catch (error) {
+        unstable_rethrow(error)
         const body = toErrorResponse(error)
         return NextResponse.json(body, { status: errorResponseStatus(body) })
     }

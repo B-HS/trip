@@ -1,5 +1,6 @@
 'use client'
 
+import type { Route } from 'next'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, type FC } from 'react'
 import { getAuthErrorMessage } from '@/entities/auth/auth.error'
@@ -7,7 +8,9 @@ import type { LoginValues } from '@/entities/auth/auth.validate'
 import { LoginForm } from '@/features/auth/login-form'
 import { signIn } from '@/shared/lib/auth-client'
 
-const DEFAULT_REDIRECT_PATH = '/trips'
+const DEFAULT_REDIRECT_PATH: Route = '/trips'
+
+const isInternalPath = (path: string) => path.startsWith('/') && !path.startsWith('//')
 
 export const LoginWidget: FC = () => {
     const [isPending, setIsPending] = useState(false)
@@ -15,7 +18,7 @@ export const LoginWidget: FC = () => {
     const searchParams = useSearchParams()
 
     const nextPath = searchParams.get('next')
-    const redirectPath = nextPath?.startsWith('/') ? nextPath : DEFAULT_REDIRECT_PATH
+    const redirectPath = nextPath && isInternalPath(nextPath) ? (nextPath as Route) : DEFAULT_REDIRECT_PATH
 
     const handleSubmit = async (values: LoginValues) => {
         setIsPending(true)

@@ -74,10 +74,12 @@ export const AppShell: FC<AppShellProps> = ({ user, defaultCollapsed = false, ch
     useEffect(() => writeSidebarState(isCollapsed), [isCollapsed])
 
     return (
-        <div className='flex h-dvh min-h-0 w-full flex-col md:flex-row'>
+        <div className='flex h-dvh min-h-0 w-full flex-col md:flex-row print:h-auto print:overflow-visible'>
             {isMobile ? (
                 <>
-                    <MobileTopBar onOpenNav={() => setIsNavOpen(true)} />
+                    <div className='print:hidden'>
+                        <MobileTopBar onOpenNav={() => setIsNavOpen(true)} />
+                    </div>
                     <Sheet open={isNavOpen} onOpenChange={setIsNavOpen}>
                         <SheetContent
                             className='max-w-none gap-0 border-0 bg-sidebar p-0 text-sidebar-foreground sm:max-w-none'
@@ -98,7 +100,7 @@ export const AppShell: FC<AppShellProps> = ({ user, defaultCollapsed = false, ch
                 </>
             ) : (
                 <motion.aside
-                    className='shrink-0 overflow-hidden bg-sidebar text-sidebar-foreground'
+                    className='shrink-0 overflow-hidden bg-sidebar text-sidebar-foreground print:hidden'
                     initial={false}
                     animate={{ width: isCollapsed ? SIDEBAR_WIDTH_ICON : SIDEBAR_WIDTH }}
                     transition={{ duration: SIDEBAR_COLLAPSE_DURATION, ease: 'linear' }}>
@@ -113,7 +115,7 @@ export const AppShell: FC<AppShellProps> = ({ user, defaultCollapsed = false, ch
                 </motion.aside>
             )}
             <div className='flex min-h-0 min-w-0 flex-1 flex-col gap-px bg-background'>
-                <main className='min-h-0 min-w-0 flex-1 overflow-auto p-3'>{children}</main>
+                <main className='min-h-0 min-w-0 flex-1 overflow-auto p-3 print:overflow-visible print:p-0'>{children}</main>
             </div>
         </div>
     )

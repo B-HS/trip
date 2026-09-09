@@ -8,9 +8,9 @@
 - [x] 1. 스캐폴딩 — create-next-app(bun, TS, Tailwind 4, App Router, React Compiler), 의존성 설치, git init(main, auto-commit)
 - [x] 2. 기반 설정 — prettier(feconfig-bhs), next.config(보안 헤더·cacheComponents·typedRoutes), shadcn 4(vega/radix, `shared/ui`), DESIGN §16-1/16-2 토큰 이식(globals.css, `.surface-public`), 테마·쿼리 프로바이더·루트 레이아웃, `.env` 키 추가·`.env.example`, bun test 셋업
 - [x] 3. DB — drizzle mysql 스키마(`trip_` 프리픽스 creator, 19 테이블), better-auth(username) 테이블 포함, 마이그레이션 generate → migrate 적용 완료. 정본 `docs/memory/architecture.md`·`data-model.md`
-- [ ] 4. 인증 — better-auth(drizzle adapter mysql, 이메일·비밀번호 + username 플러그인, cookiePrefix `trip`), `/api/auth/[...all]`, proxy.ts 게이팅, 로그인·회원가입 페이지
-- [ ] 5. 데이터 계층 — entities(zod 스키마·타입·server actions·route handlers·queryOptions·QUERY_KEY), `use cache` + cacheTag, 인가(소유자·멤버·공개)
-- [ ] 6. 공개 표면 — 인트로 `/`(3D 히어로·motion), 로그인, 404
+- [x] 4. 인증 — better-auth(drizzle adapter mysql, 이메일·비밀번호 + username 플러그인, cookiePrefix `trip`), `/api/auth/[...all]`, proxy.ts 게이팅, 로그인·회원가입 페이지(브라우저 확인은 13에서)
+- [x] 5. 데이터 계층 — entities/trip(type·validate·role·access·tag·repository×3·cache·action·api·query·prefetch), entities/user-state, `app/api/trips/*`, `use cache`+cacheTag(updateTag·revalidateTag 2인자), 인가. 초대 수락은 `shared/db/accept-invites.ts`(auth hook 이 entities 를 역참조하지 않도록 이동)
+- [x] 6. 공개 표면 — 인트로 `/`(3D 지구본·motion·마케팅 카피), 로그인·회원가입, 공개 레이아웃, 404, 앱 셸(레일·모바일 시트·테마 토글). 라이브 확인은 13에서
 - [ ] 7. 앱 셸·목록 — `/trips` 목록(3D 헤더), 생성 `/trips/new`, 삭제 다이얼로그
 - [ ] 8. 편집기 — `/trips/[id]/edit` 구조화 폼(기본·항공·숙소·날짜별(일정/경로/메모)·예매·정보·멤버·공유), dnd-kit 정렬
 - [ ] 9. 뷰어 — `/trips/[id]` 원본 화면 재현(사이드바·날짜별·예매·정보·인쇄), 체크·메모 DB 동기화(사용자별)
@@ -26,4 +26,5 @@
 - 3: drizzle `isConfig` 버그로 `{ client, mode }` 설정이 클라이언트로 오인됨 → migrate 스크립트는 `logger: false` 동봉. DB 는 MySQL 9.6, 스키마 `trip`.
 - 4(변경): 사용자 추가 지시로 OAuth 제거, 이메일·비밀번호 + username 로그인.
 - git: 커밋 가드 훅이 `main` 직접 커밋을 차단 → 첫 커밋(스캐폴딩)만 main, 이후 `feat/trip-app` 브랜치에서 자동 커밋. main 머지는 사용자 지시 시.
+- 위임(Workflow 2, Opus): F 목록·생성·삭제(`/trips`, `/trips/new`) / G 뷰어(`/trips/[id]`)+공개 공유(`/s/[slug]`) / H 구조화 편집기(`/trips/[id]/edit`)+멤버·공유.
 - 위임(Workflow 1, Opus): A 데이터 계층(entities/trip·user-state·api 라우트·seed) / B 오사카 템플릿 상수 / C1 3D·모션 프리미티브·인트로·404 / C2 인증 페이지·공개 레이아웃·앱 셸. 메인은 정본(스키마·auth·env·레이아웃·토큰) 담당.

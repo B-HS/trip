@@ -1,3 +1,4 @@
+import { unstable_rethrow } from 'next/navigation'
 import { NextResponse } from 'next/server'
 import { assertTripAccess } from '@/entities/trip/trip.access'
 import { getCachedTripDetail } from '@/entities/trip/trip.cache'
@@ -15,6 +16,7 @@ export const GET = async (request: Request, context: { params: Promise<{ tripId:
         if (detail === null) throw new ApiError('NOT_FOUND', '여행을 찾을 수 없습니다.')
         return NextResponse.json(successResponse({ ...detail, viewerRole }))
     } catch (error) {
+        unstable_rethrow(error)
         const body = toErrorResponse(error)
         return NextResponse.json(body, { status: errorResponseStatus(body) })
     }
