@@ -31,7 +31,6 @@ export const SortableRow: FC<SortableRowProps> = ({ id, index, removeLabel, onRe
             style={{ transform: CSS.Transform.toString(transform), transition }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
             transition={{ duration: MOTION_FADE_DURATION, ease: MOTION_EASE_STANDARD }}>
             <div className='flex shrink-0 items-center gap-1'>
                 <Button

@@ -1,4 +1,5 @@
 'use client'
+'use no memo'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CopyIcon, DownloadIcon, ExternalLinkIcon } from 'lucide-react'

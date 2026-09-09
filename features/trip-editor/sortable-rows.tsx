@@ -2,8 +2,7 @@
 
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { AnimatePresence } from 'motion/react'
-import type { FC, PropsWithChildren } from 'react'
+import { useId, type FC, type PropsWithChildren } from 'react'
 import { resolveReorder } from '@/features/trip-editor/reorder'
 import { cn } from '@/shared/lib/utils'
 
@@ -16,6 +15,7 @@ type SortableRowsProps = PropsWithChildren<{
 }>
 
 export const SortableRows: FC<SortableRowsProps> = ({ ids, onReorder, className, children }) => {
+    const dndContextId = useId()
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: POINTER_ACTIVATION_DISTANCE } }),
         useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -30,11 +30,9 @@ export const SortableRows: FC<SortableRowsProps> = ({ ids, onReorder, className,
     }
 
     return (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <DndContext id={dndContextId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={ids} strategy={verticalListSortingStrategy}>
-                <div className={cn('flex flex-col gap-px bg-background', className)}>
-                    <AnimatePresence initial={false}>{children}</AnimatePresence>
-                </div>
+                <div className={cn('flex flex-col gap-px bg-background', className)}>{children}</div>
             </SortableContext>
         </DndContext>
     )

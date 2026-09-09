@@ -1,4 +1,5 @@
 'use client'
+'use no memo'
 
 import { ExternalLinkIcon } from 'lucide-react'
 import { type FC } from 'react'
