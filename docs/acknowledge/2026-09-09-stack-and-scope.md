@@ -66,3 +66,4 @@
 - **날짜 탭 오버플로 UX(사용자 요청 2026-09-09)**: 그라데이션 대신 양끝 화살표 셀(넘칠 때만 표시, 끝에서 비활성) + 스트립 아래 2px 스크롤 위치 표시 + 키보드 좌우 이동 + "n/총" 카운터 겸 달력 점프(shadcn Calendar 팝오버, 트립 날짜만 활성).
 - **사이드바 트립 목록·즐겨찾기(사용자 요청 2026-09-09)**: 셸 레일에 즐겨찾기한 트립 목록을 표시하고, 트립 목록 카드에서 즐겨찾기(레일 추가/제거) 토글. 사용자별 `trip_favorite`(user_id·trip_id·sort_order). Phase 3 에서 목적지(나라) 기능과 함께 구현.
 - **브랜치 rename(2026-09-09)**: 사용자가 GitHub 에서 `main` → `prod` 로 변경. 로컬도 `prod` 로 rename 해 `origin/prod` 추적. 배포 브랜치는 `prod`, 작업은 `dev`. 로드맵 기록 완료 시점에 사용자 지시로 dev → prod fast-forward 머지·push(b242e56).
+- **Bun 락파일 버전(2026-09-09, Vercel 빌드 오류)**: Vercel 빌드 이미지의 Bun 1.3.14 가 Bun 1.4 가 쓴 `lockfileVersion: 2` 를 읽지 못해 실패("Unknown lockfile version"). `npx bun@1.3.14 install --lockfile-only` 로 v1 락파일을 재생성하고 `packageManager` 를 `bun@1.3.14` 로 고정했다. 로컬 Bun 1.4 는 v1 을 그대로 읽으며(`--frozen-lockfile` 통과) 재작성하지 않는다. 락파일이 다시 v2 로 바뀌면 같은 명령으로 되돌린다.
