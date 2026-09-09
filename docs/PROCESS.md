@@ -31,10 +31,19 @@
 - [x] 4. ADR-0017 회원가입 "이름" 제거(ADR 작성 → Opus 에이전트 구현 → 검증) — `auth.validate`·`signup-form`·`signup-widget`·테스트, `name` 에 사용자명 저장, ARCHITECTURE §4·ADR-0003·roadmap 7 갱신
 - [x] 5. 검증(typecheck → lint → prettier → test 183 → build) + 프로덕션 스모크(3001) + 브라우저 확인 + HANDOFF 갱신
 
+## 진행 — 세션 2 후반: 로드맵 착수 (ADR-0022)
+
+- [ ] 1단계. 버그 B1(saveDay 하위 id)·B2(기본 정보 toast 1회)·B3(날짜 정렬 낙관적)·B6(JSON 가져오기, ADR-0021)·B8(체크리스트 문구) + 로드맵 9(몇박 며칠, ADR-0020) — Opus 에이전트 2건 병렬(메인 트리와 워크트리) 진행 중. B4(shared/ui card·alert·input-group 보더)는 사용처가 없어 보류, 사용 시점에 제거
+- [ ] 2단계. 로드맵 8 셀형 UI → 1 사이드바 링크 → 5 일정 종류
+- [ ] 3단계. 로드맵 2 R2 업로드 기반 + 예매 첨부
+- [ ] 4단계. 로드맵 7 Tiptap·YouTube → 6 커뮤니티·프로필(대문·사진)
+- [ ] 5단계. 로드맵 4 AI
+- [ ] 6단계. 로드맵 10 SEO·GEO·JSON-LD·Analytics·Speed Insights
+
 ## 미착수
 
-- [ ] QA 잔여: 모바일 Sheet 실측(창 폭 390px), JSON 가져오기(미구현), 편집기 검증 오류 문구 한국어화(`tripTemplate*Schema` 의 zod 기본 영어 메시지가 그대로 노출)
-- [ ] 로드맵 1부터 6·8부터 10 + 7 의 나머지(OAuth·이메일 인증·약관·후기·에디터) — 순서는 사용자가 정한다. 착수 전 ADR 추가
+- [ ] QA 잔여: 모바일 Sheet 닫힘 포커스 복귀, 편집기 검증 오류 문구 한국어화(사용자가 직접 본 뒤 결정)
+- [ ] 로드맵 3 OSM(보류), 7 의 OAuth·이메일 인증·약관(보류)
 
 ### 진행 메모
 

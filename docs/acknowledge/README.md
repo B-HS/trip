@@ -24,3 +24,6 @@
 
 - [ADR-0018 — RHF `register` 컴포넌트는 React Compiler 에서 제외 (2026-09-09)](0018-rhf-register-react-compiler-opt-out.md)
 - [ADR-0019 — 편집기 정렬 목록은 퇴장 애니메이션 없이 렌더 (2026-09-09)](0019-sortable-rows-without-exit-animation.md)
+- [ADR-0020 — 몇박 며칠은 선택 입력, 비우면 날짜로 계산 (2026-09-09)](0020-trip-nights-and-days.md)
+- [ADR-0021 — JSON 가져오기는 현재 트립 내용을 교체 (2026-09-09)](0021-json-import-replaces-trip-content.md)
+- [ADR-0022 — 로드맵 착수 범위와 순서 (2026-09-09)](0022-roadmap-phase-order.md)
