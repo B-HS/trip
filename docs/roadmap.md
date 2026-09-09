@@ -35,7 +35,13 @@
 - **장시간 작업**: 요청은 job 으로 DB 에 저장 후 즉시 응답, 서버 worker 가 처리하고 결과를 메시지로 저장. 대화 전환·연결 끊김과 무관하게 완료된다. UI 는 polling 으로 갱신.
 - 대화·메시지·usage(프로바이더·모델·토큰) 를 사용자별로 영속 저장. 일정 수정은 diff 미리보기 후 적용(기존 server action 재사용).
 
+## 5. 일정 종류 배지 커스터마이징
+
+- 현재 일정 종류(배지·범례)는 하드코딩된 3종이다: `planned`(계획 일정) · `confirmed`(항공편·공식 셔틀) · `target`(예매 목표·미확정). 정의 위치는 `shared/constant/trip.ts` 의 `SCHEDULE_KINDS`·`SCHEDULE_KIND_LABEL`·`SCHEDULE_BUFFER_LABEL` 과 `features/trip-viewer/trip-viewer-kind.ts` 의 색·범례 라벨이며, DB 는 `trip_schedule_item.kind` 를 MySQL enum 으로 저장한다.
+- 다음 페이즈에서 트립별 사용자 지정 종류로 바꾼다: `trip_schedule_kind`(trip_id, key, label, legend_label, color_token(제한된 토큰 팔레트 중 선택: muted/success/warning/destructive/chart-n), buffer_label, sort_order). 일정 항목은 `kind` enum 대신 `kind_id` FK 를 참조하고, 트립 생성 시 기본 3종을 시드한다. 범례·배지·시간 칸·인쇄 뷰가 모두 이 테이블을 읽는다.
+- 편집기에 "일정 종류" 관리 UI(추가·이름·색·여유 문구·정렬·삭제 시 대체 종류 지정) 를 두고, 템플릿 JSON 스키마에도 종류 정의를 포함한다. 마이그레이션은 기존 enum 값을 기본 3종으로 매핑한다.
+
 ## 우선순위·전제
 
-- 순서는 사용자가 정한다(현재 1 → 2 → 3 → 4 순으로 기록).
+- 순서는 사용자가 정한다(현재 1 → 2 → 3 → 4 → 5 순으로 기록).
 - 착수 전 각 항목마다 `docs/acknowledge` 에 스택·정책 합의를 먼저 남기고, `docs/PROCESS.md` 체크리스트로 진행한다.
