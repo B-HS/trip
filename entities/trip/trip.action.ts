@@ -8,6 +8,7 @@ import {
     deleteTrip,
     exportTripTemplate,
     findTripShareSlug,
+    replaceTripFromTemplate,
     saveBookings,
     saveDestinations,
     saveFlights,
@@ -251,6 +252,17 @@ export const updateShareSettingsAction = async (tripId: string, input: ShareSett
         await expireTrip(id)
         if (previousSlug !== null && previousSlug !== settings.slug) expireShare(previousSlug)
         return settings
+    })
+}
+
+export const importTripAction = async (tripId: string, input: TripTemplateInput) => {
+    const user = await requireUser()
+    return runAction(async () => {
+        const id = tripIdSchema.parse(tripId)
+        await assertTripAccess(id, user.id, 'edit')
+        await replaceTripFromTemplate(id, tripTemplateSchema.parse(input))
+        await expireTrip(id)
+        return { id }
     })
 }
 

@@ -39,7 +39,7 @@ export const DaysTab: FC<TripEditorTabProps> = ({ tripId, detail, onSaved }) => 
             const saved = await saveDay.mutateAsync(values)
             onSaved()
             setEditingDayId(saved.id)
-            return saved.id
+            return saved
         } catch {
             return null
         }

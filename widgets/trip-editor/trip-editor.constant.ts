@@ -15,6 +15,6 @@ export const EDITOR_TAB_LABEL = {
     share: '멤버·공유',
 } as const satisfies Record<EditorTab, string>
 
-export const EDITOR_EXPORT_TAB_LABEL = '내보내기'
+export const EDITOR_EXPORT_TAB_LABEL = '내보내기·가져오기'
 
 export const resolveEditorTab = (value: string | null) => EDITOR_TABS.find((tab) => tab === value) ?? DEFAULT_EDITOR_TAB

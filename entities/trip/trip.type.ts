@@ -89,4 +89,8 @@ export type ShareSettings = { slug: string; isPublic: boolean }
 
 export type CreatedTrip = { id: string }
 
+export type SavedRow = { id: string }
+
+export type SavedDay = SavedRow & { facts: SavedRow[]; routes: SavedRow[]; scheduleItems: SavedRow[]; notes: SavedRow[] }
+
 export type TripTransaction = Parameters<Parameters<Database['transaction']>[0]>[0]

@@ -5,7 +5,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
 import { useEffect, useRef, type FC } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
+import type { SavedDay } from '@/entities/trip/trip.type'
 import { dayInputSchema, type DayInput, type DayValues } from '@/entities/trip/trip.validate'
+import { toSavedDayValues } from '@/features/trip-editor/day-saved-values'
 import { DayScheduleRow } from '@/features/trip-editor/day-schedule-row'
 import { EditorField } from '@/features/trip-editor/editor-field'
 import { EDITOR_GRID_CLASS, EDITOR_INPUT_CLASS, EDITOR_TEXTAREA_CLASS, EMPTY_TO_NULL } from '@/features/trip-editor/editor-form'
@@ -27,7 +29,7 @@ const EMPTY_NOTE = { leading: null, linkLabel: null, linkUrl: null, trailing: nu
 type DayFormProps = {
     heading: string
     defaultValues: DayInput
-    onSubmit: (values: DayValues) => Promise<string | null>
+    onSubmit: (values: DayValues) => Promise<SavedDay | null>
     isPending: boolean
 }
 
@@ -41,8 +43,8 @@ export const DayForm: FC<DayFormProps> = ({ heading, defaultValues, onSubmit, is
 
     const { errors, isDirty } = form.formState
     const handleSubmit = form.handleSubmit(async (values) => {
-        const savedDayId = await onSubmit(values)
-        if (savedDayId !== null) form.reset({ ...values, id: savedDayId })
+        const saved = await onSubmit(values)
+        if (saved !== null) form.reset(toSavedDayValues(values, saved))
     })
 
     useEffect(() => {

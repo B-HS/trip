@@ -2,8 +2,8 @@
 'use no memo'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CopyIcon, DownloadIcon, ExternalLinkIcon } from 'lucide-react'
-import { useEffect, useRef, type FC } from 'react'
+import { CopyIcon, DownloadIcon, ExternalLinkIcon, UploadIcon } from 'lucide-react'
+import { useEffect, useRef, useState, type ChangeEvent, type FC, type MouseEvent } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { shareSettingsSchema, type ShareSettingsInput, type ShareSettingsValues } from '@/entities/trip/trip.validate'
@@ -11,6 +11,17 @@ import { EditorField } from '@/features/trip-editor/editor-field'
 import { EDITOR_INPUT_CLASS, EMPTY_TO_UNDEFINED, type EditorSubmit } from '@/features/trip-editor/editor-form'
 import { EditorFormShell } from '@/features/trip-editor/editor-form-shell'
 import { EditorPanel } from '@/features/trip-editor/editor-panel'
+import { parseTripTemplateJson, type TripTemplate } from '@/shared/lib/trip-template'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/shared/ui/alert-dialog'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
@@ -18,6 +29,7 @@ import { Switch } from '@/shared/ui/switch'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? ''
 const SHARE_PATH = '/s/'
+const IMPORT_ACCEPT = 'application/json,.json'
 
 type SharePanelProps = {
     canManage: boolean
@@ -25,12 +37,26 @@ type SharePanelProps = {
     savedSlug: string | null
     onSubmit: EditorSubmit<ShareSettingsValues>
     onExport: () => void
+    onImport: (template: TripTemplate) => Promise<boolean>
     isPending: boolean
     isExporting: boolean
+    isImporting: boolean
 }
 
-export const SharePanel: FC<SharePanelProps> = ({ canManage, defaultValues, savedSlug, onSubmit, onExport, isPending, isExporting }) => {
+export const SharePanel: FC<SharePanelProps> = ({
+    canManage,
+    defaultValues,
+    savedSlug,
+    onSubmit,
+    onExport,
+    onImport,
+    isPending,
+    isExporting,
+    isImporting,
+}) => {
     const didResetRef = useRef(false)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+    const [pendingTemplate, setPendingTemplate] = useState<TripTemplate | null>(null)
     const form = useForm<ShareSettingsInput, unknown, ShareSettingsValues>({ resolver: zodResolver(shareSettingsSchema), defaultValues })
     const [isPublic, slug] = useWatch({ control: form.control, name: ['isPublic', 'slug'] })
 
@@ -49,6 +75,23 @@ export const SharePanel: FC<SharePanelProps> = ({ canManage, defaultValues, save
         } catch {
             toast.error('링크를 복사하지 못했습니다.')
         }
+    }
+    const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        event.target.value = ''
+        if (file === undefined) return
+        const template = parseTripTemplateJson(await file.text())
+        if (template === null) {
+            toast.error('올바른 트립 JSON 이 아닙니다.')
+            return
+        }
+        setPendingTemplate(template)
+    }
+    const handleImport = async (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault()
+        if (pendingTemplate === null) return
+        const isImported = await onImport(pendingTemplate)
+        if (isImported) setPendingTemplate(null)
     }
 
     useEffect(() => {
@@ -115,14 +158,38 @@ export const SharePanel: FC<SharePanelProps> = ({ canManage, defaultValues, save
                     </EditorPanel>
                 </EditorFormShell>
             )}
-            <EditorPanel title='내보내기' description='구조화된 JSON 으로 내려받아 다른 여행을 만들 때 사용할 수 있습니다.'>
-                <div>
+            <EditorPanel title='내보내기·가져오기' description='구조화된 JSON 으로 내려받거나, 내보낸 JSON 을 가져와 현재 내용을 교체할 수 있습니다.'>
+                <div className='flex flex-wrap items-center gap-2'>
                     <Button type='button' variant='outline' size='sm' disabled={isExporting} onClick={onExport}>
                         <DownloadIcon />
                         {isExporting ? '내보내는 중…' : 'JSON 내보내기'}
                     </Button>
+                    <Button type='button' variant='outline' size='sm' disabled={isImporting} onClick={() => fileInputRef.current?.click()}>
+                        <UploadIcon />
+                        {isImporting ? '가져오는 중…' : 'JSON 가져오기'}
+                    </Button>
+                    <input ref={fileInputRef} className='hidden' type='file' accept={IMPORT_ACCEPT} onChange={handleFileChange} />
                 </div>
             </EditorPanel>
+            <AlertDialog open={pendingTemplate !== null} onOpenChange={() => setPendingTemplate(null)}>
+                <AlertDialogContent className='rounded-none'>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>이 JSON 으로 교체할까요?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {pendingTemplate === null
+                                ? ''
+                                : `${pendingTemplate.title} · 날짜 ${pendingTemplate.days.length}개 · 예매 ${pendingTemplate.bookings.length}개`}
+                            <span className='mt-1 block'>현재 내용이 모두 교체됩니다. 체크·메모도 초기화됩니다.</span>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={isImporting}>취소</AlertDialogCancel>
+                        <AlertDialogAction disabled={isImporting} onClick={handleImport}>
+                            {isImporting ? '가져오는 중…' : '가져오기'}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }

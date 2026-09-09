@@ -16,7 +16,17 @@ import type {
 } from '@/entities/trip/trip.validate'
 import { isCountryCode } from '@/shared/constant/countries'
 import { getDb } from '@/shared/db/client'
-import { trip, tripBooking, tripDestination, tripFlight, tripInfoBlock, tripInfoSection, tripLodging, tripMember } from '@/shared/db/schema/trip'
+import {
+    trip,
+    tripBooking,
+    tripDay,
+    tripDestination,
+    tripFlight,
+    tripInfoBlock,
+    tripInfoSection,
+    tripLodging,
+    tripMember,
+} from '@/shared/db/schema/trip'
 import { ApiError } from '@/shared/lib/api-response'
 import type { TripTemplate } from '@/shared/lib/trip-template'
 
@@ -285,6 +295,20 @@ export const createTripFromTemplate = async (ownerId: string, template: TripTemp
         await reconcileInfoSections(tx, id, template.infoSections)
     })
     return { id } satisfies CreatedTrip
+}
+
+export const replaceTripFromTemplate = async (tripId: string, template: TripTemplate) => {
+    await getDb().transaction(async (tx) => {
+        await tx.update(trip).set(toTripValues(template)).where(eq(trip.id, tripId))
+        await reconcileDestinations(tx, tripId, template.destinations)
+        await reconcileFlights(tx, tripId, template.flights)
+        await reconcileLodgings(tx, tripId, template.lodgings)
+        await tx.delete(tripDay).where(eq(tripDay.tripId, tripId))
+        await insertTemplateDays(tx, tripId, template.days)
+        await reconcileBookings(tx, tripId, template.bookings)
+        await reconcileInfoSections(tx, tripId, template.infoSections)
+    })
+    return { id: tripId } satisfies CreatedTrip
 }
 
 export const updateTripBasics = async (tripId: string, basics: TripBasicsValues) => {

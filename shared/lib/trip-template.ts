@@ -128,5 +128,15 @@ export const tripTemplateSchema = z.object({
     infoSections: z.array(tripTemplateInfoSectionSchema).default([]),
 })
 
+export const parseTripTemplateJson = (text: string) => {
+    try {
+        const data: unknown = JSON.parse(text)
+        const parsed = tripTemplateSchema.safeParse(data)
+        return parsed.success ? parsed.data : null
+    } catch {
+        return null
+    }
+}
+
 export type TripTemplate = z.infer<typeof tripTemplateSchema>
 export type TripTemplateInput = z.input<typeof tripTemplateSchema>

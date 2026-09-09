@@ -4,6 +4,7 @@ import type { FC } from 'react'
 import { toast } from 'sonner'
 import {
     useExportTrip,
+    useImportTrip,
     useInviteMember,
     useRemoveInvite,
     useRemoveMember,
@@ -15,6 +16,7 @@ import type { ShareSettingsValues } from '@/entities/trip/trip.validate'
 import type { MemberInviteValues } from '@/features/trip-editor/editor-schema'
 import { MembersPanel } from '@/features/trip-editor/members-panel'
 import { SharePanel } from '@/features/trip-editor/share-panel'
+import type { TripTemplate } from '@/shared/lib/trip-template'
 import { toShareDefaults } from '@/widgets/trip-editor/trip-editor.mapper'
 import type { TripEditorTabProps } from '@/widgets/trip-editor/trip-editor.type'
 
@@ -30,6 +32,7 @@ export const ShareTab: FC<TripEditorTabProps> = ({ tripId, detail, onSaved }) =>
     const removeMember = useRemoveMember(tripId)
     const removeInvite = useRemoveInvite(tripId)
     const exportTrip = useExportTrip(tripId)
+    const importTrip = useImportTrip(tripId)
 
     const isMemberPending = inviteMember.isPending || updateMemberRole.isPending || removeMember.isPending || removeInvite.isPending
     const handleShareSubmit = async (values: ShareSettingsValues) => {
@@ -60,6 +63,15 @@ export const ShareTab: FC<TripEditorTabProps> = ({ tripId, detail, onSaved }) =>
         URL.revokeObjectURL(url)
         toast.success('JSON 파일을 내보냈습니다.')
     }
+    const handleImport = async (template: TripTemplate) => {
+        try {
+            await importTrip.mutateAsync(template)
+            onSaved()
+            return true
+        } catch {
+            return false
+        }
+    }
 
     return (
         <div className='flex flex-col gap-px bg-background'>
@@ -69,8 +81,10 @@ export const ShareTab: FC<TripEditorTabProps> = ({ tripId, detail, onSaved }) =>
                 savedSlug={detail.shareSlug}
                 onSubmit={handleShareSubmit}
                 onExport={handleExport}
+                onImport={handleImport}
                 isPending={updateShareSettings.isPending}
                 isExporting={exportTrip.isPending}
+                isImporting={importTrip.isPending}
             />
             {isOwner && (
                 <MembersPanel

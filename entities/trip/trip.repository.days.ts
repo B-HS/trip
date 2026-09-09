@@ -1,6 +1,6 @@
 import 'server-only'
 import { and, desc, eq, inArray } from 'drizzle-orm'
-import type { TripTransaction } from '@/entities/trip/trip.type'
+import type { SavedDay, SavedRow, TripTransaction } from '@/entities/trip/trip.type'
 import type { DayFactValues, DayNoteValues, DayValues, RouteValues, ScheduleItemValues } from '@/entities/trip/trip.validate'
 import { getDb } from '@/shared/db/client'
 import { trip, tripDay, tripDayFact, tripDayNote, tripRoute, tripScheduleItem } from '@/shared/db/schema/trip'
@@ -19,6 +19,8 @@ export const removableIds = (existing: Array<{ id: string }>, items: Array<{ id?
     const keep = new Set(items.map((item) => item.id).filter((value) => value !== undefined))
     return existing.filter((row) => !keep.has(row.id)).map((row) => row.id)
 }
+
+const toSavedRows = (ids: string[]) => ids.map((id) => ({ id }) satisfies SavedRow)
 
 const toDayValues = (day: DayFields) => ({
     date: day.date,
@@ -40,15 +42,20 @@ const saveFacts = async (tx: TripTransaction, dayId: string, items: DayFactValue
     const removable = removableIds(existing, items)
     if (removable.length > 0) await tx.delete(tripDayFact).where(inArray(tripDayFact.id, removable))
     const existingIds = new Set(existing.map((row) => row.id))
+    const savedIds: string[] = []
     for (const [index, item] of items.entries()) {
         const values = { label: item.label, value: item.value, sortOrder: index }
         const id = item.id
         if (id !== undefined && existingIds.has(id)) {
             await tx.update(tripDayFact).set(values).where(eq(tripDayFact.id, id))
+            savedIds.push(id)
             continue
         }
-        await tx.insert(tripDayFact).values({ ...values, dayId })
+        const insertedId = crypto.randomUUID()
+        await tx.insert(tripDayFact).values({ ...values, id: insertedId, dayId })
+        savedIds.push(insertedId)
     }
+    return savedIds
 }
 
 const saveRoutes = async (tx: TripTransaction, dayId: string, items: RouteValues[]) => {
@@ -56,6 +63,7 @@ const saveRoutes = async (tx: TripTransaction, dayId: string, items: RouteValues
     const removable = removableIds(existing, items)
     if (removable.length > 0) await tx.delete(tripRoute).where(inArray(tripRoute.id, removable))
     const existingIds = new Set(existing.map((row) => row.id))
+    const savedIds: string[] = []
     for (const [index, item] of items.entries()) {
         const values = {
             origin: item.origin,
@@ -68,10 +76,14 @@ const saveRoutes = async (tx: TripTransaction, dayId: string, items: RouteValues
         const id = item.id
         if (id !== undefined && existingIds.has(id)) {
             await tx.update(tripRoute).set(values).where(eq(tripRoute.id, id))
+            savedIds.push(id)
             continue
         }
-        await tx.insert(tripRoute).values({ ...values, dayId })
+        const insertedId = crypto.randomUUID()
+        await tx.insert(tripRoute).values({ ...values, id: insertedId, dayId })
+        savedIds.push(insertedId)
     }
+    return savedIds
 }
 
 const saveScheduleItems = async (tx: TripTransaction, dayId: string, items: ScheduleItemValues[]) => {
@@ -79,6 +91,7 @@ const saveScheduleItems = async (tx: TripTransaction, dayId: string, items: Sche
     const removable = removableIds(existing, items)
     if (removable.length > 0) await tx.delete(tripScheduleItem).where(inArray(tripScheduleItem.id, removable))
     const existingIds = new Set(existing.map((row) => row.id))
+    const savedIds: string[] = []
     for (const [index, item] of items.entries()) {
         const values = {
             timeLabel: item.timeLabel,
@@ -92,10 +105,14 @@ const saveScheduleItems = async (tx: TripTransaction, dayId: string, items: Sche
         const id = item.id
         if (id !== undefined && existingIds.has(id)) {
             await tx.update(tripScheduleItem).set(values).where(eq(tripScheduleItem.id, id))
+            savedIds.push(id)
             continue
         }
-        await tx.insert(tripScheduleItem).values({ ...values, dayId })
+        const insertedId = crypto.randomUUID()
+        await tx.insert(tripScheduleItem).values({ ...values, id: insertedId, dayId })
+        savedIds.push(insertedId)
     }
+    return savedIds
 }
 
 const saveDayNotes = async (tx: TripTransaction, dayId: string, items: DayNoteValues[]) => {
@@ -103,23 +120,28 @@ const saveDayNotes = async (tx: TripTransaction, dayId: string, items: DayNoteVa
     const removable = removableIds(existing, items)
     if (removable.length > 0) await tx.delete(tripDayNote).where(inArray(tripDayNote.id, removable))
     const existingIds = new Set(existing.map((row) => row.id))
+    const savedIds: string[] = []
     for (const [index, item] of items.entries()) {
         const values = { leading: item.leading, linkLabel: item.linkLabel, linkUrl: item.linkUrl, trailing: item.trailing, sortOrder: index }
         const id = item.id
         if (id !== undefined && existingIds.has(id)) {
             await tx.update(tripDayNote).set(values).where(eq(tripDayNote.id, id))
+            savedIds.push(id)
             continue
         }
-        await tx.insert(tripDayNote).values({ ...values, dayId })
+        const insertedId = crypto.randomUUID()
+        await tx.insert(tripDayNote).values({ ...values, id: insertedId, dayId })
+        savedIds.push(insertedId)
     }
+    return savedIds
 }
 
-export const saveDayChildren = async (tx: TripTransaction, dayId: string, day: DayChildren) => {
-    await saveFacts(tx, dayId, day.facts)
-    await saveRoutes(tx, dayId, day.routes)
-    await saveScheduleItems(tx, dayId, day.scheduleItems)
-    await saveDayNotes(tx, dayId, day.notes)
-}
+export const saveDayChildren = async (tx: TripTransaction, dayId: string, day: DayChildren) => ({
+    facts: toSavedRows(await saveFacts(tx, dayId, day.facts)),
+    routes: toSavedRows(await saveRoutes(tx, dayId, day.routes)),
+    scheduleItems: toSavedRows(await saveScheduleItems(tx, dayId, day.scheduleItems)),
+    notes: toSavedRows(await saveDayNotes(tx, dayId, day.notes)),
+})
 
 export const insertTemplateDays = async (tx: TripTransaction, tripId: string, days: Array<DayFields & DayChildren>) => {
     for (const [dayIndex, day] of days.entries()) {
@@ -156,9 +178,9 @@ const upsertDay = async (tx: TripTransaction, tripId: string, input: DayValues) 
 export const saveDay = async (tripId: string, input: DayValues) =>
     getDb().transaction(async (tx) => {
         const dayId = await upsertDay(tx, tripId, input)
-        await saveDayChildren(tx, dayId, input)
+        const children = await saveDayChildren(tx, dayId, input)
         await touchTrip(tx, tripId)
-        return { id: dayId }
+        return { id: dayId, ...children } satisfies SavedDay
     })
 
 export const deleteDay = async (tripId: string, dayId: string) => {

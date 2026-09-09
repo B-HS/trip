@@ -8,6 +8,7 @@ import {
     deleteDayAction,
     deleteTripAction,
     exportTripAction,
+    importTripAction,
     inviteMemberAction,
     removeInviteAction,
     removeMemberAction,
@@ -24,7 +25,8 @@ import {
     updateTripBasicsAction,
 } from '@/entities/trip/trip.action'
 import { fetchFavoriteTrips, fetchTripDetail, fetchTripList, fetchTripMembers } from '@/entities/trip/trip.api'
-import type { TripSummary } from '@/entities/trip/trip.type'
+import { orderDaysByIds } from '@/entities/trip/trip.order'
+import type { TripDetail, TripSummary } from '@/entities/trip/trip.type'
 import type {
     BookingListInput,
     DayInput,
@@ -201,11 +203,19 @@ export const useReorderDays = (tripId: string) => {
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (dayIds: string[]) => unwrapActionResult(await reorderDaysAction(tripId, dayIds)),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
-            toast.success('날짜 순서를 저장했습니다.')
+        onMutate: async (dayIds) => {
+            await queryClient.cancelQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
+            const previousDetail = queryClient.getQueryData<TripDetail>(QUERY_KEY.TRIP.DETAIL(tripId))
+            if (previousDetail !== undefined)
+                queryClient.setQueryData(QUERY_KEY.TRIP.DETAIL(tripId), { ...previousDetail, days: orderDaysByIds(previousDetail.days, dayIds) })
+            return { previousDetail }
         },
-        onError: (error) => toast.error(error.message),
+        onSuccess: () => toast.success('날짜 순서를 저장했습니다.'),
+        onError: (error, _dayIds, context) => {
+            if (context?.previousDetail !== undefined) queryClient.setQueryData(QUERY_KEY.TRIP.DETAIL(tripId), context.previousDetail)
+            toast.error(error.message)
+        },
+        onSettled: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) }),
     })
 }
 
@@ -304,6 +314,20 @@ export const useUpdateShareSettings = (tripId: string) => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
             toast.success(SAVED_MESSAGE)
+        },
+        onError: (error) => toast.error(error.message),
+    })
+}
+
+export const useImportTrip = (tripId: string) => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: async (template: TripTemplateInput) => unwrapActionResult(await importTripAction(tripId, template)),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
+            queryClient.invalidateQueries({ queryKey: QUERY_KEY.USER_STATE.TRIP(tripId) })
+            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
+            toast.success('JSON 을 가져와 내용을 교체했습니다.')
         },
         onError: (error) => toast.error(error.message),
     })
