@@ -1,11 +1,11 @@
 # ARCHITECTURE — trip
 
-> 최종 갱신: 2026-09-09 · 대응 커밋: aab891f (로컬 dev, 세션 2 후반 로드맵 1·2·5·8·9 반영)
+> 최종 갱신: 2026-09-09 · 대응 커밋: 로드맵 7 feat(editor) 커밋(세션 3 4단계, 이 문서와 같은 커밋, push·prod 머지됨)
 > 구현 정본. 코드와 어긋나면 코드를 고치거나 이 문서를 갱신한다. 결정의 배경·기각 대안은 `docs/acknowledge/README.md`.
 
 ## 1. 스택
 
-Next 16.3.4(App Router, React Compiler, `typedRoutes`, `agentRules: false`; **`cacheComponents` 는 끔** — 초기 스켈레톤 금지 결정, ADR-0010) · React 19.2 · Tailwind 4 + shadcn 4(`radix-vega`, 55개 전부 `shared/ui`) · drizzle-orm 0.45(`mysql2`, MySQL 9.6 스키마 `trip`) · better-auth 1.7(이메일·비밀번호 + `username` 플러그인) · TanStack Query 5 · zod 4 · react-hook-form 7 · motion 13 · three 0.186 + @react-three/fiber 9 + drei 10 + world-atlas·topojson-client·d3-geo · @dnd-kit · lucide-react · dayjs · sonner · next-themes · `cn` 0.2(컴파일된 clsx+tailwind-merge 대체 머저 — `shared/lib/utils.ts` 가 재export하고 shadcn 파일 51개는 `'cn'` 을 직접 import) · `@aws-sdk/client-s3`(Cloudflare R2 업로드, ADR-0026). 런타임·패키지 매니저·테스트 러너는 **bun**(락파일은 v1, `packageManager: bun@1.3.14` — ADR-0013). React Compiler 예외: RHF `register()` 를 호출하는 폼 컴포넌트 16개(인증 2·트립 생성 1·편집기 13)는 파일 상단 `'use no memo'` 로 제외한다(ADR-0018).
+Next 16.3.4(App Router, React Compiler, `typedRoutes`, `agentRules: false`; **`cacheComponents` 는 끔** — 초기 스켈레톤 금지 결정, ADR-0010) · React 19.2 · Tailwind 4 + shadcn 4(`radix-vega`, 55개 전부 `shared/ui`) · drizzle-orm 0.45(`mysql2`, MySQL 9.6 스키마 `trip`) · better-auth 1.7(이메일·비밀번호 + `username` 플러그인) · TanStack Query 5 · zod 4 · react-hook-form 7 · motion 13 · three 0.186 + @react-three/fiber 9 + drei 10 + world-atlas·topojson-client·d3-geo · @dnd-kit · lucide-react · dayjs · sonner · next-themes · `cn` 0.2(컴파일된 clsx+tailwind-merge 대체 머저 — `shared/lib/utils.ts` 가 재export하고 shadcn 파일 51개는 `'cn'` 을 직접 import) · `@aws-sdk/client-s3`(Cloudflare R2 업로드, ADR-0026) · Tiptap 3.31.3(`@tiptap/core`·`react`·`starter-kit`·`pm`·`extension-youtube`·`extension-link`·`extension-image`·`html`, 전부 같은 버전 고정) + `isomorphic-dompurify` 4.2(서버 sanitize, Node 에서는 jsdom) + `happy-dom`(`@tiptap/html` 서버 렌더 peer 라 dependencies)(ADR-0027). 런타임·패키지 매니저·테스트 러너는 **bun**(락파일은 v1, `packageManager: bun@1.3.14` — ADR-0013). React Compiler 예외: RHF `register()` 를 호출하는 폼 컴포넌트 16개(인증 2·트립 생성 1·편집기 13)는 파일 상단 `'use no memo'` 로 제외한다(ADR-0018).
 
 ## 2. 폴더 (변형 FSD, `src/` 없음)
 
@@ -20,7 +20,7 @@ app/
   template.tsx          PageTransition(fade)
   not-found.tsx         404(panel 지구본)
 widgets/  app-shell · auth · intro · trip-editor(basics·sidebar·travel·kinds·days·bookings·info·share 탭) · trip-viewer · trips     (쿼리·mutation·router·권한)
-features/ app-shell · auth · intro · trip-editor(폼·sortable·sidebar-form·kinds-form·booking-attachments-field) · trip-viewer · trips     (순수 UI, props+콜백)
+features/ app-shell · auth · intro · trip-editor(폼·sortable·sidebar-form·kinds-form·booking-attachments-field) · trip-viewer · trips · editor(rich-editor·툴바·링크/YouTube URL 다이얼로그·rich-text-content — 게시글 본문용, 로드맵 6 전까지 사용처 없음)     (순수 UI, props+콜백)
 entities/
   trip/     trip.type · trip.validate · trip.role(순수) · trip.access(server) · trip.tag · trip.order(순수, 낙관적 재배열) · trip.repository(+.days/.members/.favorites) · trip.cache · trip.action · trip.api · trip.query · trip.prefetch
   user-state/ user-state.type · .repository · .action · .api · .query
@@ -28,18 +28,18 @@ entities/
   auth/     auth.validate · auth.error
 shared/
   db/       client.ts(mysql2 풀 싱글턴) · table.ts(`trip_` creator) · schema/{auth,trip}.ts · schema.ts(합성) · accept-invites.ts(가입 시 초대 수락)
-  lib/      env.ts(getEnv, R2_* 는 선택) · auth.ts(getAuth) · auth-client.ts · session.ts · api-response.ts · action-result.ts · fetch.ts(clientFetch, FormData 허용) · query-client.ts · query-provider.tsx · motion.ts · trip-template.ts(+parseTripTemplateJson) · trip-length.ts(몇박 며칠) · r2.ts(server-only, getUploadConfig·putObject·deleteObject) · upload-validation.ts(순수 검증) · utils.ts(npm `cn` 재export)
+  lib/      env.ts(getEnv, R2_* 는 선택) · auth.ts(getAuth) · auth-client.ts · session.ts · api-response.ts · action-result.ts · fetch.ts(clientFetch, FormData 허용) · query-client.ts · query-provider.tsx · motion.ts · trip-template.ts(+parseTripTemplateJson) · trip-length.ts(몇박 며칠) · r2.ts(server-only, getUploadConfig·putObject·deleteObject) · upload-validation.ts(순수 검증) · utils.ts(npm `cn` 재export) · rich-text-extensions.ts(Tiptap 확장 목록·스키마) · rich-text-document.ts(JSON 검증·정규화·평문·빈 문서 판정, zod 스키마) · rich-text-sanitize.ts(DOMPurify 화이트리스트 + 훅, `SanitizedRichTextHtml` 브랜드 타입) · rich-text-html.ts(server-only, `generateHTML` → sanitize)
   hooks/    use-mobile · use-motion-preference · use-unsaved-changes
-  constant/ trip.ts(DEFAULT_SCHEDULE_KINDS·색 토큰 등) · upload.ts · auth.ts · site.ts · query.ts · query-key.ts · airports.ts · countries.ts · marketing.ts · template/osaka.ts
+  constant/ trip.ts(DEFAULT_SCHEDULE_KINDS·색 토큰 등) · rich-text.ts(허용 태그·속성, YouTube 임베드 프리픽스, 크기, JSON 길이 상한) · upload.ts · auth.ts · site.ts · query.ts · query-key.ts · airports.ts · countries.ts · marketing.ts · template/osaka.ts
   ui/       shadcn 55개(+ button `cell`·`cellPrimary`·`cellDestructive` 변형, `cell`·`cellIcon` 크기) + theme-provider · theme-toggle · motion-provider · motion/(7 프리미티브) · three/(지구본)
-tests/    bun test 미러 구조(entities · features · shared · widgets) + setup.ts(happy-dom)
+tests/    bun test 미러 구조(entities · features · shared · widgets) + setup.ts(happy-dom 전역 등록, `server-only` 를 빈 모듈로 mock, 자식 프레임 네비게이션 비활성)
 scripts/  migrate.ts · seed.ts
 drizzle/  0000(초기 20 테이블) · 0001(destination·favorite) · 0002(nights·days) · 0003(sidebar_link·sidebar_note) · 0004(schedule_kind + 데이터 이관, kind 컬럼 삭제) · 0005(upload·booking_attachment) + meta
 docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · acknowledge/ · memory/ · history/ · feedback/ · quality-assurance/ · DESIGN.md · osaka-trip-interactive.html
 ```
 
 - import 는 `@/…` 절대경로, barrel 금지, 의존은 `app → widgets → features → entities → shared` 방향만.
-- 서버 전용 모듈(`shared/db/*`, `shared/lib/auth.ts`·`session.ts`, `entities/*/*.repository*.ts`, `*.cache.ts`, `*.access.ts`, `*.prefetch.ts`)은 `import 'server-only'`, 액션 파일은 `'use server'`.
+- 서버 전용 모듈(`shared/db/*`, `shared/lib/auth.ts`·`session.ts`·`r2.ts`·`rich-text-html.ts`, `entities/*/*.repository*.ts`, `*.cache.ts`, `*.access.ts`, `*.prefetch.ts`)은 `import 'server-only'`, 액션 파일은 `'use server'`.
 
 ## 3. 라우트·렌더링
 
@@ -116,3 +116,11 @@ docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · acknowledge/ · memor
 ## 11. 검증
 
 `bun run typecheck` → `bun run lint` → `bun test` → `bun run build`. UI 는 브라우저에서 라이트·다크 확인 후 완료 보고(`docs/quality-assurance/`).
+
+## 12. 리치 텍스트 (ADR-0027)
+
+- 정본은 Tiptap JSON. 서버 경계에서 `richTextDocumentSchema`(`shared/lib/rich-text-document.ts`)가 길이 상한 → `doc` 형태 → ProseMirror `Node.fromJSON` + `check()` 로 검증하고 정규화된 JSON 을 돌려준다(알 수 없는 노드·마크는 거부, 알 수 없는 attrs 는 버림).
+- 확장은 `createRichTextExtensions()` 한 곳: StarterKit(heading 2·3, Link 포함 — `isAllowedUri` 로 http(s) 만, `rel`·`target` 강제; code·horizontalRule·underline 은 끔) + Image(`loading='lazy'`) + Youtube(`nocookie`, 640×360). 편집기와 서버 렌더가 같은 목록을 쓴다.
+- 렌더는 서버에서만: `renderRichTextHtml(doc)`(`server-only`) = `@tiptap/html` `generateHTML` → `sanitizeRichTextHtml`. sanitize 는 DOMPurify 화이트리스트(`RICH_TEXT_ALLOWED_TAGS`·`RICH_TEXT_ALLOWED_ATTRIBUTES`, class 불허) + 호출 범위로 한정한 훅(iframe 은 youtube(-nocookie).com/embed 프리픽스만, img·a 는 http(s) 만, a 에 `rel='noopener noreferrer' target='_blank'`). 결과는 `SanitizedRichTextHtml` 브랜드 타입이며 `features/editor/rich-text-content.tsx` 는 이 타입만 받는다.
+- 편집기 `features/editor/rich-editor.tsx` 는 순수 UI(`content`·`onChange`·`label`·`isUploadEnabled`·`isUploading`·`onUploadImage`). 툴바 14셀(ADR-0023 셀형), 링크·YouTube 는 `RichEditorUrlDialog`(useState, RHF 아님), 이미지는 위젯이 `useUploadImage('post')` 로 올린 URL 을 넣는다. `immediatelyRender: false`, `useEditorState` 로 툴바만 리렌더. `content` 는 초기값이라 문서를 바꾸려면 부모가 `key` 로 리마운트한다.
+- 스타일은 `app/globals.css` `@layer components .rich-text`(토큰 색만, blockquote·pre 는 `bg-muted`, iframe 은 16:9 반응형).

@@ -1,6 +1,6 @@
 # PROCESS — trip
 
-> 최종 갱신: 2026-09-09 · 대응 커밋: aab891f (로컬 dev, 세션 2 후반. prod 는 68c0ff1, 이 문서 커밋 뒤 push·prod 머지 예정)
+> 최종 갱신: 2026-09-09 · 대응 커밋: 로드맵 7 feat(editor) 커밋(세션 3 4단계, 이 문서와 같은 커밋, push·prod 머지됨)
 > 기준 문서: `~/.claude/convention/*.md`, `~/personal-llm/*.md`, `docs/HANDOFF.md`(세션 진입점), `docs/ARCHITECTURE.md`, `docs/acknowledge/README.md`, `docs/DESIGN.md`
 
 ## 완료 — 초기 구축 (2026-09-09, Phase 1~3)
@@ -39,8 +39,8 @@
 - [ ] 4단계. 로드맵 7 Tiptap·YouTube(ADR-0027) → 6 커뮤니티·프로필(대문·사진, ADR-0028). **세션 3 진행 중**
     - [x] 4-0. 컨텍스트 복원·문서-코드 대조(불일치 4건 보고: 문서 헤더 stale·auto-push false·dev 서버 PID 교체·Vercel CLI 구버전) → 질문 4건 추천안 승인 → ADR-0031, `llm-rules.auto-push true`
     - [x] 4-1. 의존성 고정: `@tiptap/{core,react,starter-kit,pm,extension-youtube,extension-link,extension-image,html}@3.31.3` + `isomorphic-dompurify@4.2.0`, `happy-dom` 을 dependencies 로(`npx bun@1.3.14 install`)
-    - [ ] 4-2. Workflow(ADR-0031): API 사실 확인(Sonnet, node_modules 1차 출처) → `shared/lib` 확장 목록·서버 렌더·sanitize·문서 검증 + 테스트(Opus max) → `features/editor` 에디터 UI + 테스트(Opus max) → 리뷰 3렌즈 보안·컨벤션·FSD(Opus high) → 확정 지적 수정(Opus max)
-    - [ ] 4-3. 메인 검증(typecheck·lint·prettier·test·build) → ADR-0027 구현 메모 → 문서 헤더 갱신 → 커밋 → push·prod 머지(화면 미연결, ADR-0031)
+    - [x] 4-2. Workflow(ADR-0031, run `wf_896d6110-973`, 에이전트 8·51분, 리뷰 17건 → 적용 14·오탐 1·범위 밖 2): API 사실 확인(Sonnet, node_modules 1차 출처) → `shared/lib` 확장 목록·서버 렌더·sanitize·문서 검증 + 테스트(Opus max) → `features/editor` 에디터 UI + 테스트(Opus max) → 리뷰 3렌즈 보안·컨벤션·FSD(Opus high) → 확정 지적 수정(Opus max)
+    - [x] 4-3. 메인 검증(typecheck·lint·prettier·test 305·build 통과, 범위 밖 지적 2건은 메인이 처리: `UPLOAD_DISABLED_HINT` shared 승격·ARCHITECTURE §2·§12) → ADR-0027 구현 메모 → 문서 헤더 갱신 → 커밋 → push·prod 머지(화면 미연결, ADR-0031)
     - [ ] 4-4. 로드맵 6 착수(ADR-0028): 마이그레이션 0006, admin 플러그인, `proxy.ts` `/` 리다이렉트 제거, 게시판·댓글·채택·포인트, 프로필. 게시글 화면에서 에디터 브라우저 실측(라이트·다크) 후 ADR-0027 추기
 - [ ] 5단계. 로드맵 4 AI(ADR-0029: Vercel Queues, 자기 키만, AES-GCM, `APP_ENCRYPTION_KEY` 없이 구현 후 키 등록 시 테스트)
 - [ ] 6단계. 로드맵 10 SEO·GEO·JSON-LD·Analytics·Speed Insights(ADR-0030)

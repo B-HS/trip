@@ -22,5 +22,7 @@ export const UPLOAD_IMAGE_ACCEPT = UPLOAD_IMAGE_MIME_TYPES.join(',')
 export const UPLOAD_KINDS = ['booking', 'avatar', 'banner', 'post'] as const
 export type UploadKind = (typeof UPLOAD_KINDS)[number]
 
+export const UPLOAD_DISABLED_HINT = '저장소가 설정되지 않았습니다.'
+
 export const UPLOAD_ATTACHMENT_KINDS = ['image', 'link'] as const
 export type UploadAttachmentKind = (typeof UPLOAD_ATTACHMENT_KINDS)[number]

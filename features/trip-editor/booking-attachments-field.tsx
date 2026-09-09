@@ -8,13 +8,11 @@ import type { UploadedImage } from '@/entities/upload/upload.type'
 import { EditorField } from '@/features/trip-editor/editor-field'
 import { EDITOR_INPUT_CLASS, EMPTY_TO_NULL } from '@/features/trip-editor/editor-form'
 import type { BookingsFormInput, BookingsFormValues } from '@/features/trip-editor/editor-schema'
-import { UPLOAD_IMAGE_ACCEPT } from '@/shared/constant/upload'
+import { UPLOAD_DISABLED_HINT, UPLOAD_IMAGE_ACCEPT } from '@/shared/constant/upload'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 
 const EMPTY_LINK_ATTACHMENT = { kind: 'link', url: '', label: null, uploadId: null } as const
-
-const UPLOAD_DISABLED_HINT = '저장소가 설정되지 않았습니다.'
 
 type BookingAttachmentsFieldProps = {
     bookingIndex: number

@@ -1,6 +1,6 @@
 # 데이터 모델 — trip
 
-> 최종 갱신: 2026-09-09 · 대응 커밋: aab891f (로컬 dev, 마이그레이션 0000~0005 적용됨, 테이블 26개 + 이력 테이블) · 구조 전체는 `docs/ARCHITECTURE.md`
+> 최종 갱신: 2026-09-09 · 대응 커밋: 세션 3 4단계 로드맵 7 커밋(스키마 변경 없음, 마이그레이션 0000~0005 적용됨, 테이블 26개 + 이력 테이블) · 구조 전체는 `docs/ARCHITECTURE.md`
 
 > 정본은 `shared/db/schema/{auth,trip}.ts`. 이 문서는 읽기용 요약이다. 모든 테이블은 `trip_` 프리픽스(`shared/db/table.ts` 의 `tripTable`).
 
