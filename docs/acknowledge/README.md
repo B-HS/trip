@@ -33,3 +33,4 @@
 - [ADR-0026 — 이미지 업로드는 서버 경유 R2 저장, 3MB 제한 (2026-09-09)](0026-r2-server-upload.md)
 - [ADR-0027 — 게시글 에디터는 Tiptap 3, YouTube 는 공식 확장 (2026-09-09)](0027-tiptap-editor-with-youtube.md)
 - [ADR-0028 — 커뮤니티 홈·게시판·포인트·프로필(대문·사진) (2026-09-09)](0028-community-and-profile.md)
+- [ADR-0029 — AI 작업은 Vercel Queues, 키는 사용자 소유·암호화 저장 (2026-09-09)](0029-ai-jobs-on-vercel-queues.md)

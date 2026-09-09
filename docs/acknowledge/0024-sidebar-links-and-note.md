@@ -8,7 +8,7 @@
 
 - 테이블 `trip_sidebar_link`(id, trip_id FK cascade, sort_order, label 80, url 500, description 200 NULL) 를 추가한다(마이그레이션). `trip_trip` 에 `sidebar_note` text NULL 을 추가해 제목 블록 아래에 자유 소개 문구를 보여 준다.
 - 뷰어 사이드바: 소개 문구는 기간 줄 아래, 링크 목록은 숙소 아래 "링크" 섹션(라벨 + 설명, 외부 링크 아이콘, `target='_blank' rel='noopener noreferrer'`). 인쇄 트리에도 같은 섹션.
-- 편집기: 새 탭 `sidebar`("사이드바") 에 소개 문구 textarea 와 링크 목록(`SortableRows` 정렬, 추가·삭제, URL 은 `z.url()` 검증 + `https?` 만). 저장은 다른 탭과 같이 reconcile(`saveSidebarLinks`) + `updateTripBasics` 확장(`sidebarNote`).
+- 편집기: 새 탭 `sidebar`("사이드바") 에 소개 문구 textarea 와 링크 목록(`SortableRows` 정렬, 추가·삭제, URL 은 `z.url()` 검증 + `https?` 만). 저장은 별도 액션 `saveSidebarAction` → `saveSidebar`(한 트랜잭션에서 `sidebar_note` 갱신 + 링크 reconcile). 기본 정보 탭은 바뀌지 않는다(`tripBasicsFieldsSchema` 가 두 필드를 omit).
 - 템플릿 JSON(`tripTemplateSchema`) 에 `sidebarNote`·`sidebarLinks` 를 선택 필드로 추가해 내보내기·가져오기·시드가 함께 다룬다. 오사카 템플릿은 원본 HTML 의 링크가 없으므로 빈 배열.
 - 권한은 편집(owner·editor). 공개 페이지에도 노출된다(링크는 공개 정보로 본다).
 
