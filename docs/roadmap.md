@@ -30,6 +30,7 @@
   - Anthropic: `GET https://api.anthropic.com/v1/models`(버전 헤더 포함)
   - Ollama Cloud: Ollama 공식 API 의 모델 목록 엔드포인트(구현 직전 공식 문서로 재확인)
   - 목록·capability 는 서버에서 캐시(짧은 TTL)하고, 클라이언트 선택값은 서버에서 프로바이더·모델 소속을 재검증한다.
+- **추론 강도(reasoning effort)**: 모델별로 지원하는 추론 강도 옵션을 정확히 표시·선택할 수 있어야 한다. 프로바이더·모델마다 다르므로(예: OpenAI reasoning 모델의 `reasoning.effort` low/medium/high 계열, Anthropic 의 extended thinking·budget 계열, Ollama 모델의 think 옵션 등) 하드코딩하지 말고 각 프로바이더 공식 문서·모델 메타데이터에서 지원 여부와 허용 값을 확인해 모델 선택 시 동적으로 노출하고, 미지원 모델에는 표시하지 않는다. 서버에서 선택값을 재검증한다.
 - **과금**: 무료 한도(서비스 키로 제공, 사용자·일 단위 쿼터) + 사용자가 자신의 API 키를 등록하면 그 키로 무제한. 키는 서버 측 암호화 저장, API·로그·UI 에 원문 미노출, 교체·삭제 UI 제공.
 - **장시간 작업**: 요청은 job 으로 DB 에 저장 후 즉시 응답, 서버 worker 가 처리하고 결과를 메시지로 저장. 대화 전환·연결 끊김과 무관하게 완료된다. UI 는 polling 으로 갱신.
 - 대화·메시지·usage(프로바이더·모델·토큰) 를 사용자별로 영속 저장. 일정 수정은 diff 미리보기 후 적용(기존 server action 재사용).
