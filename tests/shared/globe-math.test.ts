@@ -1,13 +1,14 @@
 import { describe, expect, test } from 'bun:test'
-import { Vector3 } from 'three'
+import { Euler, Vector3 } from 'three'
 import {
+    airportsFacingRotation,
     buildGlobeArc,
     collectGlobeAirports,
     describeGlobeRoutes,
     formatGlobeRouteLabel,
+    globeFacingRotation,
     greatCircleArc,
     latLngToVector3,
-    longitudeFacingRotation,
     resolveGlobeRoutes,
 } from '@/shared/ui/three/globe-math'
 
@@ -46,12 +47,43 @@ describe('latLngToVector3', () => {
     })
 })
 
-describe('longitudeFacingRotation', () => {
-    test('회전을 적용하면 해당 경도가 +z 를 향한다', () => {
-        const longitude = 126.4407
-        const point = latLngToVector3(0, longitude, 1).applyAxisAngle(new Vector3(0, 1, 0), longitudeFacingRotation(longitude))
-        expect(point.z).toBeCloseTo(1, PRECISION)
-        expect(point.x).toBeCloseTo(0, PRECISION)
+describe('globeFacingRotation', () => {
+    test('회전을 적용하면 해당 방향이 +z 를 향한다', () => {
+        const direction = latLngToVector3(37.4602, 126.4407, 1)
+        const rotation = globeFacingRotation(direction)
+        const faced = direction.clone().applyEuler(new Euler(rotation.x, rotation.y, 0))
+        expect(faced.z).toBeCloseTo(1, PRECISION)
+        expect(faced.x).toBeCloseTo(0, PRECISION)
+        expect(faced.y).toBeCloseTo(0, PRECISION)
+    })
+
+    test('적도 위 지점은 y 회전만 필요하다', () => {
+        expect(globeFacingRotation(latLngToVector3(0, -73.7781, 1)).x).toBeCloseTo(0, PRECISION)
+    })
+})
+
+describe('airportsFacingRotation', () => {
+    test('공항들의 평균 방향이 카메라를 향한다', () => {
+        const airports = collectGlobeAirports(resolveGlobeRoutes([{ from: 'ICN', to: 'KIX' }]))
+        const rotation = airportsFacingRotation(airports)
+        const centroid = airports
+            .reduce((total, airport) => total.add(latLngToVector3(airport.lat, airport.lng, 1)), new Vector3())
+            .normalize()
+            .applyEuler(new Euler(rotation.x, rotation.y, 0))
+        expect(centroid.z).toBeCloseTo(1, PRECISION)
+        expect(centroid.x).toBeCloseTo(0, PRECISION)
+        expect(centroid.y).toBeCloseTo(0, PRECISION)
+    })
+
+    test('공항이 하나면 그 공항이 정면에 온다', () => {
+        const [airport] = collectGlobeAirports(resolveGlobeRoutes([{ from: 'JFK', to: 'LHR' }]))
+        const rotation = airportsFacingRotation([airport])
+        const faced = latLngToVector3(airport.lat, airport.lng, 1).applyEuler(new Euler(rotation.x, rotation.y, 0))
+        expect(faced.z).toBeCloseTo(1, PRECISION)
+    })
+
+    test('공항이 없거나 방향이 상쇄되면 회전하지 않는다', () => {
+        expect(airportsFacingRotation([])).toEqual({ x: 0, y: 0 })
     })
 })
 
