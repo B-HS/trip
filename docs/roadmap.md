@@ -68,7 +68,15 @@
 - 현재 목록 카드·통계는 시작일~종료일 차이로 "7일"만 계산해 보여준다. 실제 여행은 "7박 5일"(시차·야간 비행), "0박 2일"(당일·새벽 귀국) 처럼 박·일이 날짜 차이와 다를 수 있다.
 - 트립에 `nights`·`days` 정수 필드(선택)를 두고, 비어 있으면 날짜 차이로 자동 계산(시작일~종료일 → N박 N+1일)하되 사용자가 편집기 기본 정보에서 덮어쓸 수 있게 한다. 카드·뷰어 사이드바·통계 타일·템플릿 JSON·시드가 같은 값을 쓴다. 기존 `periodNote`(예: "6박 7일 · 예비일 하루")는 자유 문구로 유지하고, 표기 우선순위(커스텀 박/일 → 자동 계산)를 acknowledge 에 기록한다.
 
+## 10. SEO·GEO·JSON-LD·Vercel Analytics/Speed Insights
+
+- **SEO**: 라우트별 `generateMetadata`(title template·description·canonical·robots), `app/sitemap.ts`(정적 페이지 + 공개 트립 `/s/[slug]`), `app/robots.ts`, Open Graph·Twitter 카드(공개 트립은 `app/s/[slug]/opengraph-image.tsx` 로 동적 OG 이미지 — 제목·기간·목적지), `hreflang`/`lang='ko'` 유지, 시맨틱 헤딩 계층 점검, 이미지 `alt`.
+- **GEO(생성형 엔진 최적화)**: 공개 트립·게시글을 AI 검색이 인용하기 쉽도록 명확한 요약 문단·구조화 목록·정확한 날짜/장소 표기, `llms.txt`(사이트 개요·주요 공개 URL) 제공, 본문 텍스트가 초기 HTML 에 포함되도록(현재 SSR 유지) 보장.
+- **JSON-LD**: `WebSite`·`Organization`(루트), 공개 트립은 `TouristTrip` + `itemListElement`(일정)·`Place`(목적지·숙소)·`Flight`(항공편) 조합, 게시판 글은 `Article`/`QAPage`(질문·채택 답변), 사용자 페이지는 `ProfilePage`. `<script type="application/ld+json">` 은 `</script>` 이스케이프 처리 후 주입(sanitize 예외 정책 유지).
+- **Vercel Analytics**: 이미 `@vercel/analytics` 를 루트 레이아웃에 마운트했다. 커스텀 이벤트(트립 생성·예시 생성·공유 링크 복사·즐겨찾기) 를 `track()` 으로 추가하고, 개인정보(이메일·트립 내용)는 이벤트에 넣지 않는다.
+- **Vercel Speed Insights**: `@vercel/speed-insights` 추가·마운트, Core Web Vitals 를 배포 후 확인하고 지구본(three) 청크·이미지·폰트 로딩을 기준으로 개선한다(성능 예산을 acknowledge 에 기록).
+
 ## 우선순위·전제
 
-- 순서는 사용자가 정한다(현재 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 순으로 기록).
+- 순서는 사용자가 정한다(현재 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 순으로 기록).
 - 착수 전 각 항목마다 `docs/acknowledge` 에 스택·정책 합의를 먼저 남기고, `docs/PROCESS.md` 체크리스트로 진행한다.

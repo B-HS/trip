@@ -21,7 +21,7 @@
 - [ ] 13-old. 검증 — typecheck·lint·test·build 통과. 브라우저: 인트로(라이트·다크)·회원가입·목록·예시 생성·뷰어(체크·뷰 전환·다크)·편집기(다크) 확인 완료. 남은 확인: 공유 페이지 `/s/[slug]`, 편집기 저장·정렬, 인쇄 미리보기, 모바일 시트
 - [ ] 14. 문서 — docs/memory(데이터 모델·환경변수), docs/history, docs/quality-assurance 체크리스트
 
-- [ ] 16. 다음 페이즈(미착수, 사용자 기획): 사이드바 링크·설명 커스터마이징 / 예매 첨부(이미지·링크) / OSM 지도·현재 위치 / AI 질문답·수정(Ollama Cloud·OpenAI·Claude, 모델 목록·추론 강도 동적 로드, models.dev 금지) / 일정 종류 배지 커스터마이징(현재 3종 하드코딩) / 커뮤니티(메인=커뮤니티 홈, 공개 트립 탐색·좋아요·이번 주/달 플랜, 자유·질문게시판·답변 포인트, 사용자 페이지) / Naver·GitHub OAuth·회원가입 약관·여행 후기 게시판·Tiptap+shadcn 에디터(YouTube embed) / 셀형 액션 UI 전면 적용 / 몇박 몇일 커스텀 표기 → `docs/roadmap.md`
+- [ ] 16. 다음 페이즈(미착수, 사용자 기획): 사이드바 링크·설명 커스터마이징 / 예매 첨부(이미지·링크) / OSM 지도·현재 위치 / AI 질문답·수정(Ollama Cloud·OpenAI·Claude, 모델 목록·추론 강도 동적 로드, models.dev 금지) / 일정 종류 배지 커스터마이징(현재 3종 하드코딩) / 커뮤니티(메인=커뮤니티 홈, 공개 트립 탐색·좋아요·이번 주/달 플랜, 자유·질문게시판·답변 포인트, 사용자 페이지) / Naver·GitHub OAuth·회원가입 약관·여행 후기 게시판·Tiptap+shadcn 에디터(YouTube embed) / 셀형 액션 UI 전면 적용 / 몇박 몇일 커스텀 표기 / SEO·GEO·JSON-LD·Vercel Analytics·Speed Insights → `docs/roadmap.md`
 - [x] 15. Phase 3 — 목적지(나라) 지정 + 지구본 연동, 즐겨찾기 + 레일 트립 목록, 보더 없는 폼 컨트롤, 모션 줄이기 토글, QA 체크리스트(7ac95d6). 브라우저 확인 진행 중
 
 ### 진행 메모
