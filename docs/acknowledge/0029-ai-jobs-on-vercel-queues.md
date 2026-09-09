@@ -30,3 +30,4 @@
 
 - 로컬 개발에서 Queues 는 `vercel link` 와 `vercel env pull`(OIDC 토큰) 이 필요하다. Vercel CLI 를 최신으로 올리고 이 프로젝트를 링크하는 것은 사용자 작업.
 - `APP_ENCRYPTION_KEY` 는 Vercel 환경변수에도 같은 값으로 등록해야 한다(사용자 작업, 값은 문서에 기록하지 않는다).
+- 사용자 결정(세션 2 후반): **키 없이 먼저 구현**한다. `APP_ENCRYPTION_KEY` 가 없으면 `/settings/ai` 의 키 등록·AI 기능을 비활성화하고 "암호화 키 미설정" 안내를 보여 주며, 사용자가 `.env` 와 Vercel 에 키를 넣은 뒤 테스트한다. `.env.example` 에는 키 이름만 둔다.
