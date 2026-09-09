@@ -18,7 +18,7 @@
 ### 완료 (코드·문서에 반영됨)
 
 - 스캐폴딩·기반: `package.json`(bun 스크립트 `dev/build/lint/typecheck/format/test/db:generate/db:migrate/db:seed`), `next.config.ts`(reactCompiler, typedRoutes, agentRules false, 보안 헤더, cacheComponents 없음), `app/globals.css`(DESIGN §16-1/16-2 토큰, `.surface-public`), `app/layout.tsx`(Theme·Motion·Query·Tooltip·Toaster·Analytics), `app/template.tsx`(페이지 fade), `proxy.ts`(세션 쿠키 게이팅).
-- DB: `shared/db/schema/{auth,trip}.ts` 21 테이블(`trip_` 프리픽스), `drizzle/0000_*.sql`·`0001_*.sql` 적용(MySQL 9.6, 스키마 `trip`), `scripts/migrate.ts`(drizzle `logger:false` 우회), `scripts/seed.ts`.
+- DB: `shared/db/schema/{auth,trip}.ts` 22 테이블(`trip_` 프리픽스), `drizzle/0000_*.sql`·`0001_*.sql` 적용(MySQL 9.6, 스키마 `trip`), `scripts/migrate.ts`(drizzle `logger:false` 우회), `scripts/seed.ts`.
 - 인증: `shared/lib/auth.ts`(이메일·비밀번호 + username, cookiePrefix `trip`, 초대 자동 수락 hook), `shared/lib/auth-client.ts`, `shared/lib/session.ts`, `app/api/auth/[...all]/route.ts`, `widgets/auth/*`, `features/auth/*`, `entities/auth/*`.
 - 데이터 계층: `entities/trip/*`(type·validate·role·access·tag·repository×4·cache·action·api·query·prefetch), `entities/user-state/*`, `app/api/trips/**`(list·favorites·detail·members·user-state GET).
 - 화면: 인트로 `app/(public)/page.tsx` + `widgets/intro`·`features/intro`; 앱 셸 `widgets/app-shell/app-shell.tsx` + `features/app-shell/*`(레일·즐겨찾기·사용자 메뉴·모션 토글); 목록 `app/(app)/trips/page.tsx` + `widgets/trips/*`·`features/trips/*`; 새 트립 `app/(app)/trips/new/page.tsx`; 뷰어 `app/(app)/trips/[tripId]/page.tsx` + `widgets/trip-viewer/trip-viewer-widget.tsx` + `features/trip-viewer/*`(사이드바·뷰 탭·날짜 탭·day-panel·schedule-row·bookings·info·인쇄 트리); 편집기 `app/(app)/trips/[tripId]/edit/page.tsx` + `widgets/trip-editor/*`·`features/trip-editor/*`; 공개 공유 `app/(public)/s/[slug]/page.tsx`; 404 `app/not-found.tsx`.
@@ -79,7 +79,7 @@
 
 - Node 22 / Bun 1.4.0 로컬(락파일은 v1, `packageManager bun@1.3.14`), pnpm 미사용. `bun install --frozen-lockfile` 통과.
 - 실행: `bun run dev`(:3000) · `bun run build` · `bun run db:generate && bun run db:migrate`(마이그레이션은 사용자의 MySQL 에 직접 적용됨) · `bun run db:seed`(SEED_OWNER_EMAIL 가입 후).
-- DB: MySQL 9.6, 스키마 `trip`, 테이블 21개 + `trip___drizzle_migrations`. 로컬 검증 계정 tester@example.com(사용자명 tester), 예시 트립 1개.
+- DB: MySQL 9.6, 스키마 `trip`, 테이블 22개 + `trip___drizzle_migrations`. 로컬 검증 계정 tester@example.com(사용자명 tester), 예시 트립 1개.
 - 참조 원본: `docs/DESIGN.md`(flunti-otel 디자인 시스템, 사용자 해석이 우선), `docs/osaka-trip-interactive.html`(데이터 정본). Calendar 레포 클론은 스크래치패드에만 있었음(재클론 필요 시 `https://github.com/B-HS/Calendar`).
 - 브라우저 검증은 Claude in Chrome(localhost:3000). Google Maps API 키·메일 서버 없음.
 
@@ -94,7 +94,7 @@
 
 - `docs/HANDOFF.md` — 이 문서(세션 진입점)
 - `docs/ARCHITECTURE.md` — 스택·폴더·라우트·인증·데이터 계층·인가·계층/모션·3D·템플릿·검증(정본)
-- `docs/memory/data-model.md` — 21 테이블 요약과 원본 HTML 대응
+- `docs/memory/data-model.md` — 22 테이블 요약과 원본 HTML 대응
 - `docs/acknowledge/README.md` + `ADR-0001~0016` — 결정·이유·기각 대안
 - `docs/roadmap.md` — 다음 페이즈 계획 10건(미착수)
 - `docs/PROCESS.md` — 체크리스트·진행 메모

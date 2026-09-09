@@ -5,7 +5,7 @@
 
 ## 1. 스택
 
-Next 16.3.4(App Router, React Compiler, `typedRoutes`, `agentRules: false`; **`cacheComponents` 는 끔** — 초기 스켈레톤 금지 결정, ADR-0010) · React 19.2 · Tailwind 4 + shadcn 4(`radix-vega`, 55개 전부 `shared/ui`) · drizzle-orm 0.45(`mysql2`, MySQL 9.6 스키마 `trip`) · better-auth 1.7(이메일·비밀번호 + `username` 플러그인) · TanStack Query 5 · zod 4 · react-hook-form 7 · motion 13 · three 0.186 + @react-three/fiber 9 + drei 10 + world-atlas·topojson-client·d3-geo · @dnd-kit · lucide-react · dayjs · sonner · next-themes. 런타임·패키지 매니저·테스트 러너는 **bun**(락파일은 v1, `packageManager: bun@1.3.14` — ADR-0013).
+Next 16.3.4(App Router, React Compiler, `typedRoutes`, `agentRules: false`; **`cacheComponents` 는 끔** — 초기 스켈레톤 금지 결정, ADR-0010) · React 19.2 · Tailwind 4 + shadcn 4(`radix-vega`, 55개 전부 `shared/ui`) · drizzle-orm 0.45(`mysql2`, MySQL 9.6 스키마 `trip`) · better-auth 1.7(이메일·비밀번호 + `username` 플러그인) · TanStack Query 5 · zod 4 · react-hook-form 7 · motion 13 · three 0.186 + @react-three/fiber 9 + drei 10 + world-atlas·topojson-client·d3-geo · @dnd-kit · lucide-react · dayjs · sonner · next-themes · `cn` 0.2(컴파일된 clsx+tailwind-merge 대체 머저 — `shared/lib/utils.ts` 가 재export하고 shadcn 파일 51개는 `'cn'` 을 직접 import). 런타임·패키지 매니저·테스트 러너는 **bun**(락파일은 v1, `packageManager: bun@1.3.14` — ADR-0013).
 
 ## 2. 폴더 (변형 FSD, `src/` 없음)
 
@@ -26,13 +26,13 @@ entities/
   auth/     auth.validate · auth.error
 shared/
   db/       client.ts(mysql2 풀 싱글턴) · table.ts(`trip_` creator) · schema/{auth,trip}.ts · schema.ts(합성) · accept-invites.ts(가입 시 초대 수락)
-  lib/      env.ts(getEnv) · auth.ts(getAuth) · auth-client.ts · session.ts · api-response.ts · action-result.ts · fetch.ts(clientFetch) · query-client.ts · query-provider.tsx · motion.ts · trip-template.ts · utils.ts(cn)
+  lib/      env.ts(getEnv) · auth.ts(getAuth) · auth-client.ts · session.ts · api-response.ts · action-result.ts · fetch.ts(clientFetch) · query-client.ts · query-provider.tsx · motion.ts · trip-template.ts · utils.ts(npm `cn` 재export)
   hooks/    use-mobile · use-motion-preference · use-unsaved-changes
   constant/ trip.ts · auth.ts · site.ts · query.ts · query-key.ts · airports.ts · countries.ts · marketing.ts · template/osaka.ts
   ui/       shadcn 55개 + theme-provider · theme-toggle · motion-provider · motion/(7 프리미티브) · three/(지구본)
 tests/    bun test 미러 구조(entities · features · shared · widgets) + setup.ts(happy-dom)
 scripts/  migrate.ts · seed.ts
-drizzle/  0000(초기 19 테이블) · 0001(destination·favorite) + meta
+drizzle/  0000(초기 20 테이블) · 0001(destination·favorite) + meta
 docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · acknowledge/ · memory/ · history/ · feedback/ · quality-assurance/ · DESIGN.md · osaka-trip-interactive.html
 ```
 
