@@ -32,7 +32,7 @@ export const ViewTabs: FC<ViewTabsProps> = ({ activeView, onSelect }) => (
                     <motion.span
                         aria-hidden
                         layoutId={VIEW_INDICATOR_LAYOUT_ID}
-                        className='absolute inset-0 -z-10 bg-sidebar-accent'
+                        className='absolute inset-0 -z-10 bg-accent'
                         transition={{ duration: MOTION_FADE_DURATION, ease: MOTION_EASE_STANDARD }}
                     />
                 )}

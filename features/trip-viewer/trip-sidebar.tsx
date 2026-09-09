@@ -37,7 +37,7 @@ export const TripSidebar: FC<TripSidebarProps> = ({
     verifiedOn,
     isPrintLayout = false,
 }) => (
-    <aside className={cn('flex flex-col gap-3 bg-sidebar p-3 text-sidebar-foreground', isPrintLayout && 'break-inside-avoid')}>
+    <aside className={cn('flex flex-col gap-3 bg-card p-3 text-card-foreground', isPrintLayout && 'break-inside-avoid')}>
         <div>
             {eyebrow && <p className='text-2xs font-medium tracking-wide text-muted-foreground'>{eyebrow}</p>}
             <h1 className='mt-2 text-2xl leading-tight font-semibold tracking-tight break-keep text-foreground'>{title}</h1>

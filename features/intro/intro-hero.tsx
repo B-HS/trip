@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
+import { motion, useScroll, useTransform } from 'motion/react'
 import Link from 'next/link'
 import { type FC, useRef } from 'react'
 import { INTRO_HERO } from '@/shared/constant/marketing'
@@ -8,6 +8,7 @@ import { Button } from '@/shared/ui/button'
 import { FadeIn } from '@/shared/ui/motion/fade-in'
 import { TextReveal } from '@/shared/ui/motion/text-reveal'
 import { TripGlobeLazy } from '@/shared/ui/three/trip-globe-lazy'
+import { useReducedMotionPreference } from '@/shared/hooks/use-motion-preference'
 
 const SCROLL_RANGE = [0, 1]
 const GLOBE_PARALLAX_DISTANCE = 56
@@ -18,7 +19,7 @@ const NOTE_DELAY = 0.42
 
 export const IntroHero: FC = () => {
     const sectionRef = useRef<HTMLElement>(null)
-    const prefersReducedMotion = useReducedMotion()
+    const prefersReducedMotion = useReducedMotionPreference()
     const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] })
     const globeOffsetY = useTransform(scrollYProgress, SCROLL_RANGE, [NO_PARALLAX, prefersReducedMotion ? NO_PARALLAX : GLOBE_PARALLAX_DISTANCE])
 

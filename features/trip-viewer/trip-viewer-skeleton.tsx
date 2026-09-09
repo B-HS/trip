@@ -9,7 +9,7 @@ const range = (length: number) => Array.from({ length }, (_, index) => index)
 
 export const TripViewerSkeleton: FC = () => (
     <div className='grid w-full grid-cols-1 gap-px bg-background md:grid-cols-[16rem_minmax(0,1fr)]'>
-        <div className='flex flex-col gap-3 bg-sidebar p-3'>
+        <div className='flex flex-col gap-3 bg-card p-3'>
             <Skeleton className='h-3 w-28 rounded-none' />
             <Skeleton className='h-8 w-40 rounded-none' />
             <Skeleton className='h-4 w-32 rounded-none' />

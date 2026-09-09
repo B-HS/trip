@@ -74,7 +74,7 @@ export const AppShell: FC<AppShellProps> = ({ user, defaultCollapsed = false, ch
     useEffect(() => writeSidebarState(isCollapsed), [isCollapsed])
 
     return (
-        <div className='flex h-dvh min-h-0 w-full flex-col md:flex-row print:h-auto print:overflow-visible'>
+        <div className='flex h-dvh min-h-0 w-full flex-col bg-background md:flex-row print:h-auto print:overflow-visible'>
             {isMobile ? (
                 <>
                     <div className='print:hidden'>
@@ -115,7 +115,7 @@ export const AppShell: FC<AppShellProps> = ({ user, defaultCollapsed = false, ch
                 </motion.aside>
             )}
             <div className='flex min-h-0 min-w-0 flex-1 flex-col gap-px bg-background'>
-                <main className='min-h-0 min-w-0 flex-1 overflow-auto p-3 print:overflow-visible print:p-0'>{children}</main>
+                <main className='min-h-0 min-w-0 flex-1 overflow-auto print:overflow-visible'>{children}</main>
             </div>
         </div>
     )

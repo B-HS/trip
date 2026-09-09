@@ -16,7 +16,7 @@ export const DaySummaryTable: FC<DaySummaryTableProps> = ({ days }) => (
         <TableHeader>
             <TableRow>
                 {COLUMN_LABELS.map((label) => (
-                    <TableHead key={label} scope='col' className='h-auto bg-sidebar p-2 text-xs font-medium text-muted-foreground'>
+                    <TableHead key={label} scope='col' className='h-auto bg-muted p-2 text-xs font-medium text-muted-foreground'>
                         {label}
                     </TableHead>
                 ))}

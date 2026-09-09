@@ -11,6 +11,7 @@ const SECURITY_HEADERS = [
 
 const nextConfig: NextConfig = {
     reactCompiler: true,
+    agentRules: false,
     cacheComponents: true,
     typedRoutes: true,
     serverExternalPackages: ['mysql2'],

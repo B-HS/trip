@@ -122,10 +122,10 @@ export const DayPanel: FC<DayPanelProps> = ({
                     <Table className='text-xs'>
                         <TableHeader>
                             <TableRow>
-                                <TableHead scope='col' className='h-auto w-40 bg-sidebar p-2 text-xs font-medium text-muted-foreground'>
+                                <TableHead scope='col' className='h-auto w-40 bg-muted p-2 text-xs font-medium text-muted-foreground'>
                                     항목
                                 </TableHead>
-                                <TableHead scope='col' className='h-auto bg-sidebar p-2 text-xs font-medium text-muted-foreground'>
+                                <TableHead scope='col' className='h-auto bg-muted p-2 text-xs font-medium text-muted-foreground'>
                                     확인된 내용
                                 </TableHead>
                             </TableRow>

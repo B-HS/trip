@@ -208,7 +208,7 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
                                 />
                                 <TripLegend />
                                 {trip.bufferPolicy && (
-                                    <p className='bg-sidebar px-3 py-2 text-xs break-keep text-muted-foreground'>{trip.bufferPolicy}</p>
+                                    <p className='bg-muted px-3 py-2 text-xs break-keep text-muted-foreground'>{trip.bufferPolicy}</p>
                                 )}
                             </>
                         )}

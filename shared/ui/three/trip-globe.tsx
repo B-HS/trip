@@ -1,12 +1,12 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { useReducedMotion } from 'motion/react'
 import { type FC, useEffect, useRef, useState } from 'react'
 import { cn } from '@/shared/lib/utils'
 import { describeGlobeRoutes, formatGlobeRouteLabel, type GlobeRouteInput, resolveGlobeRoutes } from '@/shared/ui/three/globe-math'
 import { GLOBE_VARIANT_CONFIG, type GlobeVariant } from '@/shared/ui/three/globe-variant'
 import { TripGlobeScene } from '@/shared/ui/three/trip-globe-scene'
+import { useReducedMotionPreference } from '@/shared/hooks/use-motion-preference'
 
 const DPR_RANGE: [number, number] = [1, 1.5]
 const CAMERA_POSITION_X = 0
@@ -25,7 +25,7 @@ export const TripGlobe: FC<TripGlobeProps> = ({ routes, variant = 'hero', intera
     const [isVisible, setIsVisible] = useState(true)
     const config = GLOBE_VARIANT_CONFIG[variant]
     const resolvedRoutes = resolveGlobeRoutes(routes)
-    const prefersReducedMotion = useReducedMotion()
+    const prefersReducedMotion = useReducedMotionPreference()
     const isAnimated = !prefersReducedMotion && isVisible
     const frameloop = prefersReducedMotion ? 'demand' : isVisible ? 'always' : 'never'
 
