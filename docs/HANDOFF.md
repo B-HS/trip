@@ -1,6 +1,6 @@
 # HANDOFF — 2026-09-09 세션 2 종료 스냅샷
 
-> 대응 커밋: 이 문서 커밋 직전 코드 커밋 `aab891f`(로컬 dev). 이 문서 커밋 뒤 `dev` 를 push 하고 `prod` 로 빨리감기(ff) 머지한다(자동 승인, ADR-0022). 이 문서는 새 세션의 단일 진입점이며 매 핸드오프마다 덮어쓴다.
+> 대응 커밋: `4976c31`(origin/dev = origin/prod, Vercel 배포·확인 완료). 마지막 코드 커밋은 공개 페이지 캐시 키 버전 수정(`fix(share)`), 그 앞이 `aab891f`(R2 업로드). 이 문서는 새 세션의 단일 진입점이며 매 핸드오프마다 덮어쓴다.
 > 복기 신뢰도: 세션 2 전체 대화 기준. Opus 서브에이전트 8건(원인 분석 1, 리서치 2, 구현 5)은 최종 보고서 기준이며 결과는 메인이 브라우저·API 로 재검증했다.
 
 ## 1. 프로젝트 한 줄 정의
@@ -27,7 +27,8 @@
 - `ffb5aee` 일정 종류 테이블 `trip_schedule_kind` + `kind_id` + 편집기 "일정 종류" 탭(ADR-0025, 마이그레이션 0004 에 데이터 이관 SQL 포함, `kind` enum 컬럼 삭제).
 - `aab891f` 서버 경유 R2 업로드 `/api/uploads` + 예매 첨부(ADR-0026, 마이그레이션 0005, `@aws-sdk/client-s3`). `eslint.config.mjs` 에 `.claude/**` 무시.
 - 문서 커밋들: ADR-0020~0030, 리서치 메모, PROCESS·ARCHITECTURE·data-model·roadmap·history·QA 체크리스트.
-- prod 배포 확인: `68c0ff1`(1·2단계 앞부분) 까지 `trip.gumyo.net` 에서 확인(`/s/osaka-qa` 에 "6박 7일"). `ffb5aee`·`aab891f` 는 이 문서 커밋과 함께 push·배포 예정 — **마이그레이션 0004 가 `kind` 컬럼을 지웠으므로 prod 가 `68c0ff1` 인 동안 뷰어·편집기가 깨진다. 새 세션 첫 작업은 push·prod 머지·배포 확인.**
+- `4976c31` 공개 페이지 `unstable_cache` 키에 `PUBLIC_TRIP_CACHE_VERSION` 추가. 배포 직후 `/s/osaka-qa` 가 옛 캐시 형태로 약 10분 500 이었던 장애의 수정(`docs/bug/…` 추가 절). `PublicTrip` 형태가 바뀌는 배포마다 값을 올린다.
+- prod 배포 확인: `4976c31` 이 `trip.gumyo.net` 에 배포됨 — `/`·`/login`·`/signup` 200, `/trips` 307, `/s/osaka-qa` 200("6박 7일", 범례 3종), `/api/uploads` POST 401(미로그인).
 
 ### 진행 중
 
@@ -35,7 +36,7 @@
 
 ### 미착수 (순서대로)
 
-1. **push + prod ff 머지 + 배포 확인**(`/`·`/login`·`/signup` 200, `/trips` 307, `/s/osaka-qa` 200 에 "링크"·범례).
+1. (완료) push·prod 머지·배포 확인은 세션 2 말미에 끝냈다. 새 세션은 2번부터.
 2. 4단계 로드맵 7: Tiptap 3.31 고정 버전, `features/editor/rich-editor.tsx`(순수 UI, 툴바 셀), 공식 YouTube 확장(nocookie), 서버 `generateHTML` + DOMPurify iframe 화이트리스트 훅, `happy-dom` 을 dependencies 로(ADR-0027). 이미지 업로드는 `useUploadImage('post')` 재사용.
 3. 4단계 로드맵 6: 커뮤니티 홈(`/` 로그인 시 커뮤니티, 인트로 유지 + 공개 섹션), `/explore`·좋아요, 게시판 3종(free·qna·review)·댓글·채택·포인트(+2/+10), better-auth `admin` 플러그인 `role`, 프로필 `/u/[username]`·`/settings/profile`(대문·사진 업로드, 소개), 인가 표 확장(ADR-0028). 마이그레이션 0006.
 4. 5단계 로드맵 4: Vercel Queues(`@vercel/queue`, `vercel.json` `experimentalTriggers`), `trip_ai_*` 테이블, AI SDK v7 + `@ai-sdk/openai`·`anthropic`·`openai-compatible`(Ollama Cloud), 사용자 키 AES-256-GCM(`APP_ENCRYPTION_KEY` 없으면 기능 비활성 + 안내), 모델 목록 동적, 추론 강도, `generateObject` 로 일정 수정 제안 + diff 승인(ADR-0029).
@@ -90,11 +91,10 @@
 
 ## 8. 다음 세션 TODO (우선순위 순)
 
-1. `git push origin dev` → `prod` ff 머지 → push → Vercel 배포 확인(마이그레이션 0004 로 인해 이전 배포는 깨져 있음).
-2. 로드맵 7 Tiptap + YouTube 구현(ADR-0027) — Opus 에이전트, 워크트리 가능.
-3. 로드맵 6 커뮤니티·프로필(ADR-0028) — 마이그레이션 0006, `proxy.ts` `/` 리다이렉트 제거, admin 플러그인.
-4. 로드맵 4 AI(ADR-0029), 로드맵 10(ADR-0030).
-5. R2 키·암호화 키가 들어오면 업로드·AI 키 등록 실측.
+1. 로드맵 7 Tiptap + YouTube 구현(ADR-0027) — Opus 에이전트, 워크트리 가능. 배포·마이그레이션은 세션 2 말미에 모두 반영·확인됨(`4976c31`).
+2. 로드맵 6 커뮤니티·프로필(ADR-0028) — 마이그레이션 0006, `proxy.ts` `/` 리다이렉트 제거, admin 플러그인.
+3. 로드맵 4 AI(ADR-0029), 로드맵 10(ADR-0030).
+4. R2 키·암호화 키가 들어오면 업로드·AI 키 등록 실측.
 
 ## 9. 문서 지도
 
