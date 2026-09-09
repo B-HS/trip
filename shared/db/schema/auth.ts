@@ -1,5 +1,8 @@
 import { relations } from 'drizzle-orm'
-import { boolean, index, text, timestamp, varchar } from 'drizzle-orm/mysql-core'
+import { boolean, index, text, timestamp, varchar, type AnyMySqlColumn } from 'drizzle-orm/mysql-core'
+import { DEFAULT_USER_ROLE, USER_ROLE_MAX_LENGTH } from '@/shared/constant/auth'
+import { PROFILE_BANNER_URL_MAX_LENGTH, PROFILE_BIO_MAX_LENGTH } from '@/shared/constant/community'
+import { tripUpload } from '@/shared/db/schema/trip'
 import { tripTable } from '@/shared/db/table'
 
 export const user = tripTable('user', {
@@ -10,6 +13,13 @@ export const user = tripTable('user', {
     username: varchar('username', { length: 255 }).unique(),
     displayUsername: text('display_username'),
     image: text('image'),
+    role: varchar('role', { length: USER_ROLE_MAX_LENGTH }).default(DEFAULT_USER_ROLE).notNull(),
+    banned: boolean('banned').default(false).notNull(),
+    banReason: text('ban_reason'),
+    banExpires: timestamp('ban_expires', { fsp: 3 }),
+    bio: varchar('bio', { length: PROFILE_BIO_MAX_LENGTH }),
+    bannerUrl: varchar('banner_url', { length: PROFILE_BANNER_URL_MAX_LENGTH }),
+    bannerUploadId: varchar('banner_upload_id', { length: 36 }).references((): AnyMySqlColumn => tripUpload.id, { onDelete: 'set null' }),
     createdAt: timestamp('created_at', { fsp: 3 }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { fsp: 3 })
         .defaultNow()
@@ -29,6 +39,7 @@ export const session = tripTable(
             .notNull(),
         ipAddress: text('ip_address'),
         userAgent: text('user_agent'),
+        impersonatedBy: varchar('impersonated_by', { length: 36 }),
         userId: varchar('user_id', { length: 36 })
             .notNull()
             .references(() => user.id, { onDelete: 'cascade' }),

@@ -13,7 +13,8 @@
         "test": "bun test",
         "db:generate": "drizzle-kit generate",
         "db:migrate": "bun run scripts/migrate.ts",
-        "db:seed": "bun --conditions=react-server run scripts/seed.ts"
+        "db:seed": "bun --conditions=react-server run scripts/seed.ts",
+        "admin:set": "bun --conditions=react-server run scripts/set-admin.ts"
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.1128.0",

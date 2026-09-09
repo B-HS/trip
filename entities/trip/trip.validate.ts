@@ -132,6 +132,8 @@ export const dayMemoSchema = z.object({ content: z.string().max(DAY_MEMO_MAX_LEN
 
 export const favoriteFlagSchema = z.boolean()
 
+export const likeFlagSchema = z.boolean()
+
 export type TripBasicsInput = z.input<typeof tripBasicsSchema>
 export type TripBasicsValues = z.output<typeof tripBasicsSchema>
 export type TripBasicsFormInput = z.input<typeof tripBasicsFormSchema>

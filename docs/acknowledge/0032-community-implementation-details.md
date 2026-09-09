@@ -52,3 +52,14 @@ Workflow A(사실 확인 Sonnet → 데이터 계층 Opus max → 리뷰 2렌즈
 - 댓글마다 +2: 도배 유인. 채택 변경 허용: 회수 규칙과 UI 가 필요해 1차 범위 초과.
 - 소프트 삭제: 목록·카운터·검색이 전부 `deleted_at` 을 봐야 해 1차 범위 초과.
 - 게시판 목록을 TanStack Query 로 클라이언트 조회: 비로그인 SEO 페이지에 불필요한 왕복.
+
+## 구현 메모 — 데이터 계층 (2026-09-10, Workflow `roadmap-6a-community-data-layer`)
+
+- `trip_post.accepted_comment_id` 컬럼(FK 없음)을 추가해 "글당 채택 1건·되돌릴 수 없음" 을 글 행에 기록한다. 채택 댓글이 삭제돼도 재채택이 막혀 +10 반복 지급이 불가능하다. `PostListItem.hasAcceptedComment` 는 이 컬럼에서 유도한다.
+- 카운터·채택·좋아요 트랜잭션은 대상 글/트립 행을 `SELECT … FOR UPDATE` 로 먼저 잠근다(리뷰: 잠금 없는 COUNT 재계산은 동시 요청에서 어긋남). `trip_post`·`trip_comment` 의 `updated_at` 은 `$onUpdate` 없이 두고 본문 수정 경로만 명시적으로 갱신한다(조회수·좋아요 갱신이 수정 시각을 오염시키지 않도록).
+- 글 **수정은 작성자만**(`canEditPost`·`assertPostEdit`), 삭제는 작성자 또는 admin(`canManagePost`·`assertPostManage`). ADR-0028 의 "삭제는 작성자 또는 admin" 을 그대로 두고 수정에는 admin 을 넣지 않았다.
+- 프로필 저장: `profileUpdateSchema` 의 `avatarUploadId`·`bannerUploadId` 는 `undefined` = 유지, `null` = 제거, 문자열 = 본인 소유·kind 일치 업로드로 교체. UI 는 이미지를 그대로 둘 때 그 필드를 보내지 않는다.
+- better-auth 코어 `/update-user` 를 `disabledPaths` 로 닫았다(name·image 를 검증 없이 바꾸는 우회 경로). 사용자명 변경을 열 때 이 목록을 다시 본다.
+- `banner_upload_id` 는 FK(set null)를 걸었다. `auth.ts ↔ trip.ts ↔ community.ts` 순환 import 는 drizzle 의 지연 콜백이라 정상이며 양쪽 진입 순서로 로드해 확인했다.
+- **UI 제약**: `/s/[slug]` 는 `(community)` 레이아웃(세션 프레임)으로 옮기면서 `export const revalidate` 를 제거해 동적 렌더로 둔다(사용자별 좋아요 상태를 프리페치하므로 ISR 로 두면 다른 방문자에게 새어 나간다). 트립 데이터 자체는 `getPublicTrip` 의 `unstable_cache` 가 계속 캐시한다. 채택 버튼은 `!post.hasAcceptedComment && canAcceptComment(...)` 로 게이팅한다.
+- 마이그레이션 0006 적용(로컬 = prod DB): 이력 7행, 테이블 32, 게시판 3행 시드, 기존 사용자 3명 `role='user'`.

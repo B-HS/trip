@@ -88,6 +88,34 @@ export type TripSummary = Pick<
     flights: Array<Pick<TripFlight, 'direction' | 'departCode' | 'arriveCode'>>
 }
 
+export type PublicTripCard = Pick<
+    Trip,
+    'id' | 'title' | 'eyebrow' | 'destination' | 'startDate' | 'endDate' | 'customNights' | 'customDays' | 'periodNote' | 'likeCount'
+> & {
+    shareSlug: string
+    owner: TripOwner
+    destinations: TripDestinationView[]
+    flights: Array<Pick<TripFlight, 'direction' | 'departCode' | 'arriveCode'>>
+    updatedAt: string
+}
+
+export type PublicTripCardPage = {
+    items: PublicTripCard[]
+    page: number
+    pageSize: number
+    total: number
+    pageCount: number
+}
+
+export type TripLikeState = { count: number; liked: boolean }
+
+export type HomeTrips = {
+    thisWeek: PublicTripCard[]
+    thisMonth: PublicTripCard[]
+    recent: PublicTripCard[]
+    popular: PublicTripCard[]
+}
+
 export type TripMemberView = Pick<TripUser, 'name' | 'email' | 'username' | 'image'> & { userId: string; role: MemberRole }
 
 export type TripInviteView = Pick<TripInvite, 'id' | 'email' | 'role'> & { createdAt: string }

@@ -22,12 +22,13 @@ import {
     saveSidebarAction,
     saveTripBasicsAction,
     toggleFavoriteAction,
+    toggleTripLikeAction,
     updateMemberRoleAction,
     updateShareSettingsAction,
 } from '@/entities/trip/trip.action'
-import { fetchFavoriteTrips, fetchTripDetail, fetchTripList, fetchTripMembers } from '@/entities/trip/trip.api'
+import { fetchFavoriteTrips, fetchTripDetail, fetchTripLike, fetchTripList, fetchTripMembers } from '@/entities/trip/trip.api'
 import { orderDaysByIds } from '@/entities/trip/trip.order'
-import type { TripDetail, TripSummary } from '@/entities/trip/trip.type'
+import type { TripDetail, TripLikeState, TripSummary } from '@/entities/trip/trip.type'
 import type {
     BookingListInput,
     DayInput,
@@ -47,6 +48,8 @@ import { unwrapActionResult } from '@/shared/lib/action-result'
 import type { TripTemplateInput } from '@/shared/lib/trip-template'
 
 const SAVED_MESSAGE = '저장했습니다.'
+const MIN_LIKE_COUNT = 0
+const LIKE_STEP = 1
 
 export const tripListQueryOptions = () => queryOptions({ queryKey: QUERY_KEY.TRIP.LIST, queryFn: fetchTripList })
 
@@ -58,6 +61,8 @@ export const tripDetailQueryOptions = (tripId: string) =>
 export const tripMembersQueryOptions = (tripId: string) =>
     queryOptions({ queryKey: QUERY_KEY.TRIP.MEMBERS(tripId), queryFn: () => fetchTripMembers(tripId) })
 
+export const tripLikeQueryOptions = (tripId: string) => queryOptions({ queryKey: QUERY_KEY.TRIP.LIKE(tripId), queryFn: () => fetchTripLike(tripId) })
+
 export const useTripList = () => useQuery(tripListQueryOptions())
 
 export const useFavoriteTrips = () => useQuery(favoriteTripsQueryOptions())
@@ -65,6 +70,8 @@ export const useFavoriteTrips = () => useQuery(favoriteTripsQueryOptions())
 export const useTripDetail = (tripId: string) => useQuery({ ...tripDetailQueryOptions(tripId), enabled: tripId.length > 0 })
 
 export const useTripMembers = (tripId: string) => useQuery({ ...tripMembersQueryOptions(tripId), enabled: tripId.length > 0 })
+
+export const useTripLike = (tripId: string) => useQuery({ ...tripLikeQueryOptions(tripId), enabled: tripId.length > 0 })
 
 export const useCreateTrip = () => {
     const queryClient = useQueryClient()
@@ -350,3 +357,26 @@ export const useExportTrip = (tripId: string) =>
         mutationFn: async () => unwrapActionResult(await exportTripAction(tripId)),
         onError: (error) => toast.error(error.message),
     })
+
+export const useToggleTripLike = (tripId: string) => {
+    const queryClient = useQueryClient()
+    const queryKey = QUERY_KEY.TRIP.LIKE(tripId)
+    return useMutation({
+        mutationFn: async (liked: boolean) => unwrapActionResult(await toggleTripLikeAction(tripId, liked)),
+        onMutate: async (liked) => {
+            await queryClient.cancelQueries({ queryKey })
+            const previous = queryClient.getQueryData<TripLikeState>(queryKey)
+            if (previous) {
+                const step = liked ? LIKE_STEP : -LIKE_STEP
+                const count = previous.liked === liked ? previous.count : Math.max(previous.count + step, MIN_LIKE_COUNT)
+                queryClient.setQueryData<TripLikeState>(queryKey, { count, liked })
+            }
+            return { previous }
+        },
+        onError: (error, _liked, context) => {
+            if (context?.previous) queryClient.setQueryData(queryKey, context.previous)
+            toast.error(error.message)
+        },
+        onSettled: () => queryClient.invalidateQueries({ queryKey }),
+    })
+}

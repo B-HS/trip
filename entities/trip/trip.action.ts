@@ -20,6 +20,7 @@ import {
 } from '@/entities/trip/trip.repository'
 import { deleteDay, reorderDays, saveDay } from '@/entities/trip/trip.repository.days'
 import { setTripFavorite } from '@/entities/trip/trip.repository.favorites'
+import { findTripIsPublic, setTripLike } from '@/entities/trip/trip.repository.likes'
 import { inviteMember, removeInvite, removeMember, updateMemberRole } from '@/entities/trip/trip.repository.members'
 import { tripShareTag } from '@/entities/trip/trip.tag'
 import {
@@ -29,6 +30,7 @@ import {
     favoriteFlagSchema,
     flightListSchema,
     infoSectionListSchema,
+    likeFlagSchema,
     lodgingListSchema,
     memberInviteSchema,
     memberRoleSchema,
@@ -288,5 +290,17 @@ export const exportTripAction = async (tripId: string) => {
         const id = tripIdSchema.parse(tripId)
         await assertTripAccess(id, user.id, 'view')
         return exportTripTemplate(id)
+    })
+}
+
+export const toggleTripLikeAction = async (tripId: string, liked: boolean) => {
+    const user = await requireUser()
+    return runAction(async () => {
+        const id = tripIdSchema.parse(tripId)
+        const flag = likeFlagSchema.parse(liked)
+        if ((await findTripIsPublic(id)) !== true) await assertTripAccess(id, user.id, 'view')
+        const state = await setTripLike(id, user.id, flag)
+        await expireTrip(id)
+        return state
     })
 }

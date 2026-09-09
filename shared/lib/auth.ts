@@ -1,12 +1,22 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { nextCookies } from 'better-auth/next-js'
-import { username } from 'better-auth/plugins'
+import { admin, username } from 'better-auth/plugins'
 import { acceptPendingInvitesForUser } from '@/shared/db/accept-invites'
 import { getDb } from '@/shared/db/client'
 import { account, session, user, verification } from '@/shared/db/schema/auth'
 import { getEnv } from '@/shared/lib/env'
-import { AUTH_COOKIE_PREFIX, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from '@/shared/constant/auth'
+import {
+    ADMIN_ROLE,
+    AUTH_COOKIE_PREFIX,
+    DEFAULT_USER_ROLE,
+    PASSWORD_MAX_LENGTH,
+    PASSWORD_MIN_LENGTH,
+    USERNAME_MAX_LENGTH,
+    USERNAME_MIN_LENGTH,
+} from '@/shared/constant/auth'
+
+const DISABLED_AUTH_PATHS = ['/update-user']
 
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30
 const SESSION_UPDATE_AGE_SECONDS = 60 * 60 * 24
@@ -35,7 +45,12 @@ const createAuth = () => {
             },
         },
         advanced: { cookiePrefix: AUTH_COOKIE_PREFIX },
-        plugins: [username({ minUsernameLength: USERNAME_MIN_LENGTH, maxUsernameLength: USERNAME_MAX_LENGTH }), nextCookies()],
+        disabledPaths: DISABLED_AUTH_PATHS,
+        plugins: [
+            username({ minUsernameLength: USERNAME_MIN_LENGTH, maxUsernameLength: USERNAME_MAX_LENGTH }),
+            admin({ defaultRole: DEFAULT_USER_ROLE, adminRoles: [ADMIN_ROLE] }),
+            nextCookies(),
+        ],
     })
 }
 

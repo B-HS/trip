@@ -43,6 +43,13 @@
       "when": 1788960290887,
       "tag": "0005_dry_puppet_master",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1788990494711,
+      "tag": "0006_groovy_cardiac",
+      "breakpoints": true
     }
   ]
 }

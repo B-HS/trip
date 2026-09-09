@@ -2,6 +2,7 @@ import 'server-only'
 import type { QueryClient } from '@tanstack/react-query'
 import { getTripRole } from '@/entities/trip/trip.access'
 import { getFavoriteTrips, getTripDetail, getTripList } from '@/entities/trip/trip.cache'
+import { findTripLikeState } from '@/entities/trip/trip.repository.likes'
 import { findTripInvites, findTripMembers } from '@/entities/trip/trip.repository.members'
 import { QUERY_KEY } from '@/shared/constant/query-key'
 import { ApiError } from '@/shared/lib/api-response'
@@ -30,3 +31,6 @@ export const prefetchTripMembers = async (queryClient: QueryClient, tripId: stri
             return { members, invites }
         },
     })
+
+export const prefetchTripLike = async (queryClient: QueryClient, tripId: string, userId: string | null) =>
+    queryClient.prefetchQuery({ queryKey: QUERY_KEY.TRIP.LIKE(tripId), queryFn: () => findTripLikeState(tripId, userId) })

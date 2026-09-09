@@ -1,0 +1,11 @@
+import 'server-only'
+import type { QueryClient } from '@tanstack/react-query'
+import { findComments } from '@/entities/community/community.repository.comments'
+import { findPostLikeState } from '@/entities/community/community.repository.likes'
+import { QUERY_KEY } from '@/shared/constant/query-key'
+
+export const prefetchComments = async (queryClient: QueryClient, postId: string) =>
+    queryClient.prefetchQuery({ queryKey: QUERY_KEY.COMMUNITY.COMMENTS(postId), queryFn: () => findComments(postId) })
+
+export const prefetchPostLike = async (queryClient: QueryClient, postId: string, userId: string | null) =>
+    queryClient.prefetchQuery({ queryKey: QUERY_KEY.COMMUNITY.POST_LIKE(postId), queryFn: () => findPostLikeState(postId, userId) })

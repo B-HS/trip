@@ -1,6 +1,7 @@
 import { relations } from 'drizzle-orm'
 import { boolean, date, index, int, mysqlEnum, primaryKey, text, timestamp, uniqueIndex, varchar } from 'drizzle-orm/mysql-core'
 import { user } from '@/shared/db/schema/auth'
+import { tripLike } from '@/shared/db/schema/community'
 import { tripTable } from '@/shared/db/table'
 import {
     BOOKING_PRIORITIES,
@@ -51,6 +52,7 @@ export const trip = tripTable(
         sidebarNote: text('sidebar_note'),
         shareSlug: varchar('share_slug', { length: 64 }),
         isPublic: boolean('is_public').default(false).notNull(),
+        likeCount: int('like_count').notNull().default(0),
         createdAt: createdAt(),
         updatedAt: updatedAt(),
     },
@@ -418,6 +420,7 @@ export const tripRelations = relations(trip, ({ one, many }) => ({
     invites: many(tripInvite),
     destinations: many(tripDestination),
     favorites: many(tripFavorite),
+    likes: many(tripLike),
     flights: many(tripFlight),
     lodgings: many(tripLodging),
     sidebarLinks: many(tripSidebarLink),
