@@ -16,7 +16,7 @@ type ViewTabsProps = {
 }
 
 export const ViewTabs: FC<ViewTabsProps> = ({ activeView, onSelect }) => (
-    <nav className='flex gap-px bg-background' aria-label='보기 선택'>
+    <nav className='flex' aria-label='보기 선택'>
         {TRIP_VIEWS.map((view) => (
             <button
                 key={view}
@@ -25,14 +25,14 @@ export const ViewTabs: FC<ViewTabsProps> = ({ activeView, onSelect }) => (
                 aria-controls={TRIP_VIEW_PANEL_ID}
                 onClick={() => onSelect(view)}
                 className={cn(
-                    'relative isolate h-12 rounded-none bg-card px-4 text-sm font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
-                    view === activeView ? 'text-primary-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                    'relative isolate h-12 rounded-none px-4 text-sm font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+                    view === activeView ? 'text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}>
                 {view === activeView && (
                     <motion.span
                         aria-hidden
                         layoutId={VIEW_INDICATOR_LAYOUT_ID}
-                        className='absolute inset-0 -z-10 bg-primary'
+                        className='absolute inset-0 -z-10 bg-card'
                         transition={{ duration: MOTION_FADE_DURATION, ease: MOTION_EASE_STANDARD }}
                     />
                 )}

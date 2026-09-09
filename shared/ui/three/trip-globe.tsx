@@ -23,6 +23,7 @@ export type TripGlobeProps = {
 export const TripGlobe: FC<TripGlobeProps> = ({ routes, variant = 'hero', interactive = true, autoRotate = true, className }) => {
     const containerRef = useRef<HTMLDivElement>(null)
     const [isVisible, setIsVisible] = useState(true)
+    const [isHovered, setIsHovered] = useState(false)
     const config = GLOBE_VARIANT_CONFIG[variant]
     const resolvedRoutes = resolveGlobeRoutes(routes)
     const prefersReducedMotion = useReducedMotionPreference()
@@ -38,7 +39,11 @@ export const TripGlobe: FC<TripGlobeProps> = ({ routes, variant = 'hero', intera
     }, [])
 
     return (
-        <div ref={containerRef} className={cn('relative w-full', config.heightClassName, className)}>
+        <div
+            ref={containerRef}
+            className={cn('relative w-full', config.heightClassName, className)}
+            onPointerEnter={() => setIsHovered(true)}
+            onPointerLeave={() => setIsHovered(false)}>
             <Canvas
                 aria-hidden
                 className={cn(!interactive && 'pointer-events-none')}
@@ -46,7 +51,13 @@ export const TripGlobe: FC<TripGlobeProps> = ({ routes, variant = 'hero', intera
                 frameloop={frameloop}
                 camera={{ position: [CAMERA_POSITION_X, CAMERA_POSITION_Y, config.cameraDistance], fov: config.cameraFov }}
                 gl={{ alpha: true, antialias: config.antialias, powerPreference: 'low-power' }}>
-                <TripGlobeScene routes={resolvedRoutes} variant={variant} interactive={interactive} autoRotate={autoRotate} animated={isAnimated} />
+                <TripGlobeScene
+                    routes={resolvedRoutes}
+                    variant={variant}
+                    interactive={interactive}
+                    autoRotate={autoRotate && !isHovered}
+                    animated={isAnimated}
+                />
             </Canvas>
             {config.showLabels && resolvedRoutes.length > 0 && (
                 <ul

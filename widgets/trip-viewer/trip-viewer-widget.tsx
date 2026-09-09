@@ -178,19 +178,25 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
     )
 
     return (
-        <div className='flex w-full flex-col gap-px bg-background'>
-            <div className='grid grid-cols-1 items-start gap-px md:grid-cols-[16rem_minmax(0,1fr)] print:hidden'>
-                <div className='md:sticky md:top-0'>{sidebar(false)}</div>
+        <div className='flex w-full flex-1 flex-col gap-px bg-background'>
+            <div className='grid flex-1 grid-cols-1 gap-px md:grid-cols-[16rem_minmax(0,1fr)] print:hidden'>
+                <div className='bg-muted'>
+                    <div className='md:sticky md:top-0'>{sidebar(false)}</div>
+                </div>
                 <div className='flex min-w-0 flex-col gap-px'>
-                    <div className='flex items-stretch justify-between gap-px bg-background'>
+                    <div className='flex items-stretch justify-between bg-background'>
                         <ViewTabs activeView={activeView} onSelect={handleSelectView} />
-                        <Button type='button' variant='ghost' className='h-12 rounded-none bg-card px-4 text-sm' onClick={() => window.print()}>
+                        <Button
+                            type='button'
+                            variant='ghost'
+                            className='h-12 rounded-none px-4 text-sm hover:bg-muted'
+                            onClick={() => window.print()}>
                             <PrinterIcon aria-hidden />
                             전체 일정 인쇄
                         </Button>
                     </div>
                     {!isMember && <p className='bg-card p-3 text-xs text-muted-foreground'>{PUBLIC_NOTICE}</p>}
-                    <div id={TRIP_VIEW_PANEL_ID} className='flex min-w-0 flex-col gap-px'>
+                    <div id={TRIP_VIEW_PANEL_ID} className='flex min-w-0 flex-1 flex-col gap-px'>
                         {activeView === 'itinerary' && days.length > 0 && (
                             <>
                                 <DayPicker
@@ -248,6 +254,7 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
                                 {activeView === 'info' && <InfoPanel sections={trip.infoSections} days={days} />}
                             </motion.div>
                         </AnimatePresence>
+                        <div aria-hidden className='min-h-0 flex-1 bg-card' />
                     </div>
                     <TripFooter footerNote={trip.footerNote} />
                 </div>

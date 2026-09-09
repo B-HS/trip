@@ -53,7 +53,7 @@ export const TripListWidget: FC = () => {
     const handleCreateSample = () => createFromTemplate.mutate(OSAKA_TRIP_TEMPLATE, { onSuccess: (created) => router.push(`/trips/${created.id}`) })
 
     const renderCards = () => (
-        <StaggerList as='ul' className='grid gap-px sm:grid-cols-2 xl:grid-cols-3'>
+        <StaggerList as='ul' className='flex flex-col gap-px'>
             <AnimatePresence>
                 {trips.map((trip) => (
                     <motion.li key={trip.id} layout variants={CARD_ITEM_VARIANTS} exit={CARD_EXIT} transition={CARD_TRANSITION}>
@@ -107,7 +107,7 @@ export const TripListWidget: FC = () => {
     }
 
     return (
-        <div className='flex flex-col gap-px'>
+        <div className='flex flex-1 flex-col gap-px'>
             <FadeIn as='section' className='flex flex-col gap-1 bg-card p-3'>
                 <p className='font-mono text-2xs tracking-widest text-muted-foreground uppercase'>TRIPS</p>
                 <h1 className='text-2xl font-semibold tracking-tight'>내 트립</h1>
@@ -121,6 +121,7 @@ export const TripListWidget: FC = () => {
                 )}
             </FadeIn>
             {renderTrips()}
+            <div aria-hidden className='min-h-0 flex-1 bg-card' />
             <TripDeleteDialog target={deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)} />
         </div>
     )

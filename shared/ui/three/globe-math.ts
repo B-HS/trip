@@ -23,12 +23,13 @@ export const latLngToVector3 = (lat: number, lng: number, radius: number) => {
 }
 
 /**
- * Rotation around the y axis that brings the given longitude to face the default camera at +z.
+ * Euler x/y rotation that brings the given direction to face the default camera at +z.
+ * The y rotation swings the direction onto the y-z plane, the x rotation lifts it onto +z.
  */
-export const longitudeFacingRotation = (lng: number) => {
-    const lngRadian = lng * DEGREE_TO_RADIAN
-    return -Math.atan2(Math.cos(lngRadian), -Math.sin(lngRadian))
-}
+export const globeFacingRotation = (direction: Vector3) => ({
+    x: Math.atan2(direction.y, Math.hypot(direction.x, direction.z)),
+    y: -Math.atan2(direction.x, direction.z),
+})
 
 /**
  * Samples the great-circle path between two points, lifting the middle of the arc off the surface.
@@ -84,6 +85,14 @@ export const collectGlobeAirports = (routes: readonly GlobeRoute[]) => {
         byCode.set(route.to.code, route.to)
     })
     return [...byCode.values()]
+}
+
+/**
+ * Rotation that points the mean direction of the given airports at the camera.
+ */
+export const airportsFacingRotation = (airports: readonly GlobeAirport[]) => {
+    const mean = airports.reduce((total, airport) => total.add(latLngToVector3(airport.lat, airport.lng, 1)), new Vector3())
+    return mean.lengthSq() < DEGENERATE_ANGLE_EPSILON ? { x: 0, y: 0 } : globeFacingRotation(mean.normalize())
 }
 
 export const buildGlobeArc = (route: GlobeRoute, radius: number, segments: number, lift: number) =>

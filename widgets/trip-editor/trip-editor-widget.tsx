@@ -77,7 +77,7 @@ export const TripEditorWidget: FC<TripEditorWidgetProps> = ({ tripId }) => {
 
     return (
         <Tabs
-            className='gap-px bg-background'
+            className='flex-1 gap-px bg-background'
             value={activeTab}
             onValueChange={(value) => router.replace(`/trips/${tripId}/edit?${EDITOR_TAB_PARAM}=${value}`, { scroll: false })}>
             <div className='flex flex-wrap items-center justify-between gap-2 bg-card p-3'>
@@ -92,9 +92,12 @@ export const TripEditorWidget: FC<TripEditorWidgetProps> = ({ tripId }) => {
                     </Link>
                 </Button>
             </div>
-            <TabsList className='h-auto w-full flex-wrap justify-start gap-1 bg-card p-3' variant='line'>
+            <TabsList className='h-12 w-full flex-wrap justify-start gap-0 rounded-none bg-background p-0'>
                 {EDITOR_TABS.map((tab) => (
-                    <TabsTrigger key={tab} className='h-8 flex-none px-2 text-xs' value={tab}>
+                    <TabsTrigger
+                        key={tab}
+                        className='h-12 flex-none rounded-none border-0 px-4 text-sm shadow-none after:hidden data-active:bg-card data-active:shadow-none dark:data-active:border-0 dark:data-active:bg-card'
+                        value={tab}>
                         {tab === 'share' && !isOwner ? EDITOR_EXPORT_TAB_LABEL : EDITOR_TAB_LABEL[tab]}
                         {tabCount[tab] !== undefined && <span className='font-mono text-muted-foreground tabular-nums'>{tabCount[tab]}</span>}
                     </TabsTrigger>
@@ -107,6 +110,7 @@ export const TripEditorWidget: FC<TripEditorWidgetProps> = ({ tripId }) => {
                     </motion.div>
                 </AnimatePresence>
             </TabsContent>
+            <div aria-hidden className='min-h-0 flex-1 bg-card' />
         </Tabs>
     )
 }
