@@ -5,7 +5,7 @@
 
 ## 1. 스택
 
-Next 16.3.4(App Router, React Compiler, `typedRoutes`, `agentRules: false`; **`cacheComponents` 는 끔** — 초기 스켈레톤 금지 결정, ADR-0010) · React 19.2 · Tailwind 4 + shadcn 4(`radix-vega`, 55개 전부 `shared/ui`) · drizzle-orm 0.45(`mysql2`, MySQL 9.6 스키마 `trip`) · better-auth 1.7(이메일·비밀번호 + `username` 플러그인) · TanStack Query 5 · zod 4 · react-hook-form 7 · motion 13 · three 0.186 + @react-three/fiber 9 + drei 10 + world-atlas·topojson-client·d3-geo · @dnd-kit · lucide-react · dayjs · sonner · next-themes · `cn` 0.2(컴파일된 clsx+tailwind-merge 대체 머저 — `shared/lib/utils.ts` 가 재export하고 shadcn 파일 51개는 `'cn'` 을 직접 import). 런타임·패키지 매니저·테스트 러너는 **bun**(락파일은 v1, `packageManager: bun@1.3.14` — ADR-0013).
+Next 16.3.4(App Router, React Compiler, `typedRoutes`, `agentRules: false`; **`cacheComponents` 는 끔** — 초기 스켈레톤 금지 결정, ADR-0010) · React 19.2 · Tailwind 4 + shadcn 4(`radix-vega`, 55개 전부 `shared/ui`) · drizzle-orm 0.45(`mysql2`, MySQL 9.6 스키마 `trip`) · better-auth 1.7(이메일·비밀번호 + `username` 플러그인) · TanStack Query 5 · zod 4 · react-hook-form 7 · motion 13 · three 0.186 + @react-three/fiber 9 + drei 10 + world-atlas·topojson-client·d3-geo · @dnd-kit · lucide-react · dayjs · sonner · next-themes · `cn` 0.2(컴파일된 clsx+tailwind-merge 대체 머저 — `shared/lib/utils.ts` 가 재export하고 shadcn 파일 51개는 `'cn'` 을 직접 import). 런타임·패키지 매니저·테스트 러너는 **bun**(락파일은 v1, `packageManager: bun@1.3.14` — ADR-0013). React Compiler 예외: RHF `register()` 를 호출하는 폼 컴포넌트 13개는 파일 상단 `'use no memo'` 로 제외한다(ADR-0018).
 
 ## 2. 폴더 (변형 FSD, `src/` 없음)
 
@@ -98,7 +98,7 @@ docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · acknowledge/ · memor
 ## 8. 시각 계층·모션
 
 - 계층(ADR-0011): 레일 `bg-sidebar` → 콘텐츠 사이드바 컬럼 `bg-muted`(콘텐츠 전체 높이) → 탭 스트립 `bg-background`(활성 탭 `bg-card`) → 블록 `bg-card`(1px 심 `gap-px`). 보더는 표만 허용, 라운드·그림자 없음(공개 표면은 `.surface-public` 토큰으로 6px 라운드). 콘텐츠 영역은 dvh 를 채우고 남는 부분은 `bg-card` 채움 블록.
-- 모션: 토큰 `shared/lib/motion.ts`(0.18s fade·0.24s bar·standard ease·stagger). 루트 `MotionConfig reducedMotion='never'`; 모션 감소는 앱 내 설정 `use-motion-preference`(사용자 메뉴 토글, localStorage `trip-motion`). 페이지 전환 fade, 뷰·날짜 전환 `AnimatePresence`, 목록 stagger, 체크 완료 opacity/strike, 진행바 트윈, 탭·날짜 인디케이터 `layoutId`.
+- 모션: 토큰 `shared/lib/motion.ts`(0.18s fade·0.24s bar·standard ease·stagger). 루트 `MotionConfig reducedMotion='never'`; 모션 감소는 앱 내 설정 `use-motion-preference`(사용자 메뉴 토글, localStorage `trip-motion`). 페이지 전환 fade, 뷰·날짜 전환 `AnimatePresence`, 목록 stagger, 체크 완료 opacity/strike, 진행바 트윈, 탭·날짜 인디케이터 `layoutId`. 편집기 정렬 행(`SortableRows`)은 진입 페이드만 쓰고 `AnimatePresence`·exit 는 쓰지 않는다(ADR-0019). 다크 토큰·`dark:` 변형은 `@media screen` 한정이라 인쇄는 항상 라이트 토큰이다.
 - 테마: next-themes(class), 전역 단축키 `d`(`shared/ui/theme-provider.tsx`).
 
 ## 9. 3D (`shared/ui/three/`)

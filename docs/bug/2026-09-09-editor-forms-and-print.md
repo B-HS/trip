@@ -1,0 +1,22 @@
+# 버그 — 편집기 폼·정렬 목록·인쇄 (2026-09-09, 세션 2 QA)
+
+> QA 체크리스트 잔여 항목 실측 중 발견. 결정 배경은 ADR-0018·0019.
+
+| #   | 증상                                                                                 | 원인                                                                                                                                                                        | 해결                                                                                          |
+| --- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| 1   | 편집기에서 저장 뒤 다시 고쳐 저장하면 이전 값이 저장됨. 빈 필수값도 검증 없이 저장됨 | RHF `reset()` 이 `_fields` 를 비우는데 React Compiler 가 상수 인자 `register()` 호출을 메모이즈해 재등록·ref 재부착이 안 됨. dev 는 StrictMode 이중 마운트가 첫 편집을 가림 | `register()` 사용 컴포넌트 13개에 `'use no memo'` (ADR-0018)                                  |
+| 2   | 날짜 폼의 하위 행이 저장·리셋마다 투명한 채 18개씩 누적돼 실제 행을 아래로 밀어냄    | motion 13.2 `AnimatePresence` exitComplete 게이트가 all-or-nothing 이고 완료 신호 유실 시 영구 잠김. `useFieldArray` 가 reset 마다 key 전부 재발급                          | `SortableRows` 의 `AnimatePresence`·`exit` 제거 (ADR-0019)                                    |
+| 3   | dev 콘솔 hydration 경고 "aria-describedby DndDescribedBy-N 불일치"                   | dnd-kit `DndContext` 의 전역 카운터 id 가 서버·클라이언트에서 다르게 매겨짐                                                                                                 | `useId()` 를 `DndContext id` 로 전달                                                          |
+| 4   | 다크 모드에서 인쇄하면 블록 배경이 검정, 글자가 회색으로 인쇄됨                      | `.dark` 토큰과 `dark:` 변형이 print 미디어에도 적용                                                                                                                         | `.dark` 토큰 블록·`.dark .surface-public`·`@custom-variant dark` 를 `@media screen` 으로 한정 |
+| 5   | 인쇄 시 확인된 내용 표·전체 일정 표가 페이지 경계에서 잘릴 수 있음                   | 표 컨테이너에 `break-inside` 회피 없음                                                                                                                                      | 표 래퍼와 `DaySummaryTable` 에 `break-inside-avoid`                                           |
+| 6   | globals.css 의 `.print-hidden`/`.print-visible` 이 어디서도 안 쓰임                  | Tailwind `print:` 변형으로 대체된 뒤 남은 dead CSS                                                                                                                          | 제거                                                                                          |
+
+## 재현·검증 방법
+
+- 1·2: `/trips/[id]/edit?tab=days` 에서 제목 수정 → Cmd+S → 다시 수정 → Cmd+S. 서버 액션 본문(`Next-Action` POST)의 `title` 과 `/api/trips/[id]` 의 값을 대조. 하위 행 핸들(`button[aria-label="순서 변경"]`) 수가 저장 후에도 7+18 로 유지되는지 확인.
+- 3: 날짜 탭을 새로 열어 콘솔 오류 0건.
+- 4·5: 다크 테마에서 스타일시트의 `@media print` 규칙(레이어 포함)을 화면에 주입하고 `@media screen` 규칙을 끈 뒤 `.bg-card` 배경·`.text-muted-foreground` 색·`table` 의 `break-inside` 를 계산값으로 확인.
+
+## 참고
+
+- 브라우저 도구 입력이 가려진 탭에는 전달되지 않아, 검증은 페이지 내 스크립트(native setter + `input` 이벤트, `execCommand('insertText')`, 창 `keydown`)로 수행했다. 실제 키 입력으로 재확인이 필요하면 창을 앞으로 가져온 뒤 같은 절차를 따른다.

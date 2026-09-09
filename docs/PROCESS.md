@@ -27,12 +27,13 @@
 - [x] 0. 컨텍스트 복원 — HANDOFF·ARCHITECTURE·ADR 16건·roadmap·QA 정독, HANDOFF 3번 코드 전수 대조(테이블 22개·고아 스켈레톤 2개·npm `cn` 미기록 발견)
 - [x] 1. 문서 정정 — 테이블 수 22(HANDOFF·PROCESS·ARCHITECTURE), npm `cn` 기록(ARCHITECTURE §1·ADR-0012), 고아 `trip-create-skeleton`·`trip-list-skeleton` 삭제
 - [x] 2. Vercel prod 확인 — `trip.gumyo.net` `/`·`/login`·`/signup` 200, `/trips` → `/login?next=` 307, 없는 slug 404
-- [ ] 3. QA 잔여 실측(라이트·다크) — `/s/[slug]`(공개 토글 후), 인쇄 미리보기, 모바일 Sheet, 편집기 저장·드래그 정렬 → 체크리스트 체크 + 이슈 수정
+- [x] 3. QA 잔여 실측(라이트·다크) — `/s/[slug]`(공개 토글·404·태그 반영), 인쇄(미디어 규칙 주입 에뮬레이션), 편집기 저장·키보드 정렬·필수값 링 → 체크리스트 13건 체크. 발견·수정 6건은 `docs/bug/2026-09-09-editor-forms-and-print.md`(ADR-0018·0019). 모바일 Sheet 는 브라우저 창 고정으로 미실측
 - [ ] 4. ADR-0017 회원가입 "이름" 제거 — `auth.validate`·`signup-form`·`signup-widget`·테스트, `name` 에 사용자명 저장, ARCHITECTURE §4·ADR-0003·roadmap 7 갱신
 - [ ] 5. 검증(typecheck → lint → test → build) + 브라우저 확인 + HANDOFF 갱신
 
 ## 미착수
 
+- [ ] QA 잔여: 모바일 Sheet 실측(창 폭 390px), JSON 가져오기(미구현), 편집기 검증 오류 문구 한국어화(`tripTemplate*Schema` 의 zod 기본 영어 메시지가 그대로 노출)
 - [ ] 로드맵 1~~6·8~~10 + 7 의 나머지(OAuth·이메일 인증·약관·후기·에디터) — 순서는 사용자가 정한다. 착수 전 ADR 추가
 
 ### 진행 메모
