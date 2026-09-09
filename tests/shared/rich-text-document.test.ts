@@ -6,6 +6,7 @@ import {
     parseRichTextDocument,
     richTextDocumentSchema,
     richTextPlainText,
+    toPlainDocument,
     type RichTextDocument,
 } from '@/shared/lib/rich-text-document'
 
@@ -121,5 +122,17 @@ describe('isRichTextEmpty', () => {
     test('이미지나 YouTube 만 있어도 비어 있지 않다', () => {
         expect(isRichTextEmpty({ type: 'doc', content: [{ type: 'image', attrs: { src: 'https://cdn.example.com/a.png' } }] })).toBe(false)
         expect(isRichTextEmpty({ type: 'doc', content: [{ type: 'youtube', attrs: { src: 'https://youtu.be/dQw4w9WgXcQ' } }] })).toBe(false)
+    })
+})
+
+describe('toPlainDocument', () => {
+    test('ProseMirror 가 만든 null 프로토타입 attrs 를 순수 객체로 바꾼다', () => {
+        const attrs = Object.assign(Object.create(null), { level: 2 })
+        const plain = toPlainDocument({ type: 'doc', content: [{ type: 'heading', attrs, content: [{ type: 'text', text: '제목' }] }] })
+        const heading = plain.content?.[0]
+
+        expect(Object.getPrototypeOf(heading?.attrs)).toBe(Object.prototype)
+        expect(heading?.attrs).toEqual({ level: 2 })
+        expect(parseRichTextDocument(plain)).not.toBeNull()
     })
 })

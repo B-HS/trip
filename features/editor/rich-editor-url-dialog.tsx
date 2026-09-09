@@ -27,6 +27,7 @@ export const RichEditorUrlDialog: FC<RichEditorUrlDialogProps> = ({ copy, inputI
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
+        event.stopPropagation()
         const trimmed = url.trim()
         if (!validate(trimmed)) {
             setIsInvalid(true)

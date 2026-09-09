@@ -45,6 +45,8 @@ const nodeText = (node: RichTextDocument): string => {
 const hasMediaNode = (node: RichTextDocument): boolean =>
     RICH_TEXT_MEDIA_NODE_TYPES.some((type) => type === node.type) || (node.content ?? []).some(hasMediaNode)
 
+export const toPlainDocument = (doc: RichTextDocument): RichTextDocument => JSON.parse(JSON.stringify(doc))
+
 export const richTextPlainText = (doc: RichTextDocument, maxLength?: number) => {
     const text = nodeText(doc).replace(WHITESPACE_PATTERN, ' ').trim()
     return maxLength === undefined ? text : text.slice(0, maxLength)

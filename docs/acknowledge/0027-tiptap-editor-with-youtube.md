@@ -31,3 +31,9 @@
 - `rich-text-html.ts` 는 `server-only`. bun test 에서 import 하기 위해 `tests/setup.ts` 가 `mock.module('server-only', () => ({}))` 를 등록한다. 같은 파일에서 happy-dom 의 자식 프레임 네비게이션을 끈다(YouTube iframe 렌더 시 실제 네트워크 요청 방지).
 - 편집기: 확장 배열은 모듈 스코프 1회 생성(`@tiptap/react` 가 배열 identity 로 옵션 비교). 다이얼로그는 열릴 때만 마운트해 입력 상태가 자연히 초기화된다(닫힘 애니메이션 없음). lucide 1.43 에 YouTube 브랜드 아이콘이 없어 `PlayCircleIcon`. 붙여넣기·드래그 이미지 업로드는 없음(툴바 셀 + 숨김 file input 만).
 - 검증: typecheck·lint·prettier·`bun test` 305(신규 49: 문서 15·sanitize 11·렌더 8·에디터 12·콘텐츠 3)·`bun run build` 통과. 보안 리뷰에서 우회 문자열 40여 건 실측(전부 차단). **브라우저 실측과 Next 서버 번들(happy-dom·jsdom) 검증은 아직 없다** — 사용처가 없어 빌드 경로에 실리지 않았다. 로드맵 6 게시글 작성·상세 화면에 연결하면서 라이트·다크 실측과 `next build` 번들 확인을 한다(ADR-0031). 번들 문제가 나면 `next.config.ts` `serverExternalPackages` 에 `jsdom`·`happy-dom` 추가가 첫 조치.
+
+## 실측 메모 (2026-09-10, 로드맵 6 게시글 작성 화면에서 첫 브라우저 실측)
+
+- **버그 발견·수정**: 서버 액션으로 보낸 본문에서 YouTube 노드의 `attrs` 가 `"$T"`(React Flight 임시 참조)로 직렬화돼 `richTextDocumentSchema` 가 "본문 형식이 올바르지 않습니다" 로 거부했다. 원인은 ProseMirror 가 노드 `attrs` 를 `Object.create(null)` 로 만들고, React 의 서버 액션 직렬화가 null 프로토타입 객체를 plain object 로 보지 않는 것. heading·image·codeBlock 등 attrs 가 있는 모든 노드가 같은 경로로 깨진다. `RichEditor.onUpdate` 가 `toPlainDocument`(JSON 왕복, `shared/lib/rich-text-document.ts`)로 정규화한 문서만 `onChange` 로 넘기도록 고쳤다(테스트 `toPlainDocument` 추가). bun 테스트가 plain 객체로만 검증해 잡지 못했던 사례.
+- 툴바 셀·링크/YouTube 다이얼로그·nocookie iframe 삽입·트립 첨부 Select·저장 바는 라이트 모드에서 정상 렌더. 브라우저 자동화의 Return 키가 툴바 버튼에 전달돼 문단 분리 대신 버튼이 눌리는 현상은 도구 한계(합성 keydown 으로는 ProseMirror 가 문단을 나눔).
+- **버그 발견·수정 2**: 링크·YouTube 다이얼로그의 `<form>` 제출 이벤트가 React 포털을 타고 바깥 글 작성 `<form>` 까지 버블링돼 글 폼 검증이 함께 실행됐다(제목 오류 표시). `RichEditorUrlDialog.handleSubmit` 에 `event.stopPropagation()` 을 추가했다(포털 안 중첩 폼은 React 트리 기준으로 이벤트가 전파된다).

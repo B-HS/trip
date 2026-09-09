@@ -9,7 +9,7 @@ import { RichEditorYoutubeDialog } from '@/features/editor/rich-editor-youtube-d
 import { RICH_EDITOR_FILE_INPUT_LABEL } from '@/features/editor/rich-editor.constant'
 import { RICH_TEXT_CLASS, RICH_TEXT_YOUTUBE_HEIGHT, RICH_TEXT_YOUTUBE_WIDTH } from '@/shared/constant/rich-text'
 import { UPLOAD_IMAGE_ACCEPT } from '@/shared/constant/upload'
-import { EMPTY_RICH_TEXT_DOCUMENT, type RichTextDocument } from '@/shared/lib/rich-text-document'
+import { EMPTY_RICH_TEXT_DOCUMENT, toPlainDocument, type RichTextDocument } from '@/shared/lib/rich-text-document'
 import { createRichTextExtensions } from '@/shared/lib/rich-text-extensions'
 import { cn } from '@/shared/lib/utils'
 
@@ -57,7 +57,7 @@ export const RichEditor: FC<RichEditorProps> = ({
                 ...describedBy,
             },
         },
-        onUpdate: ({ editor: instance }) => onChange(instance.getJSON()),
+        onUpdate: ({ editor: instance }) => onChange(toPlainDocument(instance.getJSON())),
     })
 
     const handleOpenLink = () => {

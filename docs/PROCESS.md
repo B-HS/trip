@@ -43,8 +43,10 @@
     - [x] 4-3. 메인 검증(typecheck·lint·prettier·test 305·build 통과, 범위 밖 지적 2건은 메인이 처리: `UPLOAD_DISABLED_HINT` shared 승격·ARCHITECTURE §2·§12) → ADR-0027 구현 메모 → 문서 헤더 갱신 → 커밋 → push·prod 머지(화면 미연결, ADR-0031)
     - [ ] 4-4. 로드맵 6(ADR-0028 + 구현 세부 ADR-0032)
         - [x] 4-4a. Workflow A(`wf_82e6e3fc-3bc`, 에이전트 5·49분, 리뷰 15건 → 적용 11·범위 밖 2·시그니처 유지 1) → 마이그레이션 0006 적용(이력 7행·테이블 32·게시판 3행) → `c152820`: 사실 확인(Sonnet) → 데이터 계층(스키마·마이그레이션 0006·entities·액션·쿼리·admin 플러그인·set-admin, Opus max) → 리뷰 2렌즈(Opus high) → 수정 → 메인: SQL 검토·`bun run db:migrate`·커밋
-        - [ ] 4-4b. Workflow B: UI-A(프레임·홈·인트로 섹션·탐색·`/s/[slug]` 이동·좋아요·셸·proxy, 메인 트리) ∥ UI-B(게시판·글·댓글·채택·에디터 연결·프로필, 워크트리) → 메인 patch 이식
-        - [ ] 4-4c. Workflow C: 리뷰 4렌즈 → 수정 → 메인 검증(typecheck·lint·prettier·test·build) → 브라우저 실측(에디터 ADR-0027 포함, 라이트·다크) → ARCHITECTURE·data-model·roadmap·ADR 추기 → 커밋·push·prod 머지
+        - [x] 4-4b. Workflow B(`wf_4da023f7-876`, 3 에이전트 순차·52분, 워크트리 미사용) → `8640392`: UI-A(프레임·홈·인트로 섹션·탐색·`/s/[slug]` 이동·좋아요·셸·proxy, 메인 트리) ∥ UI-B(게시판·글·댓글·채택·에디터 연결·프로필, 워크트리) → 메인 patch 이식
+        - [x] 4-4c-1. Workflow C(`wf_8d07ef83-242`, 리뷰 4렌즈 17건 + 메인 결정 10건: route group `(shell)` 통합·`aria-current`·`Route<T>` 제네릭·`React.cache`·`findLatestPostsByBoard`·작성자 조회수 제외 등) → 검증 통과 → 문서·커밋(`e0aa431` ADR-0033, `8640392` UI)
+        - [x] 4-4c-2. 브라우저 실측 1차(`docs/quality-assurance/2026-09-10-community-editor-checklist.md`): 에디터·글 CRUD·댓글·좋아요·탐색·프로필·설정 확인, 버그 2건 수정(ProseMirror attrs `$T` 직렬화 → `toPlainDocument`, 다이얼로그 submit 버블링)
+        - [ ] 4-4c-3. **사용자 지시로 여기서 중단(2026-09-10)**. 남은 것: 비로그인 표면 시각 확인, 질문 게시판 채택 실측, 삭제 흐름, 라이트 모드 재확인, QA 데이터 정리 → push·prod 머지
     - [ ] 4-5. 로드맵 6 확장(ADR-0033 §3): 마이그레이션 0007(soft delete·신고·차단·원장 revoked), 채택 변경·취소(+포인트 회수), 댓글 수정, 신고·`/admin/reports`·밴, 사용자 간 차단, 사용자명 변경
 - [ ] 5단계. i18n ko·ja·en(ADR-0033 §4): next-intl, 프리픽스 as-needed, 쿠키, 언어 전환 셀, 전 문구·검증·toast·메타데이터 카탈로그화, 날짜·숫자 locale 포맷
 - [ ] 6단계. 인증 확장(ADR-0033 §2): Naver·GitHub OAuth, 이메일 인증(Cloudflare mail worker, 리서치 후), 약관·동의(`docs/legal/` ko→ja·en, korean-law-mcp)
