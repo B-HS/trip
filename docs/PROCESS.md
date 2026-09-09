@@ -1,6 +1,6 @@
 # PROCESS — trip
 
-> 최종 갱신: 2026-09-09 · 대응 커밋: 95d1cc4 (로컬 dev, origin·prod 는 beb00c1, 2026-09-09 세션 2)
+> 최종 갱신: 2026-09-09 · 대응 커밋: aab891f (로컬 dev, 세션 2 후반. prod 는 68c0ff1, 이 문서 커밋 뒤 push·prod 머지 예정)
 > 기준 문서: `~/.claude/convention/*.md`, `~/personal-llm/*.md`, `docs/HANDOFF.md`(세션 진입점), `docs/ARCHITECTURE.md`, `docs/acknowledge/README.md`, `docs/DESIGN.md`
 
 ## 완료 — 초기 구축 (2026-09-09, Phase 1~3)
@@ -34,18 +34,21 @@
 ## 진행 — 세션 2 후반: 로드맵 착수 (ADR-0022)
 
 - [x] 1단계. 버그 B1(saveDay 하위 id)·B2(기본 정보 toast 1회)·B3(날짜 정렬 낙관적)·B6(JSON 가져오기, ADR-0021)·B8(체크리스트 문구) + 로드맵 9(몇박 며칠, ADR-0020) — Opus 에이전트 2건 병렬 구현 → 3-way 적용 → 마이그레이션 0002 적용 → 브라우저 실측(하위 id 유지, 30ms 낙관적 정렬, JSON 왕복, toast 1회, 7박 5일 표기). B4(shared/ui card·alert·input-group 보더)는 사용처가 없어 보류, 사용 시점에 제거
-- [~] 2단계. 로드맵 8 셀형 UI(완료, `bc18131`) → 1 사이드바 링크(완료, 마이그레이션 0003 적용, 브라우저 실측) → 5 일정 종류(진행 예정)
-- [ ] 3단계. 로드맵 2 R2 업로드 기반 + 예매 첨부
-- [ ] 4단계. 로드맵 7 Tiptap·YouTube → 6 커뮤니티·프로필(대문·사진)
-- [ ] 5단계. 로드맵 4 AI
-- [ ] 6단계. 로드맵 10 SEO·GEO·JSON-LD·Analytics·Speed Insights
+- [x] 2단계. 로드맵 8 셀형 UI(ADR-0023, `bc18131`) → 1 사이드바 링크·소개 문구(ADR-0024, 마이그레이션 0003, `fddab44`, 브라우저 실측: URL 검증·저장·탭 배지·공개 페이지 링크) → 5 일정 종류(ADR-0025, 마이그레이션 0004 데이터 이관, `ffb5aee`, 실측: 종류 추가·범례·일정 구분 변경·삭제 다이얼로그)
+- [x] 3단계. 로드맵 2 서버 경유 R2 업로드 + 예매 첨부(ADR-0026, 마이그레이션 0005, `aab891f`, 실측: R2 미설정 시 업로드 비활성·안내, 링크 첨부 저장·뷰어 표시). R2 키 설정 후 이미지 업로드 실측 필요
+- [ ] 4단계. 로드맵 7 Tiptap·YouTube(ADR-0027) → 6 커뮤니티·프로필(대문·사진, ADR-0028). **다음 세션 시작 지점**
+- [ ] 5단계. 로드맵 4 AI(ADR-0029: Vercel Queues, 자기 키만, AES-GCM, `APP_ENCRYPTION_KEY` 없이 구현 후 키 등록 시 테스트)
+- [ ] 6단계. 로드맵 10 SEO·GEO·JSON-LD·Analytics·Speed Insights(ADR-0030)
 
 ## 미착수
 
-- [ ] QA 잔여: 모바일 Sheet 닫힘 포커스 복귀, 편집기 검증 오류 문구 한국어화(사용자가 직접 본 뒤 결정)
+- [ ] QA 잔여: 모바일 Sheet 닫힘 포커스 복귀, 편집기 검증 오류 문구 한국어화(사용자가 직접 본 뒤 결정), 일정 종류 `key` 입력란 노출 여부, R2 설정 후 이미지 업로드
 - [ ] 로드맵 3 OSM(보류), 7 의 OAuth·이메일 인증·약관(보류)
+- [ ] 사용자 작업: `.env`·Vercel 환경변수에 `APP_ENCRYPTION_KEY`·`R2_ACCOUNT_ID`·`R2_ACCESS_KEY_ID`·`R2_SECRET_ACCESS_KEY`·`R2_BUCKET`·`R2_PUBLIC_BASE_URL` 추가, `.env.example` 에 이름 추가(AI 는 `.env*` 접근 불가), R2 커스텀 도메인 연결, Vercel CLI 링크(`vercel link`, Queues 로컬 개발용)
 
 ### 진행 메모
 
-- Vercel: 브랜치 `prod`, 환경변수 `DATABASE_URL`·`BETTER_AUTH_SECRET`·`BETTER_AUTH_URL`·`NEXT_PUBLIC_APP_URL`(+선택 `SEED_OWNER_EMAIL`). 락파일 v1(ADR-0013).
-- 검증 계정(로컬 DB): tester@example.com / 사용자명 tester(예시 트립 1개 생성됨).
+- Vercel: 브랜치 `prod`(Pro 플랜), 환경변수 `DATABASE_URL`·`BETTER_AUTH_SECRET`·`BETTER_AUTH_URL`·`NEXT_PUBLIC_APP_URL`(+선택 `SEED_OWNER_EMAIL`). 락파일 v1(ADR-0013, 의존성 추가 시 `npx bun@1.3.14 install`).
+- DB: 공용 MySQL(로컬·prod 동일). 마이그레이션 0000~0005 적용됨. 마이그레이션이 컬럼을 지우면 이전 배포 코드가 깨지므로 적용과 push·배포를 연달아 한다.
+- 검증 계정: tester@example.com / 사용자명 tester(오사카 예시 트립, 공개 slug `osaka-qa`), throwaway `qa_session2_204103@example.com`.
+- 에이전트 운용: 구현은 Opus 서브에이전트(메인 트리 1 + `isolation: worktree` 1 병렬). 워크트리 결과는 `git -C <wt> diff HEAD` patch 를 `git apply --3way` 로 이식하고 신규 파일은 복사, 마이그레이션은 메인에서 `bun run db:generate` 로 다시 생성. 끝난 워크트리는 `git worktree remove --force`(push 와 같은 명령에 두면 가드 훅이 `-f`·"fast-forward" 문자열을 force push 로 오인해 차단하므로 분리).
