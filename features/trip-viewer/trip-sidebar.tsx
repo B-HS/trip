@@ -55,7 +55,7 @@ export const TripSidebar: FC<TripSidebarProps> = ({
             <section className='flex flex-col gap-2'>
                 <h2 className='text-sm font-medium text-foreground'>확정 항공편</h2>
                 {flights.map((flight) => (
-                    <div key={flight.id} className='flex flex-col gap-1 border-t border-border pt-2'>
+                    <div key={flight.id} className='flex flex-col gap-1 bg-muted pt-2'>
                         <span className='text-xs text-muted-foreground'>{flight.label}</span>
                         <div className='flex items-baseline justify-between gap-2'>
                             <strong className='font-mono text-sm font-medium tabular-nums'>
@@ -79,7 +79,7 @@ export const TripSidebar: FC<TripSidebarProps> = ({
             <section className='flex flex-col gap-2'>
                 <h2 className='text-sm font-medium text-foreground'>모든 날의 출발점</h2>
                 {lodgings.map((lodging) => (
-                    <div key={lodging.id} className='flex flex-col gap-1 border-t border-border pt-2'>
+                    <div key={lodging.id} className='flex flex-col gap-1 bg-muted pt-2'>
                         <strong className='text-sm leading-snug font-medium break-keep'>{lodging.name}</strong>
                         {lodging.nameLocal && <span className='text-xs text-muted-foreground'>{lodging.nameLocal}</span>}
                         {lodging.accessNote && <span className='text-xs text-muted-foreground'>{lodging.accessNote}</span>}

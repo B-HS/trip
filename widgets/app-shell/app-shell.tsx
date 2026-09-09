@@ -116,7 +116,7 @@ export const AppShell: FC<AppShellProps> = ({ user, defaultCollapsed = false, ch
             )}
             <div className='flex min-h-0 min-w-0 flex-1 flex-col gap-px bg-background'>
                 <main className='flex min-h-0 min-w-0 flex-1 flex-col overflow-auto print:overflow-visible'>
-                    <div className='flex min-h-full flex-1 flex-col'>{children}</div>
+                    <div className='flex flex-1 flex-col'>{children}</div>
                 </main>
             </div>
         </div>

@@ -49,9 +49,9 @@ export const ScheduleRow: FC<ScheduleRowProps> = ({ item, isCompleted, isCheckab
                 className='grid grid-cols-1 gap-px sm:grid-cols-[7rem_minmax(0,1fr)]'
                 animate={{ opacity: isCompleted ? COMPLETED_OPACITY : FULL_OPACITY }}
                 transition={ROW_TRANSITION}>
-                <div className='flex flex-col items-start gap-1.5 bg-muted p-3'>
+                <div className='flex flex-col items-start gap-1.5 bg-card p-3'>
                     <time className={cn('font-mono text-xs font-medium tabular-nums', isCompleted && 'line-through')}>{item.timeLabel}</time>
-                    <Badge variant='outline' className={cn(ROW_ACTION_CLASS, SCHEDULE_KIND_BADGE_CLASS[item.kind])}>
+                    <Badge variant='secondary' className={cn(ROW_ACTION_CLASS, 'border-0', SCHEDULE_KIND_BADGE_CLASS[item.kind])}>
                         {SCHEDULE_KIND_LABEL[item.kind]}
                     </Badge>
                 </div>

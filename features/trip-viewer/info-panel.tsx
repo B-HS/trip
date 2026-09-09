@@ -76,12 +76,12 @@ export const InfoPanel: FC<InfoPanelProps> = ({ sections, days, isPrintLayout = 
             ) : (
                 <Accordion
                     type='multiple'
-                    className='bg-card px-3'
+                    className='gap-px bg-background bg-card px-3'
                     defaultValue={sections.filter((section) => section.isDefaultOpen).map((section) => section.id)}>
                     {sections.map((section) => (
-                        <AccordionItem key={section.id} value={section.id} className='last:border-b-0'>
-                            <AccordionTrigger className='py-3 text-sm font-medium hover:no-underline'>{section.title}</AccordionTrigger>
-                            <AccordionContent className='flex flex-col gap-3 pb-3'>{renderBlocks(section.blocks)}</AccordionContent>
+                        <AccordionItem key={section.id} value={section.id} className='border-b-0 bg-card'>
+                            <AccordionTrigger className='px-3 py-3 text-sm font-medium hover:no-underline'>{section.title}</AccordionTrigger>
+                            <AccordionContent className='flex flex-col gap-3 px-3 pb-3'>{renderBlocks(section.blocks)}</AccordionContent>
                         </AccordionItem>
                     ))}
                 </Accordion>

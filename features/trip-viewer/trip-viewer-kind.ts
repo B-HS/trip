@@ -1,9 +1,9 @@
 import type { ScheduleKind } from '@/shared/constant/trip'
 
 export const SCHEDULE_KIND_BADGE_CLASS = {
-    planned: 'border-border bg-muted text-foreground',
-    confirmed: 'border-success/40 bg-success/15 text-foreground',
-    target: 'border-warning/40 bg-warning/15 text-foreground',
+    planned: 'bg-muted text-foreground',
+    confirmed: 'bg-success/15 text-foreground',
+    target: 'bg-warning/15 text-foreground',
 } as const satisfies Record<ScheduleKind, string>
 
 export const SCHEDULE_KIND_SWATCH_CLASS = {

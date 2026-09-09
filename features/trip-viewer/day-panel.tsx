@@ -9,7 +9,6 @@ import { formatDayNumber, formatRatio, toPercent } from '@/features/trip-viewer/
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { cn } from '@/shared/lib/utils'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/shared/ui/accordion'
-import { Button } from '@/shared/ui/button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty'
 import { AnimatedProgress } from '@/shared/ui/motion/animated-progress'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table'
@@ -85,8 +84,8 @@ export const DayPanel: FC<DayPanelProps> = ({
                 </div>
             </header>
             {!isPrintLayout && (
-                <div className='flex flex-col gap-3 bg-card px-3 py-2 sm:flex-row sm:items-center sm:justify-between print:hidden'>
-                    <div className='flex min-w-0 flex-1 items-center gap-2'>
+                <div className='flex flex-col gap-px bg-background sm:flex-row sm:items-stretch print:hidden'>
+                    <div className='flex min-w-0 flex-1 items-center gap-2 bg-card px-3 py-2'>
                         <span aria-live='polite' className='font-mono text-xs whitespace-nowrap text-muted-foreground tabular-nums'>
                             {formatRatio(completedCount, day.scheduleItems.length)} 완료
                         </span>
@@ -98,25 +97,29 @@ export const DayPanel: FC<DayPanelProps> = ({
                     </div>
                     {isCheckable && (
                         <div className='flex gap-px'>
-                            <Button
+                            <button
                                 type='button'
-                                size='sm'
-                                variant={isHideCompleted ? 'default' : 'secondary'}
                                 aria-pressed={isHideCompleted}
-                                className='rounded-none'
+                                className={cn(
+                                    'min-h-10 px-4 text-xs font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+                                    isHideCompleted ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted',
+                                )}
                                 onClick={onToggleHideCompleted}>
                                 {isHideCompleted ? '완료 표시' : '완료 숨기기'}
-                            </Button>
-                            <Button type='button' size='sm' variant='secondary' className='rounded-none' onClick={onRequestReset}>
+                            </button>
+                            <button
+                                type='button'
+                                className='min-h-10 bg-card px-4 text-xs font-medium text-foreground outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50'
+                                onClick={onRequestReset}>
                                 체크 초기화
-                            </Button>
+                            </button>
                         </div>
                     )}
                 </div>
             )}
             {day.overview && <p className='bg-card p-3 text-sm leading-relaxed break-keep'>{day.overview}</p>}
             {day.facts.length > 0 && (
-                <div className='bg-card p-3'>
+                <div className='bg-card'>
                     <Table className='text-xs'>
                         <TableHeader>
                             <TableRow>

@@ -92,11 +92,11 @@ export const TripEditorWidget: FC<TripEditorWidgetProps> = ({ tripId }) => {
                     </Link>
                 </Button>
             </div>
-            <TabsList className='h-12 w-full flex-wrap justify-start gap-0 rounded-none bg-background p-0'>
+            <TabsList className='flex h-12 w-full items-stretch justify-start gap-0 rounded-none bg-background p-0'>
                 {EDITOR_TABS.map((tab) => (
                     <TabsTrigger
                         key={tab}
-                        className='h-12 flex-none rounded-none border-0 px-4 text-sm shadow-none after:hidden data-active:bg-card data-active:shadow-none dark:data-active:border-0 dark:data-active:bg-card'
+                        className='h-full flex-none rounded-none border-0 px-4 py-0 text-sm shadow-none after:hidden data-active:bg-card data-active:shadow-none dark:data-active:border-0 dark:data-active:bg-card'
                         value={tab}>
                         {tab === 'share' && !isOwner ? EDITOR_EXPORT_TAB_LABEL : EDITOR_TAB_LABEL[tab]}
                         {tabCount[tab] !== undefined && <span className='font-mono text-muted-foreground tabular-nums'>{tabCount[tab]}</span>}
