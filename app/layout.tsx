@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import type { FC, PropsWithChildren } from 'react'
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/shared/constant/site'
 import { QueryProvider } from '@/shared/lib/query-provider'
+import { MotionProvider } from '@/shared/ui/motion-provider'
 import { Toaster } from '@/shared/ui/sonner'
 import { ThemeProvider } from '@/shared/ui/theme-provider'
 import { TooltipProvider } from '@/shared/ui/tooltip'
@@ -28,9 +29,11 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => (
     <html lang='ko' suppressHydrationWarning>
         <body className='flex min-h-dvh flex-col'>
             <ThemeProvider>
-                <QueryProvider>
-                    <TooltipProvider>{children}</TooltipProvider>
-                </QueryProvider>
+                <MotionProvider>
+                    <QueryProvider>
+                        <TooltipProvider>{children}</TooltipProvider>
+                    </QueryProvider>
+                </MotionProvider>
                 <Toaster position='bottom-right' />
             </ThemeProvider>
             <Analytics />
