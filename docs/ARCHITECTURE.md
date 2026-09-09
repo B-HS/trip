@@ -1,6 +1,6 @@
 # ARCHITECTURE — trip
 
-> 최종 갱신: 2026-09-09 · 대응 커밋: 8f345b1 (dev = prod, 2026-09-09)
+> 최종 갱신: 2026-09-09 · 대응 커밋: 95d1cc4 (로컬 dev, origin·prod 는 beb00c1, 2026-09-09 세션 2)
 > 구현 정본. 코드와 어긋나면 코드를 고치거나 이 문서를 갱신한다. 결정의 배경·기각 대안은 `docs/acknowledge/README.md`.
 
 ## 1. 스택
@@ -57,7 +57,7 @@ docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · acknowledge/ · memor
 ## 4. 인증
 
 - `getAuth()`: drizzle adapter(mysql, `trip_user/session/account/verification`), `emailAndPassword`(이메일 인증 없음), `username()`(3~30자, `^[a-z0-9_.]+$`), `advanced.cookiePrefix = 'trip'`, `nextCookies()`, `databaseHooks.user.create.after` → `acceptPendingInvitesForUser`(`shared/db/accept-invites.ts`).
-- 서버: `getServerSession()`, `requireUser()`(없으면 `/login`). 클라이언트: `signIn.email`/`signIn.username`(식별자에 `@` 포함 여부로 분기), `signUp.email({ name, email, password, username, displayUsername })` — `name` 은 better-auth 필수 컬럼이라 폼에서 받는다(로드맵 7: 제거 예정).
+- 서버: `getServerSession()`, `requireUser()`(없으면 `/login`). 클라이언트: `signIn.email`/`signIn.username`(식별자에 `@` 포함 여부로 분기), `signUp.email({ name: username, email, password, username, displayUsername: username })` — 가입 폼은 사용자명·이메일·비밀번호만 받고, better-auth 필수 컬럼 `name` 에는 사용자명을 저장한다(ADR-0017).
 
 ## 5. 데이터 계층 (`entities/trip/`)
 

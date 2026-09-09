@@ -1,6 +1,6 @@
 # PROCESS — trip
 
-> 최종 갱신: 2026-09-09 · 대응 커밋: 8f345b1 (dev = prod, 2026-09-09)
+> 최종 갱신: 2026-09-09 · 대응 커밋: 95d1cc4 (로컬 dev, origin·prod 는 beb00c1, 2026-09-09 세션 2)
 > 기준 문서: `~/.claude/convention/*.md`, `~/personal-llm/*.md`, `docs/HANDOFF.md`(세션 진입점), `docs/ARCHITECTURE.md`, `docs/acknowledge/README.md`, `docs/DESIGN.md`
 
 ## 완료 — 초기 구축 (2026-09-09, Phase 1~3)
@@ -28,8 +28,8 @@
 - [x] 1. 문서 정정 — 테이블 수 22(HANDOFF·PROCESS·ARCHITECTURE), npm `cn` 기록(ARCHITECTURE §1·ADR-0012), 고아 `trip-create-skeleton`·`trip-list-skeleton` 삭제
 - [x] 2. Vercel prod 확인 — `trip.gumyo.net` `/`·`/login`·`/signup` 200, `/trips` → `/login?next=` 307, 없는 slug 404
 - [x] 3. QA 잔여 실측(라이트·다크) — `/s/[slug]`(공개 토글·404·태그 반영), 인쇄(미디어 규칙 주입 에뮬레이션), 편집기 저장·키보드 정렬·필수값 링 → 체크리스트 13건 체크. 발견·수정 6건은 `docs/bug/2026-09-09-editor-forms-and-print.md`(ADR-0018·0019). 모바일 Sheet 는 브라우저 창 고정으로 미실측
-- [ ] 4. ADR-0017 회원가입 "이름" 제거 — `auth.validate`·`signup-form`·`signup-widget`·테스트, `name` 에 사용자명 저장, ARCHITECTURE §4·ADR-0003·roadmap 7 갱신
-- [ ] 5. 검증(typecheck → lint → test → build) + 브라우저 확인 + HANDOFF 갱신
+- [x] 4. ADR-0017 회원가입 "이름" 제거(ADR 작성 → Opus 에이전트 구현 → 검증) — `auth.validate`·`signup-form`·`signup-widget`·테스트, `name` 에 사용자명 저장, ARCHITECTURE §4·ADR-0003·roadmap 7 갱신
+- [x] 5. 검증(typecheck → lint → prettier → test 183 → build) + 프로덕션 스모크(3001) + 브라우저 확인 + HANDOFF 갱신
 
 ## 미착수
 

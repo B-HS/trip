@@ -1,6 +1,6 @@
 # 데이터 모델 — trip
 
-> 최종 갱신: 2026-09-09 · 대응 커밋: 8f345b1 (dev = prod, 2026-09-09) · 구조 전체는 `docs/ARCHITECTURE.md`
+> 최종 갱신: 2026-09-09 · 대응 커밋: 95d1cc4 (로컬 dev, origin·prod 는 beb00c1, 2026-09-09 세션 2) · 구조 전체는 `docs/ARCHITECTURE.md`
 
 > 정본은 `shared/db/schema/{auth,trip}.ts`. 이 문서는 읽기용 요약이다. 모든 테이블은 `trip_` 프리픽스(`shared/db/table.ts` 의 `tripTable`).
 
