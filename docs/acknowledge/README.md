@@ -27,3 +27,6 @@
 - [ADR-0020 — 몇박 며칠은 선택 입력, 비우면 날짜로 계산 (2026-09-09)](0020-trip-nights-and-days.md)
 - [ADR-0021 — JSON 가져오기는 현재 트립 내용을 교체 (2026-09-09)](0021-json-import-replaces-trip-content.md)
 - [ADR-0022 — 로드맵 착수 범위와 순서 (2026-09-09)](0022-roadmap-phase-order.md)
+- [ADR-0023 — 셀형 액션 UI 를 `Button` 변형으로 전면 적용 (2026-09-09)](0023-cell-action-ui.md)
+- [ADR-0024 — 뷰어 사이드바 링크 목록과 소개 문구 (2026-09-09)](0024-sidebar-links-and-note.md)
+- [ADR-0025 — 일정 종류를 트립별 테이블로 (2026-09-09)](0025-schedule-kinds-per-trip.md)
