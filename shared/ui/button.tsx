@@ -17,6 +17,9 @@ const buttonVariants = cva(
                 destructive:
                     'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:ring-destructive/40 dark:bg-destructive/20 dark:hover:bg-destructive/30',
                 link: 'text-primary underline-offset-4 hover:underline',
+                cell: 'bg-card text-foreground hover:bg-muted',
+                cellPrimary: 'bg-primary text-primary-foreground hover:bg-primary/90',
+                cellDestructive: 'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:ring-destructive/40',
             },
             size: {
                 'default':
@@ -28,6 +31,9 @@ const buttonVariants = cva(
                 'icon-xs': "size-6 rounded-[min(var(--radius-md),8px)] in-data-[slot=button-group]:rounded-md [&_svg:not([class*='size-'])]:size-3",
                 'icon-sm': 'size-8 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-md',
                 'icon-lg': 'size-10',
+                'cell': "h-auto min-h-10 gap-1.5 self-stretch rounded-none border-0 px-4 text-xs font-medium shadow-none aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 [&_svg:not([class*='size-'])]:size-4",
+                'cellIcon':
+                    "h-auto min-h-10 gap-1.5 self-stretch rounded-none border-0 px-3 text-xs font-medium shadow-none aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 [&_svg:not([class*='size-'])]:size-4",
             },
         },
         defaultVariants: {

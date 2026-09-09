@@ -152,7 +152,7 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                 description='여행하는 순서대로 나라를 추가하세요. 항공편이 없으면 지구본 경로에 사용됩니다.'
                 count={rows.fields.length}
                 action={
-                    <Button type='button' variant='outline' size='sm' onClick={() => rows.append({ countryCode: DEFAULT_COUNTRY_CODE, city: null })}>
+                    <Button type='button' variant='cell' size='cell' onClick={() => rows.append({ countryCode: DEFAULT_COUNTRY_CODE, city: null })}>
                         <PlusIcon />
                         나라 추가
                     </Button>

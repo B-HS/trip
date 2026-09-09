@@ -9,6 +9,7 @@ import { SCHEDULE_BUFFER_LABEL, SCHEDULE_KIND_LABEL, buildMapUrl } from '@/share
 import { MOTION_EASE_STANDARD, MOTION_FADE_DURATION } from '@/shared/lib/motion'
 import { cn } from '@/shared/lib/utils'
 import { Badge } from '@/shared/ui/badge'
+import { Button } from '@/shared/ui/button'
 import { Checkbox } from '@/shared/ui/checkbox'
 
 const ROW_OFFSET_Y = 8
@@ -55,33 +56,36 @@ export const ScheduleRow: FC<ScheduleRowProps> = ({ item, isCompleted, isCheckab
                         {SCHEDULE_KIND_LABEL[item.kind]}
                     </Badge>
                 </div>
-                <div className='flex items-start gap-3 bg-card p-3'>
-                    {isCheckable && (
-                        <Checkbox
-                            id={checkboxId}
-                            className='mt-0.5 rounded-none'
-                            checked={isCompleted}
-                            aria-label={`${item.timeLabel} ${item.title} 완료`}
-                            onCheckedChange={(checked) => onToggle?.(checked === true)}
-                        />
-                    )}
-                    {isCheckable ? (
-                        <label htmlFor={checkboxId} className={cn('min-w-0 flex-1 cursor-pointer', isCompleted && 'line-through')}>
-                            {content}
-                        </label>
-                    ) : (
-                        <div className={cn('min-w-0 flex-1', isCompleted && 'line-through')}>{content}</div>
-                    )}
+                <div className='flex min-w-0 gap-px bg-background'>
+                    <div className='flex min-w-0 flex-1 items-start gap-3 bg-card p-3'>
+                        {isCheckable && (
+                            <Checkbox
+                                id={checkboxId}
+                                className='mt-0.5 rounded-none'
+                                checked={isCompleted}
+                                aria-label={`${item.timeLabel} ${item.title} 완료`}
+                                onCheckedChange={(checked) => onToggle?.(checked === true)}
+                            />
+                        )}
+                        {isCheckable ? (
+                            <label htmlFor={checkboxId} className={cn('min-w-0 flex-1 cursor-pointer', isCompleted && 'line-through')}>
+                                {content}
+                            </label>
+                        ) : (
+                            <div className={cn('min-w-0 flex-1', isCompleted && 'line-through')}>{content}</div>
+                        )}
+                    </div>
                     {item.mapQuery && (
-                        <a
-                            className={cn(ROW_ACTION_CLASS, 'shrink-0 gap-1 bg-primary text-primary-foreground no-underline hover:bg-primary/90')}
-                            href={buildMapUrl(item.mapQuery)}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            aria-label={`${item.title} Google 지도에서 열기`}>
-                            지도 열기
-                            <ExternalLinkIcon aria-hidden className='size-3' />
-                        </a>
+                        <Button className='no-underline' variant='cellPrimary' size='cell' asChild>
+                            <a
+                                href={buildMapUrl(item.mapQuery)}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                aria-label={`${item.title} Google 지도에서 열기`}>
+                                지도 열기
+                                <ExternalLinkIcon aria-hidden />
+                            </a>
+                        </Button>
                     )}
                 </div>
             </motion.div>

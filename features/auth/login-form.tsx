@@ -68,9 +68,11 @@ export const LoginForm: FC<LoginFormProps> = ({ onSubmit, isPending }) => {
                     {errorMessage}
                 </p>
             )}
-            <Button type='submit' disabled={isPending}>
-                {isPending ? '로그인 중…' : '로그인'}
-            </Button>
+            <div className='flex gap-px bg-background'>
+                <Button className='flex-1' type='submit' variant='cellPrimary' size='cell' disabled={isPending}>
+                    {isPending ? '로그인 중…' : '로그인'}
+                </Button>
+            </div>
         </form>
     )
 }

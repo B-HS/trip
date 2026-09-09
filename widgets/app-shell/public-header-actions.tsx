@@ -14,18 +14,20 @@ export const PublicHeaderActions: FC = () => {
             <ThemeToggle />
             {!isPending &&
                 (session ? (
-                    <Button size='sm' variant='ghost' asChild>
-                        <Link href='/trips'>내 트립</Link>
-                    </Button>
+                    <div className='flex items-stretch gap-px bg-background'>
+                        <Button variant='cell' size='cell' asChild>
+                            <Link href='/trips'>내 트립</Link>
+                        </Button>
+                    </div>
                 ) : (
-                    <>
-                        <Button size='sm' variant='ghost' asChild>
+                    <div className='flex items-stretch gap-px bg-background'>
+                        <Button variant='cell' size='cell' asChild>
                             <Link href='/login'>로그인</Link>
                         </Button>
-                        <Button size='sm' asChild>
+                        <Button variant='cellPrimary' size='cell' asChild>
                             <Link href='/signup'>시작하기</Link>
                         </Button>
-                    </>
+                    </div>
                 ))}
         </>
     )

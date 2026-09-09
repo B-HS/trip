@@ -51,10 +51,12 @@ export const InfoSectionRow: FC<InfoSectionRowProps> = ({ sectionIndex }) => {
                         기본 펼침
                     </Label>
                 </div>
-                <Button type='button' variant='outline' size='sm' onClick={() => blocks.append(EMPTY_BLOCK)}>
-                    <PlusIcon />
-                    블록 추가
-                </Button>
+                <div className='flex gap-px bg-background'>
+                    <Button type='button' variant='cell' size='cell' onClick={() => blocks.append(EMPTY_BLOCK)}>
+                        <PlusIcon />
+                        블록 추가
+                    </Button>
+                </div>
             </div>
             {blocks.fields.length === 0 ? (
                 <p className='text-xs text-muted-foreground'>블록이 없습니다.</p>

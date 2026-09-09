@@ -160,7 +160,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, defaultValues, onSubmit, is
                     title='확인된 내용'
                     count={facts.fields.length}
                     action={
-                        <Button type='button' variant='outline' size='sm' onClick={() => facts.append(EMPTY_FACT)}>
+                        <Button type='button' variant='cell' size='cell' onClick={() => facts.append(EMPTY_FACT)}>
                             <PlusIcon />
                             항목 추가
                         </Button>
@@ -201,7 +201,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, defaultValues, onSubmit, is
                     title='이동 경로'
                     count={routes.fields.length}
                     action={
-                        <Button type='button' variant='outline' size='sm' onClick={() => routes.append(EMPTY_ROUTE)}>
+                        <Button type='button' variant='cell' size='cell' onClick={() => routes.append(EMPTY_ROUTE)}>
                             <PlusIcon />
                             경로 추가
                         </Button>
@@ -277,7 +277,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, defaultValues, onSubmit, is
                     title='타임라인'
                     count={scheduleItems.fields.length}
                     action={
-                        <Button type='button' variant='outline' size='sm' onClick={() => scheduleItems.append(EMPTY_SCHEDULE)}>
+                        <Button type='button' variant='cell' size='cell' onClick={() => scheduleItems.append(EMPTY_SCHEDULE)}>
                             <PlusIcon />
                             일정 추가
                         </Button>
@@ -301,7 +301,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, defaultValues, onSubmit, is
                     title='참고'
                     count={notes.fields.length}
                     action={
-                        <Button type='button' variant='outline' size='sm' onClick={() => notes.append(EMPTY_NOTE)}>
+                        <Button type='button' variant='cell' size='cell' onClick={() => notes.append(EMPTY_NOTE)}>
                             <PlusIcon />
                             참고 추가
                         </Button>

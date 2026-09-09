@@ -62,7 +62,7 @@ export const BookingsForm: FC<BookingsFormProps> = ({ defaultValues, onSubmit, i
                 description='우선순위 순서대로 정렬해 두면 뷰어에서 그대로 표시됩니다.'
                 count={rows.fields.length}
                 action={
-                    <Button type='button' variant='outline' size='sm' onClick={() => rows.append(EMPTY_BOOKING)}>
+                    <Button type='button' variant='cell' size='cell' onClick={() => rows.append(EMPTY_BOOKING)}>
                         <PlusIcon />
                         예매 추가
                     </Button>

@@ -122,15 +122,16 @@ export const TripCreateForm: FC<TripCreateFormProps> = ({ isPending, onSubmit })
                                 </Button>
                             </div>
                         ))}
-                        <Button
-                            className='w-fit'
-                            type='button'
-                            variant='outline'
-                            size='sm'
-                            onClick={() => rows.append({ countryCode: DEFAULT_COUNTRY_CODE, city: null })}>
-                            <PlusIcon aria-hidden />
-                            나라 추가
-                        </Button>
+                        <div className='flex w-fit gap-px bg-background'>
+                            <Button
+                                type='button'
+                                variant='cell'
+                                size='cell'
+                                onClick={() => rows.append({ countryCode: DEFAULT_COUNTRY_CODE, city: null })}>
+                                <PlusIcon aria-hidden />
+                                나라 추가
+                            </Button>
+                        </div>
                     </div>
                     <FieldErrorMessage>{destinationsError}</FieldErrorMessage>
                 </Field>
@@ -163,8 +164,8 @@ export const TripCreateForm: FC<TripCreateFormProps> = ({ isPending, onSubmit })
                     <FieldErrorMessage>{periodNoteError}</FieldErrorMessage>
                 </Field>
             </FieldGroup>
-            <div className='flex justify-end'>
-                <Button type='submit' size='sm' disabled={isPending}>
+            <div className='flex w-fit gap-px self-end bg-background'>
+                <Button type='submit' variant='cellPrimary' size='cell' disabled={isPending}>
                     {isPending ? '만드는 중…' : '트립 만들기'}
                 </Button>
             </div>

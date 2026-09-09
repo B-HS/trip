@@ -53,7 +53,7 @@ export const DayList: FC<DayListProps> = ({ days, selectedDayId, onSelect, onCre
                 title='날짜'
                 count={days.length}
                 action={
-                    <Button type='button' variant='outline' size='sm' disabled={isPending} onClick={onCreate}>
+                    <Button type='button' variant='cell' size='cell' disabled={isPending} onClick={onCreate}>
                         <PlusIcon />
                         날짜 추가
                     </Button>
@@ -92,9 +92,11 @@ export const DayList: FC<DayListProps> = ({ days, selectedDayId, onSelect, onCre
                                 : `${deletingDay.shortLabel} ${deletingDay.title} 의 일정과 경로가 함께 삭제됩니다.`}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>취소</AlertDialogCancel>
-                        <Button type='button' variant='destructive' disabled={isPending} onClick={handleDelete}>
+                    <AlertDialogFooter className='gap-px bg-background'>
+                        <AlertDialogCancel variant='cell' size='cell'>
+                            취소
+                        </AlertDialogCancel>
+                        <Button type='button' variant='cellDestructive' size='cell' disabled={isPending} onClick={handleDelete}>
                             삭제
                         </Button>
                     </AlertDialogFooter>

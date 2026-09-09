@@ -157,10 +157,12 @@ export const MembersPanel: FC<MembersPanelProps> = ({
                             ))}
                         </NativeSelect>
                     </EditorField>
-                    <Button type='submit' size='sm' disabled={isPending}>
-                        <UserPlusIcon />
-                        {isPending ? '저장 중…' : '초대'}
-                    </Button>
+                    <div className='flex gap-px bg-background'>
+                        <Button type='submit' variant='cellPrimary' size='cell' disabled={isPending}>
+                            <UserPlusIcon />
+                            {isPending ? '저장 중…' : '초대'}
+                        </Button>
+                    </div>
                 </form>
                 {invites.length === 0 ? (
                     <p className='text-xs text-muted-foreground'>대기 중인 초대가 없습니다.</p>
@@ -195,9 +197,11 @@ export const MembersPanel: FC<MembersPanelProps> = ({
                                 : `${removingMember.name} 님은 더 이상 이 여행을 볼 수 없습니다.`}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>취소</AlertDialogCancel>
-                        <Button type='button' variant='destructive' disabled={isPending} onClick={handleRemove}>
+                    <AlertDialogFooter className='gap-px bg-background'>
+                        <AlertDialogCancel variant='cell' size='cell'>
+                            취소
+                        </AlertDialogCancel>
+                        <Button type='button' variant='cellDestructive' size='cell' disabled={isPending} onClick={handleRemove}>
                             삭제
                         </Button>
                     </AlertDialogFooter>

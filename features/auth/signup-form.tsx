@@ -98,9 +98,11 @@ export const SignupForm: FC<SignupFormProps> = ({ onSubmit, isPending }) => {
                     {errorMessage}
                 </p>
             )}
-            <Button type='submit' disabled={isPending}>
-                {isPending ? '가입 중…' : '회원가입'}
-            </Button>
+            <div className='flex gap-px bg-background'>
+                <Button className='flex-1' type='submit' variant='cellPrimary' size='cell' disabled={isPending}>
+                    {isPending ? '가입 중…' : '회원가입'}
+                </Button>
+            </div>
         </form>
     )
 }

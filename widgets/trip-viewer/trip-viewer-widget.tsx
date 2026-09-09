@@ -187,13 +187,9 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
                     <div className='md:sticky md:top-0'>{sidebar(false)}</div>
                 </div>
                 <div className='flex min-w-0 flex-col gap-px'>
-                    <div className='flex items-stretch justify-between bg-background'>
+                    <div className='flex items-stretch justify-between gap-px bg-background'>
                         <ViewTabs activeView={activeView} onSelect={handleSelectView} />
-                        <Button
-                            type='button'
-                            variant='ghost'
-                            className='h-12 rounded-none px-4 text-sm hover:bg-muted'
-                            onClick={() => window.print()}>
+                        <Button type='button' variant='cell' size='cell' onClick={() => window.print()}>
                             <PrinterIcon aria-hidden />
                             전체 일정 인쇄
                         </Button>
@@ -294,9 +290,13 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
                             {`${resetTargetDay?.title ?? '선택한 날짜'}의 완료 표시가 모두 해제됩니다. 다른 날짜와 메모는 그대로 유지됩니다.`}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>취소</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleConfirmReset}>초기화</AlertDialogAction>
+                    <AlertDialogFooter className='gap-px bg-background sm:ml-auto sm:w-fit'>
+                        <AlertDialogCancel variant='cell' size='cell'>
+                            취소
+                        </AlertDialogCancel>
+                        <AlertDialogAction variant='cellPrimary' size='cell' onClick={handleConfirmReset}>
+                            초기화
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

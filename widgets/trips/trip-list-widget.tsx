@@ -96,16 +96,17 @@ export const TripListWidget: FC = () => {
         return (
             <>
                 <TripStatTiles tiles={tiles} />
-                <section className='flex flex-wrap items-center gap-2 bg-card p-3'>
-                    <Button size='sm' asChild>
+                <section className='flex flex-wrap items-stretch gap-px bg-background'>
+                    <Button variant='cellPrimary' size='cell' asChild>
                         <Link href={NEW_TRIP_PATH}>
                             <PlusIcon aria-hidden />새 트립
                         </Link>
                     </Button>
-                    <Button variant='outline' size='sm' disabled={createFromTemplate.isPending} onClick={handleCreateSample}>
+                    <Button variant='cell' size='cell' disabled={createFromTemplate.isPending} onClick={handleCreateSample}>
                         <SparklesIcon aria-hidden />
                         {createFromTemplate.isPending ? '만드는 중…' : '오사카 예시 트립 만들기'}
                     </Button>
+                    <div aria-hidden className='min-w-0 flex-1 bg-card' />
                 </section>
                 {trips.length === 0 ? (
                     <TripEmptyState newTripHref={NEW_TRIP_PATH} isSamplePending={createFromTemplate.isPending} onCreateSample={handleCreateSample} />

@@ -80,12 +80,12 @@ export const TripEditorWidget: FC<TripEditorWidgetProps> = ({ tripId }) => {
             className='flex-1 gap-px bg-background'
             value={activeTab}
             onValueChange={(value) => router.replace(`/trips/${tripId}/edit?${EDITOR_TAB_PARAM}=${value}`, { scroll: false })}>
-            <div className='flex flex-wrap items-center justify-between gap-2 bg-card p-3'>
-                <div className='flex min-w-0 flex-col gap-0.5'>
+            <div className='flex flex-wrap items-stretch justify-between gap-px bg-background'>
+                <div className='flex min-w-0 flex-1 flex-col justify-center gap-0.5 bg-card p-3'>
                     <h1 className='truncate text-sm font-semibold tracking-tight'>{detail.title}</h1>
                     <p className='text-xs text-muted-foreground'>{savedAt === null ? '탭마다 따로 저장합니다.' : `최근 저장 ${savedAt}`}</p>
                 </div>
-                <Button variant='outline' size='sm' asChild>
+                <Button variant='cell' size='cell' asChild>
                     <Link href={`/trips/${tripId}`}>
                         <ExternalLinkIcon />
                         보기

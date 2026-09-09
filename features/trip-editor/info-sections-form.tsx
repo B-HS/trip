@@ -50,7 +50,7 @@ export const InfoSectionsForm: FC<InfoSectionsFormProps> = ({ defaultValues, onS
                     description='뷰어의 아코디언 섹션입니다. 섹션과 블록 모두 순서를 바꿀 수 있습니다.'
                     count={rows.fields.length}
                     action={
-                        <Button type='button' variant='outline' size='sm' onClick={() => rows.append(EMPTY_SECTION)}>
+                        <Button type='button' variant='cell' size='cell' onClick={() => rows.append(EMPTY_SECTION)}>
                             <PlusIcon />
                             섹션 추가
                         </Button>

@@ -138,17 +138,17 @@ export const SharePanel: FC<SharePanelProps> = ({
                                 ? '저장하면 공유 주소가 만들어집니다.'
                                 : `${APP_URL}${SHARE_PATH}${previewSlug}`}
                         </p>
-                        <div className='flex flex-wrap items-center gap-2'>
-                            <Button type='button' variant='outline' size='sm' disabled={savedUrl === null} onClick={handleCopy}>
+                        <div className='flex w-fit flex-wrap items-stretch gap-px bg-background'>
+                            <Button type='button' variant='cell' size='cell' disabled={savedUrl === null} onClick={handleCopy}>
                                 <CopyIcon />
                                 링크 복사
                             </Button>
                             {savedUrl === null ? (
-                                <Button type='button' variant='outline' size='sm' disabled>
+                                <Button type='button' variant='cell' size='cell' disabled>
                                     <ExternalLinkIcon />새 탭에서 열기
                                 </Button>
                             ) : (
-                                <Button variant='outline' size='sm' asChild>
+                                <Button variant='cell' size='cell' asChild>
                                     <a href={savedUrl} target='_blank' rel='noopener noreferrer'>
                                         <ExternalLinkIcon />새 탭에서 열기
                                     </a>
@@ -159,12 +159,12 @@ export const SharePanel: FC<SharePanelProps> = ({
                 </EditorFormShell>
             )}
             <EditorPanel title='내보내기·가져오기' description='구조화된 JSON 으로 내려받거나, 내보낸 JSON 을 가져와 현재 내용을 교체할 수 있습니다.'>
-                <div className='flex flex-wrap items-center gap-2'>
-                    <Button type='button' variant='outline' size='sm' disabled={isExporting} onClick={onExport}>
+                <div className='flex w-fit flex-wrap items-stretch gap-px bg-background'>
+                    <Button type='button' variant='cell' size='cell' disabled={isExporting} onClick={onExport}>
                         <DownloadIcon />
                         {isExporting ? '내보내는 중…' : 'JSON 내보내기'}
                     </Button>
-                    <Button type='button' variant='outline' size='sm' disabled={isImporting} onClick={() => fileInputRef.current?.click()}>
+                    <Button type='button' variant='cell' size='cell' disabled={isImporting} onClick={() => fileInputRef.current?.click()}>
                         <UploadIcon />
                         {isImporting ? '가져오는 중…' : 'JSON 가져오기'}
                     </Button>
@@ -182,9 +182,11 @@ export const SharePanel: FC<SharePanelProps> = ({
                             <span className='mt-1 block'>현재 내용이 모두 교체됩니다. 체크·메모도 초기화됩니다.</span>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isImporting}>취소</AlertDialogCancel>
-                        <AlertDialogAction disabled={isImporting} onClick={handleImport}>
+                    <AlertDialogFooter className='gap-px bg-background sm:ml-auto sm:w-fit'>
+                        <AlertDialogCancel variant='cell' size='cell' disabled={isImporting}>
+                            취소
+                        </AlertDialogCancel>
+                        <AlertDialogAction variant='cellPrimary' size='cell' disabled={isImporting} onClick={handleImport}>
                             {isImporting ? '가져오는 중…' : '가져오기'}
                         </AlertDialogAction>
                     </AlertDialogFooter>

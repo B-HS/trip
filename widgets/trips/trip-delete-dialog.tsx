@@ -38,9 +38,11 @@ export const TripDeleteDialog: FC<TripDeleteDialogProps> = ({ target, onOpenChan
                         {target?.title ?? ''}의 날짜별 일정과 예매 목록, 멤버가 함께 삭제됩니다. 되돌릴 수 없습니다.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel disabled={deleteTrip.isPending}>취소</AlertDialogCancel>
-                    <AlertDialogAction variant='destructive' disabled={deleteTrip.isPending} onClick={handleConfirm}>
+                <AlertDialogFooter className='gap-px bg-background sm:ml-auto sm:w-fit'>
+                    <AlertDialogCancel variant='cell' size='cell' disabled={deleteTrip.isPending}>
+                        취소
+                    </AlertDialogCancel>
+                    <AlertDialogAction variant='cellDestructive' size='cell' disabled={deleteTrip.isPending} onClick={handleConfirm}>
                         {deleteTrip.isPending ? '삭제 중…' : '삭제'}
                     </AlertDialogAction>
                 </AlertDialogFooter>

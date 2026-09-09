@@ -15,11 +15,11 @@ const NotFoundPage = () => (
                 <h1 className='text-xl font-extrabold tracking-tight text-balance'>{NOT_FOUND_COPY.title}</h1>
                 <EmptyDescription className='leading-7'>{NOT_FOUND_COPY.description}</EmptyDescription>
             </EmptyHeader>
-            <EmptyContent className='flex-row flex-wrap justify-center gap-2'>
-                <Button asChild>
+            <EmptyContent className='w-fit flex-row flex-wrap items-stretch justify-center gap-px bg-background'>
+                <Button asChild variant='cellPrimary' size='cell'>
                     <Link href={NOT_FOUND_COPY.primaryAction.href}>{NOT_FOUND_COPY.primaryAction.label}</Link>
                 </Button>
-                <Button asChild variant='outline'>
+                <Button asChild variant='cell' size='cell'>
                     <Link href={NOT_FOUND_COPY.secondaryAction.href}>{NOT_FOUND_COPY.secondaryAction.label}</Link>
                 </Button>
             </EmptyContent>

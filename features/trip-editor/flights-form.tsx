@@ -68,7 +68,7 @@ export const FlightsForm: FC<FlightsFormProps> = ({ defaultValues, onSubmit, isP
                 description='드래그해서 순서를 바꿀 수 있습니다.'
                 count={rows.fields.length}
                 action={
-                    <Button type='button' variant='outline' size='sm' onClick={() => rows.append(EMPTY_FLIGHT)}>
+                    <Button type='button' variant='cell' size='cell' onClick={() => rows.append(EMPTY_FLIGHT)}>
                         <PlusIcon />
                         항공편 추가
                     </Button>

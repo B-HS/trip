@@ -23,8 +23,8 @@ export const TripTemplateCard: FC<TripTemplateCardProps> = ({ title, description
                 <li key={highlight}>{highlight}</li>
             ))}
         </ul>
-        <div className='mt-auto flex justify-end'>
-            <Button variant='outline' size='sm' disabled={isPending} onClick={onCreate}>
+        <div className='mt-auto flex w-fit gap-px self-end bg-background'>
+            <Button variant='cell' size='cell' disabled={isPending} onClick={onCreate}>
                 <SparklesIcon aria-hidden />
                 {isPending ? '만드는 중…' : '예시로 시작하기'}
             </Button>

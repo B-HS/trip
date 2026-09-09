@@ -61,7 +61,7 @@ export const LodgingsForm: FC<LodgingsFormProps> = ({ defaultValues, onSubmit, i
                 description='모든 날의 출발점이 되는 숙소 정보입니다.'
                 count={rows.fields.length}
                 action={
-                    <Button type='button' variant='outline' size='sm' onClick={() => rows.append(EMPTY_LODGING)}>
+                    <Button type='button' variant='cell' size='cell' onClick={() => rows.append(EMPTY_LODGING)}>
                         <PlusIcon />
                         숙소 추가
                     </Button>

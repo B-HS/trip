@@ -58,11 +58,11 @@ export const TripCard: FC<TripCardProps> = ({
                     <h2 className='truncate text-sm font-medium text-card-foreground'>{title}</h2>
                 </Link>
             </div>
-            <div className='flex shrink-0 items-center'>
+            <div className='flex shrink-0 items-stretch gap-px bg-background'>
                 <Button
                     className='relative z-10 shrink-0'
-                    variant='ghost'
-                    size='icon-sm'
+                    variant='cell'
+                    size='cellIcon'
                     aria-pressed={isFavorite}
                     aria-label={isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
                     onClick={onToggleFavorite}>
@@ -70,7 +70,7 @@ export const TripCard: FC<TripCardProps> = ({
                 </Button>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button className='relative z-10 shrink-0' variant='ghost' size='icon-sm' aria-label={`${title} 메뉴 열기`}>
+                        <Button className='relative z-10 shrink-0' variant='cell' size='cellIcon' aria-label={`${title} 메뉴 열기`}>
                             <MoreHorizontalIcon aria-hidden />
                         </Button>
                     </DropdownMenuTrigger>

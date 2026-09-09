@@ -10,8 +10,8 @@ type EditorToolbarProps = {
 }
 
 export const EditorToolbar: FC<EditorToolbarProps> = ({ title, description, count, action }) => (
-    <div className='flex flex-wrap items-center justify-between gap-2 bg-card p-3'>
-        <div className='flex min-w-0 flex-col gap-0.5'>
+    <div className='flex flex-wrap items-stretch justify-between gap-px bg-background'>
+        <div className='flex min-w-0 flex-1 flex-col justify-center gap-0.5 bg-card p-3'>
             <h2 className='flex items-center gap-2 text-sm font-medium'>
                 {title}
                 {count !== undefined && <span className='font-mono text-xs text-muted-foreground tabular-nums'>{count}</span>}
