@@ -16,6 +16,7 @@ import { BookingsTab } from '@/widgets/trip-editor/bookings-tab'
 import { DaysTab } from '@/widgets/trip-editor/days-tab'
 import { InfoTab } from '@/widgets/trip-editor/info-tab'
 import { ShareTab } from '@/widgets/trip-editor/share-tab'
+import { SidebarTab } from '@/widgets/trip-editor/sidebar-tab'
 import { TravelTab } from '@/widgets/trip-editor/travel-tab'
 import {
     EDITOR_EXPORT_TAB_LABEL,
@@ -31,6 +32,7 @@ const SAVED_TIME_FORMAT = 'HH:mm:ss'
 
 const TAB_COMPONENT = {
     basics: BasicsTab,
+    sidebar: SidebarTab,
     travel: TravelTab,
     days: DaysTab,
     bookings: BookingsTab,
@@ -68,6 +70,7 @@ export const TripEditorWidget: FC<TripEditorWidgetProps> = ({ tripId }) => {
     const isOwner = detail.viewerRole === 'owner'
     const tabCount = {
         basics: undefined,
+        sidebar: detail.sidebarLinks.length,
         travel: detail.flights.length + detail.lodgings.length,
         days: detail.days.length,
         bookings: detail.bookings.length,

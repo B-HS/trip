@@ -18,6 +18,7 @@ import {
     saveFlightsAction,
     saveInfoSectionsAction,
     saveLodgingsAction,
+    saveSidebarAction,
     saveTripBasicsAction,
     toggleFavoriteAction,
     updateMemberRoleAction,
@@ -35,6 +36,7 @@ import type {
     MemberInviteInput,
     MemberRoleInput,
     ShareSettingsInput,
+    SidebarInput,
     TripBasicsFormInput,
     TripCreateInput,
 } from '@/entities/trip/trip.validate'
@@ -152,6 +154,18 @@ export const useSaveLodgings = (tripId: string) => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
             toast.success('숙소를 저장했습니다.')
+        },
+        onError: (error) => toast.error(error.message),
+    })
+}
+
+export const useSaveSidebar = (tripId: string) => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: async (input: SidebarInput) => unwrapActionResult(await saveSidebarAction(tripId, input)),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
+            toast.success('사이드바를 저장했습니다.')
         },
         onError: (error) => toast.error(error.message),
     })

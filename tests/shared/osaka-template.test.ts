@@ -28,6 +28,11 @@ describe('오사카 템플릿 스키마', () => {
         expect(parsed.periodNote).toBe('예비일 하루')
         expect(parsed.verifiedOn).toBe('2026-09-09')
     })
+
+    test('사이드바 소개 문구와 링크는 비어 있다', () => {
+        expect(parsed.sidebarNote).toBeNull()
+        expect(parsed.sidebarLinks).toEqual([])
+    })
 })
 
 describe('오사카 템플릿 전수 이식 수량', () => {

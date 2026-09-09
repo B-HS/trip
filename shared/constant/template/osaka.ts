@@ -14,6 +14,7 @@ export const OSAKA_TRIP_TEMPLATE = {
     bufferPolicy: '일반 일정은 표시 구간의 마지막 10분, 항공편·공식 셔틀은 인접 대기 구간에서 10분을 확보합니다.',
     bookingNote: '키린과 아사히 회차를 먼저 확보한 뒤 나머지 입장권을 구매합니다.',
     footerNote: '최신 합의 일정을 기준으로 작성했습니다. 개별 열차 연결과 투어 잔여석은 미확정입니다. 공식 예매 링크는 인터넷 연결이 필요합니다.',
+    sidebarNote: null,
     destinations: [{ countryCode: 'JP', city: '오사카' }],
     flights: [
         {
@@ -53,6 +54,7 @@ export const OSAKA_TRIP_TEMPLATE = {
             note: '조식 06:30~09:00',
         },
     ],
+    sidebarLinks: [],
     days: [
         {
             date: '2026-10-01',

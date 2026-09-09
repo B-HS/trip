@@ -11,6 +11,22 @@ describe('parseTripTemplateJson', () => {
         expect(parsed?.days.length).toBe(OSAKA_TRIP_TEMPLATE.days.length)
     })
 
+    test('사이드바 링크가 http 주소가 아니면 null 을 반환한다', () => {
+        const template = { ...OSAKA_TRIP_TEMPLATE, sidebarLinks: [{ label: '안내', url: 'javascript:alert(1)', description: null }] }
+        expect(parseTripTemplateJson(JSON.stringify(template))).toBeNull()
+    })
+
+    test('사이드바 소개 문구와 링크를 함께 파싱한다', () => {
+        const template = {
+            ...OSAKA_TRIP_TEMPLATE,
+            sidebarNote: '예매 링크를 모아 두었습니다.',
+            sidebarLinks: [{ label: '공식 예매', url: 'https://ticket.example.com', description: null }],
+        }
+        const parsed = parseTripTemplateJson(JSON.stringify(template))
+        expect(parsed?.sidebarNote).toBe('예매 링크를 모아 두었습니다.')
+        expect(parsed?.sidebarLinks[0]?.label).toBe('공식 예매')
+    })
+
     test('JSON 이 아니면 null 을 반환한다', () => {
         expect(parseTripTemplateJson('트립 아님')).toBeNull()
     })

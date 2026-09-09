@@ -15,6 +15,7 @@ import {
     tripTemplateLodgingSchema,
     tripTemplateRouteSchema,
     tripTemplateScheduleItemSchema,
+    tripTemplateSidebarLinkSchema,
 } from '@/shared/lib/trip-template'
 
 const SHARE_SLUG_MIN_LENGTH = 3
@@ -28,9 +29,11 @@ const optionalId = z.uuid().optional()
 export const tripIdSchema = z.uuid()
 
 const tripBasicsFieldsSchema = tripTemplateFieldsSchema.omit({
+    sidebarNote: true,
     destinations: true,
     flights: true,
     lodgings: true,
+    sidebarLinks: true,
     days: true,
     bookings: true,
     infoSections: true,
@@ -60,6 +63,11 @@ export const flightListSchema = z.array(flightInputSchema)
 
 export const lodgingInputSchema = tripTemplateLodgingSchema.extend({ id: optionalId })
 export const lodgingListSchema = z.array(lodgingInputSchema)
+
+export const sidebarLinkInputSchema = tripTemplateSidebarLinkSchema.extend({ id: optionalId })
+export const sidebarLinkListSchema = z.array(sidebarLinkInputSchema)
+
+export const sidebarSchema = tripTemplateFieldsSchema.pick({ sidebarNote: true }).extend({ links: sidebarLinkListSchema })
 
 export const bookingInputSchema = tripTemplateBookingSchema.extend({ id: optionalId })
 export const bookingListSchema = z.array(bookingInputSchema)
@@ -114,6 +122,10 @@ export type FlightListInput = z.input<typeof flightListSchema>
 export type LodgingInput = z.input<typeof lodgingInputSchema>
 export type LodgingValues = z.output<typeof lodgingInputSchema>
 export type LodgingListInput = z.input<typeof lodgingListSchema>
+export type SidebarLinkInput = z.input<typeof sidebarLinkInputSchema>
+export type SidebarLinkValues = z.output<typeof sidebarLinkInputSchema>
+export type SidebarInput = z.input<typeof sidebarSchema>
+export type SidebarValues = z.output<typeof sidebarSchema>
 export type BookingInput = z.input<typeof bookingInputSchema>
 export type BookingValues = z.output<typeof bookingInputSchema>
 export type BookingListInput = z.input<typeof bookingListSchema>

@@ -10,6 +10,7 @@ import {
     memberInviteSchema,
     memberRoleSchema,
     shareSettingsSchema,
+    sidebarSchema,
     tripBasicsFormSchema,
     tripBasicsSchema,
     tripCreateSchema,
@@ -166,6 +167,33 @@ describe('infoSectionListSchema / bookingListSchema', () => {
 
     test('링크가 URL 이 아니면 실패한다', () => {
         expect(() => bookingListSchema.parse([{ title: '키린 공장 견학', linkUrl: 'kirin' }])).toThrow()
+    })
+})
+
+describe('sidebarSchema', () => {
+    test('소개 문구가 없으면 null 로 채우고 링크는 그대로 파싱한다', () => {
+        const parsed = sidebarSchema.parse({ links: [{ label: '공식 예매', url: 'https://ticket.example.com' }] })
+        expect(parsed.sidebarNote).toBeNull()
+        expect(parsed.links[0]?.label).toBe('공식 예매')
+        expect(parsed.links[0]?.description).toBeNull()
+        expect(parsed.links[0]?.id).toBeUndefined()
+    })
+
+    test('http 와 https 주소만 허용한다', () => {
+        expect(sidebarSchema.parse({ links: [{ label: '안내', url: 'http://example.com' }] }).links).toHaveLength(1)
+        expect(() => sidebarSchema.parse({ links: [{ label: '안내', url: 'javascript:alert(1)' }] })).toThrow()
+        expect(() => sidebarSchema.parse({ links: [{ label: '안내', url: 'mailto:guest@example.com' }] })).toThrow()
+        expect(() => sidebarSchema.parse({ links: [{ label: '안내', url: 'example.com' }] })).toThrow()
+    })
+
+    test('라벨이 비어 있으면 실패한다', () => {
+        expect(() => sidebarSchema.parse({ links: [{ label: '', url: 'https://example.com' }] })).toThrow()
+    })
+
+    test('기본 정보 스키마에는 사이드바 값이 섞이지 않는다', () => {
+        const parsed = tripBasicsSchema.parse({ ...basics, sidebarNote: '섞이면 안 됩니다.' })
+        expect('sidebarNote' in parsed).toBe(false)
+        expect('sidebarLinks' in parsed).toBe(false)
     })
 })
 

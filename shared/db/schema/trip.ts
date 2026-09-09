@@ -37,6 +37,7 @@ export const trip = tripTable(
         bufferPolicy: text('buffer_policy'),
         bookingNote: text('booking_note'),
         footerNote: text('footer_note'),
+        sidebarNote: text('sidebar_note'),
         shareSlug: varchar('share_slug', { length: 64 }),
         isPublic: boolean('is_public').default(false).notNull(),
         createdAt: createdAt(),
@@ -133,6 +134,21 @@ export const tripLodging = tripTable(
         note: varchar('note', { length: 255 }),
     },
     (table) => [index('lodging_trip_id_idx').on(table.tripId)],
+)
+
+export const tripSidebarLink = tripTable(
+    'sidebar_link',
+    {
+        id: id(),
+        tripId: varchar('trip_id', { length: 36 })
+            .notNull()
+            .references(() => trip.id, { onDelete: 'cascade' }),
+        sortOrder: int('sort_order').notNull().default(0),
+        label: varchar('label', { length: 80 }).notNull(),
+        url: varchar('url', { length: 500 }).notNull(),
+        description: varchar('description', { length: 200 }),
+    },
+    (table) => [index('sidebar_link_trip_id_idx').on(table.tripId)],
 )
 
 export const tripDay = tripTable(
@@ -340,6 +356,7 @@ export const tripRelations = relations(trip, ({ one, many }) => ({
     favorites: many(tripFavorite),
     flights: many(tripFlight),
     lodgings: many(tripLodging),
+    sidebarLinks: many(tripSidebarLink),
     days: many(tripDay),
     bookings: many(tripBooking),
     infoSections: many(tripInfoSection),
@@ -370,6 +387,10 @@ export const tripFlightRelations = relations(tripFlight, ({ one }) => ({
 
 export const tripLodgingRelations = relations(tripLodging, ({ one }) => ({
     trip: one(trip, { fields: [tripLodging.tripId], references: [trip.id] }),
+}))
+
+export const tripSidebarLinkRelations = relations(tripSidebarLink, ({ one }) => ({
+    trip: one(trip, { fields: [tripSidebarLink.tripId], references: [trip.id] }),
 }))
 
 export const tripDayRelations = relations(tripDay, ({ one, many }) => ({

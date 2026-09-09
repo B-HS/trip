@@ -12,6 +12,7 @@ import type {
     InfoSectionValues,
     LodgingValues,
     ShareSettingsValues,
+    SidebarValues,
     TripBasicsValues,
 } from '@/entities/trip/trip.validate'
 import { isCountryCode } from '@/shared/constant/countries'
@@ -26,6 +27,7 @@ import {
     tripInfoSection,
     tripLodging,
     tripMember,
+    tripSidebarLink,
 } from '@/shared/db/schema/trip'
 import { ApiError } from '@/shared/lib/api-response'
 import type { TripTemplate } from '@/shared/lib/trip-template'
@@ -118,6 +120,22 @@ const reconcileLodgings = async (tx: TripTransaction, tripId: string, list: Lodg
             continue
         }
         await tx.insert(tripLodging).values({ ...values, tripId })
+    }
+}
+
+const reconcileSidebarLinks = async (tx: TripTransaction, tripId: string, list: SidebarValues['links']) => {
+    const existing = await tx.select({ id: tripSidebarLink.id }).from(tripSidebarLink).where(eq(tripSidebarLink.tripId, tripId))
+    const removable = removableIds(existing, list)
+    if (removable.length > 0) await tx.delete(tripSidebarLink).where(inArray(tripSidebarLink.id, removable))
+    const existingIds = new Set(existing.map((row) => row.id))
+    for (const [index, item] of list.entries()) {
+        const values = { label: item.label, url: item.url, description: item.description, sortOrder: index }
+        const id = item.id
+        if (id !== undefined && existingIds.has(id)) {
+            await tx.update(tripSidebarLink).set(values).where(eq(tripSidebarLink.id, id))
+            continue
+        }
+        await tx.insert(tripSidebarLink).values({ ...values, tripId })
     }
 }
 
@@ -235,6 +253,7 @@ export const findTripDetail = async (tripId: string) => {
             destinations: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
             flights: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
             lodgings: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
+            sidebarLinks: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
             bookings: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
             infoSections: {
                 orderBy: (fields, { asc }) => [asc(fields.sortOrder)],
@@ -289,11 +308,12 @@ export const createTrip = async (ownerId: string, basics: TripBasicsValues, dest
 export const createTripFromTemplate = async (ownerId: string, template: TripTemplate) => {
     const id = crypto.randomUUID()
     await getDb().transaction(async (tx) => {
-        await tx.insert(trip).values({ ...toTripValues(template), id, ownerId })
+        await tx.insert(trip).values({ ...toTripValues(template), sidebarNote: template.sidebarNote, id, ownerId })
         await tx.insert(tripMember).values({ tripId: id, userId: ownerId, role: 'owner' })
         await reconcileDestinations(tx, id, template.destinations)
         await reconcileFlights(tx, id, template.flights)
         await reconcileLodgings(tx, id, template.lodgings)
+        await reconcileSidebarLinks(tx, id, template.sidebarLinks)
         await insertTemplateDays(tx, id, template.days)
         await reconcileBookings(tx, id, template.bookings)
         await reconcileInfoSections(tx, id, template.infoSections)
@@ -303,10 +323,14 @@ export const createTripFromTemplate = async (ownerId: string, template: TripTemp
 
 export const replaceTripFromTemplate = async (tripId: string, template: TripTemplate) => {
     await getDb().transaction(async (tx) => {
-        await tx.update(trip).set(toTripValues(template)).where(eq(trip.id, tripId))
+        await tx
+            .update(trip)
+            .set({ ...toTripValues(template), sidebarNote: template.sidebarNote })
+            .where(eq(trip.id, tripId))
         await reconcileDestinations(tx, tripId, template.destinations)
         await reconcileFlights(tx, tripId, template.flights)
         await reconcileLodgings(tx, tripId, template.lodgings)
+        await reconcileSidebarLinks(tx, tripId, template.sidebarLinks)
         await tx.delete(tripDay).where(eq(tripDay.tripId, tripId))
         await insertTemplateDays(tx, tripId, template.days)
         await reconcileBookings(tx, tripId, template.bookings)
@@ -336,6 +360,14 @@ export const saveFlights = async (tripId: string, list: FlightValues[]) => {
 export const saveLodgings = async (tripId: string, list: LodgingValues[]) => {
     await getDb().transaction(async (tx) => {
         await reconcileLodgings(tx, tripId, list)
+        await touchTrip(tx, tripId)
+    })
+}
+
+export const saveSidebar = async (tripId: string, input: SidebarValues) => {
+    await getDb().transaction(async (tx) => {
+        await tx.update(trip).set({ sidebarNote: input.sidebarNote }).where(eq(trip.id, tripId))
+        await reconcileSidebarLinks(tx, tripId, input.links)
         await touchTrip(tx, tripId)
     })
 }
@@ -410,6 +442,7 @@ export const exportTripTemplate = async (tripId: string) => {
         bufferPolicy: detail.bufferPolicy,
         bookingNote: detail.bookingNote,
         footerNote: detail.footerNote,
+        sidebarNote: detail.sidebarNote,
         destinations: detail.destinations.flatMap((item) =>
             isCountryCode(item.countryCode) ? [{ countryCode: item.countryCode, city: item.city }] : [],
         ),
@@ -435,6 +468,7 @@ export const exportTripTemplate = async (tripId: string) => {
             url: item.url,
             note: item.note,
         })),
+        sidebarLinks: detail.sidebarLinks.map((link) => ({ label: link.label, url: link.url, description: link.description })),
         days: detail.days.map((day) => ({
             date: day.date,
             shortLabel: day.shortLabel,

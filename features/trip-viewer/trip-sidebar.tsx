@@ -1,6 +1,6 @@
 import { ExternalLinkIcon } from 'lucide-react'
 import type { FC } from 'react'
-import type { TripDestinationView, TripFlight, TripLodging } from '@/entities/trip/trip.type'
+import type { TripDestinationView, TripFlight, TripLodging, TripSidebarLink } from '@/entities/trip/trip.type'
 import { formatPeriodLabel, formatRatio, formatVerifiedOn, toPercent } from '@/features/trip-viewer/trip-viewer-format'
 import { countryName } from '@/shared/constant/countries'
 import { formatTripLength } from '@/shared/lib/trip-length'
@@ -15,11 +15,13 @@ type TripSidebarProps = {
     customNights: number | null
     customDays: number | null
     periodNote: string | null
+    sidebarNote: string | null
     completedCount: number
     totalCount: number
     destinations?: readonly TripDestinationView[]
     flights: readonly TripFlight[]
     lodgings: readonly TripLodging[]
+    sidebarLinks: readonly TripSidebarLink[]
     disclaimer: string | null
     verifiedOn: string | null
     isPrintLayout?: boolean
@@ -36,11 +38,13 @@ export const TripSidebar: FC<TripSidebarProps> = ({
     customNights,
     customDays,
     periodNote,
+    sidebarNote,
     completedCount,
     totalCount,
     destinations = [],
     flights,
     lodgings,
+    sidebarLinks,
     disclaimer,
     verifiedOn,
     isPrintLayout = false,
@@ -57,6 +61,7 @@ export const TripSidebar: FC<TripSidebarProps> = ({
                 {formatTripLength({ startDate, endDate, nights: customNights, days: customDays })}
             </p>
             {periodNote && <p className='mt-1 text-xs text-muted-foreground'>{periodNote}</p>}
+            {sidebarNote && <p className='mt-1 text-xs break-keep text-muted-foreground'>{sidebarNote}</p>}
         </div>
         <div className='flex flex-col gap-1'>
             <span aria-live='polite' className='text-xs text-muted-foreground'>
@@ -119,6 +124,24 @@ export const TripSidebar: FC<TripSidebarProps> = ({
                                 <ExternalLinkIcon aria-hidden className='size-3' />
                             </a>
                         )}
+                    </div>
+                ))}
+            </section>
+        )}
+        {sidebarLinks.length > 0 && (
+            <section className='flex flex-col gap-2'>
+                <h2 className='text-sm font-medium text-foreground'>링크</h2>
+                {sidebarLinks.map((link) => (
+                    <div key={link.id} className='flex flex-col gap-1 bg-muted pt-2'>
+                        <a
+                            className='inline-flex w-fit items-center gap-1 text-sm leading-snug font-medium break-keep underline'
+                            href={link.url}
+                            target='_blank'
+                            rel='noopener noreferrer'>
+                            {link.label}
+                            <ExternalLinkIcon aria-hidden className='size-3' />
+                        </a>
+                        {link.description && <span className='text-xs text-muted-foreground'>{link.description}</span>}
                     </div>
                 ))}
             </section>

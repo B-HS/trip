@@ -7,6 +7,7 @@ import type {
     InfoSectionInput,
     LodgingInput,
     ShareSettingsInput,
+    SidebarInput,
     TripBasicsInput,
 } from '@/entities/trip/trip.validate'
 
@@ -66,6 +67,12 @@ export const toLodgingDefaults = (detail: TripDetail) =>
                 note: lodging.note,
             }) satisfies LodgingInput,
     )
+
+export const toSidebarDefaults = (detail: TripDetail) =>
+    ({
+        sidebarNote: detail.sidebarNote,
+        links: detail.sidebarLinks.map((link) => ({ id: link.id, label: link.label, url: link.url, description: link.description })),
+    }) satisfies SidebarInput
 
 export const toBookingDefaults = (detail: TripDetail) =>
     detail.bookings.map(

@@ -11,6 +11,8 @@ import {
 } from '@/shared/constant/trip'
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
+const HTTP_URL_PATTERN = /^https?:\/\//
+const SIDEBAR_LINK_URL_ISSUE = '링크는 http 또는 https 주소여야 합니다.'
 
 const optionalText = (max: number) => z.string().trim().max(max).nullable().default(null)
 const optionalUrl = z.url().max(500).nullable().default(null)
@@ -48,6 +50,15 @@ export const tripTemplateLodgingSchema = z.object({
     checkOut: optionalText(8),
     url: optionalUrl,
     note: optionalText(255),
+})
+
+export const tripTemplateSidebarLinkSchema = z.object({
+    label: z.string().trim().min(1).max(80),
+    url: z
+        .url()
+        .max(500)
+        .refine((value) => HTTP_URL_PATTERN.test(value), SIDEBAR_LINK_URL_ISSUE),
+    description: optionalText(200),
 })
 
 export const tripTemplateDayFactSchema = z.object({
@@ -136,9 +147,11 @@ export const tripTemplateFieldsSchema = z.object({
     bufferPolicy: optionalText(2000),
     bookingNote: optionalText(2000),
     footerNote: optionalText(2000),
+    sidebarNote: optionalText(500),
     destinations: z.array(tripTemplateDestinationSchema).default([]),
     flights: z.array(tripTemplateFlightSchema).default([]),
     lodgings: z.array(tripTemplateLodgingSchema).default([]),
+    sidebarLinks: z.array(tripTemplateSidebarLinkSchema).default([]),
     days: z.array(tripTemplateDaySchema).default([]),
     bookings: z.array(tripTemplateBookingSchema).default([]),
     infoSections: z.array(tripTemplateInfoSectionSchema).default([]),

@@ -13,6 +13,7 @@ import {
     saveFlights,
     saveInfoSections,
     saveLodgings,
+    saveSidebar,
     saveTripBasics,
     updateShareSettings,
 } from '@/entities/trip/trip.repository'
@@ -31,6 +32,7 @@ import {
     memberInviteSchema,
     memberRoleSchema,
     shareSettingsSchema,
+    sidebarSchema,
     tripBasicsFormSchema,
     tripCreateSchema,
     tripIdSchema,
@@ -42,6 +44,7 @@ import {
     type MemberInviteInput,
     type MemberRoleInput,
     type ShareSettingsInput,
+    type SidebarInput,
     type TripBasicsFormInput,
     type TripCreateInput,
 } from '@/entities/trip/trip.validate'
@@ -115,6 +118,17 @@ export const saveLodgingsAction = async (tripId: string, list: LodgingListInput)
         const id = tripIdSchema.parse(tripId)
         await assertTripAccess(id, user.id, 'edit')
         await saveLodgings(id, lodgingListSchema.parse(list))
+        await expireTrip(id)
+        return { id }
+    })
+}
+
+export const saveSidebarAction = async (tripId: string, input: SidebarInput) => {
+    const user = await requireUser()
+    return runAction(async () => {
+        const id = tripIdSchema.parse(tripId)
+        await assertTripAccess(id, user.id, 'edit')
+        await saveSidebar(id, sidebarSchema.parse(input))
         await expireTrip(id)
         return { id }
     })
