@@ -2,7 +2,13 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
-@custom-variant dark (&:is(.dark *, [data-theme='dark'] *));
+@custom-variant dark {
+    @media screen {
+        &:is(.dark *, [data-theme='dark'] *) {
+            @slot;
+        }
+    }
+}
 
 :root {
     --palette-neutral-1000: oklch(1 0 0);
@@ -118,43 +124,45 @@
     --z-overlay: 50;
 }
 
-.dark,
-[data-theme='dark'] {
-    color-scheme: dark;
-    --sidebar: var(--palette-neutral-098);
-    --background: var(--palette-neutral-162);
-    --card: var(--palette-neutral-212);
-    --foreground: var(--palette-neutral-985);
-    --card-foreground: var(--palette-neutral-985);
-    --popover: var(--palette-neutral-205);
-    --popover-foreground: var(--palette-neutral-985);
-    --primary: var(--palette-neutral-922);
-    --primary-foreground: var(--palette-neutral-205);
-    --secondary: var(--palette-neutral-269);
-    --secondary-foreground: var(--palette-neutral-985);
-    --muted: var(--palette-neutral-269);
-    --muted-foreground: var(--palette-neutral-708);
-    --accent: var(--palette-neutral-269);
-    --accent-foreground: var(--palette-neutral-985);
-    --destructive: var(--palette-red-704);
-    --destructive-foreground: var(--palette-neutral-985-alt);
-    --warning: var(--palette-amber-790);
-    --success: var(--palette-green-696);
-    --border: var(--palette-white-a10);
-    --input: var(--palette-white-a15);
-    --ring: var(--palette-neutral-556);
-    --chart-1: var(--palette-indigo-488);
-    --chart-2: var(--palette-green-696);
-    --chart-3: var(--palette-amber-769);
-    --chart-4: var(--palette-purple-627);
-    --chart-5: var(--palette-rose-645);
-    --sidebar-foreground: var(--palette-slate-968);
-    --sidebar-primary: var(--palette-blue-488);
-    --sidebar-primary-foreground: var(--palette-neutral-1000);
-    --sidebar-accent: var(--palette-neutral-232);
-    --sidebar-accent-foreground: var(--palette-slate-968);
-    --sidebar-border: var(--palette-slate-274);
-    --sidebar-ring: var(--palette-blue-623);
+@media screen {
+    .dark,
+    [data-theme='dark'] {
+        color-scheme: dark;
+        --sidebar: var(--palette-neutral-098);
+        --background: var(--palette-neutral-162);
+        --card: var(--palette-neutral-212);
+        --foreground: var(--palette-neutral-985);
+        --card-foreground: var(--palette-neutral-985);
+        --popover: var(--palette-neutral-205);
+        --popover-foreground: var(--palette-neutral-985);
+        --primary: var(--palette-neutral-922);
+        --primary-foreground: var(--palette-neutral-205);
+        --secondary: var(--palette-neutral-269);
+        --secondary-foreground: var(--palette-neutral-985);
+        --muted: var(--palette-neutral-269);
+        --muted-foreground: var(--palette-neutral-708);
+        --accent: var(--palette-neutral-269);
+        --accent-foreground: var(--palette-neutral-985);
+        --destructive: var(--palette-red-704);
+        --destructive-foreground: var(--palette-neutral-985-alt);
+        --warning: var(--palette-amber-790);
+        --success: var(--palette-green-696);
+        --border: var(--palette-white-a10);
+        --input: var(--palette-white-a15);
+        --ring: var(--palette-neutral-556);
+        --chart-1: var(--palette-indigo-488);
+        --chart-2: var(--palette-green-696);
+        --chart-3: var(--palette-amber-769);
+        --chart-4: var(--palette-purple-627);
+        --chart-5: var(--palette-rose-645);
+        --sidebar-foreground: var(--palette-slate-968);
+        --sidebar-primary: var(--palette-blue-488);
+        --sidebar-primary-foreground: var(--palette-neutral-1000);
+        --sidebar-accent: var(--palette-neutral-232);
+        --sidebar-accent-foreground: var(--palette-slate-968);
+        --sidebar-border: var(--palette-slate-274);
+        --sidebar-ring: var(--palette-blue-623);
+    }
 }
 
 .surface-public {
@@ -175,10 +183,12 @@
     --shadow-2xl: 0px 0px 7px 0px oklch(0 0 0 / 0.15);
 }
 
-.dark .surface-public,
-[data-theme='dark'] .surface-public {
-    --background: var(--palette-neutral-145);
-    --card: var(--palette-neutral-205);
+@media screen {
+    .dark .surface-public,
+    [data-theme='dark'] .surface-public {
+        --background: var(--palette-neutral-145);
+        --card: var(--palette-neutral-205);
+    }
 }
 
 @theme inline {
@@ -268,11 +278,5 @@
     body {
         background: white;
         color: black;
-    }
-    .print-hidden {
-        display: none !important;
-    }
-    .print-visible {
-        display: block !important;
     }
 }

@@ -12,7 +12,7 @@ type DaySummaryTableProps = {
 const COLUMN_LABELS = ['날짜', '오전', '오후', '저녁'] as const
 
 export const DaySummaryTable: FC<DaySummaryTableProps> = ({ days }) => (
-    <Table className='text-xs'>
+    <Table className='break-inside-avoid text-xs'>
         <TableHeader>
             <TableRow>
                 {COLUMN_LABELS.map((label) => (

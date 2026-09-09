@@ -119,7 +119,7 @@ export const DayPanel: FC<DayPanelProps> = ({
             )}
             {day.overview && <p className='bg-card p-3 text-sm leading-relaxed break-keep'>{day.overview}</p>}
             {day.facts.length > 0 && (
-                <div className='bg-card'>
+                <div className='break-inside-avoid bg-card'>
                     <Table className='text-xs'>
                         <TableHeader>
                             <TableRow>
