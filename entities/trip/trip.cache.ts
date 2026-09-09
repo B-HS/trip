@@ -1,31 +1,16 @@
 import 'server-only'
-import { cacheLife, cacheTag } from 'next/cache'
-import { findPublicTripIdBySlug, findTripDetail, findTripSummariesForUser } from '@/entities/trip/trip.repository'
-import { tripListTag, tripShareTag, tripTag } from '@/entities/trip/trip.tag'
+import { unstable_cache } from 'next/cache'
+import { findPublicTripBySlug, findTripDetail, findTripSummariesForUser } from '@/entities/trip/trip.repository'
+import { tripShareTag } from '@/entities/trip/trip.tag'
 
-export const getCachedTripList = async (userId: string) => {
-    'use cache'
-    cacheLife('days')
-    cacheTag(tripListTag(userId))
-    return findTripSummariesForUser(userId)
-}
+const PUBLIC_TRIP_REVALIDATE_SECONDS = 60 * 60
 
-export const getCachedTripDetail = async (tripId: string) => {
-    'use cache'
-    cacheLife('days')
-    cacheTag(tripTag(tripId))
-    return findTripDetail(tripId)
-}
+export const getTripList = (userId: string) => findTripSummariesForUser(userId)
 
-const getCachedPublicTripId = async (slug: string) => {
-    'use cache'
-    cacheLife('hours')
-    cacheTag(tripShareTag(slug))
-    return findPublicTripIdBySlug(slug)
-}
+export const getTripDetail = (tripId: string) => findTripDetail(tripId)
 
-export const getCachedPublicTrip = async (slug: string) => {
-    const tripId = await getCachedPublicTripId(slug)
-    if (tripId === null) return null
-    return getCachedTripDetail(tripId)
-}
+export const getPublicTrip = (slug: string) =>
+    unstable_cache(() => findPublicTripBySlug(slug), ['public-trip', slug], {
+        tags: [tripShareTag(slug)],
+        revalidate: PUBLIC_TRIP_REVALIDATE_SECONDS,
+    })()

@@ -4,7 +4,6 @@ import type { TripFlight, TripLodging } from '@/entities/trip/trip.type'
 import { formatPeriodLabel, formatRatio, formatVerifiedOn, toPercent } from '@/features/trip-viewer/trip-viewer-format'
 import { cn } from '@/shared/lib/utils'
 import { AnimatedProgress } from '@/shared/ui/motion/animated-progress'
-import { TripGlobeLazy } from '@/shared/ui/three/trip-globe-lazy'
 
 type TripSidebarProps = {
     eyebrow: string | null
@@ -104,15 +103,6 @@ export const TripSidebar: FC<TripSidebarProps> = ({
                 {disclaimer && verifiedOn && <br />}
                 {verifiedOn && `정보 확인 ${formatVerifiedOn(verifiedOn)}`}
             </p>
-        )}
-        {!isPrintLayout && flights.length > 0 && (
-            <div className='mt-auto print:hidden'>
-                <TripGlobeLazy
-                    routes={flights.map((flight) => ({ from: flight.departCode, to: flight.arriveCode }))}
-                    variant='mini'
-                    interactive={false}
-                />
-            </div>
         )}
     </aside>
 )

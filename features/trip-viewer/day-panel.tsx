@@ -18,8 +18,6 @@ import { Textarea } from '@/shared/ui/textarea'
 const SCHEDULE_STAGGER = 0.03
 const ROUTES_ACCORDION_VALUE = 'routes'
 const MEMO_ROWS = 3
-const EVEN_ROUTE_REMAINDER = 1
-const STRIPE_MODULO = 2
 
 const TIMELINE_VARIANTS: Variants = {
     hidden: {},
@@ -61,8 +59,8 @@ export const DayPanel: FC<DayPanelProps> = ({
     const completedCount = day.scheduleItems.filter((item) => checkedIds.has(item.id)).length
     const visibleItems = isHideCompleted && !isPrintLayout ? day.scheduleItems.filter((item) => !checkedIds.has(item.id)) : day.scheduleItems
     const memoId = `day-memo-${day.id}`
-    const routeBlocks = day.routes.map((route, routeIndex) => (
-        <div key={route.id} className={cn('py-3', routeIndex % STRIPE_MODULO === EVEN_ROUTE_REMAINDER && '-mx-3 bg-background px-3')}>
+    const routeBlocks = day.routes.map((route) => (
+        <div key={route.id} className='bg-card px-4 py-3'>
             <div className='flex items-baseline justify-between gap-3'>
                 <strong className='text-sm leading-snug font-medium break-keep'>
                     {route.origin} → {route.destination}
@@ -150,15 +148,17 @@ export const DayPanel: FC<DayPanelProps> = ({
             )}
             {day.routes.length > 0 &&
                 (isPrintLayout ? (
-                    <section className='bg-card px-3 py-1'>
-                        <h3 className='py-3 text-sm font-medium'>이동시간 계산</h3>
+                    <section className='flex flex-col gap-px bg-background'>
+                        <h3 className='bg-card px-4 py-3 text-sm font-medium'>이동시간 계산</h3>
                         {routeBlocks}
                     </section>
                 ) : (
-                    <Accordion type='single' collapsible defaultValue={isMobile ? undefined : ROUTES_ACCORDION_VALUE} className='bg-card px-3'>
+                    <Accordion type='single' collapsible defaultValue={isMobile ? undefined : ROUTES_ACCORDION_VALUE} className='bg-card'>
                         <AccordionItem value={ROUTES_ACCORDION_VALUE} className='border-b-0'>
-                            <AccordionTrigger className='py-3 text-sm font-medium hover:no-underline'>이동시간 계산</AccordionTrigger>
-                            <AccordionContent className='pb-3'>{routeBlocks}</AccordionContent>
+                            <AccordionTrigger className='px-4 py-3 text-sm font-medium hover:no-underline'>이동시간 계산</AccordionTrigger>
+                            <AccordionContent className='p-0'>
+                                <div className='flex flex-col gap-px bg-background'>{routeBlocks}</div>
+                            </AccordionContent>
                         </AccordionItem>
                     </Accordion>
                 ))}

@@ -1,14 +1,14 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Suspense } from 'react'
-import { getCachedPublicTrip } from '@/entities/trip/trip.cache'
-import { TripViewerSkeleton } from '@/features/trip-viewer/trip-viewer-skeleton'
+import { getPublicTrip } from '@/entities/trip/trip.cache'
 import { SITE_NAME } from '@/shared/constant/site'
 import { TripViewerWidget } from '@/widgets/trip-viewer/trip-viewer-widget'
 
 type SharedTripPageProps = {
     params: Promise<{ slug: string }>
 }
+
+export const revalidate = 3600
 
 const NOT_FOUND_TITLE = '공개된 여행을 찾을 수 없습니다'
 
@@ -17,7 +17,7 @@ const buildDescription = (destination: string, periodNote: string | null) =>
 
 export const generateMetadata = async ({ params }: SharedTripPageProps): Promise<Metadata> => {
     const { slug } = await params
-    const trip = await getCachedPublicTrip(slug)
+    const trip = await getPublicTrip(slug)
     if (!trip) return { title: NOT_FOUND_TITLE }
     const description = buildDescription(trip.destination, trip.periodNote)
     return {
@@ -27,20 +27,16 @@ export const generateMetadata = async ({ params }: SharedTripPageProps): Promise
     }
 }
 
-const SharedTripContent = async ({ params }: SharedTripPageProps) => {
+const SharedTripPage = async ({ params }: SharedTripPageProps) => {
     const { slug } = await params
-    const trip = await getCachedPublicTrip(slug)
+    const trip = await getPublicTrip(slug)
     if (!trip) notFound()
 
-    return <TripViewerWidget mode='public' initialTrip={trip} />
+    return (
+        <div className='mx-auto w-full max-w-(--content-max-width) p-3'>
+            <TripViewerWidget mode='public' initialTrip={trip} />
+        </div>
+    )
 }
-
-const SharedTripPage = ({ params }: SharedTripPageProps) => (
-    <div className='mx-auto w-full max-w-(--content-max-width) p-3'>
-        <Suspense fallback={<TripViewerSkeleton />}>
-            <SharedTripContent params={params} />
-        </Suspense>
-    </div>
-)
 
 export default SharedTripPage

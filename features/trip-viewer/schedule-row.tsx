@@ -17,6 +17,8 @@ const FULL_OPACITY = 1
 
 const ROW_TRANSITION = { duration: MOTION_FADE_DURATION, ease: MOTION_EASE_STANDARD } as const
 
+const ROW_ACTION_CLASS = 'inline-flex h-6 min-w-16 items-center justify-center rounded-none px-2 text-2xs font-medium'
+
 const ROW_VARIANTS: Variants = {
     hidden: { opacity: 0, y: ROW_OFFSET_Y },
     visible: { opacity: 1, y: 0, transition: ROW_TRANSITION },
@@ -35,12 +37,7 @@ export const ScheduleRow: FC<ScheduleRowProps> = ({ item, isCompleted, isCheckab
     const bufferLabel = item.bufferNote ?? SCHEDULE_BUFFER_LABEL[item.kind]
     const content = (
         <>
-            <span className='flex flex-wrap items-baseline justify-between gap-2'>
-                <strong className='text-sm leading-snug font-medium break-keep'>{item.title}</strong>
-                <Badge variant='outline' className={cn('h-auto shrink-0 px-2 py-0.5 text-2xs', SCHEDULE_KIND_BADGE_CLASS[item.kind])}>
-                    {SCHEDULE_KIND_LABEL[item.kind]}
-                </Badge>
-            </span>
+            <strong className='block text-sm leading-snug font-medium break-keep'>{item.title}</strong>
             {item.note && <span className='mt-1 block text-xs break-keep text-muted-foreground'>{item.note}</span>}
             <span className='mt-1 inline-block bg-muted px-1.5 py-0.5 text-2xs font-medium text-muted-foreground'>{bufferLabel}</span>
         </>
@@ -52,7 +49,12 @@ export const ScheduleRow: FC<ScheduleRowProps> = ({ item, isCompleted, isCheckab
                 className='grid grid-cols-1 gap-px sm:grid-cols-[7rem_minmax(0,1fr)]'
                 animate={{ opacity: isCompleted ? COMPLETED_OPACITY : FULL_OPACITY }}
                 transition={ROW_TRANSITION}>
-                <time className={cn('bg-muted p-3 font-mono text-xs font-medium tabular-nums', isCompleted && 'line-through')}>{item.timeLabel}</time>
+                <div className='flex flex-col items-start gap-1.5 bg-muted p-3'>
+                    <time className={cn('font-mono text-xs font-medium tabular-nums', isCompleted && 'line-through')}>{item.timeLabel}</time>
+                    <Badge variant='outline' className={cn(ROW_ACTION_CLASS, SCHEDULE_KIND_BADGE_CLASS[item.kind])}>
+                        {SCHEDULE_KIND_LABEL[item.kind]}
+                    </Badge>
+                </div>
                 <div className='flex items-start gap-3 bg-card p-3'>
                     {isCheckable && (
                         <Checkbox
@@ -72,7 +74,7 @@ export const ScheduleRow: FC<ScheduleRowProps> = ({ item, isCompleted, isCheckab
                     )}
                     {item.mapQuery && (
                         <a
-                            className='inline-flex h-7 shrink-0 items-center gap-1 rounded-none bg-primary px-2 text-2xs font-medium text-primary-foreground no-underline'
+                            className={cn(ROW_ACTION_CLASS, 'shrink-0 gap-1 bg-primary text-primary-foreground no-underline hover:bg-primary/90')}
                             href={buildMapUrl(item.mapQuery)}
                             target='_blank'
                             rel='noopener noreferrer'

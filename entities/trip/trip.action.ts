@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidateTag, updateTag } from 'next/cache'
+import { revalidatePath, updateTag } from 'next/cache'
 import { assertTripAccess } from '@/entities/trip/trip.access'
 import {
     createTrip,
@@ -16,8 +16,8 @@ import {
     updateTripBasics,
 } from '@/entities/trip/trip.repository'
 import { deleteDay, reorderDays, saveDay } from '@/entities/trip/trip.repository.days'
-import { findTripMemberUserIds, inviteMember, removeInvite, removeMember, updateMemberRole } from '@/entities/trip/trip.repository.members'
-import { tripListTag, tripShareTag, tripTag } from '@/entities/trip/trip.tag'
+import { inviteMember, removeInvite, removeMember, updateMemberRole } from '@/entities/trip/trip.repository.members'
+import { tripShareTag } from '@/entities/trip/trip.tag'
 import {
     bookingListSchema,
     dayIdListSchema,
@@ -44,28 +44,20 @@ import { runAction } from '@/shared/lib/action-result'
 import { requireUser } from '@/shared/lib/session'
 import { tripTemplateSchema, type TripTemplateInput } from '@/shared/lib/trip-template'
 
-const REVALIDATE_PROFILE = 'max'
-
-const expireTripLists = (userIds: string[]) => {
-    for (const userId of userIds) updateTag(tripListTag(userId))
-}
-
 const expireShare = (slug: string | null) => {
-    if (slug !== null) revalidateTag(tripShareTag(slug), REVALIDATE_PROFILE)
+    if (slug === null) return
+    updateTag(tripShareTag(slug))
+    revalidatePath(`/s/${slug}`)
 }
 
 const expireTrip = async (tripId: string) => {
-    updateTag(tripTag(tripId))
-    const [userIds, slug] = await Promise.all([findTripMemberUserIds(tripId), findTripShareSlug(tripId)])
-    expireTripLists(userIds)
-    expireShare(slug)
+    expireShare(await findTripShareSlug(tripId))
 }
 
 export const createTripAction = async (input: TripBasicsInput) => {
     const user = await requireUser()
     return runAction(async () => {
         const created = await createTrip(user.id, tripBasicsSchema.parse(input))
-        updateTag(tripListTag(user.id))
         return created
     })
 }
@@ -74,7 +66,6 @@ export const createTripFromTemplateAction = async (template: TripTemplateInput) 
     const user = await requireUser()
     return runAction(async () => {
         const created = await createTripFromTemplate(user.id, tripTemplateSchema.parse(template))
-        updateTag(tripListTag(user.id))
         return created
     })
 }
@@ -173,10 +164,8 @@ export const deleteTripAction = async (tripId: string) => {
     return runAction(async () => {
         const id = tripIdSchema.parse(tripId)
         await assertTripAccess(id, user.id, 'own')
-        const [userIds, slug] = await Promise.all([findTripMemberUserIds(id), findTripShareSlug(id)])
+        const slug = await findTripShareSlug(id)
         await deleteTrip(id)
-        updateTag(tripTag(id))
-        expireTripLists(userIds)
         expireShare(slug)
         return { id }
     })
@@ -189,7 +178,6 @@ export const inviteMemberAction = async (tripId: string, input: MemberInviteInpu
         await assertTripAccess(id, user.id, 'own')
         const invite = memberInviteSchema.parse(input)
         const result = await inviteMember(id, invite.email, invite.role, user.id)
-        if (result.kind === 'member') updateTag(tripListTag(result.userId))
         return result
     })
 }
@@ -200,7 +188,6 @@ export const updateMemberRoleAction = async (tripId: string, userId: string, rol
         const id = tripIdSchema.parse(tripId)
         await assertTripAccess(id, user.id, 'own')
         await updateMemberRole(id, userId, memberRoleSchema.parse(role))
-        updateTag(tripListTag(userId))
         return { id }
     })
 }
@@ -211,7 +198,6 @@ export const removeMemberAction = async (tripId: string, userId: string) => {
         const id = tripIdSchema.parse(tripId)
         await assertTripAccess(id, user.id, 'own')
         await removeMember(id, userId)
-        updateTag(tripListTag(userId))
         return { id }
     })
 }

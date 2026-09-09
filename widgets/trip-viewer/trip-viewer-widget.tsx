@@ -3,7 +3,6 @@
 import dayjs from 'dayjs'
 import { PrinterIcon, TriangleAlertIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { usePathname, useSearchParams } from 'next/navigation'
 import { type FC, useEffect, useRef, useState } from 'react'
 import { useTripDetail } from '@/entities/trip/trip.query'
 import type { PublicTrip, TripDayDetail } from '@/entities/trip/trip.type'
@@ -23,7 +22,7 @@ import { TripFooter } from '@/features/trip-viewer/trip-footer'
 import { TripSidebar } from '@/features/trip-viewer/trip-sidebar'
 import { TripViewerSkeleton } from '@/features/trip-viewer/trip-viewer-skeleton'
 import { TRIP_VIEW_PANEL_ID, ViewTabs } from '@/features/trip-viewer/view-tabs'
-import { TRIP_VIEWS, type TripView } from '@/shared/constant/trip'
+import type { TripView } from '@/shared/constant/trip'
 import { FADE } from '@/shared/lib/motion'
 import {
     AlertDialog,
@@ -57,6 +56,8 @@ type TripViewerWidgetProps = {
     tripId?: string
     mode: TripViewerMode
     initialTrip?: PublicTrip
+    initialView?: TripView
+    initialDayOrdinal?: number
 }
 
 const resolveTodayDayIndex = (days: readonly TripDayDetail[]) => {
@@ -71,7 +72,7 @@ const resolveMemoLabel = (status: MemoStatus | undefined) => {
     return MEMO_IDLE_LABEL
 }
 
-export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, initialTrip }) => {
+export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, initialTrip, initialView, initialDayOrdinal }) => {
     const memoTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
     const [selectedView, setSelectedView] = useState<TripView | null>(null)
@@ -81,8 +82,6 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
     const [memoDrafts, setMemoDrafts] = useState<Record<string, string>>({})
     const [memoStatuses, setMemoStatuses] = useState<Record<string, MemoStatus>>({})
 
-    const pathname = usePathname()
-    const searchParams = useSearchParams()
     const isMounted = useMounted()
     const detailQuery = useTripDetail(tripId ?? '')
     const userStateQuery = useTripUserState(tripId ?? '')
@@ -99,19 +98,19 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
     const checkedScheduleSet = new Set(checkedScheduleIds)
     const scheduleItems = days.flatMap((day) => day.scheduleItems)
     const completedScheduleCount = scheduleItems.filter((item) => checkedScheduleSet.has(item.id)).length
-    const dayOrdinal = Number.parseInt(searchParams.get('day') ?? '', 10)
+    const dayOrdinal = initialDayOrdinal ?? Number.NaN
     const hasDayParam = Number.isInteger(dayOrdinal) && dayOrdinal >= FIRST_DAY_ORDINAL && dayOrdinal <= days.length
     const fallbackDayIndex = isMounted ? resolveTodayDayIndex(days) : FIRST_DAY_INDEX
-    const activeView = selectedView ?? TRIP_VIEWS.find((view) => view === searchParams.get('view')) ?? DEFAULT_VIEW
+    const activeView = selectedView ?? initialView ?? DEFAULT_VIEW
     const activeDayIndex = selectedDayIndex ?? (hasDayParam ? dayOrdinal - FIRST_DAY_ORDINAL : fallbackDayIndex)
     const activeDay = days.at(activeDayIndex) ?? null
     const resetTargetDay = days.find((day) => day.id === resetTargetDayId) ?? null
 
     const replaceParam = (key: string, value: string) => {
         if (!isMember) return
-        const params = new URLSearchParams(searchParams.toString())
+        const params = new URLSearchParams(window.location.search)
         params.set(key, value)
-        window.history.replaceState(null, '', `${pathname}?${params.toString()}`)
+        window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`)
     }
 
     const handleSelectView = (view: TripView) => {
@@ -183,9 +182,9 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
             <div className='grid grid-cols-1 items-start gap-px md:grid-cols-[16rem_minmax(0,1fr)] print:hidden'>
                 <div className='md:sticky md:top-0'>{sidebar(false)}</div>
                 <div className='flex min-w-0 flex-col gap-px'>
-                    <div className='flex flex-wrap items-center justify-between gap-2 bg-card p-3'>
+                    <div className='flex items-stretch justify-between gap-px bg-background'>
                         <ViewTabs activeView={activeView} onSelect={handleSelectView} />
-                        <Button type='button' size='sm' variant='secondary' className='rounded-none' onClick={() => window.print()}>
+                        <Button type='button' variant='ghost' className='h-12 rounded-none bg-card px-4 text-sm' onClick={() => window.print()}>
                             <PrinterIcon aria-hidden />
                             전체 일정 인쇄
                         </Button>

@@ -22,6 +22,7 @@
 
 ### 진행 메모
 
+- 13(사용자 피드백 2차): 뷰 탭을 여백 없는 풀블리드 스트립으로, 종류 배지를 시간 칸으로 이동, 지도 버튼과 높이 통일(h-6), 경로 블록을 px-4 카드+심으로. cacheComponents 해제로 초기 스켈레톤 제거(`docs/acknowledge` 참조). 지구본은 실제 지리(해안선·점·곡선 경로)로 재작성 위임 중.
 - 13(사용자 피드백 반영): OS reduce-motion 무시(앱 내 설정으로 대체), 파비콘 Calendar 것 사용, 셸 레일-콘텐츠 사이 12px 인셋·1px 심 제거, 뷰어 사이드바를 bg-sidebar → bg-card 로(레일과 같은 톤 금지), 표 헤더·안내 스트립은 bg-muted. Next `agentRules` 비활성, 공유 페이지 빈 generateStaticParams 제거, route handler/action catch 에 `unstable_rethrow`.
 
 - 1: `create-next-app` 은 `.env` 가 있는 디렉터리를 거부해 스크래치패드에 생성 후 복사(README.md·CLAUDE.md·AGENTS.md 는 복사하지 않음).
