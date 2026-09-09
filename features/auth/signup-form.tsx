@@ -16,7 +16,7 @@ type SignupFormProps = {
     isPending: boolean
 }
 
-const SIGNUP_DEFAULT_VALUES: SignupValues = { name: '', username: '', email: '', password: '', passwordConfirm: '' }
+const SIGNUP_DEFAULT_VALUES: SignupValues = { username: '', email: '', password: '', passwordConfirm: '' }
 
 export const SignupForm: FC<SignupFormProps> = ({ onSubmit, isPending }) => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -31,11 +31,6 @@ export const SignupForm: FC<SignupFormProps> = ({ onSubmit, isPending }) => {
     return (
         <form className='flex flex-col gap-4' onSubmit={handleSubmit} noValidate>
             <FieldGroup className='gap-4'>
-                <Field data-invalid={!!errors.name}>
-                    <FieldLabel htmlFor='signup-name'>이름</FieldLabel>
-                    <Input id='signup-name' autoComplete='name' placeholder='변현석' aria-invalid={!!errors.name} {...form.register('name')} />
-                    <FieldError errors={[errors.name]} />
-                </Field>
                 <Field data-invalid={!!errors.username}>
                     <FieldLabel htmlFor='signup-username'>사용자명</FieldLabel>
                     <Input

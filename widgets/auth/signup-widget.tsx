@@ -16,7 +16,7 @@ export const SignupWidget: FC = () => {
     const handleSubmit = async (values: SignupValues) => {
         setIsPending(true)
         const { error } = await signUp.email({
-            name: values.name,
+            name: values.username,
             email: values.email,
             password: values.password,
             username: values.username,

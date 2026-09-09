@@ -1,12 +1,5 @@
 import { z } from 'zod'
-import {
-    NAME_MAX_LENGTH,
-    PASSWORD_MAX_LENGTH,
-    PASSWORD_MIN_LENGTH,
-    USERNAME_MAX_LENGTH,
-    USERNAME_MIN_LENGTH,
-    USERNAME_PATTERN,
-} from '@/shared/constant/auth'
+import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_PATTERN } from '@/shared/constant/auth'
 
 const passwordSchema = z
     .string()
@@ -20,7 +13,6 @@ export const loginSchema = z.object({
 
 export const signupSchema = z
     .object({
-        name: z.string().trim().min(1, '이름을 입력해 주세요.').max(NAME_MAX_LENGTH, `이름은 ${NAME_MAX_LENGTH}자 이하로 입력해 주세요.`),
         username: z
             .string()
             .trim()

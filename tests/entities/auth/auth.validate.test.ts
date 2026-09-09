@@ -5,7 +5,6 @@ import { PASSWORD_MIN_LENGTH, USERNAME_MIN_LENGTH } from '@/shared/constant/auth
 const VALID_PASSWORD = 'trip-1234'
 
 const validSignupValues = {
-    name: '변현석',
     username: 'trip.user',
     email: 'trip@example.com',
     password: VALID_PASSWORD,
@@ -51,6 +50,12 @@ describe('signupSchema', () => {
 
     test('이메일 형식이 아니면 실패한다', () => {
         expect(signupSchema.safeParse({ ...validSignupValues, email: 'trip-example.com' }).success).toBe(false)
+    })
+
+    test('이름을 넘겨도 결과에 포함하지 않는다', () => {
+        const result = signupSchema.safeParse({ ...validSignupValues, name: '변현석' })
+        expect(result.success).toBe(true)
+        expect(result.data).not.toHaveProperty('name')
     })
 
     test('비밀번호 확인이 다르면 passwordConfirm 경로로 실패한다', () => {
