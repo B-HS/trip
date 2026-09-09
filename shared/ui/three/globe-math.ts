@@ -1,15 +1,23 @@
 import { Vector3 } from 'three'
-import { AIRPORTS, type AirportCode, isAirportCode } from '@/shared/constant/airports'
+import { AIRPORTS, isAirportCode } from '@/shared/constant/airports'
 
 const DEGREE_TO_RADIAN = Math.PI / 180
 const MIN_ARC_SEGMENTS = 2
 const DEGENERATE_ANGLE_EPSILON = 1e-6
+const MAX_LATITUDE = 90
+const MAX_LONGITUDE = 180
 
-export type GlobeRouteInput = { from: string; to: string }
+export type GlobePointInput = { lat: number; lng: number; label: string }
 
-export type GlobeAirport = { code: AirportCode; name: string; city: string; lat: number; lng: number }
+export type GlobeEndpointInput = string | GlobePointInput
 
-export type GlobeRoute = { key: string; from: GlobeAirport; to: GlobeAirport }
+export type GlobeRouteInput = { from: GlobeEndpointInput; to: GlobeEndpointInput }
+
+export type GlobePoint = { key: string; code: string | null; label: string; lat: number; lng: number }
+
+export type GlobeAirport = GlobePoint
+
+export type GlobeRoute = { key: string; from: GlobePoint; to: GlobePoint }
 
 /**
  * Projects a geographic coordinate onto a sphere of the given radius.
@@ -55,23 +63,35 @@ export const greatCircleArc = (from: Vector3, to: Vector3, radius: number, segme
     })
 }
 
-const toGlobeAirport = (code: AirportCode): GlobeAirport => ({ code, ...AIRPORTS[code] })
+const isCoordinate = (value: number, limit: number) => Number.isFinite(value) && Math.abs(value) <= limit
 
-const resolveAirport = (code: string) => {
+const resolveAirportEndpoint = (code: string): GlobePoint | null => {
     const normalized = code.trim().toUpperCase()
-    return isAirportCode(normalized) ? toGlobeAirport(normalized) : null
+    if (!isAirportCode(normalized)) return null
+    const airport = AIRPORTS[normalized]
+    return { key: normalized, code: normalized, label: airport.city, lat: airport.lat, lng: airport.lng }
 }
 
+const resolvePointEndpoint = (point: GlobePointInput): GlobePoint | null => {
+    const label = point.label.trim()
+    if (label.length === 0 || !isCoordinate(point.lat, MAX_LATITUDE) || !isCoordinate(point.lng, MAX_LONGITUDE)) return null
+    return { key: `${label}@${point.lat},${point.lng}`, code: null, label, lat: point.lat, lng: point.lng }
+}
+
+const resolveEndpoint = (endpoint: GlobeEndpointInput) =>
+    typeof endpoint === 'string' ? resolveAirportEndpoint(endpoint) : resolvePointEndpoint(endpoint)
+
 /**
- * Maps IATA code pairs onto known airports, dropping unknown codes, self routes and duplicates.
+ * Maps route endpoints — IATA codes or explicit coordinates — onto globe points,
+ * dropping unknown endpoints, self routes and duplicates.
  */
 export const resolveGlobeRoutes = (routes: readonly GlobeRouteInput[]) => {
     const seen = new Set<string>()
     return routes.flatMap((route) => {
-        const from = resolveAirport(route.from)
-        const to = resolveAirport(route.to)
-        if (!from || !to || from.code === to.code) return []
-        const key = `${from.code}-${to.code}`
+        const from = resolveEndpoint(route.from)
+        const to = resolveEndpoint(route.to)
+        if (!from || !to || from.key === to.key) return []
+        const key = `${from.key}-${to.key}`
         if (seen.has(key)) return []
         seen.add(key)
         return [{ key, from, to }]
@@ -79,19 +99,19 @@ export const resolveGlobeRoutes = (routes: readonly GlobeRouteInput[]) => {
 }
 
 export const collectGlobeAirports = (routes: readonly GlobeRoute[]) => {
-    const byCode = new Map<AirportCode, GlobeAirport>()
+    const byKey = new Map<string, GlobePoint>()
     routes.forEach((route) => {
-        byCode.set(route.from.code, route.from)
-        byCode.set(route.to.code, route.to)
+        byKey.set(route.from.key, route.from)
+        byKey.set(route.to.key, route.to)
     })
-    return [...byCode.values()]
+    return [...byKey.values()]
 }
 
 /**
- * Rotation that points the mean direction of the given airports at the camera.
+ * Rotation that points the mean direction of the given points at the camera.
  */
-export const airportsFacingRotation = (airports: readonly GlobeAirport[]) => {
-    const mean = airports.reduce((total, airport) => total.add(latLngToVector3(airport.lat, airport.lng, 1)), new Vector3())
+export const airportsFacingRotation = (points: readonly GlobePoint[]) => {
+    const mean = points.reduce((total, point) => total.add(latLngToVector3(point.lat, point.lng, 1)), new Vector3())
     return mean.lengthSq() < DEGENERATE_ANGLE_EPSILON ? { x: 0, y: 0 } : globeFacingRotation(mean.normalize())
 }
 
@@ -104,9 +124,11 @@ export const buildGlobeArc = (route: GlobeRoute, radius: number, segments: numbe
         lift,
     )
 
-export const formatGlobeRouteLabel = (route: GlobeRoute) => `${route.from.city} ${route.from.code} → ${route.to.city} ${route.to.code}`
+const formatGlobePoint = (point: GlobePoint) => (point.code === null ? point.label : `${point.label} ${point.code}`)
+
+export const formatGlobeRouteLabel = (route: GlobeRoute) => `${formatGlobePoint(route.from)} → ${formatGlobePoint(route.to)}`
 
 export const describeGlobeRoutes = (routes: readonly GlobeRoute[]) =>
     routes.length === 0
         ? '경로가 표시되지 않은 지구본입니다.'
-        : `여행 경로 지구본. ${routes.map((route) => `${route.from.city}에서 ${route.to.city}까지`).join(', ')}.`
+        : `여행 경로 지구본. ${routes.map((route) => `${route.from.label}에서 ${route.to.label}까지`).join(', ')}.`

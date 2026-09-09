@@ -3,6 +3,7 @@
 import { Check } from 'lucide-react'
 import { motion, type Variants } from 'motion/react'
 import type { FC } from 'react'
+import { cn } from '@/shared/lib/utils'
 import { INTRO_SHOWCASE } from '@/shared/constant/marketing'
 import { MOTION_BAR_DURATION, MOTION_EASE_STANDARD, MOTION_FADE_DURATION } from '@/shared/lib/motion'
 import { AnimatedNumber } from '@/shared/ui/motion/animated-number'
@@ -54,8 +55,8 @@ export const IntroShowcase: FC = () => {
     return (
         <section className='mx-auto w-full max-w-3xl px-6 py-16'>
             <IntroSectionHeading eyebrow={INTRO_SHOWCASE.eyebrow} title={INTRO_SHOWCASE.title} description={INTRO_SHOWCASE.description} />
-            <Reveal className='mt-10 overflow-hidden rounded-md border border-border bg-card shadow-sm'>
-                <div className='flex flex-col gap-3 border-b border-border p-5'>
+            <Reveal className='mt-10 flex flex-col gap-px overflow-hidden rounded-md border border-border bg-border shadow-sm'>
+                <div className='flex flex-col gap-3 bg-card p-5'>
                     <div className='flex items-baseline justify-between gap-4'>
                         <div className='flex items-baseline gap-2'>
                             <span className='text-2xs font-medium tracking-wide text-muted-foreground'>{INTRO_SHOWCASE.dayLabel}</span>
@@ -67,13 +68,19 @@ export const IntroShowcase: FC = () => {
                     </div>
                     <AnimatedProgress value={completedPercent} label={INTRO_SHOWCASE.progressLabel} />
                 </div>
-                <motion.ul variants={LIST_VARIANTS} initial={REST} whileInView={DONE} viewport={{ once: true, margin: SHOWCASE_MARGIN }}>
+                <motion.ul
+                    className='flex flex-col gap-px bg-border'
+                    variants={LIST_VARIANTS}
+                    initial={REST}
+                    whileInView={DONE}
+                    viewport={{ once: true, margin: SHOWCASE_MARGIN }}>
                     {INTRO_SHOWCASE.items.map((item) => (
-                        <motion.li
-                            key={item.id}
-                            variants={ROW_VARIANTS}
-                            className='flex items-start gap-3 border-b border-border p-4 last:border-b-0'>
-                            <span className='mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-sm border border-border'>
+                        <motion.li key={item.id} variants={ROW_VARIANTS} className='flex items-start gap-3 bg-card p-4'>
+                            <span
+                                className={cn(
+                                    'mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-none',
+                                    item.isCompleted ? 'bg-primary text-primary-foreground' : 'bg-muted',
+                                )}>
                                 {item.isCompleted && (
                                     <motion.span variants={CHECK_VARIANTS} className='flex'>
                                         <Check aria-hidden className='size-3' />

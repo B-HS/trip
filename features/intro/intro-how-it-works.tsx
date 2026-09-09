@@ -14,7 +14,7 @@ export const IntroHowItWorks: FC = () => (
         <StaggerList as='ol' className='mt-10 flex flex-col gap-px overflow-hidden rounded-md border border-border bg-border shadow-sm'>
             {INTRO_STEPS.map((step, index) => (
                 <StaggerItem key={step.id} as='li' className='flex items-start gap-4 bg-card p-5'>
-                    <span className='flex size-6 shrink-0 items-center justify-center rounded-sm border border-border text-2xs font-medium text-muted-foreground tabular-nums'>
+                    <span className='flex size-6 shrink-0 items-center justify-center rounded-sm bg-muted text-2xs font-medium text-muted-foreground tabular-nums'>
                         {String(index + FIRST_STEP_NUMBER).padStart(STEP_NUMBER_PAD, '0')}
                     </span>
                     <div className='flex flex-col gap-2'>

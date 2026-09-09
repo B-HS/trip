@@ -6,6 +6,7 @@ import { resolveTripRole } from '@/entities/trip/trip.role'
 import type { CreatedTrip, PublicTrip, ShareSettings, TripDetail, TripSummary, TripTransaction } from '@/entities/trip/trip.type'
 import type {
     BookingValues,
+    DestinationValues,
     FlightValues,
     InfoBlockValues,
     InfoSectionValues,
@@ -13,8 +14,9 @@ import type {
     ShareSettingsValues,
     TripBasicsValues,
 } from '@/entities/trip/trip.validate'
+import { isCountryCode } from '@/shared/constant/countries'
 import { getDb } from '@/shared/db/client'
-import { trip, tripBooking, tripFlight, tripInfoBlock, tripInfoSection, tripLodging, tripMember } from '@/shared/db/schema/trip'
+import { trip, tripBooking, tripDestination, tripFlight, tripInfoBlock, tripInfoSection, tripLodging, tripMember } from '@/shared/db/schema/trip'
 import { ApiError } from '@/shared/lib/api-response'
 import type { TripTemplate } from '@/shared/lib/trip-template'
 
@@ -36,6 +38,22 @@ const toTripValues = (basics: TripBasicsValues) => ({
     bookingNote: basics.bookingNote,
     footerNote: basics.footerNote,
 })
+
+const reconcileDestinations = async (tx: TripTransaction, tripId: string, list: DestinationValues[]) => {
+    const existing = await tx.select({ id: tripDestination.id }).from(tripDestination).where(eq(tripDestination.tripId, tripId))
+    const removable = removableIds(existing, list)
+    if (removable.length > 0) await tx.delete(tripDestination).where(inArray(tripDestination.id, removable))
+    const existingIds = new Set(existing.map((row) => row.id))
+    for (const [index, item] of list.entries()) {
+        const values = { countryCode: item.countryCode, city: item.city, sortOrder: index }
+        const id = item.id
+        if (id !== undefined && existingIds.has(id)) {
+            await tx.update(tripDestination).set(values).where(eq(tripDestination.id, id))
+            continue
+        }
+        await tx.insert(tripDestination).values({ ...values, tripId })
+    }
+}
 
 const reconcileFlights = async (tx: TripTransaction, tripId: string, list: FlightValues[]) => {
     const existing = await tx.select({ id: tripFlight.id }).from(tripFlight).where(eq(tripFlight.tripId, tripId))
@@ -166,6 +184,8 @@ export const findTripSummariesForUser = async (userId: string) => {
         orderBy: (fields, { desc }) => [desc(fields.startDate), desc(fields.createdAt)],
         with: {
             members: { where: (fields, { eq: equals }) => equals(fields.userId, userId), columns: { role: true } },
+            favorites: { where: (fields, { eq: equals }) => equals(fields.userId, userId), columns: { sortOrder: true } },
+            destinations: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)], columns: { countryCode: true, city: true } },
             flights: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)], columns: { direction: true, departCode: true, arriveCode: true } },
             bookings: { columns: { id: true } },
             days: { columns: { id: true }, with: { scheduleItems: { columns: { id: true } } } },
@@ -186,6 +206,8 @@ export const findTripSummariesForUser = async (userId: string) => {
                 scheduleCount: row.days.reduce((total, day) => total + day.scheduleItems.length, 0),
                 bookingCount: row.bookings.length,
                 updatedAt: row.updatedAt.toISOString(),
+                isFavorite: row.favorites.length > 0,
+                destinations: row.destinations,
                 flights: row.flights,
             }) satisfies TripSummary,
     )
@@ -196,6 +218,7 @@ export const findTripDetail = async (tripId: string) => {
         where: (fields, { eq: equals }) => equals(fields.id, tripId),
         with: {
             owner: { columns: { id: true, name: true, username: true, image: true } },
+            destinations: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
             flights: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
             lodgings: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
             bookings: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
@@ -239,11 +262,12 @@ export const findPublicTripBySlug = async (slug: string) => {
     return findTripDetail(tripId)
 }
 
-export const createTrip = async (ownerId: string, basics: TripBasicsValues) => {
+export const createTrip = async (ownerId: string, basics: TripBasicsValues, destinations: DestinationValues[]) => {
     const id = crypto.randomUUID()
     await getDb().transaction(async (tx) => {
         await tx.insert(trip).values({ ...toTripValues(basics), id, ownerId })
         await tx.insert(tripMember).values({ tripId: id, userId: ownerId, role: 'owner' })
+        await reconcileDestinations(tx, id, destinations)
     })
     return { id } satisfies CreatedTrip
 }
@@ -253,6 +277,7 @@ export const createTripFromTemplate = async (ownerId: string, template: TripTemp
     await getDb().transaction(async (tx) => {
         await tx.insert(trip).values({ ...toTripValues(template), id, ownerId })
         await tx.insert(tripMember).values({ tripId: id, userId: ownerId, role: 'owner' })
+        await reconcileDestinations(tx, id, template.destinations)
         await reconcileFlights(tx, id, template.flights)
         await reconcileLodgings(tx, id, template.lodgings)
         await insertTemplateDays(tx, id, template.days)
@@ -268,6 +293,13 @@ export const updateTripBasics = async (tripId: string, basics: TripBasicsValues)
 
 export const deleteTrip = async (tripId: string) => {
     await getDb().delete(trip).where(eq(trip.id, tripId))
+}
+
+export const saveDestinations = async (tripId: string, list: DestinationValues[]) => {
+    await getDb().transaction(async (tx) => {
+        await reconcileDestinations(tx, tripId, list)
+        await touchTrip(tx, tripId)
+    })
 }
 
 export const saveFlights = async (tripId: string, list: FlightValues[]) => {
@@ -352,6 +384,9 @@ export const exportTripTemplate = async (tripId: string) => {
         bufferPolicy: detail.bufferPolicy,
         bookingNote: detail.bookingNote,
         footerNote: detail.footerNote,
+        destinations: detail.destinations.flatMap((item) =>
+            isCountryCode(item.countryCode) ? [{ countryCode: item.countryCode, city: item.city }] : [],
+        ),
         flights: detail.flights.map((item) => ({
             direction: item.direction,
             label: item.label,

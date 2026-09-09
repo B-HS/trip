@@ -7,6 +7,7 @@ import type {
     tripDay,
     tripDayFact,
     tripDayNote,
+    tripDestination,
     tripFlight,
     tripInfoBlock,
     tripInfoSection,
@@ -19,6 +20,7 @@ import type {
 
 export type Trip = typeof trip.$inferSelect
 export type TripInsert = typeof trip.$inferInsert
+export type TripDestination = typeof tripDestination.$inferSelect
 export type TripFlight = typeof tripFlight.$inferSelect
 export type TripLodging = typeof tripLodging.$inferSelect
 export type TripDay = typeof tripDay.$inferSelect
@@ -46,8 +48,11 @@ export type TripInfoSectionDetail = TripInfoSection & { blocks: TripInfoBlock[] 
 
 export type TripRecord = Omit<Trip, 'createdAt' | 'updatedAt'> & { createdAt: string; updatedAt: string }
 
+export type TripDestinationView = Pick<TripDestination, 'countryCode' | 'city'>
+
 export type PublicTrip = TripRecord & {
     owner: TripOwner
+    destinations: TripDestination[]
     flights: TripFlight[]
     lodgings: TripLodging[]
     days: TripDayDetail[]
@@ -63,6 +68,8 @@ export type TripSummary = Pick<Trip, 'id' | 'title' | 'eyebrow' | 'destination' 
     scheduleCount: number
     bookingCount: number
     updatedAt: string
+    isFavorite: boolean
+    destinations: TripDestinationView[]
     flights: Array<Pick<TripFlight, 'direction' | 'departCode' | 'arriveCode'>>
 }
 

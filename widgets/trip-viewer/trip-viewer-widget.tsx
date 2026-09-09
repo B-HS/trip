@@ -162,6 +162,7 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
 
     const sidebar = (isPrintLayout: boolean) => (
         <TripSidebar
+            destinations={trip.destinations}
             eyebrow={trip.eyebrow}
             title={trip.title}
             startDate={trip.startDate}

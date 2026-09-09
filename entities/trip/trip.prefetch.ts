@@ -1,13 +1,16 @@
 import 'server-only'
 import type { QueryClient } from '@tanstack/react-query'
 import { getTripRole } from '@/entities/trip/trip.access'
-import { getTripDetail, getTripList } from '@/entities/trip/trip.cache'
+import { getFavoriteTrips, getTripDetail, getTripList } from '@/entities/trip/trip.cache'
 import { findTripInvites, findTripMembers } from '@/entities/trip/trip.repository.members'
 import { QUERY_KEY } from '@/shared/constant/query-key'
 import { ApiError } from '@/shared/lib/api-response'
 
 export const prefetchTripList = async (queryClient: QueryClient, userId: string) =>
     queryClient.prefetchQuery({ queryKey: QUERY_KEY.TRIP.LIST, queryFn: () => getTripList(userId) })
+
+export const prefetchFavoriteTrips = async (queryClient: QueryClient, userId: string) =>
+    queryClient.prefetchQuery({ queryKey: QUERY_KEY.TRIP.FAVORITES, queryFn: () => getFavoriteTrips(userId) })
 
 export const prefetchTripDetail = async (queryClient: QueryClient, tripId: string, userId: string) =>
     queryClient.prefetchQuery({

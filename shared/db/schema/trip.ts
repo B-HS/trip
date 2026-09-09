@@ -76,6 +76,21 @@ export const tripInvite = tripTable(
     (table) => [uniqueIndex('invite_trip_email_idx').on(table.tripId, table.email), index('invite_email_idx').on(table.email)],
 )
 
+export const tripDestination = tripTable(
+    'destination',
+    {
+        id: id(),
+        tripId: varchar('trip_id', { length: 36 })
+            .notNull()
+            .references(() => trip.id, { onDelete: 'cascade' }),
+        sortOrder: int('sort_order').notNull().default(0),
+        countryCode: varchar('country_code', { length: 2 }).notNull(),
+        city: varchar('city', { length: 80 }),
+        createdAt: createdAt(),
+    },
+    (table) => [index('destination_trip_id_idx').on(table.tripId)],
+)
+
 export const tripFlight = tripTable(
     'flight',
     {
@@ -300,10 +315,27 @@ export const tripDayMemo = tripTable(
     (table) => [primaryKey({ columns: [table.dayId, table.userId] }), index('day_memo_user_id_idx').on(table.userId)],
 )
 
+export const tripFavorite = tripTable(
+    'favorite',
+    {
+        userId: varchar('user_id', { length: 36 })
+            .notNull()
+            .references(() => user.id, { onDelete: 'cascade' }),
+        tripId: varchar('trip_id', { length: 36 })
+            .notNull()
+            .references(() => trip.id, { onDelete: 'cascade' }),
+        sortOrder: int('sort_order').notNull().default(0),
+        createdAt: createdAt(),
+    },
+    (table) => [primaryKey({ columns: [table.userId, table.tripId] }), index('favorite_trip_id_idx').on(table.tripId)],
+)
+
 export const tripRelations = relations(trip, ({ one, many }) => ({
     owner: one(user, { fields: [trip.ownerId], references: [user.id] }),
     members: many(tripMember),
     invites: many(tripInvite),
+    destinations: many(tripDestination),
+    favorites: many(tripFavorite),
     flights: many(tripFlight),
     lodgings: many(tripLodging),
     days: many(tripDay),
@@ -319,6 +351,15 @@ export const tripMemberRelations = relations(tripMember, ({ one }) => ({
 export const tripInviteRelations = relations(tripInvite, ({ one }) => ({
     trip: one(trip, { fields: [tripInvite.tripId], references: [trip.id] }),
     inviter: one(user, { fields: [tripInvite.invitedBy], references: [user.id] }),
+}))
+
+export const tripDestinationRelations = relations(tripDestination, ({ one }) => ({
+    trip: one(trip, { fields: [tripDestination.tripId], references: [trip.id] }),
+}))
+
+export const tripFavoriteRelations = relations(tripFavorite, ({ one }) => ({
+    trip: one(trip, { fields: [tripFavorite.tripId], references: [trip.id] }),
+    user: one(user, { fields: [tripFavorite.userId], references: [user.id] }),
 }))
 
 export const tripFlightRelations = relations(tripFlight, ({ one }) => ({

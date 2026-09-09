@@ -4,9 +4,11 @@ import { ListIcon, PlusIcon } from 'lucide-react'
 import { motion } from 'motion/react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState, type FC, type PropsWithChildren } from 'react'
+import { useFavoriteTrips } from '@/entities/trip/trip.query'
 import { MobileTopBar } from '@/features/app-shell/mobile-top-bar'
 import type { NavItemLink } from '@/features/app-shell/nav-item'
 import { NavRail } from '@/features/app-shell/nav-rail'
+import type { RailFavorite } from '@/features/app-shell/rail-favorite-item'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { signOut } from '@/shared/lib/auth-client'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/shared/ui/sheet'
@@ -53,6 +55,13 @@ export const AppShell: FC<AppShellProps> = ({ user, defaultCollapsed = false, ch
     const router = useRouter()
     const pathname = usePathname()
     const isMobile = useIsMobile()
+    const favoriteTrips = useFavoriteTrips()
+
+    const favorites: RailFavorite[] = (favoriteTrips.data ?? []).map((trip) => ({
+        id: trip.id,
+        title: trip.title,
+        code: trip.destinations[0]?.countryCode ?? null,
+    }))
 
     const handleSignOut = async () => {
         await signOut()
@@ -89,6 +98,7 @@ export const AppShell: FC<AppShellProps> = ({ user, defaultCollapsed = false, ch
                             <SheetDescription className='sr-only'>트립의 주요 화면으로 이동합니다.</SheetDescription>
                             <NavRail
                                 items={NAV_ITEMS}
+                                favorites={favorites}
                                 activePath={pathname}
                                 isCollapsed={false}
                                 user={user}
@@ -106,6 +116,7 @@ export const AppShell: FC<AppShellProps> = ({ user, defaultCollapsed = false, ch
                     transition={{ duration: SIDEBAR_COLLAPSE_DURATION, ease: 'linear' }}>
                     <NavRail
                         items={NAV_ITEMS}
+                        favorites={favorites}
                         activePath={pathname}
                         isCollapsed={isCollapsed}
                         user={user}

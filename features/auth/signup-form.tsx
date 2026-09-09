@@ -73,7 +73,7 @@ export const SignupForm: FC<SignupFormProps> = ({ onSubmit, isPending }) => {
                             {...form.register('password')}
                         />
                         <Button
-                            className='absolute top-0.5 right-0.5'
+                            className='absolute top-0 right-0'
                             type='button'
                             variant='ghost'
                             size='icon-sm'

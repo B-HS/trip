@@ -9,6 +9,7 @@ import {
     exportTripTemplate,
     findTripShareSlug,
     saveBookings,
+    saveDestinations,
     saveFlights,
     saveInfoSections,
     saveLodgings,
@@ -16,12 +17,15 @@ import {
     updateTripBasics,
 } from '@/entities/trip/trip.repository'
 import { deleteDay, reorderDays, saveDay } from '@/entities/trip/trip.repository.days'
+import { setTripFavorite } from '@/entities/trip/trip.repository.favorites'
 import { inviteMember, removeInvite, removeMember, updateMemberRole } from '@/entities/trip/trip.repository.members'
 import { tripShareTag } from '@/entities/trip/trip.tag'
 import {
     bookingListSchema,
     dayIdListSchema,
     dayInputSchema,
+    destinationListSchema,
+    favoriteFlagSchema,
     flightListSchema,
     infoSectionListSchema,
     lodgingListSchema,
@@ -29,9 +33,11 @@ import {
     memberRoleSchema,
     shareSettingsSchema,
     tripBasicsSchema,
+    tripCreateSchema,
     tripIdSchema,
     type BookingListInput,
     type DayInput,
+    type DestinationListInput,
     type FlightListInput,
     type InfoSectionListInput,
     type LodgingListInput,
@@ -39,6 +45,7 @@ import {
     type MemberRoleInput,
     type ShareSettingsInput,
     type TripBasicsInput,
+    type TripCreateInput,
 } from '@/entities/trip/trip.validate'
 import { runAction } from '@/shared/lib/action-result'
 import { requireUser } from '@/shared/lib/session'
@@ -54,11 +61,11 @@ const expireTrip = async (tripId: string) => {
     expireShare(await findTripShareSlug(tripId))
 }
 
-export const createTripAction = async (input: TripBasicsInput) => {
+export const createTripAction = async (input: TripCreateInput) => {
     const user = await requireUser()
     return runAction(async () => {
-        const created = await createTrip(user.id, tripBasicsSchema.parse(input))
-        return created
+        const { destinations, ...basics } = tripCreateSchema.parse(input)
+        return createTrip(user.id, basics, destinations)
     })
 }
 
@@ -78,6 +85,28 @@ export const updateTripBasicsAction = async (tripId: string, input: TripBasicsIn
         await updateTripBasics(id, tripBasicsSchema.parse(input))
         await expireTrip(id)
         return { id }
+    })
+}
+
+export const saveDestinationsAction = async (tripId: string, list: DestinationListInput) => {
+    const user = await requireUser()
+    return runAction(async () => {
+        const id = tripIdSchema.parse(tripId)
+        await assertTripAccess(id, user.id, 'edit')
+        await saveDestinations(id, destinationListSchema.parse(list))
+        await expireTrip(id)
+        return { id }
+    })
+}
+
+export const toggleFavoriteAction = async (tripId: string, isFavorite: boolean) => {
+    const user = await requireUser()
+    return runAction(async () => {
+        const id = tripIdSchema.parse(tripId)
+        await assertTripAccess(id, user.id, 'view')
+        const flag = favoriteFlagSchema.parse(isFavorite)
+        await setTripFavorite(user.id, id, flag)
+        return { id, isFavorite: flag }
     })
 }
 

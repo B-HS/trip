@@ -8,6 +8,13 @@
       "when": 1788931074667,
       "tag": "0000_woozy_talisman",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1788938597849,
+      "tag": "0001_clear_silvermane",
+      "breakpoints": true
     }
   ]
 }

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import type { FC } from 'react'
 import { useCreateTrip, useCreateTripFromTemplate } from '@/entities/trip/trip.query'
-import type { TripBasicsValues } from '@/entities/trip/trip.validate'
+import type { TripCreateValues } from '@/entities/trip/trip.validate'
 import { TripCreateForm } from '@/features/trips/trip-create-form'
 import { TripTemplateCard } from '@/features/trips/trip-template-card'
 import { OSAKA_TRIP_TEMPLATE } from '@/shared/constant/template/osaka'
@@ -25,7 +25,7 @@ export const TripCreateWidget: FC = () => {
     const createTrip = useCreateTrip()
     const createFromTemplate = useCreateTripFromTemplate()
 
-    const handleCreate = (values: TripBasicsValues) => createTrip.mutate(values, { onSuccess: (created) => router.push(`/trips/${created.id}/edit`) })
+    const handleCreate = (values: TripCreateValues) => createTrip.mutate(values, { onSuccess: (created) => router.push(`/trips/${created.id}/edit`) })
 
     const handleCreateFromTemplate = () =>
         createFromTemplate.mutate(OSAKA_TRIP_TEMPLATE, { onSuccess: (created) => router.push(`/trips/${created.id}`) })

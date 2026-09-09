@@ -2,6 +2,7 @@ export const QUERY_KEY = {
     TRIP: {
         ALL: ['trip'],
         LIST: ['trip', 'list'],
+        FAVORITES: ['trip', 'favorites'],
         DETAIL: (tripId: string) => ['trip', 'detail', tripId],
         MEMBERS: (tripId: string) => ['trip', 'members', tripId],
         SHARE: (slug: string) => ['trip', 'share', slug],

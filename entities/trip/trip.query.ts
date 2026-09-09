@@ -14,17 +14,21 @@ import {
     reorderDaysAction,
     saveBookingsAction,
     saveDayAction,
+    saveDestinationsAction,
     saveFlightsAction,
     saveInfoSectionsAction,
     saveLodgingsAction,
+    toggleFavoriteAction,
     updateMemberRoleAction,
     updateShareSettingsAction,
     updateTripBasicsAction,
 } from '@/entities/trip/trip.action'
-import { fetchTripDetail, fetchTripList, fetchTripMembers } from '@/entities/trip/trip.api'
+import { fetchFavoriteTrips, fetchTripDetail, fetchTripList, fetchTripMembers } from '@/entities/trip/trip.api'
+import type { TripSummary } from '@/entities/trip/trip.type'
 import type {
     BookingListInput,
     DayInput,
+    DestinationListInput,
     FlightListInput,
     InfoSectionListInput,
     LodgingListInput,
@@ -32,6 +36,7 @@ import type {
     MemberRoleInput,
     ShareSettingsInput,
     TripBasicsInput,
+    TripCreateInput,
 } from '@/entities/trip/trip.validate'
 import { QUERY_KEY } from '@/shared/constant/query-key'
 import { unwrapActionResult } from '@/shared/lib/action-result'
@@ -41,6 +46,8 @@ const SAVED_MESSAGE = '저장했습니다.'
 
 export const tripListQueryOptions = () => queryOptions({ queryKey: QUERY_KEY.TRIP.LIST, queryFn: fetchTripList })
 
+export const favoriteTripsQueryOptions = () => queryOptions({ queryKey: QUERY_KEY.TRIP.FAVORITES, queryFn: fetchFavoriteTrips })
+
 export const tripDetailQueryOptions = (tripId: string) =>
     queryOptions({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId), queryFn: () => fetchTripDetail(tripId) })
 
@@ -49,6 +56,8 @@ export const tripMembersQueryOptions = (tripId: string) =>
 
 export const useTripList = () => useQuery(tripListQueryOptions())
 
+export const useFavoriteTrips = () => useQuery(favoriteTripsQueryOptions())
+
 export const useTripDetail = (tripId: string) => useQuery({ ...tripDetailQueryOptions(tripId), enabled: tripId.length > 0 })
 
 export const useTripMembers = (tripId: string) => useQuery({ ...tripMembersQueryOptions(tripId), enabled: tripId.length > 0 })
@@ -56,7 +65,7 @@ export const useTripMembers = (tripId: string) => useQuery({ ...tripMembersQuery
 export const useCreateTrip = () => {
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: async (input: TripBasicsInput) => unwrapActionResult(await createTripAction(input)),
+        mutationFn: async (input: TripCreateInput) => unwrapActionResult(await createTripAction(input)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
             toast.success('여행을 만들었습니다.')
@@ -84,9 +93,56 @@ export const useUpdateTripBasics = (tripId: string) => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
+            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.FAVORITES })
             toast.success('기본 정보를 저장했습니다.')
         },
         onError: (error) => toast.error(error.message),
+    })
+}
+
+export const useSaveDestinations = (tripId: string) => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: async (list: DestinationListInput) => unwrapActionResult(await saveDestinationsAction(tripId, list)),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
+            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
+            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.FAVORITES })
+            toast.success('목적지를 저장했습니다.')
+        },
+        onError: (error) => toast.error(error.message),
+    })
+}
+
+export const useToggleFavorite = () => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: async (variables: { tripId: string; isFavorite: boolean }) =>
+            unwrapActionResult(await toggleFavoriteAction(variables.tripId, variables.isFavorite)),
+        onMutate: async ({ tripId, isFavorite }) => {
+            await queryClient.cancelQueries({ queryKey: QUERY_KEY.TRIP.LIST })
+            await queryClient.cancelQueries({ queryKey: QUERY_KEY.TRIP.FAVORITES })
+            const previousList = queryClient.getQueryData<TripSummary[]>(QUERY_KEY.TRIP.LIST)
+            const previousFavorites = queryClient.getQueryData<TripSummary[]>(QUERY_KEY.TRIP.FAVORITES)
+            const nextList = previousList?.map((trip) => (trip.id === tripId ? { ...trip, isFavorite } : trip))
+            if (nextList !== undefined) queryClient.setQueryData(QUERY_KEY.TRIP.LIST, nextList)
+            if (previousFavorites !== undefined) {
+                const target = nextList?.find((trip) => trip.id === tripId)
+                const without = previousFavorites.filter((trip) => trip.id !== tripId)
+                const next = isFavorite && target !== undefined ? [...without, target] : without
+                queryClient.setQueryData(QUERY_KEY.TRIP.FAVORITES, next)
+            }
+            return { previousList, previousFavorites }
+        },
+        onError: (error, _variables, context) => {
+            if (context?.previousList !== undefined) queryClient.setQueryData(QUERY_KEY.TRIP.LIST, context.previousList)
+            if (context?.previousFavorites !== undefined) queryClient.setQueryData(QUERY_KEY.TRIP.FAVORITES, context.previousFavorites)
+            toast.error(error.message)
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
+            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.FAVORITES })
+        },
     })
 }
 
@@ -185,6 +241,7 @@ export const useDeleteTrip = () => {
         onSuccess: (data) => {
             queryClient.removeQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(data.id) })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
+            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.FAVORITES })
             toast.success('여행을 삭제했습니다.')
         },
         onError: (error) => toast.error(error.message),

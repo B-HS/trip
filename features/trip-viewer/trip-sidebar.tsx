@@ -1,7 +1,8 @@
 import { ExternalLinkIcon } from 'lucide-react'
 import type { FC } from 'react'
-import type { TripFlight, TripLodging } from '@/entities/trip/trip.type'
+import type { TripDestinationView, TripFlight, TripLodging } from '@/entities/trip/trip.type'
 import { formatPeriodLabel, formatRatio, formatVerifiedOn, toPercent } from '@/features/trip-viewer/trip-viewer-format'
+import { countryName } from '@/shared/constant/countries'
 import { cn } from '@/shared/lib/utils'
 import { AnimatedProgress } from '@/shared/ui/motion/animated-progress'
 
@@ -13,6 +14,7 @@ type TripSidebarProps = {
     periodNote: string | null
     completedCount: number
     totalCount: number
+    destinations?: readonly TripDestinationView[]
     flights: readonly TripFlight[]
     lodgings: readonly TripLodging[]
     disclaimer: string | null
@@ -30,6 +32,7 @@ export const TripSidebar: FC<TripSidebarProps> = ({
     periodNote,
     completedCount,
     totalCount,
+    destinations = [],
     flights,
     lodgings,
     disclaimer,
@@ -51,6 +54,19 @@ export const TripSidebar: FC<TripSidebarProps> = ({
             </span>
             <AnimatedProgress value={toPercent(completedCount, totalCount)} label='전체 일정 완료율' />
         </div>
+        {destinations.length > 0 && (
+            <section className='flex flex-col gap-2'>
+                <h2 className='text-sm font-medium text-foreground'>목적지</h2>
+                <ol className='flex flex-col gap-1'>
+                    {destinations.map((destination, index) => (
+                        <li key={`${index}-${destination.countryCode}`} className='flex items-baseline gap-2 text-sm'>
+                            <span className='font-mono text-2xs tracking-widest text-muted-foreground'>{destination.countryCode}</span>
+                            <span className='truncate'>{destination.city ?? countryName(destination.countryCode)}</span>
+                        </li>
+                    ))}
+                </ol>
+            </section>
+        )}
         {flights.length > 0 && (
             <section className='flex flex-col gap-2'>
                 <h2 className='text-sm font-medium text-foreground'>확정 항공편</h2>

@@ -5,6 +5,8 @@ const TRIPS_PATH = '/api/trips'
 
 export const fetchTripList = () => clientFetch<TripSummary[]>(TRIPS_PATH)
 
+export const fetchFavoriteTrips = () => clientFetch<TripSummary[]>(`${TRIPS_PATH}/favorites`)
+
 export const fetchTripDetail = (tripId: string) => clientFetch<TripDetail>(`${TRIPS_PATH}/${tripId}`)
 
 export const fetchTripMembers = (tripId: string) => clientFetch<TripMembersView>(`${TRIPS_PATH}/${tripId}/members`)

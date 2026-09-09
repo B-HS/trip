@@ -8,7 +8,7 @@ import {
     airportsFacingRotation,
     buildGlobeArc,
     collectGlobeAirports,
-    type GlobeAirport,
+    type GlobePoint,
     type GlobeRoute,
     latLngToVector3,
 } from '@/shared/ui/three/globe-math'
@@ -51,14 +51,14 @@ const TRAVELLER_OFFSET_STEP = 0.37
 const FULL_TURN = 1
 
 type GlobeMarkerProps = {
-    airport: GlobeAirport
+    point: GlobePoint
     radius: number
     ringScale: number
     color: string
 }
 
-const GlobeMarker: FC<GlobeMarkerProps> = ({ airport, radius, ringScale, color }) => {
-    const position = latLngToVector3(airport.lat, airport.lng, GLOBE_RADIUS * MARKER_ELEVATION)
+const GlobeMarker: FC<GlobeMarkerProps> = ({ point, radius, ringScale, color }) => {
+    const position = latLngToVector3(point.lat, point.lng, GLOBE_RADIUS * MARKER_ELEVATION)
 
     return (
         <group position={position} quaternion={new Quaternion().setFromUnitVectors(MARKER_FORWARD, position.clone().normalize())}>
@@ -130,8 +130,8 @@ export const TripGlobeScene: FC<TripGlobeSceneProps> = ({ routes, variant, inter
     const spinRef = useRef<Group>(null)
     const spinSpeedRef = useRef(0)
     const config = GLOBE_VARIANT_CONFIG[variant]
-    const airports = collectGlobeAirports(routes)
-    const facing = airportsFacingRotation(airports)
+    const points = collectGlobeAirports(routes)
+    const facing = airportsFacingRotation(points)
     const travellerCount = routes.length > MAX_TRAVELLER_ARCS ? 1 : routes.length
     const theme = useGlobeTheme()
 
@@ -180,10 +180,10 @@ export const TripGlobeScene: FC<TripGlobeSceneProps> = ({ routes, variant, inter
                                 opacity={COASTLINE_OPACITY * theme.mutedForeground.alpha}
                             />
                         </lineSegments>
-                        {airports.map((airport) => (
+                        {points.map((point) => (
                             <GlobeMarker
-                                key={airport.code}
-                                airport={airport}
+                                key={point.key}
+                                point={point}
                                 radius={config.markerRadius}
                                 ringScale={config.markerRingScale}
                                 color={theme.foreground.color}

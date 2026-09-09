@@ -1,9 +1,11 @@
 import { z } from 'zod'
+import { TRIP_DESTINATION_MIN_COUNT } from '@/shared/constant/trip'
 import {
     tripTemplateBookingSchema,
     tripTemplateDayFactSchema,
     tripTemplateDayNoteSchema,
     tripTemplateDaySchema,
+    tripTemplateDestinationSchema,
     tripTemplateFlightSchema,
     tripTemplateInfoBlockSchema,
     tripTemplateInfoSectionSchema,
@@ -23,9 +25,29 @@ const optionalId = z.uuid().optional()
 
 export const tripIdSchema = z.uuid()
 
-export const tripBasicsSchema = tripTemplateSchema
-    .omit({ flights: true, lodgings: true, days: true, bookings: true, infoSections: true })
-    .refine((value) => value.endDate >= value.startDate, { message: '종료일은 시작일과 같거나 이후여야 합니다.', path: ['endDate'] })
+const tripBasicsFieldsSchema = tripTemplateSchema.omit({
+    destinations: true,
+    flights: true,
+    lodgings: true,
+    days: true,
+    bookings: true,
+    infoSections: true,
+})
+
+const hasOrderedPeriod = (value: { startDate: string; endDate: string }) => value.endDate >= value.startDate
+
+const PERIOD_ISSUE = { message: '종료일은 시작일과 같거나 이후여야 합니다.', path: ['endDate'] }
+
+export const tripBasicsSchema = tripBasicsFieldsSchema.refine(hasOrderedPeriod, PERIOD_ISSUE)
+
+export const destinationInputSchema = tripTemplateDestinationSchema.extend({ id: optionalId })
+export const destinationListSchema = z.array(destinationInputSchema)
+
+export const tripBasicsFormSchema = tripBasicsFieldsSchema.extend({ destinations: destinationListSchema }).refine(hasOrderedPeriod, PERIOD_ISSUE)
+
+export const tripCreateSchema = tripBasicsFieldsSchema
+    .extend({ destinations: destinationListSchema.min(TRIP_DESTINATION_MIN_COUNT, '목적지를 한 곳 이상 추가해 주세요.') })
+    .refine(hasOrderedPeriod, PERIOD_ISSUE)
 
 export const flightInputSchema = tripTemplateFlightSchema.extend({ id: optionalId })
 export const flightListSchema = z.array(flightInputSchema)
@@ -69,8 +91,17 @@ export const shareSettingsSchema = z.object({
 
 export const dayMemoSchema = z.object({ content: z.string().max(DAY_MEMO_MAX_LENGTH) })
 
+export const favoriteFlagSchema = z.boolean()
+
 export type TripBasicsInput = z.input<typeof tripBasicsSchema>
 export type TripBasicsValues = z.output<typeof tripBasicsSchema>
+export type TripBasicsFormInput = z.input<typeof tripBasicsFormSchema>
+export type TripBasicsFormValues = z.output<typeof tripBasicsFormSchema>
+export type TripCreateInput = z.input<typeof tripCreateSchema>
+export type TripCreateValues = z.output<typeof tripCreateSchema>
+export type DestinationInput = z.input<typeof destinationInputSchema>
+export type DestinationValues = z.output<typeof destinationInputSchema>
+export type DestinationListInput = z.input<typeof destinationListSchema>
 export type FlightInput = z.input<typeof flightInputSchema>
 export type FlightValues = z.output<typeof flightInputSchema>
 export type FlightListInput = z.input<typeof flightListSchema>

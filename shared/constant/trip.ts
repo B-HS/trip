@@ -62,3 +62,9 @@ export const TRIP_VIEW_LABEL = {
 export const GOOGLE_MAPS_SEARCH_URL = 'https://www.google.com/maps/search/?api=1&query='
 
 export const buildMapUrl = (query: string) => `${GOOGLE_MAPS_SEARCH_URL}${encodeURIComponent(query)}`
+
+export const HOME_AIRPORT_CODE = 'ICN'
+
+export const TRIP_DESTINATION_MIN_COUNT = 1
+
+export const TRIP_DESTINATION_CITY_MAX_LENGTH = 80

@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, type FC } from 'react'
-import { useCreateTripFromTemplate, useTripList } from '@/entities/trip/trip.query'
+import { useCreateTripFromTemplate, useToggleFavorite, useTripList } from '@/entities/trip/trip.query'
 import { TripCard } from '@/features/trips/trip-card'
 import { TripCardsSkeleton } from '@/features/trips/trip-cards-skeleton'
 import { TripEmptyState } from '@/features/trips/trip-empty-state'
@@ -40,6 +40,7 @@ export const TripListWidget: FC = () => {
     const today = useToday()
     const tripList = useTripList()
     const createFromTemplate = useCreateTripFromTemplate()
+    const toggleFavorite = useToggleFavorite()
 
     const trips = tripList.data ?? []
     const globeRoutes = collectGlobeRoutes(trips)
@@ -63,7 +64,9 @@ export const TripListWidget: FC = () => {
                             eyebrow={trip.eyebrow}
                             destination={trip.destination}
                             dateRangeLabel={formatTripDateRange(trip)}
+                            destinations={trip.destinations}
                             routeLabel={resolveTripRouteLabel(trip.flights)}
+                            isFavorite={trip.isFavorite}
                             status={deriveTripStatus(trip, today)}
                             roleLabel={MEMBER_ROLE_LABEL[trip.role]}
                             dayCount={trip.dayCount}
@@ -72,6 +75,7 @@ export const TripListWidget: FC = () => {
                             canEdit={trip.role !== 'viewer'}
                             canDelete={trip.role === 'owner'}
                             onDelete={() => setDeleteTarget({ id: trip.id, title: trip.title })}
+                            onToggleFavorite={() => toggleFavorite.mutate({ tripId: trip.id, isFavorite: !trip.isFavorite })}
                         />
                     </motion.li>
                 ))}
@@ -117,7 +121,7 @@ export const TripListWidget: FC = () => {
                 {globeRoutes.length > 0 ? (
                     <TripGlobeLazy routes={globeRoutes} variant='panel' interactive={false} />
                 ) : (
-                    <p className='py-6 text-center text-xs text-muted-foreground'>항공편을 등록하면 전체 경로가 지구본에 표시됩니다.</p>
+                    <p className='py-6 text-center text-xs text-muted-foreground'>목적지나 항공편을 등록하면 전체 경로가 지구본에 표시됩니다.</p>
                 )}
             </FadeIn>
             {renderTrips()}

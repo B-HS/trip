@@ -1,25 +1,33 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PlusIcon } from 'lucide-react'
 import { useEffect, useRef, type FC } from 'react'
-import { useForm } from 'react-hook-form'
-import { tripBasicsSchema, type TripBasicsInput, type TripBasicsValues } from '@/entities/trip/trip.validate'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { tripBasicsFormSchema, type TripBasicsFormInput, type TripBasicsFormValues } from '@/entities/trip/trip.validate'
 import { EditorField } from '@/features/trip-editor/editor-field'
 import { EditorFormShell } from '@/features/trip-editor/editor-form-shell'
 import { EditorPanel } from '@/features/trip-editor/editor-panel'
 import { EDITOR_GRID_CLASS, EDITOR_INPUT_CLASS, EDITOR_TEXTAREA_CLASS, EMPTY_TO_NULL, type EditorSubmit } from '@/features/trip-editor/editor-form'
+import { EditorToolbar } from '@/features/trip-editor/editor-toolbar'
+import { SortableRow } from '@/features/trip-editor/sortable-row'
+import { SortableRows } from '@/features/trip-editor/sortable-rows'
+import { CountryCombobox } from '@/features/trips/country-combobox'
+import { DEFAULT_COUNTRY_CODE } from '@/shared/constant/countries'
+import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Textarea } from '@/shared/ui/textarea'
 
 type BasicsFormProps = {
-    defaultValues: TripBasicsInput
-    onSubmit: EditorSubmit<TripBasicsValues>
+    defaultValues: TripBasicsFormInput
+    onSubmit: EditorSubmit<TripBasicsFormValues>
     isPending: boolean
 }
 
 export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPending }) => {
     const didResetRef = useRef(false)
-    const form = useForm<TripBasicsInput, unknown, TripBasicsValues>({ resolver: zodResolver(tripBasicsSchema), defaultValues })
+    const form = useForm<TripBasicsFormInput, unknown, TripBasicsFormValues>({ resolver: zodResolver(tripBasicsFormSchema), defaultValues })
+    const rows = useFieldArray({ control: form.control, name: 'destinations', keyName: 'fieldKey' })
 
     const { errors, isDirty } = form.formState
     const handleSubmit = form.handleSubmit(async (values) => {
@@ -106,6 +114,55 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                     />
                 </EditorField>
             </EditorPanel>
+            <EditorToolbar
+                title='목적지'
+                description='여행하는 순서대로 나라를 추가하세요. 항공편이 없으면 지구본 경로에 사용됩니다.'
+                count={rows.fields.length}
+                action={
+                    <Button type='button' variant='outline' size='sm' onClick={() => rows.append({ countryCode: DEFAULT_COUNTRY_CODE, city: null })}>
+                        <PlusIcon />
+                        나라 추가
+                    </Button>
+                }
+            />
+            {rows.fields.length === 0 ? (
+                <p className='bg-card p-3 text-xs text-muted-foreground'>등록된 목적지가 없습니다.</p>
+            ) : (
+                <SortableRows ids={rows.fields.map((row) => row.fieldKey)} onReorder={rows.move}>
+                    {rows.fields.map((row, index) => (
+                        <SortableRow key={row.fieldKey} id={row.fieldKey} index={index} removeLabel='목적지 삭제' onRemove={() => rows.remove(index)}>
+                            <div className={EDITOR_GRID_CLASS}>
+                                <EditorField
+                                    label='나라'
+                                    htmlFor={`destination-${index}-country`}
+                                    error={errors.destinations?.[index]?.countryCode?.message}>
+                                    <Controller
+                                        control={form.control}
+                                        name={`destinations.${index}.countryCode`}
+                                        render={({ field, fieldState }) => (
+                                            <CountryCombobox
+                                                id={`destination-${index}-country`}
+                                                value={field.value}
+                                                isInvalid={fieldState.invalid}
+                                                onChange={field.onChange}
+                                            />
+                                        )}
+                                    />
+                                </EditorField>
+                                <EditorField label='도시' htmlFor={`destination-${index}-city`} error={errors.destinations?.[index]?.city?.message}>
+                                    <Input
+                                        id={`destination-${index}-city`}
+                                        className={EDITOR_INPUT_CLASS}
+                                        placeholder='오사카'
+                                        aria-invalid={!!errors.destinations?.[index]?.city}
+                                        {...form.register(`destinations.${index}.city`, EMPTY_TO_NULL)}
+                                    />
+                                </EditorField>
+                            </div>
+                        </SortableRow>
+                    ))}
+                </SortableRows>
+            )}
             <EditorPanel title='안내 문구' description='뷰어의 범례·예매 소개·푸터에 그대로 표시됩니다.'>
                 <EditorField label='여유 시간 안내' htmlFor='basics-buffer-policy' error={errors.bufferPolicy?.message}>
                     <Textarea

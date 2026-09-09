@@ -4,17 +4,21 @@ import {
     dayIdListSchema,
     dayInputSchema,
     dayMemoSchema,
+    destinationListSchema,
     flightListSchema,
     infoSectionListSchema,
     memberInviteSchema,
     memberRoleSchema,
     shareSettingsSchema,
+    tripBasicsFormSchema,
     tripBasicsSchema,
+    tripCreateSchema,
     tripIdSchema,
 } from '@/entities/trip/trip.validate'
 
 const TRIP_ID = '3f1a2b6c-4d5e-4f70-8a9b-0c1d2e3f4a5b'
 const DAY_MEMO_MAX_LENGTH = 4000
+const CITY_MAX_LENGTH = 80
 
 const basics = {
     title: '오사카 여행 노트',
@@ -54,6 +58,47 @@ describe('tripBasicsSchema', () => {
 
     test('제목이 비어 있으면 실패한다', () => {
         expect(() => tripBasicsSchema.parse({ ...basics, title: '' })).toThrow()
+    })
+})
+
+describe('destinationListSchema', () => {
+    test('나라 코드만으로 파싱하고 도시는 null 로 채운다', () => {
+        const parsed = destinationListSchema.parse([{ countryCode: 'JP' }])
+        expect(parsed[0]?.countryCode).toBe('JP')
+        expect(parsed[0]?.city).toBeNull()
+        expect(parsed[0]?.id).toBeUndefined()
+    })
+
+    test('나라 코드가 목록에 없으면 실패한다', () => {
+        expect(() => destinationListSchema.parse([{ countryCode: 'ZZ' }])).toThrow()
+        expect(() => destinationListSchema.parse([{ countryCode: 'jp' }])).toThrow()
+    })
+
+    test('기존 항목은 uuid id 를 유지한다', () => {
+        expect(destinationListSchema.parse([{ countryCode: 'JP', id: TRIP_ID }])[0]?.id).toBe(TRIP_ID)
+    })
+
+    test('도시가 80자를 넘으면 실패한다', () => {
+        expect(() => destinationListSchema.parse([{ countryCode: 'JP', city: 'ㅁ'.repeat(CITY_MAX_LENGTH + 1) }])).toThrow()
+    })
+
+    test('빈 목록도 허용한다', () => {
+        expect(destinationListSchema.parse([])).toEqual([])
+    })
+})
+
+describe('tripCreateSchema / tripBasicsFormSchema', () => {
+    test('생성 입력은 목적지를 한 곳 이상 요구한다', () => {
+        expect(() => tripCreateSchema.parse({ ...basics, destinations: [] })).toThrow()
+        expect(tripCreateSchema.parse({ ...basics, destinations: [{ countryCode: 'JP', city: '오사카' }] }).destinations).toHaveLength(1)
+    })
+
+    test('편집 폼 입력은 목적지가 비어도 통과한다', () => {
+        expect(tripBasicsFormSchema.parse({ ...basics, destinations: [] }).destinations).toEqual([])
+    })
+
+    test('편집 폼 입력도 기간 순서를 검사한다', () => {
+        expect(() => tripBasicsFormSchema.parse({ ...basics, endDate: '2026-09-30', destinations: [] })).toThrow()
     })
 })
 

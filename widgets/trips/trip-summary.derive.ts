@@ -2,7 +2,9 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/ko'
 import type { TripSummary } from '@/entities/trip/trip.type'
 import type { TripStatus } from '@/features/trips/trip-status'
-import type { GlobeRouteInput } from '@/shared/ui/three/globe-math'
+import { COUNTRIES, isCountryCode } from '@/shared/constant/countries'
+import { HOME_AIRPORT_CODE } from '@/shared/constant/trip'
+import type { GlobeEndpointInput, GlobePointInput, GlobeRouteInput } from '@/shared/ui/three/globe-math'
 
 const DATE_LOCALE = 'ko'
 const DAY_UNIT = 'day'
@@ -15,6 +17,8 @@ const ROUTE_SEPARATOR = ' → '
 const OUTBOUND = 'outbound'
 
 type TripPeriod = Pick<TripSummary, 'startDate' | 'endDate'>
+
+type TripDestinationLabel = TripSummary['destinations'][number]
 
 export const formatTripDateRange = ({ startDate, endDate }: TripPeriod) => {
     const start = dayjs(startDate).locale(DATE_LOCALE)
@@ -41,12 +45,32 @@ export const resolveTripRouteLabel = (flights: TripSummary['flights']) => {
     return `${flight.departCode}${ROUTE_SEPARATOR}${flight.arriveCode}`
 }
 
+export const toDestinationPoint = (destination: TripDestinationLabel): GlobePointInput | null => {
+    if (!isCountryCode(destination.countryCode)) return null
+    const country = COUNTRIES[destination.countryCode]
+    return { lat: country.lat, lng: country.lng, label: `${destination.countryCode} ${destination.city ?? country.name}` }
+}
+
+export const buildDestinationRoutes = (destinations: readonly TripDestinationLabel[]) => {
+    const points = destinations.flatMap((destination) => {
+        const point = toDestinationPoint(destination)
+        return point === null ? [] : [point]
+    })
+    if (points.length === 0) return []
+    const chain: GlobeEndpointInput[] = [HOME_AIRPORT_CODE, ...points]
+    return chain.slice(1).map((to, index) => ({ from: chain[index], to }) satisfies GlobeRouteInput)
+}
+
+const endpointKey = (endpoint: GlobeEndpointInput) => (typeof endpoint === 'string' ? endpoint : endpoint.label)
+
 export const collectGlobeRoutes = (trips: TripSummary[]) => {
     const routes = new Map<string, GlobeRouteInput>()
     for (const trip of trips) {
-        for (const flight of trip.flights) {
-            routes.set(`${flight.departCode}-${flight.arriveCode}`, { from: flight.departCode, to: flight.arriveCode })
-        }
+        const tripRoutes =
+            trip.flights.length > 0
+                ? trip.flights.map((flight) => ({ from: flight.departCode, to: flight.arriveCode }) satisfies GlobeRouteInput)
+                : buildDestinationRoutes(trip.destinations)
+        for (const route of tripRoutes) routes.set(`${endpointKey(route.from)}-${endpointKey(route.to)}`, route)
     }
     return [...routes.values()]
 }

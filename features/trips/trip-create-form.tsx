@@ -1,22 +1,29 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PlusIcon, Trash2Icon } from 'lucide-react'
 import type { FC } from 'react'
-import { useForm, type FieldError } from 'react-hook-form'
-import { tripBasicsSchema, type TripBasicsInput, type TripBasicsValues } from '@/entities/trip/trip.validate'
+import { Controller, useFieldArray, useForm, type FieldError } from 'react-hook-form'
+import { tripCreateSchema, type TripCreateInput, type TripCreateValues } from '@/entities/trip/trip.validate'
+import { CountryCombobox } from '@/features/trips/country-combobox'
+import { DEFAULT_COUNTRY_CODE } from '@/shared/constant/countries'
+import { TRIP_DESTINATION_CITY_MAX_LENGTH, TRIP_DESTINATION_MIN_COUNT } from '@/shared/constant/trip'
 import { Button } from '@/shared/ui/button'
 import { Field, FieldDescription, FieldError as FieldErrorMessage, FieldGroup, FieldLabel } from '@/shared/ui/field'
 import { Input } from '@/shared/ui/input'
 
 const CUSTOM_ISSUE_TYPE = 'custom'
+const ROW_NUMBER_PAD = 2
+const ROW_NUMBER_OFFSET = 1
 
-const DEFAULT_VALUES: TripBasicsInput = {
+const DEFAULT_VALUES: TripCreateInput = {
     title: '',
     destination: '',
     eyebrow: '',
     startDate: '',
     endDate: '',
     periodNote: '',
+    destinations: [{ countryCode: DEFAULT_COUNTRY_CODE, city: null }],
 }
 
 const MESSAGE = {
@@ -26,6 +33,7 @@ const MESSAGE = {
     startDate: '시작일을 선택해 주세요.',
     endDate: '종료일을 선택해 주세요.',
     periodNote: '기간 메모는 200자 이내로 입력해 주세요.',
+    destinations: '나라를 한 곳 이상 추가해 주세요.',
 } as const
 
 const resolveMessage = (error: FieldError | undefined, fallback: string) => {
@@ -38,11 +46,13 @@ const emptyToNull = (value: string | null | undefined) => (value === null || val
 
 type TripCreateFormProps = {
     isPending: boolean
-    onSubmit: (values: TripBasicsValues) => void
+    onSubmit: (values: TripCreateValues) => void
 }
 
 export const TripCreateForm: FC<TripCreateFormProps> = ({ isPending, onSubmit }) => {
-    const form = useForm<TripBasicsInput, unknown, TripBasicsValues>({ resolver: zodResolver(tripBasicsSchema), defaultValues: DEFAULT_VALUES })
+    const form = useForm<TripCreateInput, unknown, TripCreateValues>({ resolver: zodResolver(tripCreateSchema), defaultValues: DEFAULT_VALUES })
+    const rows = useFieldArray({ control: form.control, name: 'destinations', keyName: 'fieldKey' })
+
     const { errors } = form.formState
     const titleError = resolveMessage(errors.title, MESSAGE.title)
     const destinationError = resolveMessage(errors.destination, MESSAGE.destination)
@@ -50,6 +60,7 @@ export const TripCreateForm: FC<TripCreateFormProps> = ({ isPending, onSubmit })
     const startDateError = resolveMessage(errors.startDate, MESSAGE.startDate)
     const endDateError = resolveMessage(errors.endDate, MESSAGE.endDate)
     const periodNoteError = resolveMessage(errors.periodNote, MESSAGE.periodNote)
+    const destinationsError = errors.destinations?.root?.message ?? errors.destinations?.message ?? null
 
     const handleSubmit = form.handleSubmit((values) =>
         onSubmit({ ...values, eyebrow: emptyToNull(values.eyebrow), periodNote: emptyToNull(values.periodNote) }),
@@ -67,6 +78,60 @@ export const TripCreateForm: FC<TripCreateFormProps> = ({ isPending, onSubmit })
                     <FieldLabel htmlFor='trip-destination'>목적지</FieldLabel>
                     <Input id='trip-destination' aria-invalid={destinationError !== null} placeholder='오사카' {...form.register('destination')} />
                     <FieldErrorMessage>{destinationError}</FieldErrorMessage>
+                </Field>
+                <Field data-invalid={destinationsError !== null}>
+                    <FieldLabel htmlFor='trip-country-0'>나라</FieldLabel>
+                    <FieldDescription className='text-xs'>여행하는 순서대로 나라와 도시를 추가하세요. 지구본 경로에 사용됩니다.</FieldDescription>
+                    <div className='flex flex-col gap-2'>
+                        {rows.fields.map((row, index) => (
+                            <div key={row.fieldKey} className='flex items-center gap-2'>
+                                <span className='w-5 shrink-0 font-mono text-xs text-muted-foreground tabular-nums'>
+                                    {String(index + ROW_NUMBER_OFFSET).padStart(ROW_NUMBER_PAD, '0')}
+                                </span>
+                                <Controller
+                                    control={form.control}
+                                    name={`destinations.${index}.countryCode`}
+                                    render={({ field, fieldState }) => (
+                                        <CountryCombobox
+                                            id={`trip-country-${index}`}
+                                            className='min-w-0 flex-1'
+                                            value={field.value}
+                                            isInvalid={fieldState.invalid}
+                                            onChange={field.onChange}
+                                        />
+                                    )}
+                                />
+                                <Input
+                                    aria-label={`${index + ROW_NUMBER_OFFSET}번째 도시`}
+                                    className='min-w-0 flex-1'
+                                    placeholder='도시 (선택)'
+                                    maxLength={TRIP_DESTINATION_CITY_MAX_LENGTH}
+                                    aria-invalid={errors.destinations?.[index]?.city !== undefined}
+                                    {...form.register(`destinations.${index}.city`, { setValueAs: emptyToNull })}
+                                />
+                                <Button
+                                    className='shrink-0'
+                                    type='button'
+                                    variant='ghost'
+                                    size='icon-sm'
+                                    aria-label={`${index + ROW_NUMBER_OFFSET}번째 나라 삭제`}
+                                    disabled={rows.fields.length <= TRIP_DESTINATION_MIN_COUNT}
+                                    onClick={() => rows.remove(index)}>
+                                    <Trash2Icon aria-hidden />
+                                </Button>
+                            </div>
+                        ))}
+                        <Button
+                            className='w-fit'
+                            type='button'
+                            variant='outline'
+                            size='sm'
+                            onClick={() => rows.append({ countryCode: DEFAULT_COUNTRY_CODE, city: null })}>
+                            <PlusIcon aria-hidden />
+                            나라 추가
+                        </Button>
+                    </div>
+                    <FieldErrorMessage>{destinationsError}</FieldErrorMessage>
                 </Field>
                 <Field data-invalid={eyebrowError !== null}>
                     <FieldLabel htmlFor='trip-eyebrow'>한 줄 소개</FieldLabel>

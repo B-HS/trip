@@ -1,10 +1,16 @@
 import { z } from 'zod'
-import { BOOKING_PRIORITIES, FLIGHT_DIRECTIONS, INFO_BLOCK_KINDS, SCHEDULE_KINDS } from '@/shared/constant/trip'
+import { COUNTRY_CODES } from '@/shared/constant/countries'
+import { BOOKING_PRIORITIES, FLIGHT_DIRECTIONS, INFO_BLOCK_KINDS, SCHEDULE_KINDS, TRIP_DESTINATION_CITY_MAX_LENGTH } from '@/shared/constant/trip'
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 
 const optionalText = (max: number) => z.string().trim().max(max).nullable().default(null)
 const optionalUrl = z.url().max(500).nullable().default(null)
+
+export const tripTemplateDestinationSchema = z.object({
+    countryCode: z.enum(COUNTRY_CODES),
+    city: optionalText(TRIP_DESTINATION_CITY_MAX_LENGTH),
+})
 
 export const tripTemplateFlightSchema = z.object({
     direction: z.enum(FLIGHT_DIRECTIONS),
@@ -114,6 +120,7 @@ export const tripTemplateSchema = z.object({
     bufferPolicy: optionalText(2000),
     bookingNote: optionalText(2000),
     footerNote: optionalText(2000),
+    destinations: z.array(tripTemplateDestinationSchema).default([]),
     flights: z.array(tripTemplateFlightSchema).default([]),
     lodgings: z.array(tripTemplateLodgingSchema).default([]),
     days: z.array(tripTemplateDaySchema).default([]),

@@ -2,6 +2,7 @@
 
 import { LogOutIcon } from 'lucide-react'
 import type { FC } from 'react'
+import { setMotionPreference, useMotionPreference } from '@/shared/hooks/use-motion-preference'
 import { cn } from '@/shared/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import {
@@ -12,6 +13,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
+import { Label } from '@/shared/ui/label'
+import { Switch } from '@/shared/ui/switch'
 import { ThemeToggle } from '@/shared/ui/theme-toggle'
 
 type UserMenuProps = {
@@ -21,6 +24,25 @@ type UserMenuProps = {
     image: string | null
     isCollapsed: boolean
     onSignOut: () => void
+}
+
+const MOTION_PREFERENCE_TOGGLE_ID = 'user-menu-motion-preference'
+
+const MotionPreferenceToggle: FC = () => {
+    const motionPreference = useMotionPreference()
+
+    return (
+        <div className='flex items-center justify-between gap-2 px-2 py-1.5 text-sm'>
+            <Label className='font-normal' htmlFor={MOTION_PREFERENCE_TOGGLE_ID}>
+                모션 줄이기
+            </Label>
+            <Switch
+                id={MOTION_PREFERENCE_TOGGLE_ID}
+                checked={motionPreference === 'reduced'}
+                onCheckedChange={(isReduced) => setMotionPreference(isReduced ? 'reduced' : 'full')}
+            />
+        </div>
+    )
 }
 
 export const UserMenu: FC<UserMenuProps> = ({ name, email, username, image, isCollapsed, onSignOut }) => (
@@ -49,6 +71,7 @@ export const UserMenu: FC<UserMenuProps> = ({ name, email, username, image, isCo
                     <span>테마</span>
                     <ThemeToggle variant='outline' />
                 </div>
+                <MotionPreferenceToggle />
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={onSignOut}>
                     <LogOutIcon />

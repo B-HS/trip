@@ -185,3 +185,46 @@ describe('경로 문구', () => {
         expect(describeGlobeRoutes(resolveGlobeRoutes([{ from: 'ICN', to: 'KIX' }]))).toBe('여행 경로 지구본. 서울에서 오사카까지.')
     })
 })
+
+describe('좌표 엔드포인트', () => {
+    const osaka = { lat: 34.6937, lng: 135.5023, label: 'JP 오사카' }
+
+    test('IATA 코드와 좌표를 섞어 경로를 만든다', () => {
+        const [route] = resolveGlobeRoutes([{ from: 'ICN', to: osaka }])
+        expect(route.from.code).toBe('ICN')
+        expect(route.to.code).toBeNull()
+        expect(route.to.label).toBe('JP 오사카')
+        expect(route.to.lat).toBeCloseTo(osaka.lat, PRECISION)
+    })
+
+    test('같은 라벨·좌표 경로는 한 번만 남는다', () => {
+        expect(
+            resolveGlobeRoutes([
+                { from: 'ICN', to: osaka },
+                { from: 'ICN', to: { ...osaka } },
+            ]),
+        ).toHaveLength(1)
+    })
+
+    test('라벨이 비었거나 좌표가 범위를 벗어나면 건너뛴다', () => {
+        expect(resolveGlobeRoutes([{ from: 'ICN', to: { ...osaka, label: '  ' } }])).toEqual([])
+        expect(resolveGlobeRoutes([{ from: 'ICN', to: { ...osaka, lat: 120 } }])).toEqual([])
+        expect(resolveGlobeRoutes([{ from: 'ICN', to: { ...osaka, lng: Number.NaN } }])).toEqual([])
+    })
+
+    test('좌표 지점의 라벨은 코드 없이 그대로 쓴다', () => {
+        const [route] = resolveGlobeRoutes([{ from: 'ICN', to: osaka }])
+        expect(formatGlobeRouteLabel(route)).toBe('서울 ICN → JP 오사카')
+        expect(describeGlobeRoutes([route])).toBe('여행 경로 지구본. 서울에서 JP 오사카까지.')
+    })
+
+    test('좌표 지점도 마커 목록에 모인다', () => {
+        const points = collectGlobeAirports(
+            resolveGlobeRoutes([
+                { from: 'ICN', to: osaka },
+                { from: osaka, to: { lat: 25.033, lng: 121.5654, label: 'TW 타이베이' } },
+            ]),
+        )
+        expect(points.map((point) => point.label)).toEqual(['서울', 'JP 오사카', 'TW 타이베이'])
+    })
+})
