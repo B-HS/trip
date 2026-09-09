@@ -5,7 +5,7 @@
 
 ## 1. 스택
 
-Next 16.3.4(App Router, React Compiler, `typedRoutes`, `agentRules: false`; **`cacheComponents` 는 끔** — 초기 스켈레톤 금지 결정, ADR-0010) · React 19.2 · Tailwind 4 + shadcn 4(`radix-vega`, 55개 전부 `shared/ui`) · drizzle-orm 0.45(`mysql2`, MySQL 9.6 스키마 `trip`) · better-auth 1.7(이메일·비밀번호 + `username` 플러그인) · TanStack Query 5 · zod 4 · react-hook-form 7 · motion 13 · three 0.186 + @react-three/fiber 9 + drei 10 + world-atlas·topojson-client·d3-geo · @dnd-kit · lucide-react · dayjs · sonner · next-themes · `cn` 0.2(컴파일된 clsx+tailwind-merge 대체 머저 — `shared/lib/utils.ts` 가 재export하고 shadcn 파일 51개는 `'cn'` 을 직접 import) · `@aws-sdk/client-s3`(Cloudflare R2 업로드, ADR-0026). 런타임·패키지 매니저·테스트 러너는 **bun**(락파일은 v1, `packageManager: bun@1.3.14` — ADR-0013). React Compiler 예외: RHF `register()` 를 호출하는 폼 컴포넌트 13개는 파일 상단 `'use no memo'` 로 제외한다(ADR-0018).
+Next 16.3.4(App Router, React Compiler, `typedRoutes`, `agentRules: false`; **`cacheComponents` 는 끔** — 초기 스켈레톤 금지 결정, ADR-0010) · React 19.2 · Tailwind 4 + shadcn 4(`radix-vega`, 55개 전부 `shared/ui`) · drizzle-orm 0.45(`mysql2`, MySQL 9.6 스키마 `trip`) · better-auth 1.7(이메일·비밀번호 + `username` 플러그인) · TanStack Query 5 · zod 4 · react-hook-form 7 · motion 13 · three 0.186 + @react-three/fiber 9 + drei 10 + world-atlas·topojson-client·d3-geo · @dnd-kit · lucide-react · dayjs · sonner · next-themes · `cn` 0.2(컴파일된 clsx+tailwind-merge 대체 머저 — `shared/lib/utils.ts` 가 재export하고 shadcn 파일 51개는 `'cn'` 을 직접 import) · `@aws-sdk/client-s3`(Cloudflare R2 업로드, ADR-0026). 런타임·패키지 매니저·테스트 러너는 **bun**(락파일은 v1, `packageManager: bun@1.3.14` — ADR-0013). React Compiler 예외: RHF `register()` 를 호출하는 폼 컴포넌트 16개(인증 2·트립 생성 1·편집기 13)는 파일 상단 `'use no memo'` 로 제외한다(ADR-0018).
 
 ## 2. 폴더 (변형 FSD, `src/` 없음)
 

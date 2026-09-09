@@ -23,3 +23,7 @@ React 가 문서화한 컴파일러 제외 지시어이며, RHF 의 uncontrolled
 ## 검증
 
 저장 → 편집 → 저장 시 서버 액션 본문에 두 번째 값이 실리고 API 에 반영된다. 빈 필수값은 `aria-invalid=true` 로 저장이 막힌다. `bun run build` 의 프로덕션 번들에서도 같은 흐름을 확인한다.
+
+## 추가 (2026-09-09 세션 2 후반)
+
+- 같은 규칙으로 `features/trip-editor/sidebar-form.tsx`·`kinds-form.tsx`·`booking-attachments-field.tsx` 가 추가되어 총 16개 파일이다. 새 폼을 만들 때 `register()` 를 쓰면 반드시 같은 지시어를 둔다.

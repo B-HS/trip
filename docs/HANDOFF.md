@@ -42,7 +42,7 @@
 4. 5단계 로드맵 4: Vercel Queues(`@vercel/queue`, `vercel.json` `experimentalTriggers`), `trip_ai_*` 테이블, AI SDK v7 + `@ai-sdk/openai`·`anthropic`·`openai-compatible`(Ollama Cloud), 사용자 키 AES-256-GCM(`APP_ENCRYPTION_KEY` 없으면 기능 비활성 + 안내), 모델 목록 동적, 추론 강도, `generateObject` 로 일정 수정 제안 + diff 승인(ADR-0029).
 5. 6단계 로드맵 10(ADR-0030).
 6. QA 잔여: 모바일 Sheet 닫힘 포커스 복귀, 편집기 검증 문구 한국어화(사용자가 직접 본 뒤 결정), 일정 종류 `key` 노출 여부, R2 설정 후 이미지 업로드 실측, 셀형 UI 로그아웃 표면(`/login`·`/signup`·`/`·404)은 헤드리스 촬영 미실시.
-7. 알려진 개선 후보: `shared/ui/card·alert·input-group` 보더(미사용 파일), 트립 삭제 시 R2 객체 잔존, R3F `THREE.Clock` 경고(업스트림).
+7. 알려진 개선 후보: `shared/ui/card·alert·input-group` 보더(미사용 파일), 트립 삭제 시 R2 객체 잔존, `TripSummary.dayCount`(`entities/trip/trip.type.ts`·`trip.repository.ts`)는 카드가 `lengthLabel` 을 쓰면서 UI 미사용(API 응답 호환 때문에 남김, 제거 후보), 편집기 비소유자 탭 라벨이 `EDITOR_EXPORT_TAB_LABEL`('내보내기·가져오기') 로 고정, R3F `THREE.Clock` 경고(업스트림).
 
 ## 4. 의사결정 요약 (상세·기각 대안은 `docs/acknowledge/`)
 
@@ -86,7 +86,7 @@
 - Node 22 / Bun 1.4.0 로컬(락파일 v1, `packageManager bun@1.3.14`; 의존성 추가 시 `npx bun@1.3.14 install`). Vercel Pro, CLI 미링크(`.vercel` 없음).
 - 실행: `bun run dev`(:3000, 세션 2 종료 시점에도 이전 세션의 `next-server` PID 79590 이 떠 있음) · `bun run build` · `bun run db:generate`(신규 컬럼·rename 시 TTY 프롬프트 가능) · `bun run db:migrate`.
 - DB: 공용 MySQL 9.6 스키마 `trip`(로컬·prod 동일). 마이그레이션 0000~0005 적용, 테이블 26개. 계정: tester@example.com(사용자명 tester, 오사카 예시 트립 1개, 공개 slug `osaka-qa`), throwaway `qa_session2_204103@example.com`.
-- 브라우저 자동화: Claude in Chrome. 탭이 가려지면 클릭·키 입력이 전달되지 않고 애니메이션·전환이 정지한다 → 페이지 내 스크립트(native setter + `input`/`change` 이벤트, `execCommand('insertText')`, 창 `keydown`, `fetch` 가로채기)로 검증. `tabs_context_mcp(createIfEmpty)` 가 만든 새 창은 폭 500px(모바일 레이아웃). 로그아웃 화면은 헤드리스 Chrome(`--headless=new --screenshot`, `--force-dark-mode`)으로 촬영 가능하나 가끔 멈춘다(`pkill`).
+- 브라우저 자동화: Claude in Chrome. 탭이 가려지면 클릭·키 입력이 전달되지 않고 애니메이션·전환이 정지한다 → 페이지 내 스크립트(native setter + `input`/`change` 이벤트, `execCommand('insertText')`, 창 `keydown`, `fetch` 가로채기)로 검증. `tabs_context_mcp(createIfEmpty)` 가 만든 새 창은 폭 500px(모바일 레이아웃)이고 `resize_window` 는 적용되지 않았다. localhost:3000 의 기존 탭은 줌 50%(innerWidth 3024) 였고 `cmd+0` 은 도구가 막는다 — 새 탭은 100% 다. 좌표 클릭보다 `find` ref·페이지 스크립트가 안정적이다. 로그아웃 화면은 헤드리스 Chrome(`--headless=new --screenshot`, `--force-dark-mode`)으로 촬영 가능하나 가끔 멈춘다(`pkill`).
 - 참조 원본: `docs/DESIGN.md`, `docs/osaka-trip-interactive.html`. 리서치 사실: `docs/memory/research-2026-09-09-r2-ai-tiptap.md`.
 
 ## 8. 다음 세션 TODO (우선순위 순)
