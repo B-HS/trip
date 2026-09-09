@@ -6,7 +6,7 @@
 
 ## 결정
 
-- `trip_trip` 에 `nights`·`days` 정수 컬럼(NULL 허용)을 추가한다(마이그레이션 0002). 둘은 함께 입력하거나 함께 비운다(스키마 refine).
+- `trip_trip` 에 `nights`·`days` 정수 컬럼(NULL 허용)을 추가한다(마이그레이션 0002). TypeScript 키는 `customNights`·`customDays` 다 — `trip` 테이블의 `days` relation(날짜 행 목록)과 템플릿 JSON 의 `days` 배열과 이름이 겹치기 때문이다. 둘은 함께 입력하거나 함께 비운다(스키마 refine).
 - 표기 우선순위: **커스텀 `nights`/`days` → 자동 계산**. 자동 계산은 `nights = endDate − startDate(일수)`, `days = nights + 1`. 포맷은 `shared/lib/trip-length.ts` 의 `formatTripLength` 한 곳에서 "N박 M일" 로 만든다.
 - 사용처: 목록 카드(기존 "{dayCount}일" 대체), 뷰어 사이드바 기간 줄(`formatPeriodLabel` 옆), 템플릿 JSON(`tripTemplateSchema` 에 선택 필드), 시드. `periodNote` 는 자유 문구로 유지한다. 오사카 템플릿은 `nights: 6, days: 7` 을 명시하고 `periodNote` 를 "예비일 하루" 로 줄여 중복을 없앤다(이미 DB 에 있는 예시 트립의 문구는 손대지 않는다).
 - 편집기 기본 정보 탭에 "박"·"일" 숫자 입력 2개를 두고, 힌트로 "비우면 날짜로 계산합니다" 를 보여 준다. 범위는 0~365.
