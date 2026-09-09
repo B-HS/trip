@@ -1,5 +1,7 @@
 # 로드맵 — 다음 페이즈 (미착수)
 
+> 최종 갱신: 2026-09-09 · 대응 커밋: 8f345b1 (dev = prod, 2026-09-09)
+
 > 2026-09-09 사용자가 기획 중인 고도화 기능. 현재 페이즈(Phase 3·4) 이후에 착수한다. 여기 적힌 제약은 구현 시 그대로 지킨다.
 
 ## 1. 콘텐츠 사이드바 — 추가 링크와 설명 커스터마이징
@@ -26,10 +28,10 @@
 - 트립 일정을 컨텍스트로 질문·답변하고, 승인 시 일정을 AI 가 수정(구조화된 변경 제안 → 사용자가 적용) 할 수 있게 한다.
 - **프로바이더 3종**: Ollama Cloud, OpenAI, Claude(Anthropic). 사용자는 프로바이더와 모델을 별도로 선택한다.
 - **모델 목록은 서버에서 각 프로바이더 공식 API 로 동적으로 가져온다.** `models.dev` 는 절대 사용 금지. 각 프로바이더의 정확한 1차 출처만 사용:
-  - OpenAI: `GET https://api.openai.com/v1/models`
-  - Anthropic: `GET https://api.anthropic.com/v1/models`(버전 헤더 포함)
-  - Ollama Cloud: Ollama 공식 API 의 모델 목록 엔드포인트(구현 직전 공식 문서로 재확인)
-  - 목록·capability 는 서버에서 캐시(짧은 TTL)하고, 클라이언트 선택값은 서버에서 프로바이더·모델 소속을 재검증한다.
+    - OpenAI: `GET https://api.openai.com/v1/models`
+    - Anthropic: `GET https://api.anthropic.com/v1/models`(버전 헤더 포함)
+    - Ollama Cloud: Ollama 공식 API 의 모델 목록 엔드포인트(구현 직전 공식 문서로 재확인)
+    - 목록·capability 는 서버에서 캐시(짧은 TTL)하고, 클라이언트 선택값은 서버에서 프로바이더·모델 소속을 재검증한다.
 - **추론 강도(reasoning effort)**: 모델별로 지원하는 추론 강도 옵션을 정확히 표시·선택할 수 있어야 한다. 프로바이더·모델마다 다르므로(예: OpenAI reasoning 모델의 `reasoning.effort` low/medium/high 계열, Anthropic 의 extended thinking·budget 계열, Ollama 모델의 think 옵션 등) 하드코딩하지 말고 각 프로바이더 공식 문서·모델 메타데이터에서 지원 여부와 허용 값을 확인해 모델 선택 시 동적으로 노출하고, 미지원 모델에는 표시하지 않는다. 서버에서 선택값을 재검증한다.
 - **과금**: 무료 한도(서비스 키로 제공, 사용자·일 단위 쿼터) + 사용자가 자신의 API 키를 등록하면 그 키로 무제한. 키는 서버 측 암호화 저장, API·로그·UI 에 원문 미노출, 교체·삭제 UI 제공.
 - **장시간 작업**: 요청은 job 으로 DB 에 저장 후 즉시 응답, 서버 worker 가 처리하고 결과를 메시지로 저장. 대화 전환·연결 끊김과 무관하게 완료된다. UI 는 polling 으로 갱신.

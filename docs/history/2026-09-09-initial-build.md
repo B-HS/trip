@@ -1,6 +1,7 @@
 # 2026-09-09 — 초기 구축 (Phase 1~3)
 
 ## 한 일
+
 - 스택 확정·스캐폴딩(bun, Next 16, Tailwind 4, shadcn 4 전 컴포넌트, drizzle mysql2 `trip_` 프리픽스, better-auth 이메일·사용자명, TanStack Query 5, motion, R3F). 원격 `B-HS/trip`, main=prod, dev=작업.
 - Phase 1(에이전트 4): 데이터 계층·API 라우트·시드, 오사카 템플릿 전수 이식(65행), 3D·모션·인트로·404, 인증 페이지·앱 셸.
 - Phase 2(에이전트 3): 목록/생성/삭제, 뷰어 + 공개 공유 페이지, 구조화 편집기 + 멤버·공유.
@@ -9,9 +10,11 @@
 - 로드맵 9건 기록(`docs/roadmap.md`).
 
 ## 검증
+
 - typecheck·lint·bun test 182·`next build` 통과. 브라우저 라이트·다크 확인 항목은 `docs/PROCESS.md` 13.
 
 ## 남은 것
+
 - main 머지·Vercel 배포(사용자), Vercel 환경변수(`DATABASE_URL`·`BETTER_AUTH_SECRET`·`BETTER_AUTH_URL`·`NEXT_PUBLIC_APP_URL`).
 - `docs/quality-assurance` 체크리스트 잔여 항목(공유 페이지 실측·인쇄 미리보기·모바일 시트).
 - 로드맵 1~9.
