@@ -4,7 +4,7 @@
 
 ## 1. 스택
 
-Next 16.3(App Router, React Compiler, `cacheComponents`, `typedRoutes`) · React 19.2 · Tailwind 4 + shadcn 4(`radix-vega`, 컴포넌트는 `shared/ui`) · drizzle-orm 0.45(mysql2) · better-auth 1.7(이메일·비밀번호 + username 플러그인) · TanStack Query 5 · zod 4 · react-hook-form 7 · motion 13 · three + @react-three/fiber 9 + drei 10 · @dnd-kit · lucide-react · dayjs · sonner · next-themes. 런타임·패키지 매니저·테스트 러너는 **bun**.
+Next 16.3(App Router, React Compiler, `typedRoutes`; `cacheComponents` 는 초기 스켈레톤 때문에 **끔** — 2026-09-09 결정) · React 19.2 · Tailwind 4 + shadcn 4(`radix-vega`, 컴포넌트는 `shared/ui`) · drizzle-orm 0.45(mysql2) · better-auth 1.7(이메일·비밀번호 + username 플러그인) · TanStack Query 5 · zod 4 · react-hook-form 7 · motion 13 · three + @react-three/fiber 9 + drei 10 · @dnd-kit · lucide-react · dayjs · sonner · next-themes. 런타임·패키지 매니저·테스트 러너는 **bun**.
 
 ## 2. 폴더 (변형 FSD, `src/` 없음)
 
@@ -86,14 +86,14 @@ drizzle/                마이그레이션 산출물(커밋)
 ## 8. 모션 (`motion`)
 
 - 토큰: `shared/lib/motion.ts` — `MOTION_EASE_STANDARD = [0.4, 0, 0.2, 1]`, `MOTION_FADE_DURATION = 0.18`, `MOTION_BAR_DURATION = 0.24`, 공개 표면용 `MOTION_HERO_DURATION = 0.6`, `MOTION_STAGGER = 0.06`.
-- 루트에 `MotionConfig reducedMotion='user'`. 페이지 전환 fade, 뷰 전환 `AnimatePresence mode='wait'`, 목록 `layout` + stagger, 체크 완료 시 행 opacity·strike 전환, 진행바 width 트윈, 아코디언 height, 다이얼로그는 shadcn 기본(tw-animate-css).
+- 루트에 `MotionConfig reducedMotion='never'`(OS 설정 무시). 모션 감소는 앱 내 설정 `shared/hooks/use-motion-preference.ts`(사용자 메뉴 토글). 페이지 전환 fade, 뷰 전환 `AnimatePresence mode='wait'`, 목록 `layout` + stagger, 체크 완료 시 행 opacity·strike 전환, 진행바 width 트윈, 아코디언 height, 다이얼로그는 shadcn 기본(tw-animate-css).
 - 공개 표면은 자유(스크롤 연동 `useScroll`, 패럴랙스, 텍스트 등장). 앱 표면은 위 토큰 기반으로 절제.
 
 ## 9. 3D (`shared/ui/three/`)
 
-- `trip-globe.tsx`: R3F 캔버스. 와이어프레임 지구본(모노크롬, 테마 색 = `--foreground`/`--muted-foreground` 를 `getComputedStyle` 로 읽음), 공항 좌표 마커, 경로 아크(`shared/constant/airports.ts` IATA → 위경도). 자동 회전 + 포인터 시차, `dpr={[1, 1.5]}`, `frameloop='demand'`+오프스크린 정지(IntersectionObserver), `prefers-reduced-motion` 시 정지.
+- `trip-globe.tsx`: R3F 캔버스. 실제 지리(`world-atlas` land-110m 해안선 + 점으로 찍은 육지 + 위경도 격자), 마커(공항 IATA 또는 좌표 점), 대권 곡선 경로와 이동 점. 테마 색은 CSS 토큰을 `css-color.ts`(lab/oklch → hex)로 변환. 자동 회전 + 포인터 시차, `dpr={[1, 1.5]}`, `frameloop='demand'`+오프스크린 정지(IntersectionObserver), `prefers-reduced-motion` 시 정지.
 - `next/dynamic(..., { ssr: false })` 로만 로드. 스켈레톤 자리표시자 필수.
-- 적용처: 인트로 히어로(샘플 ICN→KIX), 로그인·회원가입 배경, `/trips` 헤더(전 트립 경로), 뷰어 사이드바 미니 지구본(해당 트립), 빈 상태, `/s/[slug]` 헤더, `not-found`.
+- 적용처(정보가 있는 곳만): 인트로 히어로(샘플 ICN→KIX), `/trips` 헤더(전 트립 경로), 빈 상태, `not-found`. 장식용 미니 지구본은 두지 않는다.
 
 ## 10. 오사카 템플릿
 
