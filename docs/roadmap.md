@@ -53,6 +53,8 @@
 ## 7. 인증 확장·약관·후기 게시판·리치 에디터
 
 - **소셜 로그인**: Naver·GitHub OAuth 를 better-auth 에 추가한다(GitHub 은 내장 프로바이더, Naver 는 generic OAuth 프로바이더 설정). 기존 이메일·비밀번호·사용자명 로그인은 유지하고 계정 연동(같은 이메일 병합 정책)을 acknowledge 로 합의한다. 콜백 URL·클라이언트 키는 `.env` 키만 추가하고 값은 사용자가 입력.
+- **회원가입 폼 정리(이름 제거)**: 회원가입 입력은 **사용자명·이메일·비밀번호** 만 받는다. 현재 "이름" 입력은 better-auth 의 `user.name` 이 필수(non-null)라서 넣은 것이므로, 폼에서 제거하고 가입 시 `name` 에 사용자명을 그대로 저장한다(표시 이름은 이후 프로필 편집에서 변경 가능). 기존 `signupSchema`·`SignupForm`·`SignupWidget` 과 관련 테스트를 함께 수정한다.
+- **이메일 인증**: 가입 후 인증 메일 발송(better-auth `emailVerification.sendVerificationEmail` + 메일 프로바이더 — Resend 등 Vercel Marketplace 후보를 acknowledge 로 합의), `requireEmailVerification: true` 로 미인증 로그인 차단, 재발송·만료 처리, 인증 완료 페이지. 메일 템플릿은 한국어.
 - **회원가입 약관**: 서비스 이용약관·개인정보 처리방침 문서(`docs/legal/` 초안 → 앱 `/terms`, `/privacy` 페이지)를 만들고, 회원가입 폼에 필수 동의 체크(약관 버전과 동의 시각을 `trip_user_consent` 에 저장). 약관 개정 시 재동의 흐름.
 - **여행 후기 게시판**: 커뮤니티 게시판 타입에 `review` 를 추가한다(방문 트립 첨부, 평점(선택), 사진). 홈에 최신 후기 섹션.
 - **게시글 에디터**: Tiptap + shadcn 기반 리치 에디터(features 순수 UI + 위젯에서 저장). 지원: 제목·본문 서식, 목록, 인용, 코드, 이미지 업로드(2번 첨부 저장소 재사용), 링크, **YouTube 영상 embed**(Tiptap YouTube 확장; 허용 도메인 화이트리스트). 저장 포맷은 Tiptap JSON 을 정본으로 하고 렌더는 서버에서 HTML 로 변환 후 `isomorphic-dompurify` 로 sanitize(iframe 은 YouTube 도메인만 허용). 이미지·영상은 `next/image`·lazy iframe.
