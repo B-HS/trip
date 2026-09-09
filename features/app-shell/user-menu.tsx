@@ -1,8 +1,10 @@
 'use client'
 
-import { LogOutIcon } from 'lucide-react'
+import { LogOutIcon, SettingsIcon, UserIcon } from 'lucide-react'
+import Link from 'next/link'
 import type { FC } from 'react'
 import { setMotionPreference, useMotionPreference } from '@/shared/hooks/use-motion-preference'
+import { PROFILE_SETTINGS_PATH } from '@/shared/constant/route'
 import { cn } from '@/shared/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import {
@@ -45,6 +47,9 @@ const MotionPreferenceToggle: FC = () => {
     )
 }
 
+const PROFILE_LABEL = '내 프로필'
+const PROFILE_SETTINGS_LABEL = '프로필 설정'
+
 export const UserMenu: FC<UserMenuProps> = ({ name, email, username, image, isCollapsed, onSignOut }) => (
     <div className={cn('flex h-12 shrink-0 items-center px-3', isCollapsed && 'justify-center px-0')}>
         <DropdownMenu>
@@ -73,6 +78,20 @@ export const UserMenu: FC<UserMenuProps> = ({ name, email, username, image, isCo
                 </div>
                 <MotionPreferenceToggle />
                 <DropdownMenuSeparator />
+                {username !== null && (
+                    <DropdownMenuItem asChild>
+                        <Link href={`/u/${username}`}>
+                            <UserIcon />
+                            {PROFILE_LABEL}
+                        </Link>
+                    </DropdownMenuItem>
+                )}
+                <DropdownMenuItem asChild>
+                    <Link href={PROFILE_SETTINGS_PATH}>
+                        <SettingsIcon />
+                        {PROFILE_SETTINGS_LABEL}
+                    </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem onSelect={onSignOut}>
                     <LogOutIcon />
                     로그아웃

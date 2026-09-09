@@ -1,6 +1,7 @@
 'use client'
 
 import type { FC } from 'react'
+import { isNavItemActive } from '@/features/app-shell/nav-active'
 import { NavItem, type NavItemLink } from '@/features/app-shell/nav-item'
 import type { RailFavorite } from '@/features/app-shell/rail-favorite-item'
 import { RailFavorites } from '@/features/app-shell/rail-favorites'
@@ -28,7 +29,7 @@ export const NavRail: FC<NavRailProps> = ({ items, favorites, activePath, isColl
                     href={item.href}
                     label={item.label}
                     icon={item.icon}
-                    isActive={activePath === item.href}
+                    isActive={isNavItemActive(activePath, item)}
                     isCollapsed={isCollapsed}
                     onNavigate={onNavigate}
                 />

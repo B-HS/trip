@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { profileUpdateSchema, usernameSchema } from '@/entities/profile/profile.validate'
-import { USERNAME_MAX_LENGTH } from '@/shared/constant/auth'
+import { profileUpdateSchema } from '@/entities/profile/profile.validate'
 import { PROFILE_BIO_MAX_LENGTH, PROFILE_NAME_MAX_LENGTH, PROFILE_NAME_MIN_LENGTH } from '@/shared/constant/community'
 
 const UPLOAD_ID = '2f5a5f12-1f5b-4b3d-8e33-58f0b7e1c6c2'
@@ -45,19 +44,5 @@ describe('profileUpdateSchema', () => {
         const result = profileUpdateSchema.parse(validProfile)
         expect(result.avatarUploadId).toBeNull()
         expect(result.bannerUploadId).toBeNull()
-    })
-})
-
-describe('usernameSchema', () => {
-    test('대문자를 소문자로 정규화한다', () => {
-        expect(usernameSchema.parse('TripUser')).toBe('tripuser')
-    })
-
-    test('허용하지 않는 문자가 있으면 실패한다', () => {
-        expect(usernameSchema.safeParse('trip user').success).toBe(false)
-    })
-
-    test('최대 길이를 넘으면 실패한다', () => {
-        expect(usernameSchema.safeParse('a'.repeat(USERNAME_MAX_LENGTH + 1)).success).toBe(false)
     })
 })

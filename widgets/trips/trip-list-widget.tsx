@@ -14,19 +14,15 @@ import { TripStatTiles, type TripStatTile } from '@/features/trips/trip-stat-til
 import { OSAKA_TRIP_TEMPLATE } from '@/shared/constant/template/osaka'
 import { MEMBER_ROLE_LABEL } from '@/shared/constant/trip'
 import { MOTION_EASE_STANDARD, MOTION_FADE_DURATION } from '@/shared/lib/motion'
+import { formatTripDateRange } from '@/shared/lib/trip-date-range'
 import { formatTripLength } from '@/shared/lib/trip-length'
+import { resolveTripRouteLabel } from '@/shared/lib/trip-route-label'
 import { Button } from '@/shared/ui/button'
 import { FadeIn } from '@/shared/ui/motion/fade-in'
 import { StaggerList } from '@/shared/ui/motion/stagger-list'
 import { TripGlobeLazy } from '@/shared/ui/three/trip-globe-lazy'
 import { TripDeleteDialog, type TripDeleteTarget } from '@/widgets/trips/trip-delete-dialog'
-import {
-    collectGlobeRoutes,
-    countOngoingTrips,
-    deriveTripStatus,
-    formatTripDateRange,
-    resolveTripRouteLabel,
-} from '@/widgets/trips/trip-summary.derive'
+import { collectGlobeRoutes, countOngoingTrips, deriveTripStatus } from '@/widgets/trips/trip-summary.derive'
 import { useToday } from '@/widgets/trips/use-today'
 
 const NEW_TRIP_PATH = '/trips/new'

@@ -7,7 +7,7 @@ import type { SignupValues } from '@/entities/auth/auth.validate'
 import { SignupForm } from '@/features/auth/signup-form'
 import { signUp } from '@/shared/lib/auth-client'
 
-const SIGNUP_REDIRECT_PATH = '/trips'
+const SIGNUP_REDIRECT_PATH = '/'
 
 export const SignupWidget: FC = () => {
     const [isPending, setIsPending] = useState(false)

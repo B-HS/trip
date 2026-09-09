@@ -1,5 +1,6 @@
 import type { Trip, TripUser } from '@/entities/trip/trip.type'
 import type { tripBoard, tripComment, tripPointLedger, tripPost, tripPostLike } from '@/shared/db/schema/community'
+import type { LikeState } from '@/shared/lib/like-mutation'
 
 export type Board = typeof tripBoard.$inferSelect
 export type Post = typeof tripPost.$inferSelect
@@ -34,11 +35,13 @@ export type PostDetail = PostListItem &
         trip: PostTripLink | null
     }
 
+export type PostDetailView = Omit<PostDetail, 'body'>
+
 export type CommentView = Pick<Comment, 'id' | 'postId' | 'parentId' | 'body' | 'isAccepted'> & {
     author: PostAuthor
     createdAt: string
 }
 
-export type PostLikeState = { count: number; liked: boolean }
+export type PostLikeState = LikeState
 
 export type CommunityViewer = { id: string; role?: string | null }

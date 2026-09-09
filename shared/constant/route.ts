@@ -1,0 +1,8 @@
+export const HOME_PATH = '/'
+export const EXPLORE_PATH = '/explore'
+export const BOARDS_PATH = '/boards'
+export const TRIPS_PATH = '/trips'
+export const NEW_TRIP_PATH = '/trips/new'
+export const LOGIN_PATH = '/login'
+export const SIGNUP_PATH = '/signup'
+export const PROFILE_SETTINGS_PATH = '/settings/profile'

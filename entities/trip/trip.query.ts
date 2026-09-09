@@ -28,7 +28,7 @@ import {
 } from '@/entities/trip/trip.action'
 import { fetchFavoriteTrips, fetchTripDetail, fetchTripLike, fetchTripList, fetchTripMembers } from '@/entities/trip/trip.api'
 import { orderDaysByIds } from '@/entities/trip/trip.order'
-import type { TripDetail, TripLikeState, TripSummary } from '@/entities/trip/trip.type'
+import type { TripDetail, TripSummary } from '@/entities/trip/trip.type'
 import type {
     BookingListInput,
     DayInput,
@@ -45,11 +45,10 @@ import type {
 } from '@/entities/trip/trip.validate'
 import { QUERY_KEY } from '@/shared/constant/query-key'
 import { unwrapActionResult } from '@/shared/lib/action-result'
+import { likeToggleMutationOptions } from '@/shared/lib/like-mutation'
 import type { TripTemplateInput } from '@/shared/lib/trip-template'
 
 const SAVED_MESSAGE = '저장했습니다.'
-const MIN_LIKE_COUNT = 0
-const LIKE_STEP = 1
 
 export const tripListQueryOptions = () => queryOptions({ queryKey: QUERY_KEY.TRIP.LIST, queryFn: fetchTripList })
 
@@ -360,23 +359,11 @@ export const useExportTrip = (tripId: string) =>
 
 export const useToggleTripLike = (tripId: string) => {
     const queryClient = useQueryClient()
-    const queryKey = QUERY_KEY.TRIP.LIKE(tripId)
-    return useMutation({
-        mutationFn: async (liked: boolean) => unwrapActionResult(await toggleTripLikeAction(tripId, liked)),
-        onMutate: async (liked) => {
-            await queryClient.cancelQueries({ queryKey })
-            const previous = queryClient.getQueryData<TripLikeState>(queryKey)
-            if (previous) {
-                const step = liked ? LIKE_STEP : -LIKE_STEP
-                const count = previous.liked === liked ? previous.count : Math.max(previous.count + step, MIN_LIKE_COUNT)
-                queryClient.setQueryData<TripLikeState>(queryKey, { count, liked })
-            }
-            return { previous }
-        },
-        onError: (error, _liked, context) => {
-            if (context?.previous) queryClient.setQueryData(queryKey, context.previous)
-            toast.error(error.message)
-        },
-        onSettled: () => queryClient.invalidateQueries({ queryKey }),
-    })
+    return useMutation(
+        likeToggleMutationOptions({
+            queryClient,
+            queryKey: QUERY_KEY.TRIP.LIKE(tripId),
+            mutationFn: async (liked) => unwrapActionResult(await toggleTripLikeAction(tripId, liked)),
+        }),
+    )
 }

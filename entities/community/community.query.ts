@@ -12,13 +12,10 @@ import {
     updatePostAction,
 } from '@/entities/community/community.action'
 import { fetchComments, fetchPostLike } from '@/entities/community/community.api'
-import type { PostLikeState } from '@/entities/community/community.type'
 import type { CommentCreateInput, PostCreateInput, PostUpdateInput } from '@/entities/community/community.validate'
 import { QUERY_KEY } from '@/shared/constant/query-key'
 import { unwrapActionResult } from '@/shared/lib/action-result'
-
-const MIN_LIKE_COUNT = 0
-const LIKE_STEP = 1
+import { likeToggleMutationOptions } from '@/shared/lib/like-mutation'
 
 export const commentsQueryOptions = (postId: string) =>
     queryOptions({ queryKey: QUERY_KEY.COMMUNITY.COMMENTS(postId), queryFn: () => fetchComments(postId) })
@@ -68,25 +65,13 @@ export const useAcceptComment = (postId: string) => {
 
 export const useTogglePostLike = (postId: string) => {
     const queryClient = useQueryClient()
-    const queryKey = QUERY_KEY.COMMUNITY.POST_LIKE(postId)
-    return useMutation({
-        mutationFn: async (liked: boolean) => unwrapActionResult(await togglePostLikeAction(postId, liked)),
-        onMutate: async (liked) => {
-            await queryClient.cancelQueries({ queryKey })
-            const previous = queryClient.getQueryData<PostLikeState>(queryKey)
-            if (previous) {
-                const step = liked ? LIKE_STEP : -LIKE_STEP
-                const count = previous.liked === liked ? previous.count : Math.max(previous.count + step, MIN_LIKE_COUNT)
-                queryClient.setQueryData<PostLikeState>(queryKey, { count, liked })
-            }
-            return { previous }
-        },
-        onError: (error, _liked, context) => {
-            if (context?.previous) queryClient.setQueryData(queryKey, context.previous)
-            toast.error(error.message)
-        },
-        onSettled: () => queryClient.invalidateQueries({ queryKey }),
-    })
+    return useMutation(
+        likeToggleMutationOptions({
+            queryClient,
+            queryKey: QUERY_KEY.COMMUNITY.POST_LIKE(postId),
+            mutationFn: async (liked) => unwrapActionResult(await togglePostLikeAction(postId, liked)),
+        }),
+    )
 }
 
 export const useCreatePost = () =>

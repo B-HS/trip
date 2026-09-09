@@ -4,8 +4,11 @@ import {
     BOARD_KEY_PATTERN,
     COMMENT_BODY_MAX_LENGTH,
     EXPLORE_SORTS,
+    PAGE_PARAM,
     POST_TITLE_MAX_LENGTH,
     SEARCH_QUERY_MAX_LENGTH,
+    SEARCH_QUERY_PARAM,
+    SORT_PARAM,
 } from '@/shared/constant/community'
 import { isRichTextEmpty, richTextDocumentSchema } from '@/shared/lib/rich-text-document'
 
@@ -45,13 +48,13 @@ export const commentCreateSchema = z.object({
 })
 
 export const postSearchSchema = z.object({
-    page: pageSchema,
-    q: z.string().trim().max(SEARCH_QUERY_MAX_LENGTH).catch(EMPTY_SEARCH_QUERY),
+    [PAGE_PARAM]: pageSchema,
+    [SEARCH_QUERY_PARAM]: z.string().trim().max(SEARCH_QUERY_MAX_LENGTH).catch(EMPTY_SEARCH_QUERY),
 })
 
 export const exploreSearchSchema = z.object({
-    page: pageSchema,
-    sort: z.enum(EXPLORE_SORTS).catch(DEFAULT_EXPLORE_SORT),
+    [PAGE_PARAM]: pageSchema,
+    [SORT_PARAM]: z.enum(EXPLORE_SORTS).catch(DEFAULT_EXPLORE_SORT),
 })
 
 export type BoardKeyInput = z.input<typeof boardKeySchema>

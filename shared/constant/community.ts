@@ -77,3 +77,14 @@ export const HOME_REVIEW_LIMIT = 4
 
 export const INTRO_TRIP_LIMIT = 6
 export const INTRO_POST_LIMIT = 6
+
+export const TRIP_DATE_FORMAT = 'YYYY.MM.DD'
+
+export const SEARCH_QUERY_PARAM = 'q'
+export const PAGE_PARAM = 'page'
+export const SORT_PARAM = 'sort'
+export const PROFILE_TAB_PARAM = 'tab'
+
+export const EMPTY_POST_LABEL = '아직 등록된 글이 없습니다.'
+export const EMPTY_TRIP_LABEL = '아직 공개된 트립이 없습니다.'
+export const EMPTY_LIKED_TRIP_LABEL = '아직 좋아요한 트립이 없습니다.'

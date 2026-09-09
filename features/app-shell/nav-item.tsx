@@ -2,20 +2,22 @@
 
 import type { LucideIcon } from 'lucide-react'
 import { motion } from 'motion/react'
+import type { Route } from 'next'
 import Link from 'next/link'
-import type { ComponentProps, FC } from 'react'
+import type { FC } from 'react'
 import { cn } from '@/shared/lib/utils'
 import { MOTION_EASE_STANDARD, MOTION_FADE_DURATION } from '@/shared/lib/motion'
 
 export const NAV_ACTIVE_LAYOUT_ID = 'app-shell-nav-active'
 
 export type NavItemLink = {
-    href: ComponentProps<typeof Link>['href']
+    href: Route
     label: string
     icon: LucideIcon
+    matchPrefix?: boolean
 }
 
-type NavItemProps = NavItemLink & {
+type NavItemProps = Omit<NavItemLink, 'matchPrefix'> & {
     isActive: boolean
     isCollapsed: boolean
     onNavigate?: () => void

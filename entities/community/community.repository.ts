@@ -104,6 +104,11 @@ export const findPostPage = async ({ boardKey, page, q }: { boardKey: string; pa
 
 export const findPostsByAuthor = async (userId: string, page: number) => findPostPageBy(eq(tripPost.authorId, userId), page)
 
+export const findLatestPostsByBoard = async (boardKey: string, limit: number) => {
+    const rows = await selectPosts().where(eq(tripBoard.key, boardKey)).orderBy(desc(tripPost.createdAt)).limit(limit)
+    return rows.map(toPostListItem)
+}
+
 export const findLatestPosts = async (limit: number, kind?: BoardKind) => {
     const rows = await selectPosts()
         .where(kind === undefined ? undefined : eq(tripBoard.kind, kind))

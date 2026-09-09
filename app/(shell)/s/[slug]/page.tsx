@@ -1,14 +1,18 @@
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getPublicTrip } from '@/entities/trip/trip.cache'
+import { prefetchTripLike } from '@/entities/trip/trip.prefetch'
 import { SITE_NAME } from '@/shared/constant/site'
+import { getQueryClient } from '@/shared/lib/query-client'
+import { getServerSession } from '@/shared/lib/session'
+import { cn } from '@/shared/lib/utils'
+import { PublicTripActions } from '@/widgets/trip-viewer/public-trip-actions'
 import { TripViewerWidget } from '@/widgets/trip-viewer/trip-viewer-widget'
 
 type SharedTripPageProps = {
     params: Promise<{ slug: string }>
 }
-
-export const revalidate = 3600
 
 const NOT_FOUND_TITLE = '공개된 여행을 찾을 수 없습니다'
 
@@ -32,10 +36,17 @@ const SharedTripPage = async ({ params }: SharedTripPageProps) => {
     const trip = await getPublicTrip(slug)
     if (!trip) notFound()
 
+    const session = await getServerSession()
+    const queryClient = getQueryClient()
+    await prefetchTripLike(queryClient, trip.id, session?.user.id ?? null)
+
     return (
-        <div className='mx-auto w-full max-w-(--content-max-width) p-3'>
-            <TripViewerWidget mode='public' initialTrip={trip} />
-        </div>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+            <div className={cn('flex flex-1 flex-col gap-px', session === null && 'mx-auto w-full max-w-(--content-max-width) p-3')}>
+                <PublicTripActions trip={trip} slug={slug} isSignedIn={session !== null} />
+                <TripViewerWidget mode='public' initialTrip={trip} />
+            </div>
+        </HydrationBoundary>
     )
 }
 

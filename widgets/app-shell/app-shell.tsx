@@ -1,6 +1,6 @@
 'use client'
 
-import { ListIcon, PlusIcon } from 'lucide-react'
+import { CompassIcon, HomeIcon, ListIcon, MessagesSquareIcon, PlusIcon } from 'lucide-react'
 import { motion } from 'motion/react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState, type FC, type PropsWithChildren } from 'react'
@@ -10,6 +10,7 @@ import type { NavItemLink } from '@/features/app-shell/nav-item'
 import { NavRail } from '@/features/app-shell/nav-rail'
 import type { RailFavorite } from '@/features/app-shell/rail-favorite-item'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { BOARDS_PATH, EXPLORE_PATH, HOME_PATH, LOGIN_PATH, NEW_TRIP_PATH, TRIPS_PATH } from '@/shared/constant/route'
 import { signOut } from '@/shared/lib/auth-client'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/shared/ui/sheet'
 import {
@@ -38,11 +39,12 @@ type AppShellProps = PropsWithChildren<{
 }>
 
 const NAV_ITEMS: NavItemLink[] = [
-    { href: '/trips', label: '트립 목록', icon: ListIcon },
-    { href: '/trips/new', label: '새 트립', icon: PlusIcon },
+    { href: HOME_PATH, label: '홈', icon: HomeIcon },
+    { href: EXPLORE_PATH, label: '탐색', icon: CompassIcon, matchPrefix: true },
+    { href: BOARDS_PATH, label: '게시판', icon: MessagesSquareIcon, matchPrefix: true },
+    { href: TRIPS_PATH, label: '트립 목록', icon: ListIcon },
+    { href: NEW_TRIP_PATH, label: '새 트립', icon: PlusIcon },
 ]
-
-const SIGN_OUT_REDIRECT_PATH = '/login'
 
 const writeSidebarState = (isCollapsed: boolean) => {
     const state = isCollapsed ? SIDEBAR_STATE_COLLAPSED : SIDEBAR_STATE_EXPANDED
@@ -65,7 +67,7 @@ export const AppShell: FC<AppShellProps> = ({ user, defaultCollapsed = false, ch
 
     const handleSignOut = async () => {
         await signOut()
-        router.push(SIGN_OUT_REDIRECT_PATH)
+        router.push(LOGIN_PATH)
         router.refresh()
     }
 

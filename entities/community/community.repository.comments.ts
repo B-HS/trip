@@ -117,8 +117,9 @@ export const deleteComment = async (commentId: string) => {
     const postId = await getDb().transaction(async (tx) => {
         const [target] = await tx.select({ postId: tripComment.postId }).from(tripComment).where(eq(tripComment.id, commentId)).limit(1)
         if (!target) throw new ApiError('NOT_FOUND', COMMENT_NOT_FOUND)
-        await lockPost(tx, target.postId)
+        const post = await lockPost(tx, target.postId)
         await tx.delete(tripComment).where(eq(tripComment.id, commentId))
+        if (post.acceptedCommentId === commentId) await tx.update(tripPost).set({ acceptedCommentId: null }).where(eq(tripPost.id, target.postId))
         await syncCommentCount(tx, target.postId)
         return target.postId
     })

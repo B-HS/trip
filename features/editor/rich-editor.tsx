@@ -23,20 +23,40 @@ type RichEditorProps = {
     label: string
     isUploadEnabled: boolean
     isUploading: boolean
+    isInvalid?: boolean
+    errorId?: string
     onUploadImage: (file: File) => Promise<UploadedImage | null>
     className?: string
 }
 
-export const RichEditor: FC<RichEditorProps> = ({ content, onChange, label, isUploadEnabled, isUploading, onUploadImage, className }) => {
+export const RichEditor: FC<RichEditorProps> = ({
+    content,
+    onChange,
+    label,
+    isUploadEnabled,
+    isUploading,
+    isInvalid = false,
+    errorId,
+    onUploadImage,
+    className,
+}) => {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [linkUrl, setLinkUrl] = useState<string | null>(null)
     const [isYoutubeOpen, setIsYoutubeOpen] = useState(false)
 
+    const describedBy: Record<string, string> = isInvalid && errorId !== undefined ? { 'aria-describedby': errorId } : {}
     const editor = useEditor({
         extensions: RICH_EDITOR_EXTENSIONS,
         content: content ?? EMPTY_RICH_TEXT_DOCUMENT,
         immediatelyRender: false,
-        editorProps: { attributes: { 'class': cn(RICH_TEXT_CLASS, RICH_EDITOR_CONTENT_CLASS), 'aria-label': label } },
+        editorProps: {
+            attributes: {
+                'class': cn(RICH_TEXT_CLASS, RICH_EDITOR_CONTENT_CLASS),
+                'aria-label': label,
+                'aria-invalid': String(isInvalid),
+                ...describedBy,
+            },
+        },
         onUpdate: ({ editor: instance }) => onChange(instance.getJSON()),
     })
 

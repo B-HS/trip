@@ -6,11 +6,14 @@ import { useState, type FC } from 'react'
 import { getAuthErrorMessage } from '@/entities/auth/auth.error'
 import type { LoginValues } from '@/entities/auth/auth.validate'
 import { LoginForm } from '@/features/auth/login-form'
+import { HOME_PATH } from '@/shared/constant/route'
 import { signIn } from '@/shared/lib/auth-client'
 
-const DEFAULT_REDIRECT_PATH: Route = '/trips'
+const DEFAULT_REDIRECT_PATH: Route = HOME_PATH
+const INTERNAL_PATH_PATTERN = /^\/(?![/\\])/
+const CONTROL_CHARACTER_PATTERN = /[\u0000-\u001f\u007f]/
 
-const isInternalPath = (path: string) => path.startsWith('/') && !path.startsWith('//')
+const isInternalPath = (path: string) => INTERNAL_PATH_PATTERN.test(path) && !CONTROL_CHARACTER_PATTERN.test(path)
 
 export const LoginWidget: FC = () => {
     const [isPending, setIsPending] = useState(false)

@@ -3,7 +3,7 @@ import type { TripSummary } from '@/entities/trip/trip.type'
 import { COUNTRIES } from '@/shared/constant/countries'
 import { HOME_AIRPORT_CODE } from '@/shared/constant/trip'
 import { resolveGlobeRoutes } from '@/shared/ui/three/globe-math'
-import { buildDestinationRoutes, collectGlobeRoutes, resolveTripRouteLabel, toDestinationPoint } from '@/widgets/trips/trip-summary.derive'
+import { buildDestinationRoutes, collectGlobeRoutes, toDestinationPoint } from '@/widgets/trips/trip-summary.derive'
 
 const baseTrip: TripSummary = {
     id: 'trip-1',
@@ -102,20 +102,5 @@ describe('collectGlobeRoutes', () => {
 
     test('항공편도 목적지도 없으면 경로가 없다', () => {
         expect(collectGlobeRoutes([baseTrip])).toEqual([])
-    })
-})
-
-describe('resolveTripRouteLabel', () => {
-    test('출국 항공편을 우선해 라벨을 만든다', () => {
-        expect(
-            resolveTripRouteLabel([
-                { direction: 'inbound', departCode: 'KIX', arriveCode: 'ICN' },
-                { direction: 'outbound', departCode: 'ICN', arriveCode: 'KIX' },
-            ]),
-        ).toBe('ICN → KIX')
-    })
-
-    test('항공편이 없으면 null 이다', () => {
-        expect(resolveTripRouteLabel([])).toBeNull()
     })
 })

@@ -21,6 +21,7 @@ import type {
     tripSidebarLink,
     tripUpload,
 } from '@/shared/db/schema/trip'
+import type { LikeState } from '@/shared/lib/like-mutation'
 
 export type Trip = typeof trip.$inferSelect
 export type TripInsert = typeof trip.$inferInsert
@@ -107,7 +108,7 @@ export type PublicTripCardPage = {
     pageCount: number
 }
 
-export type TripLikeState = { count: number; liked: boolean }
+export type TripLikeState = LikeState
 
 export type HomeTrips = {
     thisWeek: PublicTripCard[]
