@@ -41,7 +41,10 @@
     - [x] 4-1. 의존성 고정: `@tiptap/{core,react,starter-kit,pm,extension-youtube,extension-link,extension-image,html}@3.31.3` + `isomorphic-dompurify@4.2.0`, `happy-dom` 을 dependencies 로(`npx bun@1.3.14 install`)
     - [x] 4-2. Workflow(ADR-0031, run `wf_896d6110-973`, 에이전트 8·51분, 리뷰 17건 → 적용 14·오탐 1·범위 밖 2): API 사실 확인(Sonnet, node_modules 1차 출처) → `shared/lib` 확장 목록·서버 렌더·sanitize·문서 검증 + 테스트(Opus max) → `features/editor` 에디터 UI + 테스트(Opus max) → 리뷰 3렌즈 보안·컨벤션·FSD(Opus high) → 확정 지적 수정(Opus max)
     - [x] 4-3. 메인 검증(typecheck·lint·prettier·test 305·build 통과, 범위 밖 지적 2건은 메인이 처리: `UPLOAD_DISABLED_HINT` shared 승격·ARCHITECTURE §2·§12) → ADR-0027 구현 메모 → 문서 헤더 갱신 → 커밋 → push·prod 머지(화면 미연결, ADR-0031)
-    - [ ] 4-4. 로드맵 6 착수(ADR-0028): 마이그레이션 0006, admin 플러그인, `proxy.ts` `/` 리다이렉트 제거, 게시판·댓글·채택·포인트, 프로필. 게시글 화면에서 에디터 브라우저 실측(라이트·다크) 후 ADR-0027 추기
+    - [ ] 4-4. 로드맵 6(ADR-0028 + 구현 세부 ADR-0032)
+        - [ ] 4-4a. Workflow A: 사실 확인(Sonnet) → 데이터 계층(스키마·마이그레이션 0006·entities·액션·쿼리·admin 플러그인·set-admin, Opus max) → 리뷰 2렌즈(Opus high) → 수정 → 메인: SQL 검토·`bun run db:migrate`·커밋
+        - [ ] 4-4b. Workflow B: UI-A(프레임·홈·인트로 섹션·탐색·`/s/[slug]` 이동·좋아요·셸·proxy, 메인 트리) ∥ UI-B(게시판·글·댓글·채택·에디터 연결·프로필, 워크트리) → 메인 patch 이식
+        - [ ] 4-4c. Workflow C: 리뷰 4렌즈 → 수정 → 메인 검증(typecheck·lint·prettier·test·build) → 브라우저 실측(에디터 ADR-0027 포함, 라이트·다크) → ARCHITECTURE·data-model·roadmap·ADR 추기 → 커밋·push·prod 머지
 - [ ] 5단계. 로드맵 4 AI(ADR-0029: Vercel Queues, 자기 키만, AES-GCM, `APP_ENCRYPTION_KEY` 없이 구현 후 키 등록 시 테스트)
 - [ ] 6단계. 로드맵 10 SEO·GEO·JSON-LD·Analytics·Speed Insights(ADR-0030)
 
