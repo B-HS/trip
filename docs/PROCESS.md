@@ -36,7 +36,12 @@
 - [x] 1단계. 버그 B1(saveDay 하위 id)·B2(기본 정보 toast 1회)·B3(날짜 정렬 낙관적)·B6(JSON 가져오기, ADR-0021)·B8(체크리스트 문구) + 로드맵 9(몇박 며칠, ADR-0020) — Opus 에이전트 2건 병렬 구현 → 3-way 적용 → 마이그레이션 0002 적용 → 브라우저 실측(하위 id 유지, 30ms 낙관적 정렬, JSON 왕복, toast 1회, 7박 5일 표기). B4(shared/ui card·alert·input-group 보더)는 사용처가 없어 보류, 사용 시점에 제거
 - [x] 2단계. 로드맵 8 셀형 UI(ADR-0023, `bc18131`) → 1 사이드바 링크·소개 문구(ADR-0024, 마이그레이션 0003, `fddab44`, 브라우저 실측: URL 검증·저장·탭 배지·공개 페이지 링크) → 5 일정 종류(ADR-0025, 마이그레이션 0004 데이터 이관, `ffb5aee`, 실측: 종류 추가·범례·일정 구분 변경·삭제 다이얼로그)
 - [x] 3단계. 로드맵 2 서버 경유 R2 업로드 + 예매 첨부(ADR-0026, 마이그레이션 0005, `aab891f`, 실측: R2 미설정 시 업로드 비활성·안내, 링크 첨부 저장·뷰어 표시). R2 키 설정 후 이미지 업로드 실측 필요
-- [ ] 4단계. 로드맵 7 Tiptap·YouTube(ADR-0027) → 6 커뮤니티·프로필(대문·사진, ADR-0028). **다음 세션 시작 지점**
+- [ ] 4단계. 로드맵 7 Tiptap·YouTube(ADR-0027) → 6 커뮤니티·프로필(대문·사진, ADR-0028). **세션 3 진행 중**
+    - [x] 4-0. 컨텍스트 복원·문서-코드 대조(불일치 4건 보고: 문서 헤더 stale·auto-push false·dev 서버 PID 교체·Vercel CLI 구버전) → 질문 4건 추천안 승인 → ADR-0031, `llm-rules.auto-push true`
+    - [x] 4-1. 의존성 고정: `@tiptap/{core,react,starter-kit,pm,extension-youtube,extension-link,extension-image,html}@3.31.3` + `isomorphic-dompurify@4.2.0`, `happy-dom` 을 dependencies 로(`npx bun@1.3.14 install`)
+    - [ ] 4-2. Workflow(ADR-0031): API 사실 확인(Sonnet, node_modules 1차 출처) → `shared/lib` 확장 목록·서버 렌더·sanitize·문서 검증 + 테스트(Opus max) → `features/editor` 에디터 UI + 테스트(Opus max) → 리뷰 3렌즈 보안·컨벤션·FSD(Opus high) → 확정 지적 수정(Opus max)
+    - [ ] 4-3. 메인 검증(typecheck·lint·prettier·test·build) → ADR-0027 구현 메모 → 문서 헤더 갱신 → 커밋 → push·prod 머지(화면 미연결, ADR-0031)
+    - [ ] 4-4. 로드맵 6 착수(ADR-0028): 마이그레이션 0006, admin 플러그인, `proxy.ts` `/` 리다이렉트 제거, 게시판·댓글·채택·포인트, 프로필. 게시글 화면에서 에디터 브라우저 실측(라이트·다크) 후 ADR-0027 추기
 - [ ] 5단계. 로드맵 4 AI(ADR-0029: Vercel Queues, 자기 키만, AES-GCM, `APP_ENCRYPTION_KEY` 없이 구현 후 키 등록 시 테스트)
 - [ ] 6단계. 로드맵 10 SEO·GEO·JSON-LD·Analytics·Speed Insights(ADR-0030)
 
@@ -52,4 +57,4 @@
 - DB: 공용 MySQL(로컬·prod 동일). 마이그레이션 0000~0005 적용됨. 마이그레이션이 컬럼을 지우면 이전 배포 코드가 깨지므로 적용과 push·배포를 연달아 한다.
 - 공개 페이지 캐시: `PublicTrip` 형태(컬럼·관계)가 바뀌면 `entities/trip/trip.cache.ts` 의 `PUBLIC_TRIP_CACHE_VERSION` 을 올린다. 로컬 `updateTag` 는 prod 데이터 캐시를 비우지 못하고, Vercel 데이터 캐시는 배포를 넘어 유지된다.
 - 검증 계정: tester@example.com / 사용자명 tester(오사카 예시 트립, 공개 slug `osaka-qa`), throwaway `qa_session2_204103@example.com`.
-- 에이전트 운용: 구현은 Opus 서브에이전트(메인 트리 1 + `isolation: worktree` 1 병렬). 워크트리 결과는 `git -C <wt> diff HEAD` patch 를 `git apply --3way` 로 이식하고 신규 파일은 복사, 마이그레이션은 메인에서 `bun run db:generate` 로 다시 생성. 끝난 워크트리는 `git worktree remove --force`(push 와 같은 명령에 두면 가드 훅이 `-f`·"fast-forward" 문자열을 force push 로 오인해 차단하므로 분리).
+- 에이전트 운용(ADR-0031, 세션 3): `Agent` 도구 금지, 위임은 `Workflow` 의 `agent()` 로만. 구현 Opus max·리뷰 Opus high·리서치/사실 확인 Sonnet. 파일을 동시에 바꾸는 에이전트가 2개 이상일 때만 `isolation: 'worktree'`. 워크트리 결과는 `git -C <wt> diff HEAD` patch 를 `git apply --3way` 로 이식하고 신규 파일은 복사, 마이그레이션은 메인에서 `bun run db:generate` 로 다시 생성. 끝난 워크트리는 `git worktree remove --force`(push 와 같은 명령에 두면 가드 훅이 `-f`·"fast-forward" 문자열을 force push 로 오인해 차단하므로 분리).
