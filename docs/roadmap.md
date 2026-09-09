@@ -41,7 +41,16 @@
 - 다음 페이즈에서 트립별 사용자 지정 종류로 바꾼다: `trip_schedule_kind`(trip_id, key, label, legend_label, color_token(제한된 토큰 팔레트 중 선택: muted/success/warning/destructive/chart-n), buffer_label, sort_order). 일정 항목은 `kind` enum 대신 `kind_id` FK 를 참조하고, 트립 생성 시 기본 3종을 시드한다. 범례·배지·시간 칸·인쇄 뷰가 모두 이 테이블을 읽는다.
 - 편집기에 "일정 종류" 관리 UI(추가·이름·색·여유 문구·정렬·삭제 시 대체 종류 지정) 를 두고, 템플릿 JSON 스키마에도 종류 정의를 포함한다. 마이그레이션은 기존 enum 값을 기본 3종으로 매핑한다.
 
+## 6. 커뮤니티 — 메인 페이지 전환
+
+- 로그인 후 "/" 는 지금처럼 곧바로 내 트립 목록으로 가지 않고 **커뮤니티 홈**이 된다(내 트립은 레일·메뉴에서 진입). 로그아웃 상태의 인트로는 유지하되 공개 커뮤니티 일부를 노출할지 착수 시 결정.
+- **공유 트립 탐색**: 공개(`is_public`)로 설정한 다른 사용자의 트립을 목록·상세로 보고 **좋아요**(사용자당 1회, `trip_like`)를 누른다. 홈에는 "이번 주 여행 플랜"·"이번 달 여행 플랜"(트립 시작일 기준) 섹션과 최근·인기(좋아요 순) 트립을 둔다. 공개 트립 상세는 기존 `/s/[slug]` 뷰어(읽기 전용)를 재사용한다.
+- **게시판**: 자유게시판·질문게시판(확장 가능한 board 타입). `trip_board`(key, name, kind free|qna), `trip_post`(board_id, author_id, title, body, trip_id nullable 로 트립 첨부, view/like/comment count), `trip_comment`(post_id, author_id, parent_id 대댓글, is_accepted 채택), `trip_post_like`. 본문은 구조화 편집기 원칙과 별개로 게시판만 마크다운 또는 리치텍스트 허용 여부를 착수 시 결정(렌더 시 sanitize 필수).
+- **답변 포인트**: 질문게시판에서 답변 작성·채택 시 포인트 적립(`trip_point_ledger`: user_id, delta, reason, ref). 사용자 프로필에 누적 포인트 표시. 적립 규칙·수치는 상수로 두고 acknowledge 에 기록.
+- **사용자 페이지** `/u/[username]`: 프로필(이름·사용자명·포인트·가입일), 작성 게시글 목록, 공유(공개)한 트립 목록, 좋아요한 트립. 다른 사용자도 열람 가능.
+- 전제: 공개 범위·신고/차단·삭제 정책, 페이지네이션(`pagination` 컴포넌트), 검색은 착수 시 acknowledge 로 합의. 인가 규칙은 기존 §6 표에 "공개 트립 열람/좋아요"·"게시글 작성/수정/삭제(작성자·관리자)" 행을 추가한다.
+
 ## 우선순위·전제
 
-- 순서는 사용자가 정한다(현재 1 → 2 → 3 → 4 → 5 순으로 기록).
+- 순서는 사용자가 정한다(현재 1 → 2 → 3 → 4 → 5 → 6 순으로 기록).
 - 착수 전 각 항목마다 `docs/acknowledge` 에 스택·정책 합의를 먼저 남기고, `docs/PROCESS.md` 체크리스트로 진행한다.
