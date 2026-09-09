@@ -21,3 +21,11 @@
 - `@tiptap/react`·`@tiptap/starter-kit`·`@tiptap/pm`·`@tiptap/extension-youtube`·`@tiptap/html` 모두 **3.31.3**(정확히 같은 버전으로 고정, React 19 peer OK).
 - YouTube 확장 옵션: `inline`·`width(640)`·`height(480)`·`controls`·`nocookie`·`allowFullscreen`·`autoplay`·`modestBranding` 등, 커맨드 `setYoutubeVideo({ src, width?, height? })`, 허용 URL 은 `youtube.com`/`youtu.be`/`youtube-nocookie.com`(www·m·music). JSON: `{ type: 'youtube', attrs: { src, start, width, height } }`.
 - 서버 렌더: `@tiptap/html` `generateHTML(doc, [StarterKit, Youtube])` — **peer `happy-dom ^20.8.9` 필요**(서버 런타임 의존성으로 승격). `isomorphic-dompurify` 4.2.0 으로 sanitize 시 `ADD_TAGS: ['iframe']` 만으로는 임의 도메인 iframe 이 통과하므로 `uponSanitizeElement` hook 으로 `src` 를 `https://www.youtube(-nocookie).com/embed/` 로 화이트리스트. `[미확인]` DOMPurify hook 예제의 공식 원문.
+
+## Vercel Queues (추가 리서치, 5분)
+
+- 과금은 API operation 당(send·receive·delete·visibility·notify, 4 KiB 청크 단위), 100만 operation 당 $0.60~0.96. 무료 포함량은 문서에 없음(Pro 표에 N/A), 베타여도 과금. Hobby 가용성은 changelog "all teams" 외 근거 없음 `[미확인]`. 출처 https://vercel.com/docs/queues/pricing , https://vercel.com/docs/limits
+- 제한: 메시지 100MB, TTL 최대 7일, 지연 최대 7일, visibility 최대 60분, 재시도 무한(32회 초과 지수 백오프, DLQ 없음), 컨슈머 실행 시간은 Functions `maxDuration`(Hobby 300s 고정). 컨슈머는 공개 URL 없음(OIDC 자동).
+- 코드: `@vercel/queue` 의 `send(topic, payload)` + `handleCallback(async (payload) => …)`, `vercel.json` `functions[route].experimentalTriggers: [{ type: 'queue/v2beta', topic }]`. 로컬은 `vercel link` → `vercel env pull` 로 OIDC 토큰 필요, `next dev` 지원. 출처 https://vercel.com/docs/queues/quickstart
+- 대안: Vercel Workflows(`workflow` 패키지, Hobby 월 50,000 events 포함, 내부적으로 Queues 요금 추가), Cron 은 Hobby 에서 **하루 1회 최소 주기**(분 단위 불가) → `after()` + Cron 1분 sweep 안은 Hobby 에서 불가.
+- 비용 추정: 일 100건이면 월 9,000~12,000 operations ≈ $0.01 미만. 실제 비용은 AI 대기 시간이 아닌 Functions Active CPU 로 결정(일 100건은 Hobby 무료 한도 안일 가능성).

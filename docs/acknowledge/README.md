@@ -30,3 +30,6 @@
 - [ADR-0023 — 셀형 액션 UI 를 `Button` 변형으로 전면 적용 (2026-09-09)](0023-cell-action-ui.md)
 - [ADR-0024 — 뷰어 사이드바 링크 목록과 소개 문구 (2026-09-09)](0024-sidebar-links-and-note.md)
 - [ADR-0025 — 일정 종류를 트립별 테이블로 (2026-09-09)](0025-schedule-kinds-per-trip.md)
+- [ADR-0026 — 이미지 업로드는 서버 경유 R2 저장, 3MB 제한 (2026-09-09)](0026-r2-server-upload.md)
+- [ADR-0027 — 게시글 에디터는 Tiptap 3, YouTube 는 공식 확장 (2026-09-09)](0027-tiptap-editor-with-youtube.md)
+- [ADR-0028 — 커뮤니티 홈·게시판·포인트·프로필(대문·사진) (2026-09-09)](0028-community-and-profile.md)
