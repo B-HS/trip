@@ -41,6 +41,8 @@ const toTripValues = (basics: TripBasicsValues) => ({
     destination: basics.destination,
     startDate: basics.startDate,
     endDate: basics.endDate,
+    customNights: basics.customNights,
+    customDays: basics.customDays,
     periodNote: basics.periodNote,
     disclaimer: basics.disclaimer,
     verifiedOn: basics.verifiedOn,
@@ -210,6 +212,8 @@ export const findTripSummariesForUser = async (userId: string) => {
                 destination: row.destination,
                 startDate: row.startDate,
                 endDate: row.endDate,
+                customNights: row.customNights,
+                customDays: row.customDays,
                 periodNote: row.periodNote,
                 role: resolveTripRole({ ownerId: row.ownerId, memberRole: row.members[0]?.role ?? null }, userId) ?? 'viewer',
                 dayCount: row.days.length,
@@ -311,19 +315,15 @@ export const replaceTripFromTemplate = async (tripId: string, template: TripTemp
     return { id: tripId } satisfies CreatedTrip
 }
 
-export const updateTripBasics = async (tripId: string, basics: TripBasicsValues) => {
-    await getDb().update(trip).set(toTripValues(basics)).where(eq(trip.id, tripId))
+export const saveTripBasics = async (tripId: string, basics: TripBasicsValues, destinations: DestinationValues[]) => {
+    await getDb().transaction(async (tx) => {
+        await tx.update(trip).set(toTripValues(basics)).where(eq(trip.id, tripId))
+        await reconcileDestinations(tx, tripId, destinations)
+    })
 }
 
 export const deleteTrip = async (tripId: string) => {
     await getDb().delete(trip).where(eq(trip.id, tripId))
-}
-
-export const saveDestinations = async (tripId: string, list: DestinationValues[]) => {
-    await getDb().transaction(async (tx) => {
-        await reconcileDestinations(tx, tripId, list)
-        await touchTrip(tx, tripId)
-    })
 }
 
 export const saveFlights = async (tripId: string, list: FlightValues[]) => {
@@ -402,6 +402,8 @@ export const exportTripTemplate = async (tripId: string) => {
         destination: detail.destination,
         startDate: detail.startDate,
         endDate: detail.endDate,
+        customNights: detail.customNights,
+        customDays: detail.customDays,
         periodNote: detail.periodNote,
         disclaimer: detail.disclaimer,
         verifiedOn: detail.verifiedOn,

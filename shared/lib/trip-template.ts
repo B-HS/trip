@@ -1,11 +1,25 @@
 import { z } from 'zod'
 import { COUNTRY_CODES } from '@/shared/constant/countries'
-import { BOOKING_PRIORITIES, FLIGHT_DIRECTIONS, INFO_BLOCK_KINDS, SCHEDULE_KINDS, TRIP_DESTINATION_CITY_MAX_LENGTH } from '@/shared/constant/trip'
+import {
+    BOOKING_PRIORITIES,
+    FLIGHT_DIRECTIONS,
+    INFO_BLOCK_KINDS,
+    SCHEDULE_KINDS,
+    TRIP_DESTINATION_CITY_MAX_LENGTH,
+    TRIP_LENGTH_MAX,
+    TRIP_LENGTH_MIN,
+} from '@/shared/constant/trip'
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 
 const optionalText = (max: number) => z.string().trim().max(max).nullable().default(null)
 const optionalUrl = z.url().max(500).nullable().default(null)
+const optionalLength = z.number().int().min(TRIP_LENGTH_MIN).max(TRIP_LENGTH_MAX).nullable().default(null)
+
+export const hasPairedTripLength = (value: { customNights: number | null; customDays: number | null }) =>
+    (value.customNights === null) === (value.customDays === null)
+
+export const TRIP_LENGTH_ISSUE = { message: '박과 일은 함께 입력해 주세요.', path: ['customDays'] }
 
 export const tripTemplateDestinationSchema = z.object({
     countryCode: z.enum(COUNTRY_CODES),
@@ -108,12 +122,14 @@ export const tripTemplateInfoSectionSchema = z.object({
     blocks: z.array(tripTemplateInfoBlockSchema).default([]),
 })
 
-export const tripTemplateSchema = z.object({
+export const tripTemplateFieldsSchema = z.object({
     title: z.string().trim().min(1).max(120),
     eyebrow: optionalText(120),
     destination: z.string().trim().min(1).max(120),
     startDate: z.string().regex(DATE_PATTERN),
     endDate: z.string().regex(DATE_PATTERN),
+    customNights: optionalLength,
+    customDays: optionalLength,
     periodNote: optionalText(200),
     disclaimer: optionalText(300),
     verifiedOn: z.string().regex(DATE_PATTERN).nullable().default(null),
@@ -127,6 +143,8 @@ export const tripTemplateSchema = z.object({
     bookings: z.array(tripTemplateBookingSchema).default([]),
     infoSections: z.array(tripTemplateInfoSectionSchema).default([]),
 })
+
+export const tripTemplateSchema = tripTemplateFieldsSchema.refine(hasPairedTripLength, TRIP_LENGTH_ISSUE)
 
 export const parseTripTemplateJson = (text: string) => {
     try {

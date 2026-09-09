@@ -9,12 +9,20 @@ import { tripBasicsFormSchema, type TripBasicsFormInput, type TripBasicsFormValu
 import { EditorField } from '@/features/trip-editor/editor-field'
 import { EditorFormShell } from '@/features/trip-editor/editor-form-shell'
 import { EditorPanel } from '@/features/trip-editor/editor-panel'
-import { EDITOR_GRID_CLASS, EDITOR_INPUT_CLASS, EDITOR_TEXTAREA_CLASS, EMPTY_TO_NULL, type EditorSubmit } from '@/features/trip-editor/editor-form'
+import {
+    EDITOR_GRID_CLASS,
+    EDITOR_INPUT_CLASS,
+    EDITOR_TEXTAREA_CLASS,
+    EMPTY_TO_NULL,
+    EMPTY_TO_NULL_NUMBER,
+    type EditorSubmit,
+} from '@/features/trip-editor/editor-form'
 import { EditorToolbar } from '@/features/trip-editor/editor-toolbar'
 import { SortableRow } from '@/features/trip-editor/sortable-row'
 import { SortableRows } from '@/features/trip-editor/sortable-rows'
 import { CountryCombobox } from '@/features/trips/country-combobox'
 import { DEFAULT_COUNTRY_CODE } from '@/shared/constant/countries'
+import { TRIP_LENGTH_MAX, TRIP_LENGTH_MIN } from '@/shared/constant/trip'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Textarea } from '@/shared/ui/textarea'
@@ -90,6 +98,30 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                         type='date'
                         aria-invalid={!!errors.endDate}
                         {...form.register('endDate')}
+                    />
+                </EditorField>
+                <EditorField label='박' htmlFor='basics-nights' error={errors.customNights?.message}>
+                    <Input
+                        id='basics-nights'
+                        className={EDITOR_INPUT_CLASS}
+                        type='number'
+                        inputMode='numeric'
+                        min={TRIP_LENGTH_MIN}
+                        max={TRIP_LENGTH_MAX}
+                        aria-invalid={!!errors.customNights}
+                        {...form.register('customNights', EMPTY_TO_NULL_NUMBER)}
+                    />
+                </EditorField>
+                <EditorField label='일' htmlFor='basics-days' error={errors.customDays?.message} hint='비우면 날짜로 계산합니다'>
+                    <Input
+                        id='basics-days'
+                        className={EDITOR_INPUT_CLASS}
+                        type='number'
+                        inputMode='numeric'
+                        min={TRIP_LENGTH_MIN}
+                        max={TRIP_LENGTH_MAX}
+                        aria-invalid={!!errors.customDays}
+                        {...form.register('customDays', EMPTY_TO_NULL_NUMBER)}
                     />
                 </EditorField>
                 <EditorField

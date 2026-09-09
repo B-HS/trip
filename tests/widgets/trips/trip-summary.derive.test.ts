@@ -12,6 +12,8 @@ const baseTrip: TripSummary = {
     destination: '오사카',
     startDate: '2026-10-01',
     endDate: '2026-10-07',
+    customNights: null,
+    customDays: null,
     periodNote: null,
     role: 'owner',
     dayCount: 7,

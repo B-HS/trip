@@ -29,6 +29,8 @@ export const trip = tripTable(
         destination: varchar('destination', { length: 120 }).notNull(),
         startDate: date('start_date', { mode: 'string' }).notNull(),
         endDate: date('end_date', { mode: 'string' }).notNull(),
+        customNights: int('nights'),
+        customDays: int('days'),
         periodNote: varchar('period_note', { length: 200 }),
         disclaimer: varchar('disclaimer', { length: 300 }),
         verifiedOn: date('verified_on', { mode: 'string' }),

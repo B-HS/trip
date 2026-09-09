@@ -33,7 +33,7 @@ const BASE_PROPS: TripCardProps = {
     isFavorite: false,
     status: { tone: 'upcoming', label: '예정 D-22' },
     roleLabel: '소유자',
-    dayCount: 7,
+    lengthLabel: '6박 7일',
     scheduleCount: 65,
     bookingCount: 9,
     canEdit: true,
@@ -53,6 +53,12 @@ describe('TripCard', () => {
         expect(screen.getByText('2026.10.01 – 10.07 (목–수)')).toBeDefined()
         expect(screen.getByText('소유자')).toBeDefined()
         expect(screen.getByText('예정 D-22')).toBeDefined()
+    })
+
+    test('여행 길이 라벨을 요약 줄에 표시한다', () => {
+        render(<TripCard {...BASE_PROPS} />)
+
+        expect(screen.getByText(/6박 7일/)).toBeDefined()
     })
 
     test('카드 전체가 상세 링크를 가리킨다', () => {

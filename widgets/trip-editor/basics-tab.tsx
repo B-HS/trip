@@ -1,7 +1,7 @@
 'use client'
 
 import type { FC } from 'react'
-import { useSaveDestinations, useUpdateTripBasics } from '@/entities/trip/trip.query'
+import { useSaveTripBasics } from '@/entities/trip/trip.query'
 import type { TripDetail } from '@/entities/trip/trip.type'
 import type { DestinationInput, TripBasicsFormValues } from '@/entities/trip/trip.validate'
 import { BasicsForm } from '@/features/trip-editor/basics-form'
@@ -16,20 +16,12 @@ const toDestinationDefaults = (detail: TripDetail) =>
             : [],
     )
 
-const isSameDestinations = (next: TripBasicsFormValues['destinations'], current: DestinationInput[]) =>
-    next.length === current.length &&
-    next.every((item, index) => item.id === current[index].id && item.countryCode === current[index].countryCode && item.city === current[index].city)
-
 export const BasicsTab: FC<TripEditorTabProps> = ({ tripId, detail, onSaved }) => {
-    const updateBasics = useUpdateTripBasics(tripId)
-    const saveDestinations = useSaveDestinations(tripId)
+    const saveBasics = useSaveTripBasics(tripId)
 
-    const destinations = toDestinationDefaults(detail)
-
-    const handleSubmit = async ({ destinations: nextDestinations, ...basics }: TripBasicsFormValues) => {
+    const handleSubmit = async (values: TripBasicsFormValues) => {
         try {
-            await updateBasics.mutateAsync(basics)
-            if (!isSameDestinations(nextDestinations, destinations)) await saveDestinations.mutateAsync(nextDestinations)
+            await saveBasics.mutateAsync(values)
             onSaved()
             return true
         } catch {
@@ -39,9 +31,9 @@ export const BasicsTab: FC<TripEditorTabProps> = ({ tripId, detail, onSaved }) =
 
     return (
         <BasicsForm
-            defaultValues={{ ...toBasicsDefaults(detail), destinations }}
+            defaultValues={{ ...toBasicsDefaults(detail), destinations: toDestinationDefaults(detail) }}
             onSubmit={handleSubmit}
-            isPending={updateBasics.isPending || saveDestinations.isPending}
+            isPending={saveBasics.isPending}
         />
     )
 }

@@ -22,7 +22,7 @@ export type TripCardProps = {
     isFavorite: boolean
     status: TripStatus | null
     roleLabel: string
-    dayCount: number
+    lengthLabel: string
     scheduleCount: number
     bookingCount: number
     canEdit: boolean
@@ -42,7 +42,7 @@ export const TripCard: FC<TripCardProps> = ({
     isFavorite,
     status,
     roleLabel,
-    dayCount,
+    lengthLabel,
     scheduleCount,
     bookingCount,
     canEdit,
@@ -136,7 +136,7 @@ export const TripCard: FC<TripCardProps> = ({
             )}
         </dl>
         <p className='mt-auto font-mono text-2xs text-muted-foreground tabular-nums'>
-            일정 {scheduleCount} · 예매 {bookingCount} · {dayCount}일
+            일정 {scheduleCount} · 예매 {bookingCount} · {lengthLabel}
         </p>
     </article>
 )

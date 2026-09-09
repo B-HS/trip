@@ -23,6 +23,8 @@ export const toBasicsDefaults = (detail: TripDetail) =>
         destination: detail.destination,
         startDate: detail.startDate,
         endDate: detail.endDate,
+        customNights: detail.customNights,
+        customDays: detail.customDays,
         periodNote: detail.periodNote,
         disclaimer: detail.disclaimer,
         verifiedOn: detail.verifiedOn,

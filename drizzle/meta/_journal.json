@@ -15,6 +15,13 @@
       "when": 1788938597849,
       "tag": "0001_clear_silvermane",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1788956795840,
+      "tag": "0002_black_rockslide",
+      "breakpoints": true
     }
   ]
 }

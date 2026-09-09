@@ -68,3 +68,7 @@ export const HOME_AIRPORT_CODE = 'ICN'
 export const TRIP_DESTINATION_MIN_COUNT = 1
 
 export const TRIP_DESTINATION_CITY_MAX_LENGTH = 80
+
+export const TRIP_LENGTH_MIN = 0
+
+export const TRIP_LENGTH_MAX = 365

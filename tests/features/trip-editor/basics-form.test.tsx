@@ -9,6 +9,8 @@ const DEFAULT_VALUES = {
     destination: '오사카',
     startDate: '2026-10-01',
     endDate: '2026-10-07',
+    customNights: null,
+    customDays: null,
     periodNote: null,
     disclaimer: null,
     verifiedOn: null,
@@ -60,6 +62,27 @@ describe('BasicsForm', () => {
         await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
         expect(onSubmit.mock.calls[0]![0].destinations).toEqual([{ countryCode: 'JP', city: '오사카' }])
         await new Promise((resolve) => setTimeout(resolve, ROW_ANIMATION_SETTLE_MS))
+    })
+
+    test('박과 일 중 하나만 채우면 오류를 보여주고 onSubmit 을 호출하지 않는다', async () => {
+        const onSubmit = mock(async (values: TripBasicsFormValues) => values.title.length > 0)
+        renderForm(onSubmit)
+        fireEvent.change(screen.getByLabelText('박'), { target: { value: '6' } })
+        fireEvent.click(screen.getByRole('button', { name: '저장' }))
+
+        await waitFor(() => expect(screen.getByText('박과 일은 함께 입력해 주세요.')).toBeDefined())
+        expect(onSubmit).not.toHaveBeenCalled()
+    })
+
+    test('박과 일을 함께 채우면 숫자로 제출한다', async () => {
+        const onSubmit = mock(async (values: TripBasicsFormValues) => values.title.length > 0)
+        renderForm(onSubmit)
+        fireEvent.change(screen.getByLabelText('박'), { target: { value: '7' } })
+        fireEvent.change(screen.getByLabelText('일'), { target: { value: '5' } })
+        fireEvent.click(screen.getByRole('button', { name: '저장' }))
+
+        await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+        expect(onSubmit.mock.calls[0]![0]).toEqual({ ...DEFAULT_VALUES, customNights: 7, customDays: 5 })
     })
 
     test('필수 값이 비면 오류를 보여주고 onSubmit 을 호출하지 않는다', async () => {

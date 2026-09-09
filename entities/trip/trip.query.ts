@@ -15,14 +15,13 @@ import {
     reorderDaysAction,
     saveBookingsAction,
     saveDayAction,
-    saveDestinationsAction,
     saveFlightsAction,
     saveInfoSectionsAction,
     saveLodgingsAction,
+    saveTripBasicsAction,
     toggleFavoriteAction,
     updateMemberRoleAction,
     updateShareSettingsAction,
-    updateTripBasicsAction,
 } from '@/entities/trip/trip.action'
 import { fetchFavoriteTrips, fetchTripDetail, fetchTripList, fetchTripMembers } from '@/entities/trip/trip.api'
 import { orderDaysByIds } from '@/entities/trip/trip.order'
@@ -30,14 +29,13 @@ import type { TripDetail, TripSummary } from '@/entities/trip/trip.type'
 import type {
     BookingListInput,
     DayInput,
-    DestinationListInput,
     FlightListInput,
     InfoSectionListInput,
     LodgingListInput,
     MemberInviteInput,
     MemberRoleInput,
     ShareSettingsInput,
-    TripBasicsInput,
+    TripBasicsFormInput,
     TripCreateInput,
 } from '@/entities/trip/trip.validate'
 import { QUERY_KEY } from '@/shared/constant/query-key'
@@ -88,29 +86,15 @@ export const useCreateTripFromTemplate = () => {
     })
 }
 
-export const useUpdateTripBasics = (tripId: string) => {
+export const useSaveTripBasics = (tripId: string) => {
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: async (input: TripBasicsInput) => unwrapActionResult(await updateTripBasicsAction(tripId, input)),
+        mutationFn: async (input: TripBasicsFormInput) => unwrapActionResult(await saveTripBasicsAction(tripId, input)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.FAVORITES })
             toast.success('기본 정보를 저장했습니다.')
-        },
-        onError: (error) => toast.error(error.message),
-    })
-}
-
-export const useSaveDestinations = (tripId: string) => {
-    const queryClient = useQueryClient()
-    return useMutation({
-        mutationFn: async (list: DestinationListInput) => unwrapActionResult(await saveDestinationsAction(tripId, list)),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
-            queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.FAVORITES })
-            toast.success('목적지를 저장했습니다.')
         },
         onError: (error) => toast.error(error.message),
     })

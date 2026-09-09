@@ -6,7 +6,14 @@ const emptyToUndefined = (value: string | null | undefined) => (value === null |
 
 const toAirportCode = (value: string | null) => (value === null ? '' : value.trim().toUpperCase())
 
+const emptyToNullNumber = (value: string | number | null | undefined) => {
+    const text = value === null || value === undefined ? '' : String(value).trim()
+    return text === '' ? null : Number(text)
+}
+
 export const EMPTY_TO_NULL = { setValueAs: emptyToNull }
+
+export const EMPTY_TO_NULL_NUMBER = { setValueAs: emptyToNullNumber }
 
 export const EMPTY_TO_UNDEFINED = { setValueAs: emptyToUndefined }
 

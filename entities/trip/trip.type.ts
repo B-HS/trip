@@ -62,7 +62,10 @@ export type PublicTrip = TripRecord & {
 
 export type TripDetail = PublicTrip & { viewerRole: MemberRole | null }
 
-export type TripSummary = Pick<Trip, 'id' | 'title' | 'eyebrow' | 'destination' | 'startDate' | 'endDate' | 'periodNote'> & {
+export type TripSummary = Pick<
+    Trip,
+    'id' | 'title' | 'eyebrow' | 'destination' | 'startDate' | 'endDate' | 'customNights' | 'customDays' | 'periodNote'
+> & {
     role: MemberRole
     dayCount: number
     scheduleCount: number

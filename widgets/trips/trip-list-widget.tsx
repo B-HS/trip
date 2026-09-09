@@ -14,6 +14,7 @@ import { TripStatTiles, type TripStatTile } from '@/features/trips/trip-stat-til
 import { OSAKA_TRIP_TEMPLATE } from '@/shared/constant/template/osaka'
 import { MEMBER_ROLE_LABEL } from '@/shared/constant/trip'
 import { MOTION_EASE_STANDARD, MOTION_FADE_DURATION } from '@/shared/lib/motion'
+import { formatTripLength } from '@/shared/lib/trip-length'
 import { Button } from '@/shared/ui/button'
 import { FadeIn } from '@/shared/ui/motion/fade-in'
 import { StaggerList } from '@/shared/ui/motion/stagger-list'
@@ -69,7 +70,12 @@ export const TripListWidget: FC = () => {
                             isFavorite={trip.isFavorite}
                             status={deriveTripStatus(trip, today)}
                             roleLabel={MEMBER_ROLE_LABEL[trip.role]}
-                            dayCount={trip.dayCount}
+                            lengthLabel={formatTripLength({
+                                startDate: trip.startDate,
+                                endDate: trip.endDate,
+                                nights: trip.customNights,
+                                days: trip.customDays,
+                            })}
                             scheduleCount={trip.scheduleCount}
                             bookingCount={trip.bookingCount}
                             canEdit={trip.role !== 'viewer'}

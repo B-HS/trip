@@ -3,6 +3,7 @@ import type { FC } from 'react'
 import type { TripDestinationView, TripFlight, TripLodging } from '@/entities/trip/trip.type'
 import { formatPeriodLabel, formatRatio, formatVerifiedOn, toPercent } from '@/features/trip-viewer/trip-viewer-format'
 import { countryName } from '@/shared/constant/countries'
+import { formatTripLength } from '@/shared/lib/trip-length'
 import { cn } from '@/shared/lib/utils'
 import { AnimatedProgress } from '@/shared/ui/motion/animated-progress'
 
@@ -11,6 +12,8 @@ type TripSidebarProps = {
     title: string
     startDate: string
     endDate: string
+    customNights: number | null
+    customDays: number | null
     periodNote: string | null
     completedCount: number
     totalCount: number
@@ -23,12 +26,15 @@ type TripSidebarProps = {
 }
 
 const FLIGHT_TERMINAL_FALLBACK = '—'
+const LENGTH_SEPARATOR = ' · '
 
 export const TripSidebar: FC<TripSidebarProps> = ({
     eyebrow,
     title,
     startDate,
     endDate,
+    customNights,
+    customDays,
     periodNote,
     completedCount,
     totalCount,
@@ -45,7 +51,11 @@ export const TripSidebar: FC<TripSidebarProps> = ({
             <h1 className='mt-2 text-2xl leading-tight font-semibold tracking-tight break-keep text-foreground'>{title}</h1>
         </div>
         <div className='text-sm text-foreground'>
-            <p className='font-mono tabular-nums'>{formatPeriodLabel(startDate, endDate)}</p>
+            <p className='font-mono tabular-nums'>
+                {formatPeriodLabel(startDate, endDate)}
+                {LENGTH_SEPARATOR}
+                {formatTripLength({ startDate, endDate, nights: customNights, days: customDays })}
+            </p>
             {periodNote && <p className='mt-1 text-xs text-muted-foreground'>{periodNote}</p>}
         </div>
         <div className='flex flex-col gap-1'>

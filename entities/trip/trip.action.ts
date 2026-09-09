@@ -10,12 +10,11 @@ import {
     findTripShareSlug,
     replaceTripFromTemplate,
     saveBookings,
-    saveDestinations,
     saveFlights,
     saveInfoSections,
     saveLodgings,
+    saveTripBasics,
     updateShareSettings,
-    updateTripBasics,
 } from '@/entities/trip/trip.repository'
 import { deleteDay, reorderDays, saveDay } from '@/entities/trip/trip.repository.days'
 import { setTripFavorite } from '@/entities/trip/trip.repository.favorites'
@@ -25,7 +24,6 @@ import {
     bookingListSchema,
     dayIdListSchema,
     dayInputSchema,
-    destinationListSchema,
     favoriteFlagSchema,
     flightListSchema,
     infoSectionListSchema,
@@ -33,19 +31,18 @@ import {
     memberInviteSchema,
     memberRoleSchema,
     shareSettingsSchema,
-    tripBasicsSchema,
+    tripBasicsFormSchema,
     tripCreateSchema,
     tripIdSchema,
     type BookingListInput,
     type DayInput,
-    type DestinationListInput,
     type FlightListInput,
     type InfoSectionListInput,
     type LodgingListInput,
     type MemberInviteInput,
     type MemberRoleInput,
     type ShareSettingsInput,
-    type TripBasicsInput,
+    type TripBasicsFormInput,
     type TripCreateInput,
 } from '@/entities/trip/trip.validate'
 import { runAction } from '@/shared/lib/action-result'
@@ -78,23 +75,13 @@ export const createTripFromTemplateAction = async (template: TripTemplateInput) 
     })
 }
 
-export const updateTripBasicsAction = async (tripId: string, input: TripBasicsInput) => {
+export const saveTripBasicsAction = async (tripId: string, input: TripBasicsFormInput) => {
     const user = await requireUser()
     return runAction(async () => {
         const id = tripIdSchema.parse(tripId)
         await assertTripAccess(id, user.id, 'edit')
-        await updateTripBasics(id, tripBasicsSchema.parse(input))
-        await expireTrip(id)
-        return { id }
-    })
-}
-
-export const saveDestinationsAction = async (tripId: string, list: DestinationListInput) => {
-    const user = await requireUser()
-    return runAction(async () => {
-        const id = tripIdSchema.parse(tripId)
-        await assertTripAccess(id, user.id, 'edit')
-        await saveDestinations(id, destinationListSchema.parse(list))
+        const { destinations, ...basics } = tripBasicsFormSchema.parse(input)
+        await saveTripBasics(id, basics, destinations)
         await expireTrip(id)
         return { id }
     })

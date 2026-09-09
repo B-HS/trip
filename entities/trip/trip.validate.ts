@@ -1,18 +1,20 @@
 import { z } from 'zod'
 import { TRIP_DESTINATION_MIN_COUNT } from '@/shared/constant/trip'
 import {
+    hasPairedTripLength,
+    TRIP_LENGTH_ISSUE,
     tripTemplateBookingSchema,
     tripTemplateDayFactSchema,
     tripTemplateDayNoteSchema,
     tripTemplateDaySchema,
     tripTemplateDestinationSchema,
+    tripTemplateFieldsSchema,
     tripTemplateFlightSchema,
     tripTemplateInfoBlockSchema,
     tripTemplateInfoSectionSchema,
     tripTemplateLodgingSchema,
     tripTemplateRouteSchema,
     tripTemplateScheduleItemSchema,
-    tripTemplateSchema,
 } from '@/shared/lib/trip-template'
 
 const SHARE_SLUG_MIN_LENGTH = 3
@@ -25,7 +27,7 @@ const optionalId = z.uuid().optional()
 
 export const tripIdSchema = z.uuid()
 
-const tripBasicsFieldsSchema = tripTemplateSchema.omit({
+const tripBasicsFieldsSchema = tripTemplateFieldsSchema.omit({
     destinations: true,
     flights: true,
     lodgings: true,
@@ -38,16 +40,20 @@ const hasOrderedPeriod = (value: { startDate: string; endDate: string }) => valu
 
 const PERIOD_ISSUE = { message: '종료일은 시작일과 같거나 이후여야 합니다.', path: ['endDate'] }
 
-export const tripBasicsSchema = tripBasicsFieldsSchema.refine(hasOrderedPeriod, PERIOD_ISSUE)
+export const tripBasicsSchema = tripBasicsFieldsSchema.refine(hasOrderedPeriod, PERIOD_ISSUE).refine(hasPairedTripLength, TRIP_LENGTH_ISSUE)
 
 export const destinationInputSchema = tripTemplateDestinationSchema.extend({ id: optionalId })
 export const destinationListSchema = z.array(destinationInputSchema)
 
-export const tripBasicsFormSchema = tripBasicsFieldsSchema.extend({ destinations: destinationListSchema }).refine(hasOrderedPeriod, PERIOD_ISSUE)
+export const tripBasicsFormSchema = tripBasicsFieldsSchema
+    .extend({ destinations: destinationListSchema })
+    .refine(hasOrderedPeriod, PERIOD_ISSUE)
+    .refine(hasPairedTripLength, TRIP_LENGTH_ISSUE)
 
 export const tripCreateSchema = tripBasicsFieldsSchema
     .extend({ destinations: destinationListSchema.min(TRIP_DESTINATION_MIN_COUNT, '목적지를 한 곳 이상 추가해 주세요.') })
     .refine(hasOrderedPeriod, PERIOD_ISSUE)
+    .refine(hasPairedTripLength, TRIP_LENGTH_ISSUE)
 
 export const flightInputSchema = tripTemplateFlightSchema.extend({ id: optionalId })
 export const flightListSchema = z.array(flightInputSchema)
