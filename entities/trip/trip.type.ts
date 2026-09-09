@@ -4,6 +4,7 @@ import type { user } from '@/shared/db/schema/auth'
 import type {
     trip,
     tripBooking,
+    tripBookingAttachment,
     tripDay,
     tripDayFact,
     tripDayNote,
@@ -18,6 +19,7 @@ import type {
     tripScheduleItem,
     tripScheduleKind,
     tripSidebarLink,
+    tripUpload,
 } from '@/shared/db/schema/trip'
 
 export type Trip = typeof trip.$inferSelect
@@ -33,6 +35,8 @@ export type TripScheduleItem = typeof tripScheduleItem.$inferSelect
 export type TripScheduleKind = typeof tripScheduleKind.$inferSelect
 export type TripDayNote = typeof tripDayNote.$inferSelect
 export type TripBooking = typeof tripBooking.$inferSelect
+export type TripBookingAttachment = typeof tripBookingAttachment.$inferSelect
+export type TripUpload = typeof tripUpload.$inferSelect
 export type TripInfoSection = typeof tripInfoSection.$inferSelect
 export type TripInfoBlock = typeof tripInfoBlock.$inferSelect
 export type TripMember = typeof tripMember.$inferSelect
@@ -50,6 +54,8 @@ export type TripDayDetail = TripDay & {
 
 export type TripInfoSectionDetail = TripInfoSection & { blocks: TripInfoBlock[] }
 
+export type TripBookingDetail = TripBooking & { attachments: TripBookingAttachment[] }
+
 export type TripRecord = Omit<Trip, 'createdAt' | 'updatedAt'> & { createdAt: string; updatedAt: string }
 
 export type TripDestinationView = Pick<TripDestination, 'countryCode' | 'city'>
@@ -62,7 +68,7 @@ export type PublicTrip = TripRecord & {
     sidebarLinks: TripSidebarLink[]
     scheduleKinds: TripScheduleKind[]
     days: TripDayDetail[]
-    bookings: TripBooking[]
+    bookings: TripBookingDetail[]
     infoSections: TripInfoSectionDetail[]
 }
 

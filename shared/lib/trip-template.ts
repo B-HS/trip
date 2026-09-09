@@ -17,6 +17,7 @@ import {
     TRIP_LENGTH_MAX,
     TRIP_LENGTH_MIN,
 } from '@/shared/constant/trip'
+import { UPLOAD_ATTACHMENT_KINDS } from '@/shared/constant/upload'
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 const HTTP_URL_PATTERN = /^https?:\/\//
@@ -28,6 +29,8 @@ export const SCHEDULE_KIND_DUPLICATE_ISSUE = { message: '일정 종류 키가 �
 export const SCHEDULE_KIND_REFERENCE_ISSUE = { message: '일정 항목이 목록에 없는 종류를 가리킵니다.', path: ['days'] }
 
 export const hasUniqueScheduleKindKeys = (kinds: Array<{ key: string }>) => new Set(kinds.map((kind) => kind.key)).size === kinds.length
+
+const ATTACHMENT_URL_ISSUE = '첨부 주소는 http 또는 https 주소여야 합니다.'
 
 const optionalText = (max: number) => z.string().trim().max(max).nullable().default(null)
 const optionalUrl = z.url().max(500).nullable().default(null)
@@ -132,6 +135,15 @@ export const tripTemplateDaySchema = z.object({
     notes: z.array(tripTemplateDayNoteSchema).default([]),
 })
 
+export const tripTemplateBookingAttachmentSchema = z.object({
+    kind: z.enum(UPLOAD_ATTACHMENT_KINDS).default('link'),
+    url: z
+        .url()
+        .max(500)
+        .refine((value) => HTTP_URL_PATTERN.test(value), ATTACHMENT_URL_ISSUE),
+    label: optionalText(80),
+})
+
 export const tripTemplateBookingSchema = z.object({
     title: z.string().trim().min(1).max(120),
     whenLabel: optionalText(120),
@@ -140,6 +152,7 @@ export const tripTemplateBookingSchema = z.object({
     linkUrl: optionalUrl,
     actionNote: optionalText(200),
     planStatus: optionalText(80),
+    attachments: z.array(tripTemplateBookingAttachmentSchema).default([]),
 })
 
 export const tripTemplateInfoBlockSchema = z.object({

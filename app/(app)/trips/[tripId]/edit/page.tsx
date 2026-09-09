@@ -5,6 +5,7 @@ import { getTripDetail } from '@/entities/trip/trip.cache'
 import { prefetchTripDetail, prefetchTripMembers } from '@/entities/trip/trip.prefetch'
 import { canEdit, canManage } from '@/entities/trip/trip.role'
 import { getQueryClient } from '@/shared/lib/query-client'
+import { getUploadConfig } from '@/shared/lib/r2'
 import { requireUser } from '@/shared/lib/session'
 import { TripEditorWidget } from '@/widgets/trip-editor/trip-editor-widget'
 
@@ -31,7 +32,7 @@ const TripEditPage = async ({ params }: TripEditPageProps) => {
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
-            <TripEditorWidget tripId={tripId} />
+            <TripEditorWidget tripId={tripId} isUploadEnabled={getUploadConfig() !== null} />
         </HydrationBoundary>
     )
 }

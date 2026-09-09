@@ -9,11 +9,14 @@ const SECURITY_HEADERS = [
     { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
 ]
 
+const uploadBaseUrl = process.env.R2_PUBLIC_BASE_URL
+
 const nextConfig: NextConfig = {
     reactCompiler: true,
     agentRules: false,
     typedRoutes: true,
     serverExternalPackages: ['mysql2'],
+    images: { remotePatterns: uploadBaseUrl ? [new URL(`${uploadBaseUrl.replace(/\/+$/, '')}/**`)] : [] },
     headers: async () => [{ source: '/:path*', headers: SECURITY_HEADERS }],
 }
 

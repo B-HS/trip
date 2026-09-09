@@ -13,6 +13,7 @@ import {
     SCHEDULE_KIND_LABEL_MAX_LENGTH,
     SCHEDULE_KIND_LEGEND_LABEL_MAX_LENGTH,
 } from '@/shared/constant/trip'
+import { UPLOAD_ATTACHMENT_KINDS, UPLOAD_KINDS } from '@/shared/constant/upload'
 
 const id = () =>
     varchar('id', { length: 36 })
@@ -288,6 +289,40 @@ export const tripBooking = tripTable(
     (table) => [index('booking_trip_id_idx').on(table.tripId)],
 )
 
+export const tripUpload = tripTable(
+    'upload',
+    {
+        id: id(),
+        ownerId: varchar('owner_id', { length: 36 })
+            .notNull()
+            .references(() => user.id, { onDelete: 'cascade' }),
+        kind: mysqlEnum('kind', UPLOAD_KINDS).notNull(),
+        key: varchar('key', { length: 300 }).notNull(),
+        url: varchar('url', { length: 500 }).notNull(),
+        mime: varchar('mime', { length: 80 }).notNull(),
+        size: int('size').notNull(),
+        createdAt: createdAt(),
+    },
+    (table) => [index('upload_owner_id_idx').on(table.ownerId)],
+)
+
+export const tripBookingAttachment = tripTable(
+    'booking_attachment',
+    {
+        id: id(),
+        bookingId: varchar('booking_id', { length: 36 })
+            .notNull()
+            .references(() => tripBooking.id, { onDelete: 'cascade' }),
+        sortOrder: int('sort_order').notNull().default(0),
+        kind: mysqlEnum('kind', UPLOAD_ATTACHMENT_KINDS).notNull().default('link'),
+        url: varchar('url', { length: 500 }).notNull(),
+        label: varchar('label', { length: 80 }),
+        uploadId: varchar('upload_id', { length: 36 }).references(() => tripUpload.id, { onDelete: 'set null' }),
+        createdBy: varchar('created_by', { length: 36 }),
+    },
+    (table) => [index('booking_attachment_booking_id_idx').on(table.bookingId), index('booking_attachment_upload_id_idx').on(table.uploadId)],
+)
+
 export const tripInfoSection = tripTable(
     'info_section',
     {
@@ -458,6 +493,7 @@ export const tripDayNoteRelations = relations(tripDayNote, ({ one }) => ({
 export const tripBookingRelations = relations(tripBooking, ({ one, many }) => ({
     trip: one(trip, { fields: [tripBooking.tripId], references: [trip.id] }),
     checks: many(tripBookingCheck),
+    attachments: many(tripBookingAttachment),
 }))
 
 export const tripInfoSectionRelations = relations(tripInfoSection, ({ one, many }) => ({
@@ -482,4 +518,13 @@ export const tripBookingCheckRelations = relations(tripBookingCheck, ({ one }) =
 export const tripDayMemoRelations = relations(tripDayMemo, ({ one }) => ({
     day: one(tripDay, { fields: [tripDayMemo.dayId], references: [tripDay.id] }),
     user: one(user, { fields: [tripDayMemo.userId], references: [user.id] }),
+}))
+
+export const tripUploadRelations = relations(tripUpload, ({ one }) => ({
+    owner: one(user, { fields: [tripUpload.ownerId], references: [user.id] }),
+}))
+
+export const tripBookingAttachmentRelations = relations(tripBookingAttachment, ({ one }) => ({
+    booking: one(tripBooking, { fields: [tripBookingAttachment.bookingId], references: [tripBooking.id] }),
+    upload: one(tripUpload, { fields: [tripBookingAttachment.uploadId], references: [tripUpload.id] }),
 }))

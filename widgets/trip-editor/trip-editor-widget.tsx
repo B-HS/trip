@@ -44,9 +44,10 @@ const TAB_COMPONENT = {
 
 type TripEditorWidgetProps = {
     tripId: string
+    isUploadEnabled: boolean
 }
 
-export const TripEditorWidget: FC<TripEditorWidgetProps> = ({ tripId }) => {
+export const TripEditorWidget: FC<TripEditorWidgetProps> = ({ tripId, isUploadEnabled }) => {
     const [savedAt, setSavedAt] = useState<string | null>(null)
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -112,7 +113,12 @@ export const TripEditorWidget: FC<TripEditorWidgetProps> = ({ tripId }) => {
             <TabsContent value={activeTab}>
                 <AnimatePresence mode='wait' initial={false}>
                     <motion.div key={activeTab} {...FADE}>
-                        <ActiveTab tripId={tripId} detail={detail} onSaved={() => setSavedAt(dayjs().format(SAVED_TIME_FORMAT))} />
+                        <ActiveTab
+                            tripId={tripId}
+                            detail={detail}
+                            isUploadEnabled={isUploadEnabled}
+                            onSaved={() => setSavedAt(dayjs().format(SAVED_TIME_FORMAT))}
+                        />
                     </motion.div>
                 </AnimatePresence>
             </TabsContent>

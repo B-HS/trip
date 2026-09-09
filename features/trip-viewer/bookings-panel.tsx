@@ -1,8 +1,9 @@
 'use client'
 
 import { ExternalLinkIcon } from 'lucide-react'
+import Image from 'next/image'
 import type { FC } from 'react'
-import type { TripBooking } from '@/entities/trip/trip.type'
+import type { TripBookingDetail } from '@/entities/trip/trip.type'
 import { formatRatio, toPercent } from '@/features/trip-viewer/trip-viewer-format'
 import { BOOKING_PRIORITY_LABEL } from '@/shared/constant/trip'
 import { cn } from '@/shared/lib/utils'
@@ -11,9 +12,13 @@ import { AnimatedProgress } from '@/shared/ui/motion/animated-progress'
 import { StaggerItem, StaggerList } from '@/shared/ui/motion/stagger-list'
 
 const STORAGE_HINT = '완료 표시는 내 계정에 저장됩니다. 체크해도 실제 예약·결제는 진행되지 않습니다.'
+const ATTACHMENT_IMAGE_WIDTH = 320
+const ATTACHMENT_IMAGE_HEIGHT = 240
+const ATTACHMENT_IMAGE_SIZES = '320px'
+const ATTACHMENT_IMAGE_ALT = '예매 첨부 이미지'
 
 type BookingsPanelProps = {
-    bookings: readonly TripBooking[]
+    bookings: readonly TripBookingDetail[]
     bookingNote: string | null
     checkedIds: readonly string[]
     isCheckable: boolean
@@ -75,6 +80,42 @@ export const BookingsPanel: FC<BookingsPanelProps> = ({ bookings, bookingNote, c
                                 {booking.linkUrl && booking.actionNote && ', '}
                                 {booking.actionNote}
                             </p>
+                        )}
+                        {booking.attachments.length > 0 && (
+                            <ul className='flex flex-col gap-2'>
+                                {booking.attachments.map((attachment) => (
+                                    <li key={attachment.id} className='text-xs break-all'>
+                                        {attachment.kind === 'image' && !isPrintLayout && (
+                                            <a href={attachment.url} target='_blank' rel='noopener noreferrer'>
+                                                <Image
+                                                    className='h-auto w-full max-w-80 bg-muted'
+                                                    src={attachment.url}
+                                                    alt={attachment.label ?? ATTACHMENT_IMAGE_ALT}
+                                                    width={ATTACHMENT_IMAGE_WIDTH}
+                                                    height={ATTACHMENT_IMAGE_HEIGHT}
+                                                    sizes={ATTACHMENT_IMAGE_SIZES}
+                                                />
+                                                {attachment.label && <span className='mt-1 block text-muted-foreground'>{attachment.label}</span>}
+                                            </a>
+                                        )}
+                                        {attachment.kind === 'image' && isPrintLayout && (
+                                            <span className='text-muted-foreground'>
+                                                {attachment.label ?? ATTACHMENT_IMAGE_ALT}: {attachment.url}
+                                            </span>
+                                        )}
+                                        {attachment.kind === 'link' && (
+                                            <a
+                                                className='inline-flex items-center gap-1 font-medium underline'
+                                                href={attachment.url}
+                                                target='_blank'
+                                                rel='noopener noreferrer'>
+                                                {attachment.label ?? attachment.url}
+                                                <ExternalLinkIcon aria-hidden className='size-3' />
+                                            </a>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
                         )}
                         {booking.planStatus && <p className='mt-auto text-xs text-muted-foreground'>계획 작성 시 상태: {booking.planStatus}</p>}
                     </StaggerItem>

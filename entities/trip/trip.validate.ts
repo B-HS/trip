@@ -5,6 +5,7 @@ import {
     hasUniqueScheduleKindKeys,
     SCHEDULE_KIND_DUPLICATE_ISSUE,
     TRIP_LENGTH_ISSUE,
+    tripTemplateBookingAttachmentSchema,
     tripTemplateBookingSchema,
     tripTemplateDayFactSchema,
     tripTemplateDayNoteSchema,
@@ -73,7 +74,15 @@ export const sidebarLinkListSchema = z.array(sidebarLinkInputSchema)
 
 export const sidebarSchema = tripTemplateFieldsSchema.pick({ sidebarNote: true }).extend({ links: sidebarLinkListSchema })
 
-export const bookingInputSchema = tripTemplateBookingSchema.extend({ id: optionalId })
+export const bookingAttachmentInputSchema = tripTemplateBookingAttachmentSchema.extend({
+    id: optionalId,
+    uploadId: z.uuid().nullable().default(null),
+})
+
+export const bookingInputSchema = tripTemplateBookingSchema.extend({
+    id: optionalId,
+    attachments: z.array(bookingAttachmentInputSchema).default([]),
+})
 export const bookingListSchema = z.array(bookingInputSchema)
 
 export const infoBlockInputSchema = tripTemplateInfoBlockSchema.extend({ id: optionalId })
@@ -142,6 +151,8 @@ export type SidebarLinkInput = z.input<typeof sidebarLinkInputSchema>
 export type SidebarLinkValues = z.output<typeof sidebarLinkInputSchema>
 export type SidebarInput = z.input<typeof sidebarSchema>
 export type SidebarValues = z.output<typeof sidebarSchema>
+export type BookingAttachmentInput = z.input<typeof bookingAttachmentInputSchema>
+export type BookingAttachmentValues = z.output<typeof bookingAttachmentInputSchema>
 export type BookingInput = z.input<typeof bookingInputSchema>
 export type BookingValues = z.output<typeof bookingInputSchema>
 export type BookingListInput = z.input<typeof bookingListSchema>

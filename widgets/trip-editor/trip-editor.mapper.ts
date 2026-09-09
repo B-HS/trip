@@ -100,6 +100,13 @@ export const toBookingDefaults = (detail: TripDetail) =>
                 linkUrl: booking.linkUrl,
                 actionNote: booking.actionNote,
                 planStatus: booking.planStatus,
+                attachments: booking.attachments.map((attachment) => ({
+                    id: attachment.id,
+                    kind: attachment.kind,
+                    url: attachment.url,
+                    label: attachment.label,
+                    uploadId: attachment.uploadId,
+                })),
             }) satisfies BookingInput,
     )
 

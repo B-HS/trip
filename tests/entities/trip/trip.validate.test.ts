@@ -20,6 +20,7 @@ import {
 
 const TRIP_ID = '3f1a2b6c-4d5e-4f70-8a9b-0c1d2e3f4a5b'
 const KIND_ID = '8c7d6e5f-4a3b-4c2d-9e8f-1a2b3c4d5e6f'
+const UPLOAD_ID = '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d'
 const DAY_MEMO_MAX_LENGTH = 4000
 const CITY_MAX_LENGTH = 80
 
@@ -180,6 +181,32 @@ describe('infoSectionListSchema / bookingListSchema', () => {
 
     test('링크가 URL 이 아니면 실패한다', () => {
         expect(() => bookingListSchema.parse([{ title: '키린 공장 견학', linkUrl: 'kirin' }])).toThrow()
+    })
+
+    test('첨부가 없으면 빈 배열로 채운다', () => {
+        expect(bookingListSchema.parse([{ title: '키린 공장 견학' }])[0]?.attachments).toEqual([])
+    })
+
+    test('이미지 첨부의 업로드 id 와 라벨을 파싱한다', () => {
+        const parsed = bookingListSchema.parse([
+            {
+                title: '키린 공장 견학',
+                attachments: [{ kind: 'image', url: 'https://cdn.example.com/uploads/booking/2026/a.jpg', uploadId: UPLOAD_ID }],
+            },
+        ])
+        expect(parsed[0]?.attachments[0]?.kind).toBe('image')
+        expect(parsed[0]?.attachments[0]?.uploadId).toBe(UPLOAD_ID)
+        expect(parsed[0]?.attachments[0]?.label).toBeNull()
+    })
+
+    test('첨부 종류를 지정하지 않으면 링크로 본다', () => {
+        const parsed = bookingListSchema.parse([{ title: '키린 공장 견학', attachments: [{ url: 'https://ticket.example.com' }] }])
+        expect(parsed[0]?.attachments[0]?.kind).toBe('link')
+        expect(parsed[0]?.attachments[0]?.uploadId).toBeNull()
+    })
+
+    test('첨부 주소가 http 가 아니면 실패한다', () => {
+        expect(() => bookingListSchema.parse([{ title: '키린 공장 견학', attachments: [{ url: 'javascript:alert(1)' }] }])).toThrow()
     })
 })
 

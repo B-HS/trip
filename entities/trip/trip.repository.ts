@@ -1,10 +1,11 @@
 import 'server-only'
-import { eq, inArray } from 'drizzle-orm'
+import { eq, inArray, type SQL } from 'drizzle-orm'
 import { getTripRole } from '@/entities/trip/trip.access'
 import { insertTemplateDays, removableIds, touchTrip } from '@/entities/trip/trip.repository.days'
 import { resolveTripRole } from '@/entities/trip/trip.role'
 import type { CreatedTrip, PublicTrip, ShareSettings, TripDetail, TripSummary, TripTransaction } from '@/entities/trip/trip.type'
 import type {
+    BookingAttachmentValues,
     BookingValues,
     DestinationValues,
     FlightValues,
@@ -22,6 +23,7 @@ import { getDb } from '@/shared/db/client'
 import {
     trip,
     tripBooking,
+    tripBookingAttachment,
     tripDay,
     tripDestination,
     tripFlight,
@@ -32,14 +34,30 @@ import {
     tripScheduleItem,
     tripScheduleKind,
     tripSidebarLink,
+    tripUpload,
 } from '@/shared/db/schema/trip'
 import { ApiError } from '@/shared/lib/api-response'
+import { deleteObject, getUploadConfig } from '@/shared/lib/r2'
 import type { TripTemplate } from '@/shared/lib/trip-template'
 
 const SHARE_SLUG_SUFFIX_LENGTH = 8
 const SHARE_SLUG_ATTEMPTS = 5
 const BASE36_RADIX = 36
 const FALLBACK_SLUG_BASE = 'trip'
+
+type ReconcilableAttachment = Omit<BookingAttachmentValues, 'id' | 'uploadId'> & { id?: string; uploadId?: string | null }
+type ReconcilableBooking = Omit<BookingValues, 'attachments'> & { attachments: ReconcilableAttachment[] }
+
+const removeUploadedObjects = async (keys: string[]) => {
+    if (keys.length === 0 || getUploadConfig() === null) return
+    for (const key of keys) {
+        try {
+            await deleteObject(key)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+}
 
 const toTripValues = (basics: TripBasicsValues) => ({
     title: basics.title,
@@ -143,9 +161,40 @@ const reconcileSidebarLinks = async (tx: TripTransaction, tripId: string, list: 
     }
 }
 
-const reconcileBookings = async (tx: TripTransaction, tripId: string, list: BookingValues[]) => {
+const findAttachmentUploadKeys = async (tx: TripTransaction, condition: SQL | undefined) => {
+    const rows = await tx
+        .select({ key: tripUpload.key })
+        .from(tripBookingAttachment)
+        .innerJoin(tripUpload, eq(tripBookingAttachment.uploadId, tripUpload.id))
+        .where(condition)
+    return rows.map((row) => row.key)
+}
+
+const reconcileBookingAttachments = async (tx: TripTransaction, bookingId: string, list: ReconcilableAttachment[]) => {
+    const existing = await tx
+        .select({ id: tripBookingAttachment.id })
+        .from(tripBookingAttachment)
+        .where(eq(tripBookingAttachment.bookingId, bookingId))
+    const removable = removableIds(existing, list)
+    const removedKeys = removable.length > 0 ? await findAttachmentUploadKeys(tx, inArray(tripBookingAttachment.id, removable)) : []
+    if (removable.length > 0) await tx.delete(tripBookingAttachment).where(inArray(tripBookingAttachment.id, removable))
+    const existingIds = new Set(existing.map((row) => row.id))
+    for (const [index, item] of list.entries()) {
+        const values = { kind: item.kind, url: item.url, label: item.label, uploadId: item.uploadId ?? null, sortOrder: index }
+        const id = item.id
+        if (id !== undefined && existingIds.has(id)) {
+            await tx.update(tripBookingAttachment).set(values).where(eq(tripBookingAttachment.id, id))
+            continue
+        }
+        await tx.insert(tripBookingAttachment).values({ ...values, bookingId })
+    }
+    return removedKeys
+}
+
+const reconcileBookings = async (tx: TripTransaction, tripId: string, list: ReconcilableBooking[]) => {
     const existing = await tx.select({ id: tripBooking.id }).from(tripBooking).where(eq(tripBooking.tripId, tripId))
     const removable = removableIds(existing, list)
+    const removedKeys = removable.length > 0 ? await findAttachmentUploadKeys(tx, inArray(tripBookingAttachment.bookingId, removable)) : []
     if (removable.length > 0) await tx.delete(tripBooking).where(inArray(tripBooking.id, removable))
     const existingIds = new Set(existing.map((row) => row.id))
     for (const [index, item] of list.entries()) {
@@ -162,10 +211,14 @@ const reconcileBookings = async (tx: TripTransaction, tripId: string, list: Book
         const id = item.id
         if (id !== undefined && existingIds.has(id)) {
             await tx.update(tripBooking).set(values).where(eq(tripBooking.id, id))
+            removedKeys.push(...(await reconcileBookingAttachments(tx, id, item.attachments)))
             continue
         }
-        await tx.insert(tripBooking).values({ ...values, tripId })
+        const bookingId = crypto.randomUUID()
+        await tx.insert(tripBooking).values({ ...values, id: bookingId, tripId })
+        await reconcileBookingAttachments(tx, bookingId, item.attachments)
     }
+    return removedKeys
 }
 
 const reconcileInfoBlocks = async (tx: TripTransaction, sectionId: string, list: InfoBlockValues[]) => {
@@ -310,7 +363,10 @@ export const findTripDetail = async (tripId: string) => {
             lodgings: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
             sidebarLinks: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
             scheduleKinds: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
-            bookings: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] },
+            bookings: {
+                orderBy: (fields, { asc }) => [asc(fields.sortOrder)],
+                with: { attachments: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] } },
+            },
             infoSections: {
                 orderBy: (fields, { asc }) => [asc(fields.sortOrder)],
                 with: { blocks: { orderBy: (fields, { asc }) => [asc(fields.sortOrder)] } },
@@ -379,7 +435,7 @@ export const createTripFromTemplate = async (ownerId: string, template: TripTemp
 }
 
 export const replaceTripFromTemplate = async (tripId: string, template: TripTemplate) => {
-    await getDb().transaction(async (tx) => {
+    const removedKeys = await getDb().transaction(async (tx) => {
         await tx
             .update(trip)
             .set({ ...toTripValues(template), sidebarNote: template.sidebarNote })
@@ -391,9 +447,11 @@ export const replaceTripFromTemplate = async (tripId: string, template: TripTemp
         await tx.delete(tripDay).where(eq(tripDay.tripId, tripId))
         await tx.delete(tripScheduleKind).where(eq(tripScheduleKind.tripId, tripId))
         await insertTemplateDays(tx, tripId, template.days, await insertScheduleKinds(tx, tripId, template.scheduleKinds))
-        await reconcileBookings(tx, tripId, template.bookings)
+        const keys = await reconcileBookings(tx, tripId, template.bookings)
         await reconcileInfoSections(tx, tripId, template.infoSections)
+        return keys
     })
+    await removeUploadedObjects(removedKeys)
     return { id: tripId } satisfies CreatedTrip
 }
 
@@ -431,10 +489,12 @@ export const saveSidebar = async (tripId: string, input: SidebarValues) => {
 }
 
 export const saveBookings = async (tripId: string, list: BookingValues[]) => {
-    await getDb().transaction(async (tx) => {
-        await reconcileBookings(tx, tripId, list)
+    const removedKeys = await getDb().transaction(async (tx) => {
+        const keys = await reconcileBookings(tx, tripId, list)
         await touchTrip(tx, tripId)
+        return keys
     })
+    await removeUploadedObjects(removedKeys)
 }
 
 export const saveInfoSections = async (tripId: string, list: InfoSectionValues[]) => {
@@ -574,6 +634,7 @@ export const exportTripTemplate = async (tripId: string) => {
             linkUrl: item.linkUrl,
             actionNote: item.actionNote,
             planStatus: item.planStatus,
+            attachments: item.attachments.map((attachment) => ({ kind: attachment.kind, url: attachment.url, label: attachment.label })),
         })),
         infoSections: detail.infoSections.map((section) => ({
             title: section.title,

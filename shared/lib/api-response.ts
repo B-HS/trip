@@ -3,6 +3,7 @@ export const API_ERROR_CODE = {
     FORBIDDEN: 'FORBIDDEN',
     NOT_FOUND: 'NOT_FOUND',
     VALIDATION_ERROR: 'VALIDATION_ERROR',
+    UPLOAD_NOT_CONFIGURED: 'UPLOAD_NOT_CONFIGURED',
     INTERNAL_ERROR: 'INTERNAL_ERROR',
 } as const
 
@@ -13,6 +14,7 @@ export const API_ERROR_STATUS = {
     FORBIDDEN: 403,
     NOT_FOUND: 404,
     VALIDATION_ERROR: 400,
+    UPLOAD_NOT_CONFIGURED: 503,
     INTERNAL_ERROR: 500,
 } as const satisfies Record<ApiErrorCode, number>
 
@@ -21,6 +23,7 @@ export const API_ERROR_MESSAGE = {
     FORBIDDEN: '접근 권한이 없습니다.',
     NOT_FOUND: '찾을 수 없습니다.',
     VALIDATION_ERROR: '입력값이 올바르지 않습니다.',
+    UPLOAD_NOT_CONFIGURED: '이미지 저장소가 설정되지 않았습니다.',
     INTERNAL_ERROR: '처리 중 오류가 발생했습니다.',
 } as const satisfies Record<ApiErrorCode, string>
 
