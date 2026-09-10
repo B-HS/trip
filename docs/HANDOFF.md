@@ -1,6 +1,6 @@
 # HANDOFF — 2026-09-10 세션 3 종료 스냅샷
 
-> 대응 커밋: `0ce5c30`(세션 4 최신) + 세션 4 후반 UI 정정(미커밋, 커밋 예정). 세션 3 스냅샷을 세션 4(2026-09-10)가 부분 갱신했다 — 4-4c·4-4d 결과는 `docs/PROCESS.md` 와 `docs/history/2026-09-10-session-4.md` 가 정본. 이 문서는 새 세션의 단일 진입점이며 매 핸드오프마다 덮어쓴다.
+> 대응 커밋: `9f52a9c`(세션 4 최신) + 4-4e 지구본 확장(미커밋, 마이그레이션 0007 은 적용됨). 세션 3 스냅샷을 세션 4(2026-09-10)가 부분 갱신했다 — 4-4c·4-4d·4-4e 결과는 `docs/PROCESS.md` 와 `docs/history/2026-09-10-session-4.md` 가 정본. 이 문서는 새 세션의 단일 진입점이며 매 핸드오프마다 덮어쓴다.
 > 복기 신뢰도: 세션 3 전체 대화 기준. Workflow 4건(에이전트 21개)의 산출은 최종 보고서 + 메인 재검증(typecheck·lint·prettier·test 433·build·브라우저 실측 1차) 기준.
 
 ## 1. 프로젝트 한 줄 정의
@@ -11,8 +11,8 @@
 
 - 최종 목표: 여행 일정·예매·정보를 구조화해 관리·공유하고 커뮤니티·i18n·인증 확장·AI·SEO 까지(ADR-0033 §5 순서).
 - 단계(ADR-0033 §5): **4 로드맵 6 기본(완료, 세션 4 push) → 4-5 로드맵 6 확장 → 5 i18n(ko·ja·en) → 6 인증 확장(OAuth·이메일 인증·약관) → 7 AI(ADR-0029) → 8 SEO(ADR-0030)**. 로드맵 3 OSM 은 제거.
-- 현재 마일스톤: 4단계 4-4 를 세션 4 에서 마무리 — 4-4c(남은 실측·댓글 UI·push·prod 배포·prod 500 복구) → 4-4d 세션 4 후반 UI 정정(ADR-0034, 미커밋). 다음은 4-4e 지구본 확장(ADR-0035 예정), 그다음 4-5 로드맵 6 확장(ADR-0036 예정).
-- 직전 작업: 레일 게시판 tree·편집기 행 정렬·트립 카드 텍스트화·모바일 1열 구현 → 브라우저 실측(A~F) → 지적 4건 반영·재확인 → 문서 갱신. 코드 변경은 아직 미커밋이다.
+- 현재 마일스톤: 4단계 4-4 를 세션 4 에서 마무리 — 4-4c(남은 실측·댓글 UI·push·prod 배포·prod 500 복구) → 4-4d UI 정정(ADR-0034, `15561b8`·`687d131`·`9f52a9c`) → **4-4e 지구본 확장(ADR-0035, 미커밋)**. 다음은 4-5 로드맵 6 확장(ADR-0036 예정).
+- 직전 작업: 트립별 출발 공항(마이그레이션 0007 적용·편집기 콤보박스·템플릿 JSON·캐시 버전 '4')과 `/trips` 지구본 상호작용(드래그 회전·hover 툴팁·선 클릭 `?route=` 필터) 구현 → 브라우저 실측(A~F, 라이트·다크) → 히트 반경 지적을 ADR §5 대로 되돌려 수정 → 재확인 통과 → 문서 갱신. 코드 변경은 아직 미커밋이다.
 
 ## 3. 완료 / 진행 중 / 미착수
 
@@ -32,15 +32,17 @@
 - `7adc2fa` 댓글 액션 셀 행 분리(ADR-0011·0023 규칙), `f0521cd` 문서, `0ce5c30` prod 글 상세 500 복구(sanitize 창을 `dompurify` + `jsdom` 26.1 로 고정 — `docs/bug/2026-09-10-post-detail-500-on-vercel.md`). 여기까지 push·prod 배포 완료.
 - 4-4c-3 마무리: §6-1 답 "전부 유지, 나중에 일괄 삭제" · dev 포트 7777 → 남은 실측 완료 → 문서 정정.
 
-### 진행 중 — 4-4d 세션 4 후반 UI 정정 (미커밋)
+- 4-4d UI 정정(ADR-0034) 커밋 완료: `15561b8` 레일 게시판 tree(`features/app-shell/nav-sub-item.tsx` 신규 · `NavItemLink.children` · `isNavParentActive` · `NAV_ITEMS` 가 `DEFAULT_BOARDS` 참조), `687d131` 편집기 행 셀형 정렬 · 트립 카드 배지 → 텍스트 · 모바일 1열 · 실측 지적 4건 반영(`allowedDevOrigins`, 공개 헤더 셀 상시 렌더, 라이트 `--sidebar-border` 대비, 카드 `w-full`), `9f52a9c` 문서. **아직 push 하지 않았다.**
 
-- ADR-0034: 레일 게시판 tree(`features/app-shell/nav-sub-item.tsx` 신규 · `NavItemLink.children` · `isNavParentActive` · `NAV_ITEMS` 가 `DEFAULT_BOARDS` 참조) → `feat(app-shell)` 커밋 예정.
-- 편집기 행 셀형 정렬 · 트립 카드 배지 → 텍스트 · 모바일 1열 · 실측 지적 4건 반영(`allowedDevOrigins`, 공개 헤더 셀 상시 렌더, 라이트 `--sidebar-border` 대비, 카드 `w-full`) → `fix(ui)` 커밋 예정.
-- 검증 typecheck·lint·format·`bun test` 459 통과. 브라우저 실측·재확인 완료(QA 체크리스트 "세션 4 후반"). 워크트리 없음.
+### 진행 중 — 4-4e 지구본 확장 (ADR-0035, 미커밋)
+
+- 출발 공항: **마이그레이션 0007 적용됨**(`trip_trip.departure_airport_code varchar(3) NULL`, 추가 전용, 이력 8행) · `AIRPORT_CODES`·`asAirportCode` · 템플릿 JSON 선택 필드(오사카 `'ICN'`) · `TripSummary.departureAirportCode` · `PUBLIC_TRIP_CACHE_VERSION='4'` · 편집기 기본 정보 탭 `features/trip-editor/airport-combobox.tsx`(생성 폼 미노출).
+- 지구본: `shared/ui/three/globe-interaction.ts` 신규(`placeGlobeTooltip`·`resolveGlobeArcEmphasis`·`GLOBE_ARC_STYLE`), `globe-math.ts`(route `key`·`label`·`description`·`isHiddenBySphere`), `trip-globe.tsx`(`dragRotate`·`showTooltip`·`selectedKey`·`onRouteSelect`·DOM 툴팁), `trip-globe-scene.tsx`(OrbitControls·`CLICK_DRAG_THRESHOLD`·글로우 튜브 히트 테스트), `shared/hooks/use-pointer.ts`(`useFinePointer`), `shared/lib/search-param.ts`(`replaceSearchParam`, 뷰어와 공용), `widgets/trips/trip-summary.derive.ts`(`collectGlobeRoutes`·`findGlobeRoute`·`filterTripsByRoute`), `trip-list-widget.tsx`(`?route=` 필터·해제 셀).
+- 검증 typecheck·lint·`format:check`·`bun test` 506 통과. 브라우저 실측·재확인 완료(QA 체크리스트 "세션 4 지구본·출발 공항"). 워크트리 없음.
 
 ### 미착수(순서대로)
 
-1. 4-5 로드맵 6 확장(ADR-0033 §3): 마이그레이션 0007(`deleted_at`·신고·차단·원장 `revoked`), 채택 변경·취소(+원장 -10), 댓글 수정, 신고 + `/admin/reports` + 밴(`banUser`), 사용자 간 차단, 사용자명 변경(`/settings/profile`, better-auth `/update-user` 는 계속 닫음), 트립 첨부 인가를 "소유자 또는 공개 트립" 으로 축소(ADR-0032 구현 메모), 채택 댓글 삭제 시 원장 회수(KNOWN ISSUE 해소), 프로필 대문 높이 상한·그리드 빈 열 채움.
+1. 4-5 로드맵 6 확장(ADR-0033 §3): 마이그레이션 0008(`deleted_at`·신고·차단·원장 `revoked` — 0007 은 출발 공항이 썼다), 채택 변경·취소(+원장 -10), 댓글 수정, 신고 + `/admin/reports` + 밴(`banUser`), 사용자 간 차단, 사용자명 변경(`/settings/profile`, better-auth `/update-user` 는 계속 닫음), 트립 첨부 인가를 "소유자 또는 공개 트립" 으로 축소(ADR-0032 구현 메모), 채택 댓글 삭제 시 원장 회수(KNOWN ISSUE 해소), 프로필 대문 높이 상한·그리드 빈 열 채움.
 2. 5단계 i18n(ADR-0033 §4, 리서치 메모 §next-intl): next-intl 4.14, `as-needed`, `app/[locale]/` 재구성 + 기존 `proxy.ts` 와 미들웨어 합성, 전 문구 카탈로그화.
 3. 6단계 인증 확장(ADR-0033 §2, 리서치 메모): Naver(genericOAuth)·GitHub, 이메일 인증(Cloudflare Email Service 베타 + `cloudflare/mail-worker/`), 약관·동의(`docs/legal/`, korean-law-mcp). 키 없으면 비활성 + 안내.
 4. 7단계 AI(ADR-0029), 8단계 SEO(ADR-0030).
@@ -48,13 +50,14 @@
 
 ## 4. 의사결정 요약 (상세·기각 대안은 `docs/acknowledge/`)
 
-| ADR       | 결정                                                                                                                                                                        |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0001~0030 | 세션 1·2 결정(스택, 구조화 데이터, 자체 인증, 셀형 UI, 락파일 v1, 템플릿, R2 업로드, Tiptap, 커뮤니티 정책, Queues AI, SEO)                                                 |
-| 0031      | `Agent` 도구 금지, 위임은 Workflow 의 `agent()` 로만(구현 Opus max·리뷰 Opus high·리서치 Sonnet), 로드맵 7 은 화면 미연결로 push, `auto-push true`, 문서 헤더는 코드 커밋에 |
-| 0032      | 세션 프레임 라우팅, 마이그레이션 0006 스키마, 포인트(답변 +2 글당 1회·채택 +10)·카운터 잠금, 렌더 방식(목록 = 서버 컴포넌트), 프로필 이미지 undefined/null/id 의미          |
-| 0033      | OSM 제거(사업자 요건), 인증 확장 착수(Cloudflare 메일), 커뮤니티 범위 밖 기능 전부 수용(무한 스크롤만 미도입), i18n ko·ja·en next-intl, 단계 순서 4→4-5→5→6→7→8             |
-| 0034      | 세션 4 UI 정정: 레일 게시판 tree(+DESIGN §6-4·§10-11 개정), 편집기 행 셀형 정렬, 트립 카드 배지 → 텍스트(트립 카드만), 모바일 1열, 실측 지적 4건 반영                       |
+| ADR       | 결정                                                                                                                                                                                                                              |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0001~0030 | 세션 1·2 결정(스택, 구조화 데이터, 자체 인증, 셀형 UI, 락파일 v1, 템플릿, R2 업로드, Tiptap, 커뮤니티 정책, Queues AI, SEO)                                                                                                       |
+| 0031      | `Agent` 도구 금지, 위임은 Workflow 의 `agent()` 로만(구현 Opus max·리뷰 Opus high·리서치 Sonnet), 로드맵 7 은 화면 미연결로 push, `auto-push true`, 문서 헤더는 코드 커밋에                                                       |
+| 0032      | 세션 프레임 라우팅, 마이그레이션 0006 스키마, 포인트(답변 +2 글당 1회·채택 +10)·카운터 잠금, 렌더 방식(목록 = 서버 컴포넌트), 프로필 이미지 undefined/null/id 의미                                                                |
+| 0033      | OSM 제거(사업자 요건), 인증 확장 착수(Cloudflare 메일), 커뮤니티 범위 밖 기능 전부 수용(무한 스크롤만 미도입), i18n ko·ja·en next-intl, 단계 순서 4→4-5→5→6→7→8                                                                   |
+| 0034      | 세션 4 UI 정정: 레일 게시판 tree(+DESIGN §6-4·§10-11 개정), 편집기 행 셀형 정렬, 트립 카드 배지 → 텍스트(트립 카드만), 모바일 1열, 실측 지적 4건 반영                                                                             |
+| 0035      | 트립별 출발 공항(마이그레이션 0007, NULL = ICN fallback, 생성 폼 미노출)과 `/trips` 지구본 상호작용: 정밀 포인터 한정 드래그 회전, hover 툴팁, 선 클릭 `?route=` 필터. `shared/ui/three` 는 표시용 문자열만 받는 도메인 중립 유지 |
 
 Workflow C 메인 결정 10건(ADR-0032 구현 메모): `(shell)` 그룹 통합, 링크 탭 `aria-current`, `Route<T>` 제네릭·상대 href, `React.cache` 캐시 모듈, `findLatestPostsByBoard`, 작성자 조회수 제외, PostForm 저장 후 `reset`, 공개 표면 `bg-border` 심, Select 팝오버 유지, 글 수정은 작성자만.
 
@@ -67,8 +70,8 @@ Workflow C 메인 결정 10건(ADR-0032 구현 메모): `(shell)` 그룹 통합,
 - 코드: `~/.claude/convention` + `~/personal-llm` 전부(arrow only, 주석 금지, any/enum 금지, FC<Props>, useCallback/useMemo 금지, FSD 위→아래, barrel 금지, zod v4, RHF+zodResolver, 토큰 색만, 이모지 금지, 매직넘버 상수화, effect 안 setState 금지). 예외: RHF `register()` 파일 `'use no memo'`(18개, ADR-0018), `Route<T>` 제네릭 컴포넌트 5개(SectionHeading·SearchForm·PostForm·NavRail·NavSubItem — FC 대신 제네릭 화살표).
 - 디자인: 보더 대신 배경 계층·1px 심(표만 보더), 셀형 Button 전면(ADR-0023), 링크 탭 `aria-current`·토글 버튼 `aria-pressed`, 콘텐츠 사이드바 전체 높이, dvh 채움, 3D 는 정보 있는 곳만, 모션 항상, 인쇄 라이트 토큰. 초기 화면 스켈레톤 금지(서버 프리페치·서버 컴포넌트 완성 HTML). shadcn 우선. 카드 메타는 배지가 아니라 텍스트(트립 카드 한정), 편집기 정렬 행은 셀형(내용 셀 + 풀하이트 삭제 셀), 레일 게시판은 tree 하위 메뉴(ADR-0034).
 - Git: Conventional Commits(영어 소문자), author 사용자 단독, 트레일러 금지, `git add -A` 금지, force push 금지. 자동 커밋·자동 push ON(단계 완료마다 push + dev→prod ff 머지, `git merge dev` 로 — `--ff-only`·"fast-forward"·`-f` 문자열은 가드 훅이 force 로 오인). 워크트리 제거는 push 와 다른 명령으로.
-- DB: 로컬 = prod 공용 MySQL. 컬럼 삭제 마이그레이션은 적용 직후 push·배포. 추가 전용은 먼저 적용해도 됨(0006 이 그렇게 적용됨). `PublicTrip` 형태 변경 시 `PUBLIC_TRIP_CACHE_VERSION` 증가(현재 `'3'`).
-- 문서: 결정은 ADR(다음 번호 **0035**), 진행은 `docs/PROCESS.md`, 버그는 `docs/bug`, QA 는 `docs/quality-assurance`, 계획은 `docs/roadmap.md`. README.md 는 지시 전까지 손대지 않는다. personal-llm 은 갱신하지 않는다. `.env*` 는 읽기·쓰기 불가(값은 문서에 기록하지 않음, 필요 키는 사용자에게 `! <명령>` 로 안내).
+- DB: 로컬 = prod 공용 MySQL. 컬럼 삭제 마이그레이션은 적용 직후 push·배포. 추가 전용은 먼저 적용해도 됨(0006·0007 이 그렇게 적용됨). `PublicTrip` 형태 변경 시 `PUBLIC_TRIP_CACHE_VERSION` 증가(현재 `'4'`).
+- 문서: 결정은 ADR(다음 번호 **0036**), 진행은 `docs/PROCESS.md`, 버그는 `docs/bug`, QA 는 `docs/quality-assurance`, 계획은 `docs/roadmap.md`. README.md 는 지시 전까지 손대지 않는다. personal-llm 은 갱신하지 않는다. `.env*` 는 읽기·쓰기 불가(값은 문서에 기록하지 않음, 필요 키는 사용자에게 `! <명령>` 로 안내).
 - 브라우저 실측(Claude in Chrome): 탭 줌 54% 라 `zoom` 액션으로 확인. CDP `type`·`key` 는 **선택된 탭**으로 가고 툴바 버튼에 Enter 가 눌려 폼이 제출되므로, 입력은 페이지 내 스크립트(native setter + `input`, 합성 `keydown` Enter, `.click()`)로. 다이얼로그·에디터 준비를 폴링으로 기다린다(dev 컴파일 2초+). 라이트·다크 모두 확인(테마는 `window` `keydown 'd'` 합성 이벤트 또는 `localStorage.theme`). headless Chrome 촬영은 멈추므로 비로그인 표면은 `curl` HTML 로 대체했다.
 
 ## 6. 미해결 질문 / 사용자 확인 필요 항목
@@ -85,27 +88,26 @@ Workflow C 메인 결정 10건(ADR-0032 구현 메모): `(shell)` 그룹 통합,
 ## 7. 환경 & 전제
 
 - Node 22 / Bun 1.4.0 로컬(락파일 v1, `packageManager bun@1.3.14`, 의존성 추가는 `npx bun@1.3.14 install`). Vercel Pro(team `team_ZNm5hw73FNPctUWAuifjdn2b`, project `prj_a0su9UvuXawlx9OEASFDvbGcDeMe`), CLI 56.5.0(구버전), `.vercel` 미링크.
-- 실행: `bun run dev -p 7777`(**:7777**, 세션 4 결정 — :3000 은 gumba 가 쓴다. `.env` 의 `BETTER_AUTH_URL`·`NEXT_PUBLIC_APP_URL` 도 7777 로 맞춰야 한다) · `bun run build` · `bun run db:generate` · `bun run db:migrate` · `bun run admin:set <email>` · 검증 `bun run typecheck && bun run lint && bun run format:check && bun test`(459) `&& bun run build`.
-- DB: 공용 MySQL 9.6 스키마 `trip`, 마이그레이션 0000~0006 적용(이력 7행), 테이블 32. 계정: tester@example.com(사용자명 tester, `role user`, 오사카 예시 트립 공개 slug `osaka-qa`, 소개 문구 있음), hyunseok(사용자 본인), qa_session2_204103@example.com(throwaway, 비밀번호 미기록). 관리자 계정 없음.
+- 실행: `bun run dev -p 7777`(**:7777**, 세션 4 결정 — :3000 은 gumba 가 쓴다. `.env` 의 `BETTER_AUTH_URL`·`NEXT_PUBLIC_APP_URL` 도 7777 로 맞춰야 한다) · `bun run build` · `bun run db:generate` · `bun run db:migrate` · `bun run admin:set <email>` · 검증 `bun run typecheck && bun run lint && bun run format:check && bun test`(506) `&& bun run build`.
+- DB: 공용 MySQL 9.6 스키마 `trip`, 마이그레이션 0000~0007 적용(이력 8행), 테이블 32. 계정: tester@example.com(사용자명 tester, `role user`, 오사카 예시 트립 공개 slug `osaka-qa`, 소개 문구 있음), hyunseok(사용자 본인), qa_session2_204103@example.com(throwaway, 비밀번호 미기록). 관리자 계정 없음.
 - 브라우저: Chrome 의 localhost 는 tester 로 로그인된 상태(세션 쿠키, 포트 무관). 비로그인 표면은 `http://[::1]:7777` 로(쿠키 분리, 확장 권한 허용 — `next.config.ts` 의 `allowedDevOrigins` 가 있어야 `/_next/*` 가 403 이 아니다, ADR-0034). localhost 탭 줌 54%. 백그라운드 탭에서는 motion fade 가 늦게 끝나 캡처 전 인라인 opacity 를 1 로 덮는 스타일을 주입한다.
 - 참조 원본: `docs/DESIGN.md`, `docs/osaka-trip-interactive.html`. 리서치: `docs/memory/research-2026-09-09-r2-ai-tiptap.md`, `docs/memory/research-2026-09-10-mail-i18n-auth.md`.
 
 ## 8. 다음 세션 TODO (우선순위 순)
 
-1. 4-4d 미커밋 변경 커밋·push·prod 머지·배포 확인(`feat(app-shell)` 레일 tree + `fix(ui)` 편집기 행·카드·모바일·실측 반영).
-2. 4-4e 지구본 확장(ADR-0035 예정): 트립별 출발 공항 컬럼 + 마이그레이션 0007, `/trips` 지구본 드래그 회전, 선 hover 툴팁(출발→도착 코드·도시 + 트립 제목·기간), 선 클릭 시 해당 트립만 필터(URL 쿼리, `/trips` 목록). 사용자 답변: 출발지는 트립별(B) · 필터는 `/trips` 목록(A) · 툴팁 A · 배지 범위는 트립 카드만(A).
-3. 4-5 로드맵 6 확장(ADR-0036 예정, ADR-0033 §3 + ADR-0032 구현 메모의 대기 항목): 세부(신고 사유 목록, 차단 범위, `/admin/reports` 화면, 원장 `revoked`) 확정 → Workflow(데이터 → UI → 리뷰) → 마이그레이션 → 실측 → push.
-4. 5단계 i18n → 6단계 인증 확장 → 7 AI → 8 SEO.
-5. R2·암호화 키가 들어오면 업로드·AI 키 등록 실측.
+1. 4-4e 미커밋 변경 커밋 + 4-4d 커밋(`15561b8`·`687d131`·`9f52a9c`)과 함께 push·prod 머지·배포 확인. **마이그레이션 0007 은 이미 공용 DB 에 적용돼 있다**(추가 전용이라 배포 전 적용해도 안전).
+2. 4-5 로드맵 6 확장(ADR-0036 예정, ADR-0033 §3 + ADR-0032 구현 메모의 대기 항목): 세부(신고 사유 목록, 차단 범위, `/admin/reports` 화면, 원장 `revoked`) 확정 → Workflow(데이터 → UI → 리뷰) → 마이그레이션 **0008** → 실측 → push.
+3. 5단계 i18n → 6단계 인증 확장 → 7 AI → 8 SEO.
+4. R2·암호화 키가 들어오면 업로드·AI 키 등록 실측.
 
 ## 9. 문서 지도
 
 - `docs/HANDOFF.md` — 이 문서
 - `docs/ARCHITECTURE.md` — 구현 정본(스택·폴더·라우트·인증·데이터 계층·인가·계층/모션·3D·템플릿·검증·리치 텍스트·커뮤니티)
 - `docs/memory/data-model.md` — 테이블 32개 요약 · `docs/memory/research-2026-09-09-r2-ai-tiptap.md`(R2·AI SDK·Tiptap·Queues) · `docs/memory/research-2026-09-10-mail-i18n-auth.md`(Cloudflare 메일·next-intl·better-auth 인증 확장·korean-law-mcp)
-- `docs/acknowledge/README.md` + ADR-0001~0034
-- `docs/roadmap.md` — 항목별 명세 + 진행 상태 표(§3 OSM 제거, §11 i18n)
+- `docs/acknowledge/README.md` + ADR-0001~0035
+- `docs/roadmap.md` — 항목별 명세 + 진행 상태 표(§3 OSM 제거, §11 i18n, §12 출발 공항·지구본 상호작용)
 - `docs/PROCESS.md` — 단계 체크리스트·진행 메모(에이전트 운용·워크트리 이식 절차)
-- `docs/history/2026-09-09-initial-build.md` · `docs/history/2026-09-09-session-2.md` · `docs/history/2026-09-09-session-3.md`(세션 3 = 이번 세션)
+- `docs/history/2026-09-09-initial-build.md` · `docs/history/2026-09-09-session-2.md` · `docs/history/2026-09-09-session-3.md` · `docs/history/2026-09-10-session-4.md`(세션 4 = 4-4c·4-4d·4-4e)
 - `docs/bug/2026-09-09-editor-forms-and-print.md` · `docs/feedback/2026-09-09-viewer-visual-feedback.md` · `docs/quality-assurance/2026-09-09-viewer-editor-checklist.md` · `docs/quality-assurance/2026-09-10-community-editor-checklist.md`(중단 지점의 남은 실측 목록)
 - `docs/DESIGN.md`, `docs/osaka-trip-interactive.html` — 외부 원본(수정 금지)

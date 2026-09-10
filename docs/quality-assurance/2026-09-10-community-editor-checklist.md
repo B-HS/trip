@@ -85,6 +85,77 @@
 - 로그인 상태 공개 헤더("탐색·게시판+홈" 분기)는 일상 경로에서 관측되지 않는다 — `(shell)` 레이아웃이 서버 세션이 있으면 `AppFrame` 을 고르고, `(public)` 의 `/login` 은 로그인 상태에서 `/` 로 리다이렉트된다. 서버·클라이언트 세션 판정이 어긋나는 구간의 방어 분기이며 단위 테스트로 덮었다
 - 관리자 삭제 UI·모바일 Sheet 포커스 복귀는 기존 잔여와 동일
 
+## 확인 완료 — 세션 4 지구본·출발 공항 (2026-09-10, 4-4e 실측 · ADR-0035)
+
+> 대상: 편집기 출발 공항 콤보박스, `/trips` 헤더 지구본의 드래그 회전·hover 툴팁·선 클릭 필터. 라이트·다크 양쪽. 실측은 Workflow 에이전트가 수행했다(ADR-0031 운용 메모).
+
+### A. 편집기 출발 공항
+
+- [x] 필드 존재·초기값: `/trips/905b4695…/edit` 기본 정보 탭에 "출발 공항" 필드가 있고 저장값이 비어 있다(`input.value=''`, placeholder "공항 검색"), 힌트 "고르지 않으면 기본 ICN 으로 계산합니다." 노출(라이트·다크)
+- [x] 높이 정렬: 콤보박스 `getBoundingClientRect().height` 32px 로 같은 행의 제목·목적지 입력과 동일(32 / 32 / 32)
+- [x] 옵션: `[role=option]` 43개(`shared/constant/airports.ts` 의 `AIRPORTS` 43개와 일치). 첫 3개 ICN 인천(서울) / GMP 김포(서울) / PUS 김해(부산), 마지막 DXB·DOH
+- [x] 검색: 도시명("부산")·소문자 IATA("pus") 모두 1건으로 좁혀지고, 무매칭("zzzz")이면 "일치하는 공항이 없습니다."
+- [x] 선택·dirty: 선택 시 입력값이 `PUS · 김해(부산)` 로 채워지고 clear(X) 버튼이 나타나며 저장·되돌리기 버튼이 활성화된다
+- [x] 되돌리기: "되돌리기" 로 원복 후 `input.value=''`, 저장·되돌리기 재비활성. 실측 종료 후 재진입해도 오사카 트립의 출발 공항은 비어 있다(저장하지 않음)
+
+### B. 생성 폼과 경로 체인
+
+- [x] `/trips/new` 에는 출발 공항 필드가 없다(ADR-0035 §2 "생성 폼에는 노출하지 않는다")
+- [x] 임시 트립(JP 삿포로)에서 출발 공항 PUS 저장 → toast "기본 정보를 저장했습니다.", 저장 버튼 재비활성
+- [x] 항공편이 없는 트립에 `PUS → JP` 호가 추가되고 지구본 sr-only 문구가 "…부산에서 JP 삿포로까지."로 갱신. panel variant 는 `showLabels:false` 라 라벨 `ul` 을 그리지 않아 sr-only·툴팁으로 확인했다
+
+### C. 드래그 회전
+
+- [x] 포인터가 컨테이너에 들어가면 자동 회전이 멈추고(연속 캡처 2장 동일), 가로 200px 드래그로 크게 회전(아시아→아프리카→남아메리카). 컨테이너 className 에 `cursor-grab active:cursor-grabbing`
+- [x] 드래그를 놓아도 필터가 걸리지 않는다: URL `/trips`(`?route=` 없음), 해제 셀 미노출, 목록 2건 유지(`CLICK_DRAG_THRESHOLD`)
+
+### D. hover 툴팁
+
+- [x] 호 위에서 DOM 오버레이 툴팁 2줄: `KIX → ICN · 오사카 → 서울` + `오사카 여행 노트 · 2026.10.01 – 10.07 (목–수)`(임시 트립 호는 `PUS → JP · 부산 → 삿포로`)
+- [x] 컨테이너 밖으로 넘치지 않음: 컨테이너 rect(x268 y110 w2139 h224) 대비 툴팁 rect(x1417 y236 w224 h59)가 x·y 모두 내부(`placeGlobeTooltip` 클램프). 호 hover 중 컨테이너 `cursor: pointer`
+- [x] 호에서 벗어나면 툴팁이 DOM 에서 제거된다
+
+### E. 선 클릭 필터
+
+- [x] 호 클릭 → URL `/trips?route=ICN-KIX`, 헤더에 `ICN → KIX 필터 해제` 셀(X 아이콘), 목록이 해당 경로 트립 1건만(motion exit 완료 후 `li` 1개)
+- [x] 같은 호 재클릭·해제 셀 클릭 모두로 해제되고 URL 이 `/trips` 로 정리된다
+- [x] 새로고침 유지: `/trips?route=ICN-KIX` 재진입 시 필터·해제 셀 유지(서버 `searchParams` → `initialRoute`)
+- [x] 없는 경로: `/trips?route=ZZ-YY` 진입 시 필터가 걸리지 않고 목록 전체가 보이며 URL 이 `/trips` 로 정리(`hasStaleRoute`)
+- [x] 통계 타일은 필터와 무관하게 전체 기준(트립 2 / 일정 65 / 예매 9), 사이드바 즐겨찾기 레일도 영향 없음
+- [x] 선택 강조: 필터 적용 시 선택된 호만 굵고 밝은 글로우, 나머지는 흐린 회색. 해제 상태에서는 모든 호가 같은 idle 굵기(라이트·다크)
+
+### F. 회귀·비상호작용 지구본
+
+- [x] `/`(로그인 커뮤니티 홈)·`/s/osaka-qa`·`/trips/905b4695…`(뷰어) 정상 렌더, 세션 중 콘솔 error·exception 0건
+- [x] 인트로 히어로(`[::1]:7777`): 컨테이너 className 이 `relative w-full h-80 sm:h-96 lg:h-[28rem]` 로 `cursor-grab`·`cursor-pointer` 없음(= `dragRotate`·`onRouteSelect` 미적용, OrbitControls 미렌더). 드래그 후에도 URL·클래스 변화 없고 툴팁도 뜨지 않는다. 라벨 `ul`("서울 ICN → 오사카 KIX" 등)과 "예시로 표시한 경로입니다." 문구 정상
+- [x] 404 페이지 지구본(panel, `showTooltip`·`onRouteSelect` 없음): 호를 호버해도 툴팁·강조가 없고 컨테이너 cursor 가 `auto`(핸들러 미등록)
+
+### 히트 반경 수정 후 재확인 (should 지적 반영)
+
+- [x] 코드: 별도 히트 튜브 mesh·`ARC_HIT_SCALE`·`ARC_HIT_RADIAL_SEGMENTS`·`hitRadius` prop 이 모두 제거되고, 포인터 핸들러가 `hitTestHandlers` 스프레드로 글로우 튜브 mesh(`tubeRadius * ARC_GLOW_SCALE`)에 직접 붙는다. 호당 mesh 는 글로우 + 코어 2개(+트래블러)
+- [x] 반경 축소 실측: 지구본을 world 반경 ≈196 스크린샷 px 로 키운 상태에서 세로 스윕 결과 idle 히트 밴드가 약 12px(글로우 3.4배 예상 지름 ≈10px 과 일치, 이전 8배 히트의 ≈23px 과 명백히 다름). 어두운 마커 클러스터 내부는 전부 미검출
+- [x] 이웃 호 오검출 해소: 확대 상태 가로 스윕에서 `KIX → ICN` 과 `PUS → JP` 가 x 8px 간격으로 분리되고, 기본 패널 크기(반경 ≈75px)에서도 7px 떨어진 두 점이 각각 다른 호를 반환한다
+- [x] 클릭·드래그: 호 클릭은 `?route=ICN-KIX` 토글, 호 위에서 시작한 드래그는 선택을 만들지 않는다
+- [x] 다크: 호 렌더·호버·툴팁(밝은 배경 + 어두운 글자) 정상. 콘솔은 R3F 내부의 기존 경고 `THREE.Clock: This module has been deprecated` 1건뿐
+
+### 미확인 / 도구 제약 (세션 4 지구본)
+
+- 자동화 탭의 `document.visibilityState` 가 `hidden` 이라 `requestAnimationFrame` 이 돌지 않는다(3초 0프레임). WebGL 렌더와 motion 이 캡처가 강제하는 프레임에서만 큰 delta 로 진행해 (a) 자동 회전이 캡처마다 10~20도 점프, (b) 필터 직후 `AnimatePresence` exit 중인 카드가 한 프레임 남아 두 건으로 보임, (c) 통계 타일 count-up 이 0 에서 멈춘 채 찍힘. (b)(c) 는 앱 결함이 아니라 이 환경의 아티팩트
+- 호 hover 는 캡처 직후 얼어붙은 방향 기준으로만 좌표가 맞았다(CDP hover 39회 중 초반 20회 실패). 포인터를 컨테이너에 넣으면 회전이 멎어 그 상태에서 프로브했고, 재확인 때는 `requestAnimationFrame` 을 페이지에서 임시로 무력화해 자전을 세웠다(코드 변경 아님, 새로고침으로 소멸)
+- JS 합성 `PointerEvent` 격자 스캔은 프로브 1회당 ≈0.9초로 45초 CDP 타임아웃이 반복돼 폐기했다. R3F raycast 가 합성 이벤트를 타는지는 확인하지 못했다
+- `zoom` 은 스크린샷을 약 1.85배 업스케일할 뿐 해상도를 주지 않아, 확대 판정 시 지구본 컨테이너 `height`(224 → 760~900px)·`max-width` 만 인라인 style 로 임시 확대한 뒤 새로고침으로 원복했다(코드 무변경). "보이는 선의 가장자리"와 "히트 경계"를 서브픽셀로 겹쳐 비교하지는 못했다(WebGL 캔버스 픽셀 되읽기 불가)
+- 세션 중 브라우저 창 폭이 한 번 바뀌어(1920 → 2419) CSS 좌표가 달라졌다. 단계마다 `getBoundingClientRect` 로 배율을 다시 계산해 보정했다. `resize_window` 는 지시대로 쓰지 않았다
+- 인트로 히어로의 "자동 회전만" 은 캡처 사이 위치 변화 + 클래스 부재로 판정했고, 자동 회전과 드래그 회전을 화면만으로 분리 판정하지는 못했다
+- 빈 상태 지구본(`interactive={false}`)과 로그아웃 상태 인트로 히어로는 확인하지 못했다(트립이 남아 있어 빈 상태가 뜨지 않고, 로그아웃은 세션 유지 지시상 미시도)
+- 네 번째 호 `ICN → JP`(lift 가 가장 낮음)는 샘플링으로 잡지 못했다. 리프트가 큰 호에 가려 최근접 히트가 다른 호로 잡히는 것으로 보이며 얇은 튜브에서는 정상 동작이지만, "호버 가능" 을 직접 확인하지는 못했다
+- 테마 측정을 위해 localhost 의 `localStorage.theme` 을 light/dark 로 바꿔가며 확인했고 종료 시 `light` 로 두었다(원래 값은 알 수 없다)
+
+### 임시 데이터 (정리 완료, 남김 없음)
+
+- 트립 "세션 4 지구본 실측"(`57684d15`) — 카드 더보기 → 삭제 → AlertDialog → toast "여행을 삭제했습니다." 로 제거. 재접속 후 `/trips` 트립 수 1, sr-only 도 ICN↔KIX 2개로 복귀
+- 히트 반경 재확인용 임시 트립 2건(`zz-temp-a` PUS→JP 삿포로, `zz-temp-b` 기본 출발→JP 도쿄)도 UI 삭제 다이얼로그로 제거. 최종 상태는 "오사카 여행 노트" 1건
+- 오사카 트립의 출발 공항은 A 항목에서 PUS 로 바꿨다가 "되돌리기" 로 원복했고 저장하지 않았다(재확인 시 non-dirty)
+
 ## 발견·수정
 
 - 세션 3: ProseMirror `attrs`(null 프로토타입)가 서버 액션에서 `$T` 로 직렬화돼 본문 저장 실패 → `toPlainDocument` 정규화(ADR-0027 실측 메모).
@@ -96,6 +167,10 @@
     - [should] 라이트 모드 트리선이 사이드바 배경과 대비 1.05:1 로 사실상 안 보였다 → 라이트 `--sidebar-border` 를 `--palette-neutral-708` 로(2.016:1). `border-border` 안은 라이트 `--border`(0.922)가 배경(0.915)보다 밝아 더 나빠져 기각.
     - [should] 공개 트립 카드가 컬럼 폭을 못 채우고 오른쪽에 `bg-background` 띠가 남았다(`li` 가 flex, `article` 이 `max-content` 285.8px) → `article` 에 `w-full`. 테스트 1건 추가.
     - [nit] `app-shell.tsx` 의 `constant/community` import 가 alias 그룹 안에서 경로 순서에 어긋난다(자동 정렬 플러그인 없음) — 반영 대상에 없어 남아 있다.
+- 세션 4 지구본·출발 공항(실측 지적 2건, ADR-0035 구현 메모):
+    - [should] 호 히트 반경이 ADR-0035 §5 결정과 달랐다 — 구현이 글로우 튜브 대신 `colorWrite=false` 히트 튜브(`ARC_HIT_SCALE` 8배, panel idle 0.056 world)를 따로 겹쳐, 그려진 어떤 선보다 약 2.35배 넓었고 출도착이 몰린 구간에서 `ICN↔KIX` 호에서 2~4px 떨어진 좌표가 계속 `PUS → JP` 툴팁을 반환했다 → 별도 히트 mesh·`ARC_HIT_SCALE`·`ARC_HIT_RADIAL_SEGMENTS`·`hitRadius` prop 을 제거하고 글로우 mesh 에 포인터 핸들러를 직접 붙였다(제안 a). 호당 draw call 3 → 2. 재확인은 위 "히트 반경 수정 후 재확인" 절.
+    - [nit] 드롭다운 목록 행 표기가 ADR-0035 §2 예시(`코드 · 이름(도시)`)와 1:1 이 아니다 — 선택된 입력값은 `PUS · 김해(부산)` 로 정확하지만, 목록 행은 코드(mono 열)와 `이름(도시)` 두 span 이라 가운데 `·` 가 없다. 코드 열 정렬이 목록에서 더 읽기 쉬워 UI 를 두고 **ADR §2 를 정정**하는 쪽으로 처리했다(ADR-0035 구현 메모 "§5·§6 결정에서 달라진 것").
+    - `trip-globe-scene.tsx` 를 렌더하는 테스트는 없다(`tests/shared` 는 `globe-interaction`·`globe-math`·`globe-geography` 순수 모듈만 덮는다). R3F 씬 테스트는 `@react-three/test-renderer` 의존성이 필요해 이번 범위 밖으로 뒀다.
 
 ## 관찰 (수정 안 함)
 
