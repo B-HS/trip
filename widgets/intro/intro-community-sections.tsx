@@ -28,13 +28,13 @@ export const IntroCommunitySections = async () => {
 
     return (
         <div className='flex w-full flex-col'>
-            <section className='mx-auto w-full max-w-5xl px-6 py-16'>
+            <section className='mx-auto w-full max-w-7xl px-6 py-16'>
                 <div className={PUBLIC_PANEL_CLASS}>
                     <IntroSectionHeading {...TRIP_SECTION} className={PUBLIC_STRIP_CLASS} />
                     <PublicTripGrid trips={trips} emptyLabel={EMPTY_TRIP_LABEL} className={PUBLIC_SEAM_CLASS} />
                 </div>
             </section>
-            <section className='mx-auto w-full max-w-5xl px-6 pb-20'>
+            <section className='mx-auto w-full max-w-7xl px-6 pb-20'>
                 <div className={PUBLIC_PANEL_CLASS}>
                     <IntroSectionHeading {...POST_SECTION} className={PUBLIC_STRIP_CLASS} />
                     <BoardCells className={PUBLIC_SEAM_CLASS} />

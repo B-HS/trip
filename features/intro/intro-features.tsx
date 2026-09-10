@@ -7,7 +7,7 @@ import { Reveal } from '@/shared/ui/motion/reveal'
 import { IntroSectionHeading } from '@/features/intro/intro-section-heading'
 
 export const IntroFeatures: FC = () => (
-    <section className='mx-auto w-full max-w-5xl px-6 py-16'>
+    <section className='mx-auto w-full max-w-7xl px-6 py-16'>
         <IntroSectionHeading {...INTRO_FEATURES_SECTION} />
         <ul className='mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
             {INTRO_FEATURES.map((feature, index) => (

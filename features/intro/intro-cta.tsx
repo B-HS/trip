@@ -7,7 +7,7 @@ import { Button } from '@/shared/ui/button'
 import { Reveal } from '@/shared/ui/motion/reveal'
 
 export const IntroCta: FC = () => (
-    <section className='mx-auto w-full max-w-3xl px-6 pt-4 pb-20'>
+    <section className='mx-auto w-full max-w-7xl px-6 pt-4 pb-20'>
         <Reveal className='flex flex-col items-start gap-4 rounded-md border border-border bg-card p-6 shadow-sm sm:p-8'>
             <h2 className='text-xl font-semibold tracking-tight text-balance'>{INTRO_CTA.title}</h2>
             <p className='text-sm leading-7 text-muted-foreground'>{INTRO_CTA.description}</p>

@@ -9,7 +9,7 @@ const FIRST_STEP_NUMBER = 1
 const STEP_NUMBER_PAD = 2
 
 export const IntroHowItWorks: FC = () => (
-    <section className='mx-auto w-full max-w-3xl px-6 py-16'>
+    <section className='mx-auto w-full max-w-7xl px-6 py-16'>
         <IntroSectionHeading {...INTRO_STEPS_SECTION} />
         <StaggerList as='ol' className='mt-10 flex flex-col gap-px overflow-hidden rounded-md border border-border bg-border shadow-sm'>
             {INTRO_STEPS.map((step, index) => (

@@ -5,6 +5,12 @@ export const metadata: Metadata = {
     title: '게시판',
 }
 
-const BoardsPage = () => <BoardsIndex />
+const BoardsPage = () => {
+    return <div className='max-w-7xl mx-auto'>
+        <BoardsIndex />
+    </div>
+
+}
+
 
 export default BoardsPage

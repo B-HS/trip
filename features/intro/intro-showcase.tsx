@@ -53,7 +53,7 @@ export const IntroShowcase: FC = () => {
     const completedPercent = (completedCount / totalCount) * PERCENT_SCALE
 
     return (
-        <section className='mx-auto w-full max-w-3xl px-6 py-16'>
+        <section className='mx-auto w-full max-w-7xl px-6 py-16'>
             <IntroSectionHeading eyebrow={INTRO_SHOWCASE.eyebrow} title={INTRO_SHOWCASE.title} description={INTRO_SHOWCASE.description} />
             <Reveal className='mt-10 flex flex-col gap-px overflow-hidden rounded-md border border-border bg-border shadow-sm'>
                 <div className='flex flex-col gap-3 bg-card p-5'>

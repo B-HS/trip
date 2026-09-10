@@ -24,13 +24,13 @@ export const IntroHero: FC = () => {
     const globeOffsetY = useTransform(scrollYProgress, SCROLL_RANGE, [NO_PARALLAX, prefersReducedMotion ? NO_PARALLAX : GLOBE_PARALLAX_DISTANCE])
 
     return (
-        <section ref={sectionRef} className='mx-auto w-full max-w-5xl px-6 pt-12 pb-16 sm:pt-16 sm:pb-20'>
+        <section ref={sectionRef} className='mx-auto w-full max-w-7xl px-6 pt-12 pb-16 sm:pt-16 sm:pb-20'>
             <div className='grid items-center gap-10 lg:grid-cols-2 lg:gap-12'>
                 <div className='flex flex-col gap-5'>
                     <FadeIn as='span' className='text-2xs font-medium tracking-wide text-muted-foreground'>
                         {INTRO_HERO.eyebrow}
                     </FadeIn>
-                    <TextReveal as='h1' text={INTRO_HERO.title} className='text-3xl font-extrabold tracking-tight text-balance' />
+                    <TextReveal as='h1' text={INTRO_HERO.title} className='text-7xl font-extrabold tracking-tight text-balance' />
                     <FadeIn as='p' delay={DESCRIPTION_DELAY} className='max-w-prose text-sm leading-7 text-muted-foreground'>
                         {INTRO_HERO.description}
                     </FadeIn>

@@ -10,6 +10,7 @@ import { renderRichTextHtml } from '@/shared/lib/rich-text-html'
 import { getServerSession } from '@/shared/lib/session'
 import { CommentsWidget } from '@/widgets/community/comments-widget'
 import { PostDetailWidget } from '@/widgets/community/post-detail-widget'
+import { cn } from 'cn'
 
 type PostPageProps = {
     params: Promise<{ key: string; postId: string }>
@@ -39,7 +40,7 @@ const PostPage = async ({ params }: PostPageProps) => {
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
-            <div className='flex flex-1 flex-col gap-px'>
+            <div className={cn('flex flex-1 flex-col gap-px', !session?.user.id && 'max-w-7xl mx-auto')}>
                 <PostDetailWidget post={postView} html={html} viewer={viewer} />
                 <CommentsWidget
                     postId={post.id}
