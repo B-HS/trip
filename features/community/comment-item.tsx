@@ -21,32 +21,38 @@ export type CommentItemProps = {
     onReply?: () => void
 }
 
-export const CommentItem: FC<CommentItemProps> = ({ comment, onDelete, onAccept, onReply }) => (
-    <article className='flex flex-col gap-1 bg-card p-3'>
-        <div className='flex flex-wrap items-center gap-1.5 font-mono text-2xs text-muted-foreground'>
-            <AuthorChip author={comment.author} createdAt={comment.createdAt} />
-            {comment.isAccepted && <Badge variant='secondary'>{ACCEPTED_LABEL}</Badge>}
-        </div>
-        <p className='text-sm break-keep whitespace-pre-wrap'>{comment.body}</p>
-        {(onReply !== undefined || comment.canAccept || comment.canManage) && (
-            <div className='mt-1 flex flex-wrap items-stretch gap-px bg-background'>
-                {onReply !== undefined && (
-                    <Button type='button' variant='cell' size='cell' onClick={onReply}>
-                        {REPLY_LABEL}
-                    </Button>
-                )}
-                {comment.canAccept && (
-                    <Button type='button' variant='cellPrimary' size='cell' onClick={onAccept}>
-                        {ACCEPT_LABEL}
-                    </Button>
-                )}
-                {comment.canManage && (
-                    <Button type='button' variant='cellDestructive' size='cell' onClick={onDelete}>
-                        {DELETE_LABEL}
-                    </Button>
-                )}
-                <div aria-hidden className='min-w-0 flex-1 bg-card' />
+export const CommentItem: FC<CommentItemProps> = ({ comment, onDelete, onAccept, onReply }) => {
+    const hasActions = onReply !== undefined || comment.canAccept || comment.canManage
+
+    return (
+        <article className='flex flex-col gap-px'>
+            <div className='flex flex-col gap-1 bg-card p-3'>
+                <div className='flex flex-wrap items-center gap-1.5 font-mono text-2xs text-muted-foreground'>
+                    <AuthorChip author={comment.author} createdAt={comment.createdAt} />
+                    {comment.isAccepted && <Badge variant='secondary'>{ACCEPTED_LABEL}</Badge>}
+                </div>
+                <p className='text-sm break-keep whitespace-pre-wrap'>{comment.body}</p>
             </div>
-        )}
-    </article>
-)
+            {hasActions && (
+                <div className='flex flex-wrap items-stretch gap-px bg-background'>
+                    {onReply !== undefined && (
+                        <Button type='button' variant='cell' size='cell' onClick={onReply}>
+                            {REPLY_LABEL}
+                        </Button>
+                    )}
+                    {comment.canAccept && (
+                        <Button type='button' variant='cellPrimary' size='cell' onClick={onAccept}>
+                            {ACCEPT_LABEL}
+                        </Button>
+                    )}
+                    {comment.canManage && (
+                        <Button type='button' variant='cellDestructive' size='cell' onClick={onDelete}>
+                            {DELETE_LABEL}
+                        </Button>
+                    )}
+                    <div aria-hidden className='min-w-0 flex-1 bg-card' />
+                </div>
+            )}
+        </article>
+    )
+}
