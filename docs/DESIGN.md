@@ -3,6 +3,8 @@
 > Framework-agnostic design system specification for the **flunti-otel** observability platform.
 > A recreator with only this document and their target framework's docs can rebuild both UI surfaces at ~100% visual fidelity.
 
+> 개정 (2026-09-10, trip 프로젝트): §6-4 case 4 와 §10-11 Do 의 "no nesting" 을 레일 하위 메뉴 tree 를 허용하도록 고쳤다 — trip 의 레일 "게시판" 이 고정 3종 하위 항목을 갖게 되어 리뷰가 must 로 요구했다(ADR-0034). 그 두 문구와 §6-4 의 `border-sidebar-border` 사용 집계 외에는 원본 그대로다.
+
 ---
 
 ## 1. Meta & Scope
@@ -654,7 +656,7 @@ Where a border does survive, it is one of four cases:
 1. **Table rules** — `border-b` on rows (stock shadcn table).
 2. **Form controls** — `border-input` on inputs and selects; controls must read as recessed.
 3. **Focus and validation** — `border-ring` on focus-visible, `border-destructive` on `aria-invalid`.
-4. **Tree indentation** — `border-l pl-3` on nested attribute-tree levels.
+4. **Tree indentation** — `border-l pl-3` on nested tree levels (attribute tree; navigation-rail sub-menus, §10-11).
 
 Explicitly zeroed:
 
@@ -666,7 +668,7 @@ Explicitly zeroed:
 
 > **The variant-specificity trap.** shadcn applies the sidebar border as `group-data-[side=left]:border-r`. A plain `border-r-0` does **not** override it, because `tailwind-merge` does not merge across variant boundaries — the variant-qualified class simply wins. The border must be cancelled with the *same* variant: `group-data-[side=left]:border-r-0`. This regressed once in the project's history and was invisible to color and coordinate checks alike.
 
-**Border colors in use**: `border-border` (2), `border-border/50` (1), `border-destructive` (7), `border-input` (8), `border-primary` (2), `border-ring` (12), `border-sidebar-border` (2), `border-transparent` (10), `border-neutral-600` (1, Surface B code block). Widths: default 1px, plus one `border-[1.5px]`; `border-dashed` twice (empty states, external service-map nodes).
+**Border colors in use**: `border-border` (2), `border-border/50` (1), `border-destructive` (7), `border-input` (8), `border-primary` (2), `border-ring` (12), `border-sidebar-border` (3), `border-transparent` (10), `border-neutral-600` (1, Surface B code block). Widths: default 1px, plus one `border-[1.5px]`; `border-dashed` twice (empty states, external service-map nodes).
 
 ### 6-5. Shadow policy
 
@@ -1755,7 +1757,7 @@ SERVICE                                      ← group label, text-2xs, uppercas
 
 **Do**
 - Zero the right border with the *same variant selector* the framework used to add it (§6-4).
-- Keep the item list flat — 18 items, one group, no labels, no nesting.
+- Keep the item list flat by default — one group, no labels. An item that owns a fixed set of sub-destinations (boards, for example) may nest one level as a tree: a `ul`/`li` sub-list indented with `border-l` (§6-4 case 4). Exactly one item — parent or child — carries `aria-current="page"` and the active marker.
 
 **Don't**
 - Change item height without also restoring the collapsed-width constraint. Overriding `height` alone can drop the width rule through class-merge conflict, and labels then spill out of the 48px rail.

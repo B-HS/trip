@@ -38,3 +38,4 @@
 - [ADR-0031 — 에이전트 운용은 Workflow 로만, 모델 배분과 4단계 검증·push 시점 (2026-09-09)](0031-workflow-agent-policy-and-phase-4-gates.md)
 - [ADR-0032 — 커뮤니티·프로필 구현 세부: 세션 프레임 라우팅, 스키마, 포인트·채택 규칙 (2026-09-10)](0032-community-implementation-details.md)
 - [ADR-0033 — 로드맵 확장: OSM 제거, 인증 확장 착수, 커뮤니티 범위 밖 기능 수용, i18n(ko·ja·en) (2026-09-10)](0033-roadmap-expansion-i18n-auth-community.md)
+- [ADR-0034 — 세션 4 UI 정정: 레일 게시판 tree, 편집기 행 정렬, 카드 배지 제거, 모바일 1열 (2026-09-10)](0034-session-4-ui-corrections.md)

@@ -1,6 +1,6 @@
 # PROCESS — trip
 
-> 최종 갱신: 2026-09-10 · 대응 커밋: `7adc2fa`(세션 4, 댓글 셀 행 분리) — 4-4c-3 종료 시 origin/dev·prod 에 push
+> 최종 갱신: 2026-09-10 · 대응 커밋: `0ce5c30`(세션 4, sanitize 창을 jsdom 26 으로 고정) + 세션 4 후반 UI 정정(미커밋 변경, 커밋 예정)
 > 기준 문서: `~/.claude/convention/*.md`, `~/personal-llm/*.md`, `docs/HANDOFF.md`(세션 진입점), `docs/ARCHITECTURE.md`, `docs/acknowledge/README.md`, `docs/DESIGN.md`
 
 ## 완료 — 초기 구축 (2026-09-09, Phase 1~3)
@@ -46,8 +46,11 @@
         - [x] 4-4b. Workflow B(`wf_4da023f7-876`, 3 에이전트 순차·52분, 워크트리 미사용) → `8640392`: UI-A(프레임·홈·인트로 섹션·탐색·`/s/[slug]` 이동·좋아요·셸·proxy, 메인 트리) ∥ UI-B(게시판·글·댓글·채택·에디터 연결·프로필, 워크트리) → 메인 patch 이식
         - [x] 4-4c-1. Workflow C(`wf_8d07ef83-242`, 리뷰 4렌즈 17건 + 메인 결정 10건: route group `(shell)` 통합·`aria-current`·`Route<T>` 제네릭·`React.cache`·`findLatestPostsByBoard`·작성자 조회수 제외 등) → 검증 통과 → 문서·커밋(`e0aa431` ADR-0033, `8640392` UI)
         - [x] 4-4c-2. 브라우저 실측 1차(`docs/quality-assurance/2026-09-10-community-editor-checklist.md`): 에디터·글 CRUD·댓글·좋아요·탐색·프로필·설정 확인, 버그 2건 수정(ProseMirror attrs `$T` 직렬화 → `toPlainDocument`, 다이얼로그 submit 버블링)
-        - [x] 4-4c-3. 세션 4(2026-09-10) 마무리: 남은 실측(라이트 모드 상세·게시판·프로필, 질문 게시판 채택 +2/+10 원장, 댓글·글 삭제, 비로그인 인트로 하단·글 상세 라이트·다크) → 사용자 지적 댓글 UI 정리(`7adc2fa`) → 문서 정정 → push·prod 머지·배포 확인. QA 데이터는 전부 유지(사용자 결정, 나중에 일괄 삭제). 미실측: 공개 헤더 액션 셀(`NEXT_PUBLIC_APP_URL` 이 :3000 이라 `useSession` 이 다른 서버로 감), 관리자 삭제 UI(관리자 계정 없음, 역할 로직은 단위 테스트)
-    - [ ] 4-5. 로드맵 6 확장(ADR-0033 §3): 마이그레이션 0007(soft delete·신고·차단·원장 revoked), 채택 변경·취소(+포인트 회수), 댓글 수정, 신고·`/admin/reports`·밴, 사용자 간 차단, 사용자명 변경
+        - [x] 4-4c-3. 세션 4(2026-09-10) 마무리: 남은 실측(라이트 모드 상세·게시판·프로필, 질문 게시판 채택 +2/+10 원장, 댓글·글 삭제, 비로그인 인트로 하단·글 상세 라이트·다크) → 사용자 지적 댓글 UI 정리(`7adc2fa`) → 문서 정정 → push·prod 머지·배포 확인. QA 데이터는 전부 유지(사용자 결정, 나중에 일괄 삭제). 미실측: 공개 헤더 액션 셀(→ 4-4d 에서 확인), 관리자 삭제 UI(관리자 계정 없음, 역할 로직은 단위 테스트)
+        - [x] 4-4c-4. prod 글 상세 500(jsdom `require(esm)`) → `isomorphic-dompurify` 대신 `dompurify` + `jsdom` 26.1 정확 고정(`0ce5c30`). happy-dom 창은 under-sanitize 로 기각. 원인·대안 비교는 `docs/bug/2026-09-10-post-detail-500-on-vercel.md`
+        - [x] 4-4d. 세션 4 후반 UI 정정(ADR-0034, 미커밋 — `feat(app-shell)` + `fix(ui)` 커밋 예정): 레일 게시판 tree(`nav-sub-item`·`NavItemLink.children`·`isNavParentActive`, 활성 마커 1개 테스트 고정) · 편집기 행 셀형 정렬(`sortable-row` 셀 구조·`EDITOR_LABEL_LINE_CLASS`·날짜 탭 3열·여행 정보 섹션 헤더 셀 행·`DAY_TABLE_HINT`) · 트립 카드 배지 → 텍스트(`TRIP_STATUS_TEXT_CLASS`) · 모바일 1열(`grid-cols-1`·`min-w-0`·`break-keep`) · DESIGN §6-4·§10-11 개정. 브라우저 실측(A~F, 라이트·다크) 후 지적 4건 반영(`allowedDevOrigins`, 공개 헤더 셀 상시 렌더, 라이트 `--sidebar-border` 대비, 카드 `w-full`) → 재확인 통과. 검증 typecheck·lint·format·`bun test` 459
+        - [ ] 4-4e. 지구본 확장(ADR-0035 예정): 트립별 출발 공항 컬럼 + 마이그레이션 0007, `/trips` 지구본 드래그 회전, 선 hover 툴팁(출발→도착 코드·도시 + 트립 제목·기간), 선 클릭 시 해당 트립만 필터(URL 쿼리, `/trips` 목록에 적용)
+    - [ ] 4-5. 로드맵 6 확장(ADR-0036 예정, ADR-0033 §3): 마이그레이션(soft delete·신고·차단·원장 revoked), 채택 변경·취소(+포인트 회수), 댓글 수정, 신고·`/admin/reports`·밴, 사용자 간 차단, 사용자명 변경
 - [ ] 5단계. i18n ko·ja·en(ADR-0033 §4): next-intl, 프리픽스 as-needed, 쿠키, 언어 전환 셀, 전 문구·검증·toast·메타데이터 카탈로그화, 날짜·숫자 locale 포맷
 - [ ] 6단계. 인증 확장(ADR-0033 §2): Naver·GitHub OAuth, 이메일 인증(Cloudflare mail worker, 리서치 후), 약관·동의(`docs/legal/` ko→ja·en, korean-law-mcp)
 - [ ] 7단계. 로드맵 4 AI(ADR-0029: Vercel Queues, 자기 키만, AES-GCM, `APP_ENCRYPTION_KEY` 없이 구현 후 키 등록 시 테스트)
@@ -69,3 +72,7 @@
 - QA 데이터(세션 4 결정): 공용 DB 의 QA 흔적(자유게시판 글 `050aa2f0`·댓글·좋아요, 질문 글 `ce90f6b2`·채택 댓글·원장 +2/+10, 오사카 트립 좋아요, tester 소개)은 전부 유지하고 나중에 한 번에 삭제한다.
 - 브라우저 캡처(세션 4): 백그라운드 탭에서는 motion 의 페이지 fade·reveal 이 늦게 끝나 옅게 찍힌다 → 캡처 전 `[style*="opacity"]{opacity:1!important;transform:none!important}` 스타일을 주입한다(측정용, 코드 아님). 비로그인 표면은 `http://[::1]:7777`(쿠키 분리, 확장 권한 허용)로 본다. 127.0.0.1 은 확장 권한이 없다.
 - 에이전트 운용(ADR-0031, 세션 3): `Agent` 도구 금지, 위임은 `Workflow` 의 `agent()` 로만. 구현 Opus max·리뷰 Opus high·리서치/사실 확인 Sonnet. 파일을 동시에 바꾸는 에이전트가 2개 이상일 때만 `isolation: 'worktree'`. 워크트리 결과는 `git -C <wt> diff HEAD` patch 를 `git apply --3way` 로 이식하고 신규 파일은 복사, 마이그레이션은 메인에서 `bun run db:generate` 로 다시 생성. 끝난 워크트리는 `git worktree remove --force`(push 와 같은 명령에 두면 가드 훅이 `-f`·"fast-forward" 문자열을 force push 로 오인해 차단하므로 분리).
+- 에이전트 운용(세션 4 지시, ADR-0031 운용 메모 추기): **메인(Fable)은 사용자 대화와 Workflow 지시·취합 등 orchestration 만** 한다. 구현·리뷰·검증·브라우저 실측·문서 편집·커밋·push·마이그레이션 적용·배포 확인은 전부 Workflow 에이전트가 수행한다. 모델 배분과 `Agent` 도구 금지는 그대로.
+- 게시판 목록 계약(ADR-0034): `shared/constant/community.ts` 의 `DEFAULT_BOARDS` 는 마이그레이션 0006 시드와 레일 하위 메뉴가 함께 참조한다. 게시판을 추가·변경하면 **두 곳을 같이** 고친다.
+- dev 오리진(ADR-0034): `next.config.ts` 의 `allowedDevOrigins` 에 `localhost`·`127.0.0.1`·`[::1]` 을 둔다. 없으면 Next 16 의 크로스 사이트 dev 차단이 `[::1]` 오리진의 `/_next/*` 를 403 으로 막아 비로그인 검증용 루프백 호스트가 하이드레이션되지 않는다(프로덕션 빌드에는 영향 없음).
+- 문서 드리프트(알고 있음): 라이트 `--sidebar-border` 를 `--palette-neutral-708` 로 올려 `docs/DESIGN.md` 139·235 행(`neutral-900` = sidebar-border light)과 어긋난다. DESIGN 은 외부 원본이라 팔레트 표는 고치지 않는다(ADR-0034 §6).
