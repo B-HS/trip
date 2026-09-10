@@ -48,4 +48,18 @@ describe('SectionHeading', () => {
 
         expect(screen.queryByRole('link')).toBeNull()
     })
+
+    test('제목 스트립은 muted 계층으로 올려 섹션 경계를 만든다', () => {
+        const { container } = render(<SectionHeading title='최근 공개 트립' />)
+        const strip = container.querySelector('h2')?.parentElement
+
+        expect(strip?.className).toContain('bg-muted')
+        expect(strip?.className).not.toContain('bg-card')
+    })
+
+    test('더 보기 셀은 muted 스트립 위에서 카드 톤으로 남는다', () => {
+        render(<SectionHeading title='최근 공개 트립' moreHref={EXPLORE_PATH} />)
+
+        expect(screen.getByRole('link', { name: '더 보기' }).className).toContain('bg-card')
+    })
 })

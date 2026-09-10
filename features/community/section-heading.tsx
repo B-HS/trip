@@ -12,7 +12,7 @@ export type SectionHeadingProps<T extends string> = {
 
 export const SectionHeading = <T extends string>({ title, description, moreHref, moreLabel = MORE_LABEL }: SectionHeadingProps<T>) => (
     <div className='flex gap-px bg-background'>
-        <div className='flex min-w-0 flex-1 flex-col gap-1 bg-card p-3'>
+        <div className='flex min-w-0 flex-1 flex-col gap-1 bg-muted p-3'>
             <h2 className='text-sm font-medium'>{title}</h2>
             {description !== undefined && <p className='text-xs text-muted-foreground'>{description}</p>}
         </div>

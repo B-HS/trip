@@ -139,7 +139,7 @@ export const TripListWidget: FC<TripListWidgetProps> = ({ initialRoute = null })
 
     return (
         <div className='flex flex-1 flex-col gap-px'>
-            <FadeIn as='section' className='flex flex-col gap-1 bg-card p-3'>
+            <FadeIn as='section' className='flex flex-col gap-1 bg-muted p-3'>
                 <p className='font-mono text-2xs tracking-widest text-muted-foreground uppercase'>TRIPS</p>
                 <h1 className='text-2xl font-semibold tracking-tight'>내 트립</h1>
                 <p className='text-xs text-muted-foreground'>참여 중인 트립을 모아 봅니다. 카드를 열면 일정과 예매 체크리스트로 이동합니다.</p>

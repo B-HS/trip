@@ -18,7 +18,7 @@ export const ExploreList = async ({ sort, page }: ExploreListProps) => {
 
     return (
         <div className='flex flex-1 flex-col gap-px'>
-            <section className='flex flex-col gap-1 bg-card p-3'>
+            <section className='flex flex-col gap-1 bg-muted p-3'>
                 <p className='font-mono text-2xs tracking-widest text-muted-foreground uppercase'>EXPLORE</p>
                 <h1 className='text-2xl font-semibold tracking-tight'>탐색</h1>
                 <p className='text-xs text-muted-foreground'>공개된 여행 일정을 둘러봅니다</p>

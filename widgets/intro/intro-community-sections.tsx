@@ -1,11 +1,14 @@
 import { findLatestPosts } from '@/entities/community/community.repository'
 import { findRecentPublicTrips } from '@/entities/trip/trip.repository.explore'
+import { BoardCells } from '@/features/community/board-cells'
 import { PostList } from '@/features/community/post-list'
 import { PublicTripGrid } from '@/features/community/public-trip-grid'
 import { IntroSectionHeading } from '@/features/intro/intro-section-heading'
 import { EMPTY_POST_LABEL, EMPTY_TRIP_LABEL, INTRO_POST_LIMIT, INTRO_TRIP_LIMIT } from '@/shared/constant/community'
 
 const PUBLIC_SEAM_CLASS = 'bg-border'
+const PUBLIC_PANEL_CLASS = 'flex flex-col gap-px bg-border'
+const PUBLIC_STRIP_CLASS = 'bg-muted p-6'
 
 const TRIP_SECTION = {
     eyebrow: '공개 일정',
@@ -26,14 +29,15 @@ export const IntroCommunitySections = async () => {
     return (
         <div className='flex w-full flex-col'>
             <section className='mx-auto w-full max-w-5xl px-6 py-16'>
-                <IntroSectionHeading {...TRIP_SECTION} />
-                <div className='mt-10'>
+                <div className={PUBLIC_PANEL_CLASS}>
+                    <IntroSectionHeading {...TRIP_SECTION} className={PUBLIC_STRIP_CLASS} />
                     <PublicTripGrid trips={trips} emptyLabel={EMPTY_TRIP_LABEL} className={PUBLIC_SEAM_CLASS} />
                 </div>
             </section>
             <section className='mx-auto w-full max-w-5xl px-6 pb-20'>
-                <IntroSectionHeading {...POST_SECTION} />
-                <div className='mt-10'>
+                <div className={PUBLIC_PANEL_CLASS}>
+                    <IntroSectionHeading {...POST_SECTION} className={PUBLIC_STRIP_CLASS} />
+                    <BoardCells className={PUBLIC_SEAM_CLASS} />
                     <PostList posts={posts} showBoard emptyLabel={EMPTY_POST_LABEL} className={PUBLIC_SEAM_CLASS} />
                 </div>
             </section>

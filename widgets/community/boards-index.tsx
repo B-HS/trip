@@ -12,7 +12,7 @@ export const BoardsIndex = async () => {
 
     return (
         <div className='flex flex-1 flex-col gap-px'>
-            <section className='flex flex-col gap-1 bg-card p-3'>
+            <section className='flex flex-col gap-1 bg-muted p-3'>
                 <p className='font-mono text-2xs tracking-widest text-muted-foreground uppercase'>BOARDS</p>
                 <h1 className='text-2xl font-semibold tracking-tight'>게시판</h1>
                 <p className='text-xs text-muted-foreground'>자유·질문·후기 게시판의 최근 글을 모아 봅니다.</p>

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import { findLatestPosts } from '@/entities/community/community.repository'
 import { findPublicTripsForHome } from '@/entities/trip/trip.repository.explore'
+import { BoardCells } from '@/features/community/board-cells'
 import { PostList } from '@/features/community/post-list'
 import { PublicTripGrid } from '@/features/community/public-trip-grid'
 import { SectionHeading } from '@/features/community/section-heading'
@@ -21,7 +22,7 @@ export const CommunityHome = async () => {
 
     return (
         <div className='flex flex-1 flex-col gap-px'>
-            <section className='flex flex-col gap-1 bg-card p-3'>
+            <section className='flex flex-col gap-1 bg-muted p-3'>
                 <p className='font-mono text-2xs tracking-widest text-muted-foreground uppercase'>COMMUNITY</p>
                 <h1 className='text-2xl font-semibold tracking-tight'>커뮤니티 홈</h1>
                 <p className='text-xs text-muted-foreground'>다른 여행자가 공개한 일정과 게시판 글을 모아 봅니다.</p>
@@ -44,6 +45,7 @@ export const CommunityHome = async () => {
             </section>
             <section className='flex flex-col gap-px'>
                 <SectionHeading title='최신 글' description='게시판에 올라온 새 글입니다.' moreHref={BOARDS_PATH} />
+                <BoardCells />
                 <PostList posts={posts} showBoard emptyLabel={EMPTY_POST_LABEL} />
             </section>
             <section className='flex flex-col gap-px'>

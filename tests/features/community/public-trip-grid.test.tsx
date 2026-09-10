@@ -36,13 +36,14 @@ const buildTrip = (id: string): PublicTripCardItem => ({
 afterEach(cleanup)
 
 describe('PublicTripGrid', () => {
-    test('모바일에서 한 열로 쌓고 sm 이상에서만 열을 늘린다', () => {
+    test('카드 수에 맞춰 폭을 채우는 auto-fit 열을 쓴다', () => {
         const { container } = render(<PublicTripGrid trips={[buildTrip('a')]} emptyLabel={EMPTY_LABEL} />)
         const grid = container.querySelector('ul')
 
-        expect(grid?.className).toContain('grid-cols-1')
-        expect(grid?.className).toContain('sm:grid-cols-2')
-        expect(grid?.className).toContain('lg:grid-cols-3')
+        expect(grid?.className).toContain('grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))]')
+        expect(grid?.className).not.toContain('grid-cols-1')
+        expect(grid?.className).not.toContain('sm:grid-cols-2')
+        expect(grid?.className).not.toContain('lg:grid-cols-3')
     })
 
     test('카드가 하나면 빈 열을 채우는 블록을 그리지 않는다', () => {
