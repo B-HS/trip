@@ -24,6 +24,7 @@ import { TripViewerSkeleton } from '@/features/trip-viewer/trip-viewer-skeleton'
 import { TRIP_VIEW_PANEL_ID, ViewTabs } from '@/features/trip-viewer/view-tabs'
 import type { TripView } from '@/shared/constant/trip'
 import { FADE } from '@/shared/lib/motion'
+import { replaceSearchParam } from '@/shared/lib/search-param'
 import {
     AlertDialog,
     AlertDialogAction,
@@ -107,10 +108,7 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
     const resetTargetDay = days.find((day) => day.id === resetTargetDayId) ?? null
 
     const replaceParam = (key: string, value: string) => {
-        if (!isMember) return
-        const params = new URLSearchParams(window.location.search)
-        params.set(key, value)
-        window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`)
+        if (isMember) replaceSearchParam(key, value)
     }
 
     const handleSelectView = (view: TripView) => {

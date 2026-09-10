@@ -11,13 +11,13 @@ export type GlobePointInput = { lat: number; lng: number; label: string }
 
 export type GlobeEndpointInput = string | GlobePointInput
 
-export type GlobeRouteInput = { from: GlobeEndpointInput; to: GlobeEndpointInput }
+export type GlobeRouteInput = { from: GlobeEndpointInput; to: GlobeEndpointInput; key?: string; label?: string; description?: string }
 
 export type GlobePoint = { key: string; code: string | null; label: string; lat: number; lng: number }
 
 export type GlobeAirport = GlobePoint
 
-export type GlobeRoute = { key: string; from: GlobePoint; to: GlobePoint }
+export type GlobeRoute = { key: string; from: GlobePoint; to: GlobePoint; label: string | null; description: string | null }
 
 /**
  * Projects a geographic coordinate onto a sphere of the given radius.
@@ -91,10 +91,10 @@ export const resolveGlobeRoutes = (routes: readonly GlobeRouteInput[]) => {
         const from = resolveEndpoint(route.from)
         const to = resolveEndpoint(route.to)
         if (!from || !to || from.key === to.key) return []
-        const key = `${from.key}-${to.key}`
+        const key = route.key ?? `${from.key}-${to.key}`
         if (seen.has(key)) return []
         seen.add(key)
-        return [{ key, from, to }]
+        return [{ key, from, to, label: route.label ?? null, description: route.description ?? null }]
     })
 }
 
@@ -126,7 +126,20 @@ export const buildGlobeArc = (route: GlobeRoute, radius: number, segments: numbe
 
 const formatGlobePoint = (point: GlobePoint) => (point.code === null ? point.label : `${point.label} ${point.code}`)
 
-export const formatGlobeRouteLabel = (route: GlobeRoute) => `${formatGlobePoint(route.from)} → ${formatGlobePoint(route.to)}`
+export const formatGlobeRouteLabel = (route: GlobeRoute) => route.label ?? `${formatGlobePoint(route.from)} → ${formatGlobePoint(route.to)}`
+
+/**
+ * True when a sphere centred on the origin hides the given point from the eye position.
+ * Used to ignore pointer hits on arcs drawn behind the globe.
+ */
+export const isHiddenBySphere = (point: Vector3, eye: Vector3, radius: number) => {
+    const toPoint = point.clone().sub(eye)
+    const lengthSq = toPoint.lengthSq()
+    if (lengthSq < DEGENERATE_ANGLE_EPSILON) return false
+    const closestRatio = -eye.dot(toPoint) / lengthSq
+    if (closestRatio <= 0 || closestRatio >= 1) return false
+    return eye.clone().addScaledVector(toPoint, closestRatio).lengthSq() < radius * radius
+}
 
 export const describeGlobeRoutes = (routes: readonly GlobeRoute[]) =>
     routes.length === 0

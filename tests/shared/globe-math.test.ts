@@ -8,6 +8,7 @@ import {
     formatGlobeRouteLabel,
     globeFacingRotation,
     greatCircleArc,
+    isHiddenBySphere,
     latLngToVector3,
     resolveGlobeRoutes,
 } from '@/shared/ui/three/globe-math'
@@ -226,5 +227,56 @@ describe('좌표 엔드포인트', () => {
             ]),
         )
         expect(points.map((point) => point.label)).toEqual(['서울', 'JP 오사카', 'TW 타이베이'])
+    })
+})
+
+describe('경로 표시 정보', () => {
+    const tokyo = { lat: 35.6762, lng: 139.6503, label: 'JP 도쿄' }
+
+    test('넘겨준 키·라벨·설명을 그대로 쓴다', () => {
+        const [route] = resolveGlobeRoutes([
+            { from: 'ICN', to: 'KIX', key: 'ICN-KIX', label: 'ICN → KIX · 서울 → 오사카', description: '오사카 여행 노트' },
+        ])
+        expect(route.key).toBe('ICN-KIX')
+        expect(route.description).toBe('오사카 여행 노트')
+        expect(formatGlobeRouteLabel(route)).toBe('ICN → KIX · 서울 → 오사카')
+    })
+
+    test('키를 넘기면 그 키로 중복을 걸러낸다', () => {
+        const routes = resolveGlobeRoutes([
+            { from: 'ICN', to: tokyo, key: 'ICN-JP' },
+            { from: 'ICN', to: { ...tokyo, label: 'JP 오사카' }, key: 'ICN-JP' },
+        ])
+        expect(routes).toHaveLength(1)
+        expect(routes[0].to.label).toBe('JP 도쿄')
+    })
+
+    test('라벨과 설명을 넘기지 않으면 비어 있고 라벨은 도시·코드로 만든다', () => {
+        const [route] = resolveGlobeRoutes([{ from: 'ICN', to: 'KIX' }])
+        expect(route.label).toBeNull()
+        expect(route.description).toBeNull()
+        expect(formatGlobeRouteLabel(route)).toBe('서울 ICN → 오사카 KIX')
+    })
+})
+
+describe('isHiddenBySphere', () => {
+    const eye = new Vector3(0, 0, 3)
+    const RADIUS = 1
+
+    test('카메라를 향한 면의 점은 가려지지 않는다', () => {
+        expect(isHiddenBySphere(new Vector3(0, 0, 1), eye, RADIUS)).toBe(false)
+    })
+
+    test('구 뒤편의 점은 가려진다', () => {
+        expect(isHiddenBySphere(new Vector3(0, 0, -1), eye, RADIUS)).toBe(true)
+        expect(isHiddenBySphere(new Vector3(1, 0, 0), eye, RADIUS)).toBe(true)
+    })
+
+    test('카메라보다 앞에 있는 점은 가려지지 않는다', () => {
+        expect(isHiddenBySphere(new Vector3(0, 0, 4), eye, RADIUS)).toBe(false)
+    })
+
+    test('카메라와 같은 자리의 점은 가려지지 않는다', () => {
+        expect(isHiddenBySphere(eye.clone(), eye, RADIUS)).toBe(false)
     })
 })
