@@ -1,6 +1,6 @@
 # PROCESS — trip
 
-> 최종 갱신: 2026-09-09 · 대응 커밋: 로드맵 7 feat(editor) 커밋(세션 3 4단계, 이 문서와 같은 커밋, push·prod 머지됨)
+> 최종 갱신: 2026-09-10 · 대응 커밋: `129999c`(로컬 dev, **미push** — origin/dev·prod 는 `196cd44`)
 > 기준 문서: `~/.claude/convention/*.md`, `~/personal-llm/*.md`, `docs/HANDOFF.md`(세션 진입점), `docs/ARCHITECTURE.md`, `docs/acknowledge/README.md`, `docs/DESIGN.md`
 
 ## 완료 — 초기 구축 (2026-09-09, Phase 1~3)

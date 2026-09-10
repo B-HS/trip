@@ -63,3 +63,17 @@ Workflow A(사실 확인 Sonnet → 데이터 계층 Opus max → 리뷰 2렌즈
 - `banner_upload_id` 는 FK(set null)를 걸었다. `auth.ts ↔ trip.ts ↔ community.ts` 순환 import 는 drizzle 의 지연 콜백이라 정상이며 양쪽 진입 순서로 로드해 확인했다.
 - **UI 제약**: `/s/[slug]` 는 `(community)` 레이아웃(세션 프레임)으로 옮기면서 `export const revalidate` 를 제거해 동적 렌더로 둔다(사용자별 좋아요 상태를 프리페치하므로 ISR 로 두면 다른 방문자에게 새어 나간다). 트립 데이터 자체는 `getPublicTrip` 의 `unstable_cache` 가 계속 캐시한다. 채택 버튼은 `!post.hasAcceptedComment && canAcceptComment(...)` 로 게이팅한다.
 - 마이그레이션 0006 적용(로컬 = prod DB): 이력 7행, 테이블 32, 게시판 3행 시드, 기존 사용자 3명 `role='user'`.
+
+## 구현 메모 — UI·리뷰 반영 (2026-09-10, Workflow `roadmap-6b-community-ui`·`roadmap-6c-community-review-fix`)
+
+- **route group 통합**: `app/(app)`·`app/(community)` 를 `app/(shell)` 하나로 합쳤다(`(shell)/layout.tsx` 가 세션으로 AppFrame/PublicFrame 선택). 서로 다른 layout 인스턴스를 오가면 AppShell 이 리마운트되기 때문. 로그인 필수 페이지는 각자 `requireUser` 를 호출한다(`trips/new` 에 추가함). `(public)` 은 `/login`·`/signup` 만.
+- 링크형 탭·정렬 셀은 `aria-current='page'`(Button `cell`·`cellIcon` 크기에 스타일 추가), 실제 토글 버튼만 `aria-pressed`.
+- `as Route` 캐스팅은 `Route<T>` 제네릭 컴포넌트(SectionHeading·SearchForm·PostForm — `FC<Props>` 대신 제네릭 화살표 컴포넌트, 컨벤션 예외)와 상대 href(`?page=`·`?tab=`·`?sort=`)로 없앴다. 남은 1곳은 `login-widget` 의 런타임 `next` 문자열(`isInternalPath` 가 `/\`·제어문자 변형을 거부).
+- 페이지·`generateMetadata` 중복 조회는 `entities/community/community.cache.ts`·`entities/profile/profile.cache.ts`(React `cache`) 로, `getServerSession` 도 `cache` 로 감쌌다. 게시판 미리보기는 `findLatestPostsByBoard(boardKey, limit)`. 조회수는 작성자 본인 조회를 제외하고, 댓글 동작은 `router.refresh()` 없이 TanStack 캐시만 갱신한다(조회수 재증가 방지 — 댓글 수·채택 게이팅을 `useComments` 결과에서 파생).
+- 공개 표면(비로그인 홈)의 인트로 섹션은 `.surface-public` 라이트에서 `--background == --card` 라 심이 안 보여 `bg-border` 심을 쓴다(`PostList`·`PublicTripGrid` 의 `className`). 셸 안은 `bg-background`.
+- **KNOWN ISSUE(4-5 에서 해소)**: 채택된 댓글을 삭제하면 `accepted_comment_id` 를 비워 재채택이 가능하다(리뷰 지적: 글이 영구 채택 상태로 묶이는 것을 막기 위해). ADR-0033 §3 의 채택 변경·취소 + 원장 회수(-10)가 들어가기 전까지는 "삭제 → 다른 댓글 채택 → +10 재지급" 경로가 열려 있다. 4-5 에서 회수 행과 함께 정리한다.
+- **정책 결정 대기(4-5 에 포함)**: 트립 첨부 인가는 현재 `view`(멤버면 남의 비공개 트립 제목이 공개 글에 노출될 수 있음, 슬러그는 마스킹). 4-5 에서 **소유자이거나 공개 트립만** 첨부 가능으로 좁힌다(메인 결정, 사용자 이견 없으면 적용).
+- 배포 전제: `next.config.ts` 의 `images.remotePatterns` 는 **빌드 시점** `R2_PUBLIC_BASE_URL` 로 고정된다. Vercel 환경변수에 빌드 타임에도 있어야 프로필 대문·본문 이미지가 `next/image` 로 렌더된다.
+- 본문 이미지 `src` 는 http(s) 임의 호스트를 허용한다(외부 이미지 삽입 = 정상 기능, 트래킹 픽셀 위험은 수용). 좁히려면 `sanitizeRichTextHtml` 의 img 정책에 `R2_PUBLIC_BASE_URL` 프리픽스 화이트리스트를 추가하면 된다.
+- 구조 잔여: `AuthorChip`·`LikeCell` 은 `features/community` 에 두고 `widgets/trip-viewer` 가 참조한다(레이어 방향은 합법). 도메인 중립 슬라이스로 옮길지는 후속 판단. `withRouteErrorHandling` 은 새 라우트 3곳만 적용(기존 6곳은 try/catch).
+- 브라우저 실측 1차에서 발견한 버그 2건(ProseMirror `attrs` 직렬화, 다이얼로그 submit 버블링)은 ADR-0027 실측 메모 참고. 개선 후보: 프로필 대문 `aspect-3/1` 높이 상한, 공개 트립 그리드 빈 열 채움.

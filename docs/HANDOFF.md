@@ -1,109 +1,103 @@
-# HANDOFF — 2026-09-09 세션 2 종료 스냅샷
+# HANDOFF — 2026-09-10 세션 3 종료 스냅샷
 
-> 대응 커밋: `4976c31`(origin/dev = origin/prod, Vercel 배포·확인 완료). 마지막 코드 커밋은 공개 페이지 캐시 키 버전 수정(`fix(share)`), 그 앞이 `aab891f`(R2 업로드). 이 문서는 새 세션의 단일 진입점이며 매 핸드오프마다 덮어쓴다.
-> 복기 신뢰도: 세션 2 전체 대화 기준. Opus 서브에이전트 8건(원인 분석 1, 리서치 2, 구현 5)은 최종 보고서 기준이며 결과는 메인이 브라우저·API 로 재검증했다.
+> 대응 커밋: `129999c`(로컬 dev). **origin/dev·origin/prod 는 `196cd44`(로드맵 7) 에 멈춰 있고, 그 뒤 로컬 커밋 5개(`f8474cc`·`c152820`·`e0aa431`·`8640392`·`129999c`)는 미push** — 사용자가 "지금 하는 것까지만 하고 멈춰" 로 중단시켰기 때문. 이 문서는 새 세션의 단일 진입점이며 매 핸드오프마다 덮어쓴다.
+> 복기 신뢰도: 세션 3 전체 대화 기준. Workflow 4건(에이전트 21개)의 산출은 최종 보고서 + 메인 재검증(typecheck·lint·prettier·test 433·build·브라우저 실측 1차) 기준.
 
 ## 1. 프로젝트 한 줄 정의
 
-정적 오사카 일정 HTML(`docs/osaka-trip-interactive.html`)을 로그인 기반 다중 트립 여행 노트 앱(Next 16 + MySQL + better-auth + TanStack Query + motion + R3F 지구본)으로 재구현해 `trip.gumyo.net`(Vercel Pro, 브랜치 `prod`)에 배포하는 프로젝트.
+정적 오사카 일정 HTML(`docs/osaka-trip-interactive.html`)을 로그인 기반 다중 트립 여행 노트 + 커뮤니티 앱(Next 16 + MySQL + better-auth + TanStack Query + motion + R3F 지구본 + Tiptap)으로 재구현해 `trip.gumyo.net`(Vercel Pro, 브랜치 `prod`)에 배포하는 프로젝트.
 
 ## 2. 현재 목표
 
-- 최종 목표: 여행 일정·예매·정보를 구조화해 관리·공유하고, 커뮤니티·AI·에디터까지 확장(로드맵 1~10 중 3 보류). DESIGN.md 의 "배경 계층·보더 없음·셀형 UI" 를 사용자의 해석대로 구현.
-- 현재 마일스톤: 로드맵 6단계 계획(ADR-0022) 중 **1~3단계 완료**(버그 수정·9·8·1·5·2). **다음은 4단계: 로드맵 7(Tiptap + YouTube, ADR-0027) → 6(커뮤니티·프로필, ADR-0028)**, 이어 5단계 로드맵 4(AI, ADR-0029), 6단계 로드맵 10(ADR-0030).
-- 직전 작업: 로드맵 5·2 병렬 구현을 합쳐 마이그레이션 0004·0005 적용, 실측, 커밋 → 문서 정리 → 이 핸드오프. 사용자가 "컨텍스트가 거의 차서 새 세션용 스킬을 돌린다" 고 하여 여기서 멈춤.
+- 최종 목표: 여행 일정·예매·정보를 구조화해 관리·공유하고 커뮤니티·i18n·인증 확장·AI·SEO 까지(ADR-0033 §5 순서).
+- 단계(ADR-0033 §5): **4 로드맵 6 기본(완료, 미push) → 4-5 로드맵 6 확장 → 5 i18n(ko·ja·en) → 6 인증 확장(OAuth·이메일 인증·약관) → 7 AI(ADR-0029) → 8 SEO(ADR-0030)**. 로드맵 3 OSM 은 제거.
+- 현재 마일스톤: 4단계 4-4c-3 에서 중단. 커뮤니티·프로필 기본 구현·리뷰·수정·브라우저 실측 1차까지 끝났고 **남은 실측 → QA 데이터 정리 결정 → push·prod ff 머지** 가 다음이다.
+- 직전 작업: 브라우저 실측 중 버그 2건 수정(`129999c`) 후 사용자 지시로 정지, `/prepare-new` 로 이 문서 작성.
 
 ## 3. 완료 / 진행 중 / 미착수
 
-### 세션 2 에서 완료(커밋 순, 전부 dev)
+### 세션 3 에서 완료(커밋 순, 전부 dev)
 
-- `dfb481e` 문서-코드 동기화(테이블 22, npm `cn`, 고아 스켈레톤 삭제).
-- `6e26b29`·`37fad63`·`7b1fc34` 편집기 폼 버그(RHF + React Compiler → `'use no memo'` ADR-0018), `AnimatePresence` 잔여 행(ADR-0019), dnd-kit hydration, 인쇄 다크 토큰, 표 분할 방지. `docs/bug/2026-09-09-editor-forms-and-print.md`.
-- `95d1cc4` 회원가입 이름 제거(ADR-0017).
-- `ac75640` JSON 가져오기(ADR-0021), `saveDay` 하위 id 반환, 날짜 정렬 낙관적.
-- `046a492` 몇박 며칠 `customNights`/`customDays`(ADR-0020, 마이그레이션 0002) + 기본 정보 저장 toast 1회.
-- `bc18131` 셀형 액션 UI 전면(ADR-0023, `Button` 변형 `cell`·`cellPrimary`·`cellDestructive`, 크기 `cell`·`cellIcon`).
-- `fddab44` 사이드바 링크·소개 문구 + 편집기 "사이드바" 탭(ADR-0024, 마이그레이션 0003).
-- `ffb5aee` 일정 종류 테이블 `trip_schedule_kind` + `kind_id` + 편집기 "일정 종류" 탭(ADR-0025, 마이그레이션 0004 에 데이터 이관 SQL 포함, `kind` enum 컬럼 삭제).
-- `aab891f` 서버 경유 R2 업로드 `/api/uploads` + 예매 첨부(ADR-0026, 마이그레이션 0005, `@aws-sdk/client-s3`). `eslint.config.mjs` 에 `.claude/**` 무시.
-- 문서 커밋들: ADR-0020~0030, 리서치 메모, PROCESS·ARCHITECTURE·data-model·roadmap·history·QA 체크리스트.
-- `4976c31` 공개 페이지 `unstable_cache` 키에 `PUBLIC_TRIP_CACHE_VERSION` 추가. 배포 직후 `/s/osaka-qa` 가 옛 캐시 형태로 약 10분 500 이었던 장애의 수정(`docs/bug/…` 추가 절). `PublicTrip` 형태가 바뀌는 배포마다 값을 올린다.
-- prod 배포 확인: `4976c31` 이 `trip.gumyo.net` 에 배포됨 — `/`·`/login`·`/signup` 200, `/trips` 307, `/s/osaka-qa` 200("6박 7일", 범례 3종), `/api/uploads` POST 401(미로그인).
+- `94c6c55` ADR-0031: `Agent` 도구 금지·Workflow 전용·모델 배분, `git config llm-rules.auto-push true`.
+- `196cd44` 로드맵 7(ADR-0027): Tiptap 3.31.3 8종·`isomorphic-dompurify`·`happy-dom`(dependencies) — `shared/constant/rich-text.ts`, `shared/lib/rich-text-{extensions,document,sanitize,html}.ts`, `features/editor/*`, `app/globals.css` `.rich-text`, `tests/setup.ts`(`server-only` mock + 자식 프레임 네비게이션 비활성). **push·prod 배포 완료**(`dpl_4JTMEamevKJ8sMYjnqQXLCCm7w2U` READY, `/`·`/login`·`/s/osaka-qa` 200, `/trips` 307).
+- `f8474cc` ADR-0032(커뮤니티 구현 세부).
+- `c152820` 로드맵 6 데이터 계층: `shared/db/schema/community.ts`(+auth/trip 컬럼), **마이그레이션 0006 적용(공용 DB, 테이블 32, 게시판 3행)**, `entities/community/*`·`entities/profile/*`·`entities/trip/trip.repository.{explore,likes}.ts`, better-auth `admin` 플러그인(`disabledPaths: ['/update-user']`), `scripts/set-admin.ts`(`bun run admin:set <email>`), `PUBLIC_TRIP_CACHE_VERSION='3'`, API `/api/posts/[postId]/{comments,like}`·`/api/trips/[tripId]/like`.
+- `e0aa431` ADR-0033(OSM 제거·인증 확장 착수·커뮤니티 확장 수용·i18n·단계 재편) + `docs/memory/research-2026-09-10-mail-i18n-auth.md`.
+- `8640392` 로드맵 6 UI: `app/(shell)/**`(세션 프레임 그룹으로 `(app)`·`(community)` 통합), `widgets/app-shell/app-frame.tsx`, `features/app-shell/{public-frame,nav-active}.tsx`, `widgets/community/*`, `widgets/profile/*`, `widgets/intro/intro-community-sections.tsx`, `widgets/trip-viewer/{public-trip-actions,trip-like-button}.tsx`, `features/community/*`, `features/profile/*`, `shared/lib/{trip-date-range,trip-route-label,like-mutation,route-handler}.ts`, `shared/constant/route.ts`, `proxy.ts`(보호 경로 4패턴, `/login`·`/signup` → `/`), 로그인·가입 후 `/`.
+- `129999c` 실측 버그 2건: `RichEditor.onUpdate` 가 `toPlainDocument`(ProseMirror null-prototype `attrs` 가 서버 액션에서 `$T` 로 깨짐) 로 정규화, `RichEditorUrlDialog.handleSubmit` 에 `stopPropagation`(포털 폼 submit 이 글 폼까지 버블링).
+- 문서: ARCHITECTURE(§1·2·3·4·6·7·12·13), data-model(32 테이블), roadmap(진행 표·§3 제거·§11 i18n), PROCESS 4단계 체크리스트, history 세션 3, QA 체크리스트 `docs/quality-assurance/2026-09-10-community-editor-checklist.md`, ADR-0018·0027·0031·0032 추기.
 
-### 진행 중
+### 진행 중 — 4-4c-3 (사용자 지시로 중단)
 
-- 없음. 워크트리 없음(`git worktree list` 가 메인만). `.claude/` 는 커밋하지 않는다(에이전트 설정·워크트리 잔여).
+- **다음 한 줄**: 사용자에게 QA 데이터 정리 여부를 1줄 객관식으로 확인(아래 §6-1) → 남은 실측(비로그인 표면 시각, 질문 게시판 채택, 글 삭제, 라이트 모드 재확인) → `git push origin dev` → `git checkout prod && git merge dev && git push origin prod && git checkout dev` → `mcp__plugin_vercel_vercel__get_deployment` 로 READY 확인 → `trip.gumyo.net` 스모크.
+- 워킹트리 clean. 워크트리 없음. Chrome 에 이 세션 탭 1개(`/boards/free/new`, 미저장 폼) 가 남아 있어 닫으면 이탈 확인이 뜰 수 있다.
 
-### 미착수 (순서대로)
+### 미착수(순서대로)
 
-1. (완료) push·prod 머지·배포 확인은 세션 2 말미에 끝냈다. 새 세션은 2번부터.
-2. 4단계 로드맵 7: Tiptap 3.31 고정 버전, `features/editor/rich-editor.tsx`(순수 UI, 툴바 셀), 공식 YouTube 확장(nocookie), 서버 `generateHTML` + DOMPurify iframe 화이트리스트 훅, `happy-dom` 을 dependencies 로(ADR-0027). 이미지 업로드는 `useUploadImage('post')` 재사용.
-3. 4단계 로드맵 6: 커뮤니티 홈(`/` 로그인 시 커뮤니티, 인트로 유지 + 공개 섹션), `/explore`·좋아요, 게시판 3종(free·qna·review)·댓글·채택·포인트(+2/+10), better-auth `admin` 플러그인 `role`, 프로필 `/u/[username]`·`/settings/profile`(대문·사진 업로드, 소개), 인가 표 확장(ADR-0028). 마이그레이션 0006.
-4. 5단계 로드맵 4: Vercel Queues(`@vercel/queue`, `vercel.json` `experimentalTriggers`), `trip_ai_*` 테이블, AI SDK v7 + `@ai-sdk/openai`·`anthropic`·`openai-compatible`(Ollama Cloud), 사용자 키 AES-256-GCM(`APP_ENCRYPTION_KEY` 없으면 기능 비활성 + 안내), 모델 목록 동적, 추론 강도, `generateObject` 로 일정 수정 제안 + diff 승인(ADR-0029).
-5. 6단계 로드맵 10(ADR-0030).
-6. QA 잔여: 모바일 Sheet 닫힘 포커스 복귀, 편집기 검증 문구 한국어화(사용자가 직접 본 뒤 결정), 일정 종류 `key` 노출 여부, R2 설정 후 이미지 업로드 실측, 셀형 UI 로그아웃 표면(`/login`·`/signup`·`/`·404)은 헤드리스 촬영 미실시.
-7. 알려진 개선 후보: `shared/ui/card·alert·input-group` 보더(미사용 파일), 트립 삭제 시 R2 객체 잔존, `TripSummary.dayCount`(`entities/trip/trip.type.ts`·`trip.repository.ts`)는 카드가 `lengthLabel` 을 쓰면서 UI 미사용(API 응답 호환 때문에 남김, 제거 후보), 편집기 비소유자 탭 라벨이 `EDITOR_EXPORT_TAB_LABEL`('내보내기·가져오기') 로 고정, R3F `THREE.Clock` 경고(업스트림).
+1. 4-5 로드맵 6 확장(ADR-0033 §3): 마이그레이션 0007(`deleted_at`·신고·차단·원장 `revoked`), 채택 변경·취소(+원장 -10), 댓글 수정, 신고 + `/admin/reports` + 밴(`banUser`), 사용자 간 차단, 사용자명 변경(`/settings/profile`, better-auth `/update-user` 는 계속 닫음), 트립 첨부 인가를 "소유자 또는 공개 트립" 으로 축소(ADR-0032 구현 메모), 채택 댓글 삭제 시 원장 회수(KNOWN ISSUE 해소), 프로필 대문 높이 상한·그리드 빈 열 채움.
+2. 5단계 i18n(ADR-0033 §4, 리서치 메모 §next-intl): next-intl 4.14, `as-needed`, `app/[locale]/` 재구성 + 기존 `proxy.ts` 와 미들웨어 합성, 전 문구 카탈로그화.
+3. 6단계 인증 확장(ADR-0033 §2, 리서치 메모): Naver(genericOAuth)·GitHub, 이메일 인증(Cloudflare Email Service 베타 + `cloudflare/mail-worker/`), 약관·동의(`docs/legal/`, korean-law-mcp). 키 없으면 비활성 + 안내.
+4. 7단계 AI(ADR-0029), 8단계 SEO(ADR-0030).
+5. QA 잔여: 모바일 Sheet 포커스 복귀, R2 설정 후 이미지 업로드(예매·에디터·프로필), 편집기 검증 문구 한국어화(사용자 확인 후), 일정 종류 `key` 노출 여부.
 
 ## 4. 의사결정 요약 (상세·기각 대안은 `docs/acknowledge/`)
 
-| ADR       | 결정                                                                                                                                                                                                                                    |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0001~0016 | 세션 1 결정(스택, 구조화 데이터, 자체 인증, `trip_` 프리픽스, 공유·사용자별 상태, 지도 링크만, 모션 항상, 지구본 실제 지리, prod/dev, 완성 HTML, 배경 계층·보더 없음, shadcn 우선, 락파일 v1, 템플릿·시드, 날짜 탭 UX, 목적지·즐겨찾기) |
-| 0017      | 회원가입은 사용자명·이메일·비밀번호만, `name` 에 사용자명                                                                                                                                                                               |
-| 0018      | RHF `register()` 컴포넌트는 `'use no memo'`(React Compiler 제외)                                                                                                                                                                        |
-| 0019      | 편집기 정렬 행은 진입 페이드만, `DndContext id`                                                                                                                                                                                         |
-| 0020      | 몇박 며칠 선택 입력(`customNights`/`customDays`), 비우면 계산                                                                                                                                                                           |
-| 0021      | JSON 가져오기 = 현재 트립 내용 교체(공유·멤버 유지)                                                                                                                                                                                     |
-| 0022      | 로드맵 착수 범위·순서·정책 답변 14건 + 자동 push·prod 머지                                                                                                                                                                              |
-| 0023      | 셀형 액션 UI 는 `Button` 변형                                                                                                                                                                                                           |
-| 0024      | 사이드바 링크 테이블 + `sidebar_note`, 별도 탭                                                                                                                                                                                          |
-| 0025      | 일정 종류 트립별 테이블, 토큰 색 팔레트, `key` 는 UUID                                                                                                                                                                                  |
-| 0026      | 서버 경유 R2 업로드 3MB, 공개 읽기는 커스텀 도메인, 키 없으면 UI 비활성                                                                                                                                                                 |
-| 0027      | Tiptap 3 + 공식 YouTube 확장, JSON 정본 + 서버 sanitize                                                                                                                                                                                 |
-| 0028      | 커뮤니티 홈·게시판·포인트·프로필 대문·사진, `role` 컬럼, 오프셋 20                                                                                                                                                                      |
-| 0029      | AI 는 Vercel Queues, 자기 키만(무료 한도 없음), AES-GCM, 키 없이 구현 후 테스트                                                                                                                                                         |
-| 0030      | SEO·GEO·JSON-LD·Analytics·Speed Insights 는 마지막 단계                                                                                                                                                                                 |
+| ADR       | 결정                                                                                                                                                                        |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0001~0030 | 세션 1·2 결정(스택, 구조화 데이터, 자체 인증, 셀형 UI, 락파일 v1, 템플릿, R2 업로드, Tiptap, 커뮤니티 정책, Queues AI, SEO)                                                 |
+| 0031      | `Agent` 도구 금지, 위임은 Workflow 의 `agent()` 로만(구현 Opus max·리뷰 Opus high·리서치 Sonnet), 로드맵 7 은 화면 미연결로 push, `auto-push true`, 문서 헤더는 코드 커밋에 |
+| 0032      | 세션 프레임 라우팅, 마이그레이션 0006 스키마, 포인트(답변 +2 글당 1회·채택 +10)·카운터 잠금, 렌더 방식(목록 = 서버 컴포넌트), 프로필 이미지 undefined/null/id 의미          |
+| 0033      | OSM 제거(사업자 요건), 인증 확장 착수(Cloudflare 메일), 커뮤니티 범위 밖 기능 전부 수용(무한 스크롤만 미도입), i18n ko·ja·en next-intl, 단계 순서 4→4-5→5→6→7→8             |
+
+Workflow C 메인 결정 10건(ADR-0032 구현 메모): `(shell)` 그룹 통합, 링크 탭 `aria-current`, `Route<T>` 제네릭·상대 href, `React.cache` 캐시 모듈, `findLatestPostsByBoard`, 작성자 조회수 제외, PostForm 저장 후 `reset`, 공개 표면 `bg-border` 심, Select 팝오버 유지, 글 수정은 작성자만.
+
+기각·보류: 워크트리 병렬 UI 구현(공용 컴포넌트 계약 충돌, ADR-0031 운용 메모) · headless Chrome 비로그인 촬영(멈춤) · 브라우저 자동화 `type`/`Return` 직접 입력(선택 탭·툴바로 새어 JS 입력으로 대체) · 트립 첨부 인가 즉시 축소(4-5 로) · 본문 img 호스트 화이트리스트(정상 기능이라 보류).
 
 ## 5. 사용자 방향성 & 작업 규칙
 
-- 답변: 한국어 존댓말, 간결, 자축·"완벽" 단언 금지, 검증 안 된 것은 안 됐다고 말한다. 모호하면 한 번에 모아 객관식으로 묻고 추천안을 먼저 둔다. 사용자는 대체로 추천안을 승인하고 "끝까지 다 해봐" 로 위임한다.
-- 코드: `~/.claude/convention` + `~/personal-llm` 전부(arrow only, 주석 금지, any/enum 금지, FC<Props>, useCallback/useMemo 금지, FSD 위→아래, barrel 금지, zod v4, RHF+zodResolver, 토큰 색만, 이모지 금지, 매직넘버 상수화, effect 안 setState 금지). 예외: RHF `register()` 파일은 `'use no memo'`(ADR-0018).
-- 디자인: 보더 대신 배경 계층·1px 심(표만 보더), 셀형 버튼 전면(ADR-0023), 콘텐츠 사이드바 전체 높이, dvh 채움, 3D 는 정보 있는 곳만, 모션 항상 동작, 인쇄는 라이트 토큰.
-- 성능: 초기 화면 스켈레톤 금지(서버 프리페치 완성 HTML).
-- 도구: shadcn 우선. **구현·리서치는 Opus 서브에이전트**(메인 트리 1 + 워크트리 1 병렬, 주제당 질문 3개·10분 상한), 메인은 지휘·ADR·재검증. 워크트리 이식 절차는 `docs/PROCESS.md` 진행 메모.
-- Git: Conventional Commits(영어 소문자), author 사용자 단독, 트레일러 금지, `git add -A` 금지, force push 금지. 자동 커밋 ON. **단계 완료마다 자동 push·prod 머지**(ADR-0022). 가드 훅은 명령 문자열의 `-f`·"fast-forward" 를 force 로 오인하므로 push 명령에는 그런 문자열을 섞지 않는다.
-- 문서: 결정은 ADR(1건 1파일), 진행은 `docs/PROCESS.md`, 버그는 `docs/bug`, 계획은 `docs/roadmap.md`. README.md 는 지시 전까지 손대지 않는다. personal-llm 은 갱신하지 않는다.
-- `.env*`: AI 는 읽기·쓰기 모두 권한상 불가(사용자 직접). 값은 문서에 기록하지 않는다.
+- 답변: 한국어 존댓말, 간결, 자축·"완벽" 단언 금지, 검증 안 된 것은 안 됐다고. 모호하면 한 번에 모아 객관식(추천안 먼저). 사용자는 대체로 "추천대로", 순서는 메인에 위임. **"멈춰" 지시가 오면 진행 중인 단위만 마무리하고 push 등 다음 단계로 넘어가지 않는다.**
+- 에이전트: **`Agent` 도구(서브에이전트) 절대 금지. 모든 위임은 `Workflow` 의 `agent()`**. 구현 Opus `max`, 리뷰 Opus `high`, 리서치·사실 확인 Sonnet. 메인(Fable)은 지휘·ADR·재검증·마이그레이션 적용·push. 워크플로 대기는 `until` 루프(10분 단위). 리서치는 주제당 질문 3개·10분.
+- 코드: `~/.claude/convention` + `~/personal-llm` 전부(arrow only, 주석 금지, any/enum 금지, FC<Props>, useCallback/useMemo 금지, FSD 위→아래, barrel 금지, zod v4, RHF+zodResolver, 토큰 색만, 이모지 금지, 매직넘버 상수화, effect 안 setState 금지). 예외: RHF `register()` 파일 `'use no memo'`(18개, ADR-0018), `Route<T>` 제네릭 컴포넌트 3개(FC 대신 제네릭 화살표).
+- 디자인: 보더 대신 배경 계층·1px 심(표만 보더), 셀형 Button 전면(ADR-0023), 링크 탭 `aria-current`·토글 버튼 `aria-pressed`, 콘텐츠 사이드바 전체 높이, dvh 채움, 3D 는 정보 있는 곳만, 모션 항상, 인쇄 라이트 토큰. 초기 화면 스켈레톤 금지(서버 프리페치·서버 컴포넌트 완성 HTML). shadcn 우선.
+- Git: Conventional Commits(영어 소문자), author 사용자 단독, 트레일러 금지, `git add -A` 금지, force push 금지. 자동 커밋·자동 push ON(단계 완료마다 push + dev→prod ff 머지, `git merge dev` 로 — `--ff-only`·"fast-forward"·`-f` 문자열은 가드 훅이 force 로 오인). 워크트리 제거는 push 와 다른 명령으로.
+- DB: 로컬 = prod 공용 MySQL. 컬럼 삭제 마이그레이션은 적용 직후 push·배포. 추가 전용은 먼저 적용해도 됨(0006 이 그렇게 적용됨). `PublicTrip` 형태 변경 시 `PUBLIC_TRIP_CACHE_VERSION` 증가(현재 `'3'`).
+- 문서: 결정은 ADR(다음 번호 **0034**), 진행은 `docs/PROCESS.md`, 버그는 `docs/bug`, QA 는 `docs/quality-assurance`, 계획은 `docs/roadmap.md`. README.md 는 지시 전까지 손대지 않는다. personal-llm 은 갱신하지 않는다. `.env*` 는 읽기·쓰기 불가(값은 문서에 기록하지 않음, 필요 키는 사용자에게 `! <명령>` 로 안내).
+- 브라우저 실측(Claude in Chrome): 탭 줌 54% 라 `zoom` 액션으로 확인. CDP `type`·`key` 는 **선택된 탭**으로 가고 툴바 버튼에 Enter 가 눌려 폼이 제출되므로, 입력은 페이지 내 스크립트(native setter + `input`, 합성 `keydown` Enter, `.click()`)로. 다이얼로그·에디터 준비를 폴링으로 기다린다(dev 컴파일 2초+). 라이트·다크 모두 확인(테마는 `window` `keydown 'd'` 합성 이벤트 또는 `localStorage.theme`). headless Chrome 촬영은 멈추므로 비로그인 표면은 `curl` HTML 로 대체했다.
 
-## 6. 미해결 질문 / 사용자 작업
+## 6. 미해결 질문 / 사용자 확인 필요 항목
 
-- 사용자 작업: `.env` 와 Vercel 환경변수에 `APP_ENCRYPTION_KEY`(`openssl rand -base64 32`)·`R2_ACCOUNT_ID`·`R2_ACCESS_KEY_ID`·`R2_SECRET_ACCESS_KEY`·`R2_BUCKET`·`R2_PUBLIC_BASE_URL` 추가, `.env.example` 에 이름 추가, R2 버킷의 Cloudflare 커스텀 도메인 연결, Vercel CLI 최신화 + `vercel link`(Queues 로컬 개발).
-- 일정 종류 `key` 를 UI 에 노출할지(현재 UUID 자동).
-- 편집기 검증 문구 한국어화 범위(사용자가 직접 본 뒤).
+1. **QA 데이터 정리**(push 전 결정): 공용 DB 에 자유게시판 글 `050aa2f0-b09e-4daf-a3ff-38944c5eb10c`("세션 3 QA 글 - 수정됨", 댓글 1·좋아요 1, 오사카 트립 연결), 오사카 트립(`905b4695-…`) 좋아요 1(tester), tester 소개 문구가 남아 있다. A(추천): 글·댓글은 삭제 흐름 실측을 겸해 UI 로 삭제, 좋아요·소개는 유지 / B: 전부 유지 / C: 전부 삭제.
+2. 트립 첨부 인가 축소(소유자 또는 공개 트립) — 메인 결정, 4-5 에서 적용 예정. 이견 시 알려 달라.
+3. 채택 댓글 삭제 시 재채택 가능(KNOWN ISSUE) — 4-5 원장 회수와 함께 해소.
+4. 프로필 대문 `aspect-3/1` 높이 상한, 공개 트립 그리드 빈 열 채움 — 4-5 에서 처리 예정(디자인 이견 시).
+5. `isomorphic-dompurify`(Node 에서 jsdom) → `dompurify` + happy-dom 창으로 교체 검토 — 서버 번들·콜드스타트 문제가 보이면.
+6. Cloudflare Email Service 가 **Beta·Workers Paid 플랜** 필요(리서치 메모). 프로덕션 트랜잭션 메일에 쓰는 리스크 수용 여부, 발신 도메인(Cloudflare DNS 필수).
+7. 사용자 작업: `.env`·Vercel 에 `APP_ENCRYPTION_KEY`·`R2_*` 5개(**`R2_PUBLIC_BASE_URL` 은 빌드 타임에도 필요** — `next/image` `remotePatterns`), `.env.example` 이름, R2 커스텀 도메인, Vercel CLI 최신화 + `vercel link`, korean-law-mcp 설치·키(6단계 약관 작성용).
+8. 편집기 검증 문구 한국어화·일정 종류 `key` 노출(기존 보류 유지).
 
 ## 7. 환경 & 전제
 
-- Node 22 / Bun 1.4.0 로컬(락파일 v1, `packageManager bun@1.3.14`; 의존성 추가 시 `npx bun@1.3.14 install`). Vercel Pro, CLI 미링크(`.vercel` 없음).
-- 실행: `bun run dev`(:3000, 세션 2 종료 시점에도 이전 세션의 `next-server` PID 79590 이 떠 있음) · `bun run build` · `bun run db:generate`(신규 컬럼·rename 시 TTY 프롬프트 가능) · `bun run db:migrate`.
-- DB: 공용 MySQL 9.6 스키마 `trip`(로컬·prod 동일). 마이그레이션 0000~0005 적용, 테이블 26개. 계정: tester@example.com(사용자명 tester, 오사카 예시 트립 1개, 공개 slug `osaka-qa`), throwaway `qa_session2_204103@example.com`.
-- 브라우저 자동화: Claude in Chrome. 탭이 가려지면 클릭·키 입력이 전달되지 않고 애니메이션·전환이 정지한다 → 페이지 내 스크립트(native setter + `input`/`change` 이벤트, `execCommand('insertText')`, 창 `keydown`, `fetch` 가로채기)로 검증. `tabs_context_mcp(createIfEmpty)` 가 만든 새 창은 폭 500px(모바일 레이아웃)이고 `resize_window` 는 적용되지 않았다. localhost:3000 의 기존 탭은 줌 50%(innerWidth 3024) 였고 `cmd+0` 은 도구가 막는다 — 새 탭은 100% 다. 좌표 클릭보다 `find` ref·페이지 스크립트가 안정적이다. 로그아웃 화면은 헤드리스 Chrome(`--headless=new --screenshot`, `--force-dark-mode`)으로 촬영 가능하나 가끔 멈춘다(`pkill`).
-- 참조 원본: `docs/DESIGN.md`, `docs/osaka-trip-interactive.html`. 리서치 사실: `docs/memory/research-2026-09-09-r2-ai-tiptap.md`.
+- Node 22 / Bun 1.4.0 로컬(락파일 v1, `packageManager bun@1.3.14`, 의존성 추가는 `npx bun@1.3.14 install`). Vercel Pro(team `team_ZNm5hw73FNPctUWAuifjdn2b`, project `prj_a0su9UvuXawlx9OEASFDvbGcDeMe`), CLI 56.5.0(구버전), `.vercel` 미링크.
+- 실행: `bun run dev`(:3000, 세션 3 종료 시점에 사용자의 `next-server` PID 25061 이 떠 있음 — 종료 금지) · `bun run build` · `bun run db:generate` · `bun run db:migrate` · `bun run admin:set <email>` · 검증 `bun run typecheck && bun run lint && bun run format:check && bun test`(433) `&& bun run build`.
+- DB: 공용 MySQL 9.6 스키마 `trip`, 마이그레이션 0000~0006 적용(이력 7행), 테이블 32. 계정: tester@example.com(사용자명 tester, `role user`, 오사카 예시 트립 공개 slug `osaka-qa`, 소개 문구 있음), hyunseok(사용자 본인), qa_session2_204103@example.com(throwaway, 비밀번호 미기록). 관리자 계정 없음.
+- 브라우저: Chrome 의 localhost:3000 은 tester 로 로그인된 상태(세션 쿠키). 새 창 탭은 폭 1440 으로 `resize_window` 가 동작했으나 페이지 줌은 54%.
+- 참조 원본: `docs/DESIGN.md`, `docs/osaka-trip-interactive.html`. 리서치: `docs/memory/research-2026-09-09-r2-ai-tiptap.md`, `docs/memory/research-2026-09-10-mail-i18n-auth.md`.
 
 ## 8. 다음 세션 TODO (우선순위 순)
 
-1. 로드맵 7 Tiptap + YouTube 구현(ADR-0027) — Opus 에이전트, 워크트리 가능. 배포·마이그레이션은 세션 2 말미에 모두 반영·확인됨(`4976c31`).
-2. 로드맵 6 커뮤니티·프로필(ADR-0028) — 마이그레이션 0006, `proxy.ts` `/` 리다이렉트 제거, admin 플러그인.
-3. 로드맵 4 AI(ADR-0029), 로드맵 10(ADR-0030).
-4. R2 키·암호화 키가 들어오면 업로드·AI 키 등록 실측.
+1. §6-1 QA 데이터 정리 확인 → 남은 실측(`docs/quality-assurance/2026-09-10-community-editor-checklist.md` "남은 실측") → push·prod 머지·배포 확인(PROCESS 4-4c-3).
+2. 4-5 로드맵 6 확장(ADR-0033 §3 + ADR-0032 구현 메모의 대기 항목): ADR-0034 로 세부(신고 사유 목록, 차단 범위, `/admin/reports` 화면, 원장 `revoked`) 확정 → Workflow(데이터 → UI → 리뷰) → 마이그레이션 0007 → 실측 → push.
+3. 5단계 i18n → 6단계 인증 확장 → 7 AI → 8 SEO.
+4. R2·암호화 키가 들어오면 업로드·AI 키 등록 실측.
 
 ## 9. 문서 지도
 
 - `docs/HANDOFF.md` — 이 문서
-- `docs/ARCHITECTURE.md` — 구현 정본(스택·폴더·라우트·인증·데이터 계층·인가·계층/모션·3D·템플릿·검증)
-- `docs/memory/data-model.md` — 테이블 26개 요약, `docs/memory/research-2026-09-09-r2-ai-tiptap.md` — R2·AI SDK·Tiptap·Queues 리서치
-- `docs/acknowledge/README.md` + ADR-0001~0030
-- `docs/roadmap.md` — 항목별 명세 + 진행 상태 표
-- `docs/PROCESS.md` — 단계 체크리스트·진행 메모(워크트리 이식 절차)
-- `docs/history/2026-09-09-initial-build.md`, `docs/history/2026-09-09-session-2.md`
-- `docs/bug/2026-09-09-editor-forms-and-print.md`, `docs/feedback/2026-09-09-viewer-visual-feedback.md`, `docs/quality-assurance/2026-09-09-viewer-editor-checklist.md`
+- `docs/ARCHITECTURE.md` — 구현 정본(스택·폴더·라우트·인증·데이터 계층·인가·계층/모션·3D·템플릿·검증·리치 텍스트·커뮤니티)
+- `docs/memory/data-model.md` — 테이블 32개 요약 · `docs/memory/research-2026-09-09-r2-ai-tiptap.md`(R2·AI SDK·Tiptap·Queues) · `docs/memory/research-2026-09-10-mail-i18n-auth.md`(Cloudflare 메일·next-intl·better-auth 인증 확장·korean-law-mcp)
+- `docs/acknowledge/README.md` + ADR-0001~0033
+- `docs/roadmap.md` — 항목별 명세 + 진행 상태 표(§3 OSM 제거, §11 i18n)
+- `docs/PROCESS.md` — 단계 체크리스트·진행 메모(에이전트 운용·워크트리 이식 절차)
+- `docs/history/2026-09-09-initial-build.md` · `docs/history/2026-09-09-session-2.md` · `docs/history/2026-09-09-session-3.md`(세션 3 = 이번 세션)
+- `docs/bug/2026-09-09-editor-forms-and-print.md` · `docs/feedback/2026-09-09-viewer-visual-feedback.md` · `docs/quality-assurance/2026-09-09-viewer-editor-checklist.md` · `docs/quality-assurance/2026-09-10-community-editor-checklist.md`(중단 지점의 남은 실측 목록)
 - `docs/DESIGN.md`, `docs/osaka-trip-interactive.html` — 외부 원본(수정 금지)

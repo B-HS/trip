@@ -27,3 +27,7 @@ React 가 문서화한 컴파일러 제외 지시어이며, RHF 의 uncontrolled
 ## 추가 (2026-09-09 세션 2 후반)
 
 - 같은 규칙으로 `features/trip-editor/sidebar-form.tsx`·`kinds-form.tsx`·`booking-attachments-field.tsx` 가 추가되어 총 16개 파일이다. 새 폼을 만들 때 `register()` 를 쓰면 반드시 같은 지시어를 둔다.
+
+## 추가 (2026-09-10 세션 3)
+
+- `features/community/post-form.tsx`·`features/profile/profile-settings-form.tsx` 가 추가되어 총 18개 파일이다. 링크·YouTube URL 다이얼로그·댓글 폼은 `useState` 라 해당 없음.
