@@ -1,6 +1,6 @@
 # ARCHITECTURE — trip
 
-> 최종 갱신: 2026-09-10 · 대응 커밋: `9f52a9c`(세션 4 후반 UI 정정 ADR-0034) + 4-4e 지구본 확장(ADR-0035, `8b9fbd5` — origin/dev·prod 동기화, prod 배포 `dpl_8P8LFrBSrpJrA7NQQqxW1eNQqvYz` Ready · 마이그레이션 0007 은 적용됨)
+> 최종 갱신: 2026-09-10 · 대응 커밋: `8b9fbd5`(4-4e 지구본 확장 ADR-0035, origin/dev·prod 동기화, prod 배포 `dpl_8P8LFrBSrpJrA7NQQqxW1eNQqvYz` Ready · 마이그레이션 0007 은 적용됨) + 4-4f 공개 게시판 메뉴·섹션 배경 계층·auto-fit 그리드(ADR-0036, **미커밋**)
 > 구현 정본. 코드와 어긋나면 코드를 고치거나 이 문서를 갱신한다. 결정의 배경·기각 대안은 `docs/acknowledge/README.md`.
 
 ## 1. 스택
@@ -21,7 +21,7 @@ app/
   template.tsx          PageTransition(fade)
   not-found.tsx         404(panel 지구본)
 widgets/  app-shell(+app-frame·public-header-actions) · auth · intro(+intro-community-sections) · trip-editor(basics·sidebar·travel·kinds·days·bookings·info·share 탭) · trip-viewer(+public-trip-actions·trip-like-button) · trips · community(community-home·explore-list·boards-index·board-list·post-detail-widget·comments-widget·post-form-widget) · profile(profile-page·profile-settings-widget)     (쿼리·mutation·router·권한. 목록·홈·프로필은 서버 컴포넌트가 repository 직접 호출)
-features/ app-shell(+public-frame·nav-item·nav-sub-item·nav-active) · auth · intro · trip-editor(폼·sortable·sidebar-form·kinds-form·booking-attachments-field·airport-combobox) · trip-viewer · trips · editor(rich-editor·툴바·링크/YouTube URL 다이얼로그·rich-text-content) · community(board-badge·author-chip·like-cell·post-row·post-list·public-trip-card·public-trip-grid·pagination-cells·section-heading·search-form·post-header·comment-item·comment-list·comment-form·post-form(+post-form.schema)·community.constant) · profile(profile-header·profile-tabs·profile-image-field·profile-settings-form·profile.constant)     (순수 UI, props+콜백)
+features/ app-shell(+public-frame·nav-item·nav-sub-item·nav-active) · auth · intro · trip-editor(폼·sortable·sidebar-form·kinds-form·booking-attachments-field·airport-combobox) · trip-viewer · trips · editor(rich-editor·툴바·링크/YouTube URL 다이얼로그·rich-text-content) · community(board-badge·board-cells·author-chip·like-cell·post-row·post-list·public-trip-card·public-trip-grid·pagination-cells·section-heading·search-form·post-header·comment-item·comment-list·comment-form·post-form(+post-form.schema)·community.constant) · profile(profile-header·profile-tabs·profile-image-field·profile-settings-form·profile.constant)     (순수 UI, props+콜백)
 entities/
   trip/     trip.type · trip.validate · trip.role(순수) · trip.access(server) · trip.tag · trip.order(순수, 낙관적 재배열) · trip.repository(+.days/.members/.favorites/.explore/.likes) · trip.cache · trip.action · trip.api · trip.query · trip.prefetch
   user-state/ user-state.type · .repository · .action · .api · .query
@@ -38,7 +38,7 @@ shared/
 tests/    bun test 미러 구조(entities · features · shared · widgets) + setup.ts(happy-dom 전역 등록, `server-only` 를 빈 모듈로 mock, 자식 프레임 네비게이션 비활성)
 scripts/  migrate.ts · seed.ts · set-admin.ts(`bun run admin:set <email>`)
 drizzle/  0000(초기 20 테이블) · 0001(destination·favorite) · 0002(nights·days) · 0003(sidebar_link·sidebar_note) · 0004(schedule_kind + 데이터 이관, kind 컬럼 삭제) · 0005(upload·booking_attachment) · 0006(board·post·comment·post_like·like·point_ledger + user role/ban/bio/banner, session impersonated_by, trip like_count, 게시판 3행 시드) · 0007(trip departure_airport_code, ALTER 1개) + meta
-docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · acknowledge/ · memory/ · history/ · feedback/ · quality-assurance/ · DESIGN.md · osaka-trip-interactive.html
+docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · env(환경변수 키·발급 안내) · acknowledge/ · memory/ · history/ · feedback/ · quality-assurance/ · DESIGN.md · osaka-trip-interactive.html
 ```
 
 - import 는 `@/…` 절대경로, barrel 금지, 의존은 `app → widgets → features → entities → shared` 방향만.
@@ -63,8 +63,9 @@ docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · acknowledge/ · memor
 | `/settings/profile`                                | `requireUser` → `ProfileSettingsWidget`(이름·소개·사진·대문 업로드/제거)                                                                                                 | 이미지는 `undefined`=유지 / `null`=제거 / 업로드 id                                                                                                            |
 
 - `proxy.ts`: `/trips/**`·`/settings/**`·`/boards/[key]/new`·`/boards/[key]/[postId]/edit` 는 세션 쿠키(`trip.session_token`, `better-auth/cookies` `getSessionCookie`) 없으면 `/login?next=…`; `/login`·`/signup` 은 쿠키 있으면 `/`. 실제 인가는 서버에서 재확인.
-- `app/(shell)/layout.tsx`: `getServerSession` → 세션이면 `AppFrame`(`trip_sidebar_state` 쿠키 + 즐겨찾기 prefetch + `AppShell`: 레일 256px/접힘 48px, Cmd/Ctrl+B, 모바일 Sheet, 즐겨찾기, 항목 홈·탐색·게시판·트립 목록·새 트립, 사용자 메뉴에 내 프로필·프로필 설정), 없으면 `PublicFrame`(공개 헤더에 탐색·게시판·로그인·시작하기 — 탐색·게시판 셀은 세션 대기 중에도 렌더하고 로그인·시작하기 ↔ 홈 분기만 세션 결과를 기다린다). 한 layout 인스턴스라 그룹 안 이동에서 셸이 리마운트되지 않는다.
+- `app/(shell)/layout.tsx`: `getServerSession` → 세션이면 `AppFrame`(`trip_sidebar_state` 쿠키 + 즐겨찾기 prefetch + `AppShell`: 레일 256px/접힘 48px, Cmd/Ctrl+B, 모바일 Sheet, 즐겨찾기, 항목 홈·탐색·게시판·트립 목록·새 트립, 사용자 메뉴에 내 프로필·프로필 설정), 없으면 `PublicFrame`(공개 헤더에 탐색·게시판·로그인·시작하기 — 탐색 셀과 게시판 메뉴는 세션 대기 중에도 렌더하고 로그인·시작하기 ↔ 홈 분기만 세션 결과를 기다린다). 한 layout 인스턴스라 그룹 안 이동에서 셸이 리마운트되지 않는다.
 - 레일 "게시판" 은 하위 tree 를 갖는다(ADR-0034): `NAV_ITEMS`(`widgets/app-shell/app-shell.tsx`)가 `DEFAULT_BOARDS`·`BOARD_KIND_LABEL` 로 자유·질문·후기 `children` 을 만들고, `NavRail` 이 `ul`/`li` 중첩 + 하위 `ul.ml-7.border-l.border-sidebar-border`(DESIGN §6-4 tree 예외)로 그린다. 활성 판정은 `nav-active.ts`(`hasNavChildren`·`isNavParentActive`) — 펼침에서는 활성 자식이 있으면 부모가 비활성, 접힘에서는 하위를 숨기고 부모 prefix 로 판정해 `aria-current='page'`·활성 `layoutId` 마커가 **항상 1개**다(테스트로 고정). `DEFAULT_BOARDS` 는 마이그레이션 0006 시드와 이 하위 메뉴가 공유하는 계약이라 게시판 추가 시 두 곳을 함께 고친다.
+- 공개 헤더의 "게시판" 은 드롭다운이다(ADR-0036): `widgets/app-shell/public-header-actions.tsx` 가 shadcn `DropdownMenu` 로 트리거(`Button variant='cell' size='cell'` + `ChevronDownIcon aria-hidden`, `aria-haspopup`·`aria-expanded` 는 Radix) + 항목 4개("게시판 전체" `/boards` 정확 일치 + `DEFAULT_BOARDS` 3개 `/boards/<key>` `matchPrefix`)를 그린다. 활성 판정은 레일과 같은 `isNavItemActive` 를 재사용해 활성 항목만 `aria-current='page'`(→ `bg-primary`). 메뉴 톤은 `rounded-none`·`shadow-none`·`ring-0` + `gap-px bg-background` + 항목 `bg-card`. `/boards` 인덱스는 포털로 유지한다.
 
 ## 4. 인증
 
@@ -112,9 +113,11 @@ docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · acknowledge/ · memor
 ## 8. 시각 계층·모션
 
 - 계층(ADR-0011): 레일 `bg-sidebar` → 콘텐츠 사이드바 컬럼 `bg-muted`(콘텐츠 전체 높이) → 탭 스트립 `bg-background`(활성 탭 `bg-card`) → 블록 `bg-card`(1px 심 `gap-px`). 보더는 표만 허용, 라운드·그림자 없음(공개 표면은 `.surface-public` 토큰으로 6px 라운드). 콘텐츠 영역은 dvh 를 채우고 남는 부분은 `bg-card` 채움 블록.
+- 섹션 배경 계층(ADR-0036): 페이지 안의 세로 계층은 **페이지 `bg-background`(1px 심) → 섹션 헤더 스트립 `bg-muted` → 블록 `bg-card`** 3단이다(DESIGN §3-3 three-tier rule). 적용 화면은 `SectionHeading` 제목 스트립(같은 행의 "더 보기" 셀은 `bg-card` 유지), 커뮤니티 홈·게시판 인덱스·탐색·트립 목록의 페이지 대문, 프로필 탭 아래 목록에 새로 세운 `SectionHeading`(`TAB_SECTION_TITLE`: 작성한 글·공개 트립·좋아요한 트립). 인트로 하단 두 섹션은 여백 구분 대신 패널 `flex flex-col gap-px bg-border` + 스트립 `bg-muted p-6`(`IntroSectionHeading` 의 `className`) 구조이고, 공개 표면이라 심 토큰이 `bg-border` 다.
+- 게시판 셀(ADR-0036): `features/community/board-cells.tsx` 가 `DEFAULT_BOARDS` 3종을 `Button variant='cell' size='cell' asChild` + `Link`(→ `/boards/<key>`) 로 그린다. 부모 `flex flex-wrap items-stretch gap-px bg-background` + 우측 `aria-hidden bg-card` 채움 셀, 컨테이너는 `nav aria-label='게시판 바로가기'`. 배치처는 커뮤니티 홈의 "최신 글" 섹션과 비로그인 인트로의 "커뮤니티 최신 글" 섹션(심 `bg-border`) 두 곳이다.
 - 셀형 액션(ADR-0023): 앱 전역의 버튼은 `Button variant='cell'|'cellPrimary'|'cellDestructive' size='cell'|'cellIcon'` 로, 부모 `flex gap-px bg-background` 안에서 1px 심으로 구분한다(라운드·보더 없음, `aria-pressed` 는 primary). 드래그 핸들 같은 작은 아이콘은 `ghost icon-xs` 유지. 일정 종류 배지·범례 색은 `trip-viewer-kind.ts` 의 토큰 → 클래스 정적 맵(ADR-0025).
 - 편집기 정렬 행(ADR-0034): 공용 `features/trip-editor/sortable-row.tsx` 가 행 루트 `flex items-stretch gap-px bg-background` + 내용 셀 `bg-card p-3` + 삭제 `cell`·`cellIcon` 풀하이트 셀(Tooltip + `aria-label`) 구조다. 선택 행은 내용 셀과 삭제 셀을 **둘 다** `bg-accent` 로 칠한다. 핸들·번호 묶음은 `-my-1 h-6`, 라벨 라인은 `EDITOR_LABEL_LINE_CLASS='leading-4'`(`editor-form.ts`)로 중심선을 맞춘다. 날짜 탭 행은 `번호 | 탭 라벨(mono muted, min-w-20 max-w-32) | 제목(truncate)`, 여행 정보 탭 섹션 헤더는 `[기본 펼침][블록 추가][섹션 삭제(cellDestructive)]` 셀 행 + 블록 삭제 툴팁 셀. 셀 행을 카드 패딩 안에 넣으면 심이 한쪽만 생긴다(댓글 `7adc2fa` 와 같은 결함).
-- 카드 메타는 배지가 아니라 텍스트(ADR-0034, 트립 카드 한정): 상태는 `TRIP_STATUS_TEXT_CLASS`(`features/trips/trip-status.ts`, 배경 틴트 없음), 상태·역할·목적지는 mono `text-2xs` 메타 줄. 게시판 배지·"채택됨" 배지는 의미 표시라 유지. 공개 트립 그리드는 `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3` + 카드 `w-full min-w-0`(부모 `li` 가 flex 라 `w-full` 이 없으면 `max-content` 폭에서 멈춘다), 텍스트는 `truncate`·`break-keep`.
+- 카드 메타는 배지가 아니라 텍스트(ADR-0034, 트립 카드 한정): 상태는 `TRIP_STATUS_TEXT_CLASS`(`features/trips/trip-status.ts`, 배경 틴트 없음), 상태·역할·목적지는 mono `text-2xs` 메타 줄. 게시판 배지·"채택됨" 배지는 의미 표시라 유지. 공개 트립 그리드는 auto-fit(`grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))]`, 최소 폭 상수 `AUTO_FIT_COLUMNS_CLASS` — 카드가 1개면 전체 폭, 좁은 폭에서는 1열, ADR-0036) + 카드 `w-full min-w-0`(부모 `li` 가 flex 라 `w-full` 이 없으면 `max-content` 폭에서 멈춘다), 텍스트는 `truncate`·`break-keep`.
 - 모션: 토큰 `shared/lib/motion.ts`(0.18s fade·0.24s bar·standard ease·stagger). 루트 `MotionConfig reducedMotion='never'`; 모션 감소는 앱 내 설정 `use-motion-preference`(사용자 메뉴 토글, localStorage `trip-motion`). 페이지 전환 fade, 뷰·날짜 전환 `AnimatePresence`, 목록 stagger, 체크 완료 opacity/strike, 진행바 트윈, 탭·날짜 인디케이터 `layoutId`. 편집기 정렬 행(`SortableRows`)은 진입 페이드만 쓰고 `AnimatePresence`·exit 는 쓰지 않는다(ADR-0019). 다크 토큰·`dark:` 변형은 `@media screen` 한정이라 인쇄는 항상 라이트 토큰이다.
 - 테마: next-themes(class), 전역 단축키 `d`(`shared/ui/theme-provider.tsx`).
 
@@ -130,7 +133,7 @@ docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · acknowledge/ · memor
 
 ## 11. 검증
 
-`bun run typecheck` → `bun run lint` → `bun test` → `bun run build`. UI 는 브라우저에서 라이트·다크 확인 후 완료 보고(`docs/quality-assurance/`).
+`bun run typecheck` → `bun run lint` → `bun run format:check` → `bun test` → `bun run build`. **검증은 한 번만 한다**(ADR-0036 §6): 구현 단계에서 이 사다리(필요하면 자체 브라우저 확인)를 끝내면 별도의 리뷰·실측·재확인 단계를 두지 않고 문서 → 배포로 간다. 라이트·다크 전수 실측이나 리뷰 렌즈는 사용자가 따로 요청할 때만 넣고, 결과는 `docs/quality-assurance/` 에 남긴다.
 
 ## 12. 리치 텍스트 (ADR-0027)
 
@@ -148,4 +151,6 @@ docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · acknowledge/ · memor
 - 프로필: `/u/[username]` 대문(`banner_url`)·사진(`image`)·표시 이름·소개·포인트 합계·가입일 + 탭(글/공개 트립/좋아요한 트립). `/settings/profile` 은 `profileUpdateSchema`(`avatarUploadId`·`bannerUploadId`: `undefined` 유지 / `null` 제거 / id 교체 — 서버가 본인 소유·kind 일치 업로드만 해석).
 - 링크형 탭·정렬 셀은 `aria-current='page'`(Button `cell` 크기에 스타일), 실제 토글 버튼은 `aria-pressed`. 목록은 오프셋 20 페이지네이션(무한 스크롤 미도입).
 - 댓글 항목(`features/community/comment-item.tsx`)은 내용 블록(`bg-card p-3`: 작성자 칩·채택 배지·본문)과 액션 셀 행(답글·채택·삭제 + `bg-card` 채움, 부모 `gap-px bg-background`)의 2블록이다. 셀 행을 카드 패딩 안에 넣으면 심이 한쪽만 생겨 ADR-0011 을 어긴다(세션 4 `7adc2fa`).
+- 게시판 진입 경로는 넷이다(ADR-0036): 앱 셸 레일 tree(로그인) · 공개 헤더 드롭다운(비로그인) · 커뮤니티 홈·인트로 최신 글 섹션의 `BoardCells` · `/boards` 인덱스 포털. 넷 다 `DEFAULT_BOARDS` 한 상수를 읽으므로 게시판을 추가하면 마이그레이션 시드와 이 상수를 함께 고치는 것으로 전부 따라온다.
+- 프로필 탭 목록은 탭별 `SectionHeading` 스트립을 갖는다(ADR-0036). 목록 자체(`PostList`·`PublicTripGrid`)와 페이지네이션 셀은 그대로다.
 - 4-5 확장 예정(ADR-0033 §3): 채택 변경·취소(원장 회수), 소프트 삭제, 댓글 수정, 신고·`/admin/reports`·밴, 사용자 간 차단, 사용자명 변경 — 마이그레이션 0008(0007 은 출발 공항이 썼다).

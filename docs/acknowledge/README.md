@@ -40,3 +40,4 @@
 - [ADR-0033 — 로드맵 확장: OSM 제거, 인증 확장 착수, 커뮤니티 범위 밖 기능 수용, i18n(ko·ja·en) (2026-09-10)](0033-roadmap-expansion-i18n-auth-community.md)
 - [ADR-0034 — 세션 4 UI 정정: 레일 게시판 tree, 편집기 행 정렬, 카드 배지 제거, 모바일 1열 (2026-09-10)](0034-session-4-ui-corrections.md)
 - [ADR-0035 — 트립별 출발 공항과 지구본 상호작용(툴팁·드래그 회전·경로 필터) (2026-09-10)](0035-trip-departure-airport-and-globe-interactions.md)
+- [ADR-0036 — 공개 헤더 게시판 드롭다운·섹션 배경 계층·auto-fit 카드 그리드 (2026-09-10)](0036-public-boards-menu-section-tiers-and-grid.md)

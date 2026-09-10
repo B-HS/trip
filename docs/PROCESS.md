@@ -1,6 +1,6 @@
 # PROCESS — trip
 
-> 최종 갱신: 2026-09-10 · 대응 커밋: `9f52a9c`(세션 4 후반 UI 정정 ADR-0034) + 4-4e 지구본 확장(ADR-0035, `8b9fbd5` — origin/dev·prod 동기화, prod 배포 `dpl_8P8LFrBSrpJrA7NQQqxW1eNQqvYz` Ready · 마이그레이션 0007 은 적용됨)
+> 최종 갱신: 2026-09-10 · 대응 커밋: `8b9fbd5`(4-4e 지구본 확장 ADR-0035, origin/dev·prod 동기화, prod 배포 `dpl_8P8LFrBSrpJrA7NQQqxW1eNQqvYz` Ready · 마이그레이션 0007 은 적용됨) + 4-4f 공개 게시판 메뉴·섹션 배경 계층·auto-fit 그리드(ADR-0036, **미커밋**)
 > 기준 문서: `~/.claude/convention/*.md`, `~/personal-llm/*.md`, `docs/HANDOFF.md`(세션 진입점), `docs/ARCHITECTURE.md`, `docs/acknowledge/README.md`, `docs/DESIGN.md`
 
 ## 완료 — 초기 구축 (2026-09-09, Phase 1~3)
@@ -50,7 +50,8 @@
         - [x] 4-4c-4. prod 글 상세 500(jsdom `require(esm)`) → `isomorphic-dompurify` 대신 `dompurify` + `jsdom` 26.1 정확 고정(`0ce5c30`). happy-dom 창은 under-sanitize 로 기각. 원인·대안 비교는 `docs/bug/2026-09-10-post-detail-500-on-vercel.md`
         - [x] 4-4d. 세션 4 후반 UI 정정(ADR-0034, 미커밋 — `feat(app-shell)` + `fix(ui)` 커밋 예정): 레일 게시판 tree(`nav-sub-item`·`NavItemLink.children`·`isNavParentActive`, 활성 마커 1개 테스트 고정) · 편집기 행 셀형 정렬(`sortable-row` 셀 구조·`EDITOR_LABEL_LINE_CLASS`·날짜 탭 3열·여행 정보 섹션 헤더 셀 행·`DAY_TABLE_HINT`) · 트립 카드 배지 → 텍스트(`TRIP_STATUS_TEXT_CLASS`) · 모바일 1열(`grid-cols-1`·`min-w-0`·`break-keep`) · DESIGN §6-4·§10-11 개정. 브라우저 실측(A~F, 라이트·다크) 후 지적 4건 반영(`allowedDevOrigins`, 공개 헤더 셀 상시 렌더, 라이트 `--sidebar-border` 대비, 카드 `w-full`) → 재확인 통과. 검증 typecheck·lint·format·`bun test` 459
         - [x] 4-4e. 지구본 확장(ADR-0035, 대응 커밋 `8b9fbd5` — origin/dev·prod 동기화, prod 배포 `dpl_8P8LFrBSrpJrA7NQQqxW1eNQqvYz` Ready, `trip.gumyo.net` 스모크 통과): **마이그레이션 0007 적용**(`trip_trip.departure_airport_code varchar(3) NULL`, 추가 전용, 이력 8행) · `AIRPORT_CODES`·`asAirportCode` · 템플릿 JSON 선택 필드(오사카 `'ICN'`) · `PUBLIC_TRIP_CACHE_VERSION='4'` · 편집기 기본 정보 탭 `AirportCombobox`(생성 폼 미노출) · `/trips` 지구본 드래그 회전(`dragRotate`, 정밀 포인터 한정 OrbitControls) · 선 hover DOM 툴팁(`globe-interaction.ts` 의 `placeGlobeTooltip`·`GLOBE_ARC_STYLE`) · 선 클릭 `?route=` 필터 + 해제 셀(`collectGlobeRoutes`·`findGlobeRoute`·`filterTripsByRoute`, `shared/lib/search-param.ts` 공용). 브라우저 실측(A~F, 라이트·다크) → 지적 2건 중 히트 반경(should)을 ADR §5 대로 글로우 튜브 핸들러로 되돌려 수정 → 재확인 통과. 검증 typecheck·lint·`format:check`·`bun test` 506
-    - [ ] 4-5. 로드맵 6 확장(ADR-0036 예정, ADR-0033 §3): 마이그레이션 0008(soft delete·신고·차단·원장 revoked), 채택 변경·취소(+포인트 회수), 댓글 수정, 신고·`/admin/reports`·밴, 사용자 간 차단, 사용자명 변경 — **다음 작업**
+        - [x] 4-4f. 공개 게시판 메뉴·섹션 배경 계층·카드 그리드(ADR-0036, 미커밋): 비로그인 공개 헤더의 "게시판" 을 shadcn `DropdownMenu` 로(트리거 `Button variant='cell' size='cell'` + `ChevronDownIcon`, 항목 "게시판 전체" + `DEFAULT_BOARDS` 3개, 활성은 레일과 공유하는 `isNavItemActive` → `aria-current='page'`, `/boards` 인덱스는 포털 유지) · 섹션 배경 3단 규칙(페이지 `bg-background` → 섹션 헤더 스트립 `bg-muted` → 블록 `bg-card`)을 `SectionHeading`·커뮤니티 홈·게시판 인덱스·탐색·트립 목록 대문·프로필 탭 섹션에 적용하고 인트로 하단 두 섹션은 패널(`gap-px bg-border`) + 스트립(`bg-muted p-6`) 구조로 전환 · `features/community/board-cells.tsx` 신규(홈·인트로 최신 글 섹션에 게시판 3셀 + `bg-card` 채움 셀) · 공개 트립 그리드를 auto-fit(`minmax(min(100%,18rem),1fr)`, 카드 1개면 전체 폭)으로 · `docs/env.md` 신규(키 목록·발급 방법·`.env.example` 갱신 블록). 검증 typecheck·lint·`format:check`·`bun test` 528 통과, **별도 실측 단계 없음**(아래 진행 메모의 검증 규칙)
+    - [ ] 4-5. 로드맵 6 확장(ADR-0037 예정, ADR-0033 §3): 마이그레이션 0008(soft delete·신고·차단·원장 revoked), 채택 변경·취소(+포인트 회수), 댓글 수정, 신고·`/admin/reports`·밴, 사용자 간 차단, 사용자명 변경 — **다음 작업**
 - [ ] 5단계. i18n ko·ja·en(ADR-0033 §4): next-intl, 프리픽스 as-needed, 쿠키, 언어 전환 셀, 전 문구·검증·toast·메타데이터 카탈로그화, 날짜·숫자 locale 포맷
 - [ ] 6단계. 인증 확장(ADR-0033 §2): Naver·GitHub OAuth, 이메일 인증(Cloudflare mail worker, 리서치 후), 약관·동의(`docs/legal/` ko→ja·en, korean-law-mcp)
 - [ ] 7단계. 로드맵 4 AI(ADR-0029: Vercel Queues, 자기 키만, AES-GCM, `APP_ENCRYPTION_KEY` 없이 구현 후 키 등록 시 테스트)
@@ -60,7 +61,7 @@
 
 - [ ] QA 잔여: 모바일 Sheet 닫힘 포커스 복귀, 편집기 검증 오류 문구 한국어화(사용자가 직접 본 뒤 결정), 일정 종류 `key` 입력란 노출 여부, R2 설정 후 이미지 업로드
 - [x] 로드맵 3 OSM 은 제거(ADR-0033 §1), 7 의 OAuth·이메일 인증·약관은 6단계로 착수(ADR-0033 §2)
-- [ ] 사용자 작업: `.env`·Vercel 환경변수에 `APP_ENCRYPTION_KEY`·`R2_ACCOUNT_ID`·`R2_ACCESS_KEY_ID`·`R2_SECRET_ACCESS_KEY`·`R2_BUCKET`·`R2_PUBLIC_BASE_URL` 추가, `.env.example` 에 이름 추가(AI 는 `.env*` 접근 불가), R2 커스텀 도메인 연결, Vercel CLI 링크(`vercel link`, Queues 로컬 개발용)
+- [ ] 사용자 작업: 환경변수는 **`docs/env.md` 가 정본**이다(키 목록·발급 방법·`.env.example` 에 붙여 넣을 블록·빌드 타임 여부). 지금 채울 것은 R2 5개와 `APP_ENCRYPTION_KEY`(§3), `.env.example` 갱신(§2, AI 는 `.env*` 접근 불가), R2 커스텀 도메인 연결. 그 외 Vercel CLI 링크(`vercel link`, Queues 로컬 개발용)
 
 ### 진행 메모
 
@@ -76,4 +77,8 @@
 - 게시판 목록 계약(ADR-0034): `shared/constant/community.ts` 의 `DEFAULT_BOARDS` 는 마이그레이션 0006 시드와 레일 하위 메뉴가 함께 참조한다. 게시판을 추가·변경하면 **두 곳을 같이** 고친다.
 - dev 오리진(ADR-0034): `next.config.ts` 의 `allowedDevOrigins` 에 `localhost`·`127.0.0.1`·`[::1]` 을 둔다. 없으면 Next 16 의 크로스 사이트 dev 차단이 `[::1]` 오리진의 `/_next/*` 를 403 으로 막아 비로그인 검증용 루프백 호스트가 하이드레이션되지 않는다(프로덕션 빌드에는 영향 없음).
 - 지구본 히트 테스트(ADR-0035): 포인터 핸들러는 **이미 그리는 글로우 튜브**에 붙인다. 별도의 보이지 않는 히트 mesh 를 겹치면 "보이는 선 ≠ 잡히는 선" 이 되어 이웃 호를 잡는다(실측으로 확인·되돌림). 호를 굵게 잡고 싶으면 `GLOBE_ARC_STYLE` 의 `radiusScale` 로 조절한다.
+- 검증 횟수(사용자 지시 2026-09-10, ADR-0036 §6): **검증은 한 번만 한다.** 구현 에이전트가 typecheck·lint·prettier·`bun test`(필요하면 자체 브라우저 확인)까지 끝내면 별도의 리뷰·실측·재확인 단계를 두지 않고 문서 → 배포로 간다. 라이트·다크 전수 실측·리뷰 렌즈는 사용자가 따로 요청할 때만 넣는다. 4-4d·4-4e 처럼 "구현 → 리뷰 → 수정 → 실측 → 수정 → 재확인" 5단계로 도는 것은 과하다는 지적이다.
+- 환경변수(ADR-0036 §5): 키 목록·용도·발급 방법·로컬/Vercel/빌드 타임 여부는 **`docs/env.md` 가 정본**이다(코드 정본은 `shared/lib/env.ts`·`next.config.ts`). `.env.example` 은 AI 가 읽지도 쓰지도 못하므로 붙여 넣을 블록을 그 문서 §2 에 둔다. 새 키가 생기면 이름만 문서와 `.env.example` 에 더한다.
+- 섹션 배경 계층(ADR-0036): 새 화면을 만들 때 페이지 대문·섹션 제목 스트립은 `bg-muted`, 그 아래 목록·카드 블록은 `bg-card` 다. 스트립과 블록을 둘 다 `bg-card` 로 두면 1px 심만 남아 계층이 무너진다.
+- 게시판 진입 경로(ADR-0036): 레일 tree · 공개 헤더 드롭다운 · `BoardCells`(홈·인트로) · `/boards` 인덱스 넷이 전부 `DEFAULT_BOARDS` 를 읽는다. 게시판을 추가하면 마이그레이션 시드와 이 상수만 고치면 넷이 따라온다.
 - 문서 드리프트(알고 있음): 라이트 `--sidebar-border` 를 `--palette-neutral-708` 로 올려 `docs/DESIGN.md` 139·235 행(`neutral-900` = sidebar-border light)과 어긋난다. DESIGN 은 외부 원본이라 팔레트 표는 고치지 않는다(ADR-0034 §6).
