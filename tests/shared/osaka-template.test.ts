@@ -21,6 +21,7 @@ describe('오사카 템플릿 스키마', () => {
         expect(parsed.title).toBe('오사카 여행 노트')
         expect(parsed.eyebrow).toBe('KANSAI / OCTOBER 2026')
         expect(parsed.destination).toBe('오사카')
+        expect(parsed.departureAirportCode).toBe('ICN')
         expect(parsed.startDate).toBe('2026-10-01')
         expect(parsed.endDate).toBe('2026-10-07')
         expect(parsed.customNights).toBe(6)

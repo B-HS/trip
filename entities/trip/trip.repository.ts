@@ -17,6 +17,7 @@ import type {
     SidebarValues,
     TripBasicsValues,
 } from '@/entities/trip/trip.validate'
+import { asAirportCode } from '@/shared/constant/airports'
 import { isCountryCode } from '@/shared/constant/countries'
 import { DEFAULT_SCHEDULE_KIND_KEY, DEFAULT_SCHEDULE_KINDS } from '@/shared/constant/trip'
 import { getDb } from '@/shared/db/client'
@@ -63,6 +64,7 @@ const toTripValues = (basics: TripBasicsValues) => ({
     title: basics.title,
     eyebrow: basics.eyebrow,
     destination: basics.destination,
+    departureAirportCode: basics.departureAirportCode,
     startDate: basics.startDate,
     endDate: basics.endDate,
     customNights: basics.customNights,
@@ -336,6 +338,7 @@ export const findTripSummariesForUser = async (userId: string) => {
                 title: row.title,
                 eyebrow: row.eyebrow,
                 destination: row.destination,
+                departureAirportCode: row.departureAirportCode,
                 startDate: row.startDate,
                 endDate: row.endDate,
                 customNights: row.customNights,
@@ -551,6 +554,7 @@ export const exportTripTemplate = async (tripId: string) => {
         title: detail.title,
         eyebrow: detail.eyebrow,
         destination: detail.destination,
+        departureAirportCode: asAirportCode(detail.departureAirportCode),
         startDate: detail.startDate,
         endDate: detail.endDate,
         customNights: detail.customNights,

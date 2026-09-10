@@ -5,6 +5,7 @@ export const OSAKA_TRIP_TEMPLATE = {
     title: '오사카 여행 노트',
     eyebrow: 'KANSAI / OCTOBER 2026',
     destination: '오사카',
+    departureAirportCode: 'ICN',
     startDate: '2026-10-01',
     endDate: '2026-10-07',
     customNights: 6,

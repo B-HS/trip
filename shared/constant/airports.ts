@@ -46,4 +46,8 @@ export const AIRPORTS = {
 
 export type AirportCode = keyof typeof AIRPORTS
 
+export const AIRPORT_CODES = Object.keys(AIRPORTS) as AirportCode[]
+
 export const isAirportCode = (code: string): code is AirportCode => code in AIRPORTS
+
+export const asAirportCode = (code: string | null) => (code !== null && isAirportCode(code) ? code : null)

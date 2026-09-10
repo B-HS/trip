@@ -12,6 +12,20 @@ describe('parseTripTemplateJson', () => {
         expect(parsed?.days.length).toBe(OSAKA_TRIP_TEMPLATE.days.length)
     })
 
+    test('출발 공항을 생략하면 null 로 채운다', () => {
+        const { departureAirportCode, ...template } = OSAKA_TRIP_TEMPLATE
+        expect(departureAirportCode).toBe('ICN')
+        expect(parseTripTemplateJson(JSON.stringify(template))?.departureAirportCode).toBeNull()
+    })
+
+    test('출발 공항이 AIRPORTS 키가 아니면 null 을 반환한다', () => {
+        expect(parseTripTemplateJson(JSON.stringify({ ...OSAKA_TRIP_TEMPLATE, departureAirportCode: 'ZZZ' }))).toBeNull()
+    })
+
+    test('출발 공항을 그대로 왕복한다', () => {
+        expect(parseTripTemplateJson(JSON.stringify({ ...OSAKA_TRIP_TEMPLATE, departureAirportCode: 'PUS' }))?.departureAirportCode).toBe('PUS')
+    })
+
     test('사이드바 링크가 http 주소가 아니면 null 을 반환한다', () => {
         const template = { ...OSAKA_TRIP_TEMPLATE, sidebarLinks: [{ label: '안내', url: 'javascript:alert(1)', description: null }] }
         expect(parseTripTemplateJson(JSON.stringify(template))).toBeNull()

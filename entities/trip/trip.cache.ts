@@ -5,7 +5,7 @@ import { findPublicTripBySlug, findTripDetail, findTripSummariesForUser } from '
 import { tripShareTag } from '@/entities/trip/trip.tag'
 
 const PUBLIC_TRIP_REVALIDATE_SECONDS = 60 * 60
-const PUBLIC_TRIP_CACHE_VERSION = '3'
+const PUBLIC_TRIP_CACHE_VERSION = '4'
 
 export const getTripList = (userId: string) => findTripSummariesForUser(userId)
 

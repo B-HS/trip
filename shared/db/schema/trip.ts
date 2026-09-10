@@ -39,6 +39,7 @@ export const trip = tripTable(
         title: varchar('title', { length: 120 }).notNull(),
         eyebrow: varchar('eyebrow', { length: 120 }),
         destination: varchar('destination', { length: 120 }).notNull(),
+        departureAirportCode: varchar('departure_airport_code', { length: 3 }),
         startDate: date('start_date', { mode: 'string' }).notNull(),
         endDate: date('end_date', { mode: 'string' }).notNull(),
         customNights: int('nights'),

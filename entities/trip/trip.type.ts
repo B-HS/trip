@@ -77,7 +77,7 @@ export type TripDetail = PublicTrip & { viewerRole: MemberRole | null }
 
 export type TripSummary = Pick<
     Trip,
-    'id' | 'title' | 'eyebrow' | 'destination' | 'startDate' | 'endDate' | 'customNights' | 'customDays' | 'periodNote'
+    'id' | 'title' | 'eyebrow' | 'destination' | 'departureAirportCode' | 'startDate' | 'endDate' | 'customNights' | 'customDays' | 'periodNote'
 > & {
     role: MemberRole
     dayCount: number

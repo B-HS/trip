@@ -63,6 +63,18 @@ describe('tripBasicsSchema', () => {
     test('제목이 비어 있으면 실패한다', () => {
         expect(() => tripBasicsSchema.parse({ ...basics, title: '' })).toThrow()
     })
+
+    test('출발 공항을 생략하거나 비우면 null 이 된다', () => {
+        expect(tripBasicsSchema.parse(basics).departureAirportCode).toBeNull()
+        expect(tripBasicsSchema.parse({ ...basics, departureAirportCode: '' }).departureAirportCode).toBeNull()
+        expect(tripBasicsSchema.parse({ ...basics, departureAirportCode: null }).departureAirportCode).toBeNull()
+    })
+
+    test('출발 공항은 AIRPORTS 키만 허용한다', () => {
+        expect(tripBasicsSchema.parse({ ...basics, departureAirportCode: 'KIX' }).departureAirportCode).toBe('KIX')
+        expect(() => tripBasicsSchema.parse({ ...basics, departureAirportCode: 'ZZZ' })).toThrow()
+        expect(() => tripBasicsSchema.parse({ ...basics, departureAirportCode: 'icn' })).toThrow()
+    })
 })
 
 describe('destinationListSchema', () => {

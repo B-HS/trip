@@ -1,0 +1,1 @@
+ALTER TABLE `trip_trip` ADD `departure_airport_code` varchar(3);

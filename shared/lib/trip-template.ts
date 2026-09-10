@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { AIRPORT_CODES } from '@/shared/constant/airports'
 import { COUNTRY_CODES } from '@/shared/constant/countries'
 import {
     BOOKING_PRIORITIES,
@@ -35,6 +36,12 @@ const ATTACHMENT_URL_ISSUE = '첨부 주소는 http 또는 https 주소여야 �
 const optionalText = (max: number) => z.string().trim().max(max).nullable().default(null)
 const optionalUrl = z.url().max(500).nullable().default(null)
 const optionalLength = z.number().int().min(TRIP_LENGTH_MIN).max(TRIP_LENGTH_MAX).nullable().default(null)
+
+const optionalAirportCode = z
+    .union([z.enum(AIRPORT_CODES), z.literal('')])
+    .nullable()
+    .default(null)
+    .transform((value) => (value === '' ? null : value))
 
 export const hasPairedTripLength = (value: { customNights: number | null; customDays: number | null }) =>
     (value.customNights === null) === (value.customDays === null)
@@ -173,6 +180,7 @@ export const tripTemplateFieldsSchema = z.object({
     title: z.string().trim().min(1).max(120),
     eyebrow: optionalText(120),
     destination: z.string().trim().min(1).max(120),
+    departureAirportCode: optionalAirportCode,
     startDate: z.string().regex(DATE_PATTERN),
     endDate: z.string().regex(DATE_PATTERN),
     customNights: optionalLength,

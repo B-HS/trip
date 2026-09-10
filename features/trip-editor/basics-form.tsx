@@ -6,6 +6,7 @@ import { PlusIcon } from 'lucide-react'
 import { useEffect, useRef, type FC } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { tripBasicsFormSchema, type TripBasicsFormInput, type TripBasicsFormValues } from '@/entities/trip/trip.validate'
+import { AirportCombobox } from '@/features/trip-editor/airport-combobox'
 import { EditorField } from '@/features/trip-editor/editor-field'
 import { EditorFormShell } from '@/features/trip-editor/editor-form-shell'
 import { EditorPanel } from '@/features/trip-editor/editor-panel'
@@ -26,6 +27,8 @@ import { TRIP_LENGTH_MAX, TRIP_LENGTH_MIN } from '@/shared/constant/trip'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Textarea } from '@/shared/ui/textarea'
+
+const DEPARTURE_AIRPORT_HINT = '고르지 않으면 기본 ICN 으로 계산합니다.'
 
 type BasicsFormProps = {
     defaultValues: TripBasicsFormInput
@@ -71,6 +74,25 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                         className={EDITOR_INPUT_CLASS}
                         aria-invalid={!!errors.destination}
                         {...form.register('destination')}
+                    />
+                </EditorField>
+                <EditorField
+                    label='출발 공항'
+                    htmlFor='basics-departure-airport'
+                    error={errors.departureAirportCode?.message}
+                    hint={DEPARTURE_AIRPORT_HINT}>
+                    <Controller
+                        control={form.control}
+                        name='departureAirportCode'
+                        render={({ field, fieldState }) => (
+                            <AirportCombobox
+                                id='basics-departure-airport'
+                                className={EDITOR_INPUT_CLASS}
+                                value={field.value ?? null}
+                                isInvalid={fieldState.invalid}
+                                onChange={field.onChange}
+                            />
+                        )}
                     />
                 </EditorField>
                 <EditorField label='기간 문구' htmlFor='basics-period-note' error={errors.periodNote?.message}>

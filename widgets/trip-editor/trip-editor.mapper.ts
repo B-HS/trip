@@ -11,6 +11,7 @@ import type {
     SidebarInput,
     TripBasicsInput,
 } from '@/entities/trip/trip.validate'
+import { asAirportCode } from '@/shared/constant/airports'
 
 const DATE_FORMAT = 'YYYY-MM-DD'
 const SHORT_LABEL_FORMAT = 'MM.DD'
@@ -23,6 +24,7 @@ export const toBasicsDefaults = (detail: TripDetail) =>
         title: detail.title,
         eyebrow: detail.eyebrow,
         destination: detail.destination,
+        departureAirportCode: asAirportCode(detail.departureAirportCode),
         startDate: detail.startDate,
         endDate: detail.endDate,
         customNights: detail.customNights,
