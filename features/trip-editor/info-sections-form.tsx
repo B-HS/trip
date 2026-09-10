@@ -61,13 +61,8 @@ export const InfoSectionsForm: FC<InfoSectionsFormProps> = ({ defaultValues, onS
                 ) : (
                     <SortableRows ids={rows.fields.map((row) => row.fieldKey)} onReorder={rows.move}>
                         {rows.fields.map((row, index) => (
-                            <SortableRow
-                                key={row.fieldKey}
-                                id={row.fieldKey}
-                                index={index}
-                                removeLabel='섹션 삭제'
-                                onRemove={() => rows.remove(index)}>
-                                <InfoSectionRow sectionIndex={index} />
+                            <SortableRow key={row.fieldKey} id={row.fieldKey} index={index}>
+                                <InfoSectionRow sectionIndex={index} onRemove={() => rows.remove(index)} />
                             </SortableRow>
                         ))}
                     </SortableRows>

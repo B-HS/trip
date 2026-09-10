@@ -7,6 +7,7 @@ import { EditorToolbar } from '@/features/trip-editor/editor-toolbar'
 import { reorderItems } from '@/features/trip-editor/reorder'
 import { SortableRow } from '@/features/trip-editor/sortable-row'
 import { SortableRows } from '@/features/trip-editor/sortable-rows'
+import { cn } from '@/shared/lib/utils'
 import {
     AlertDialog,
     AlertDialogCancel,
@@ -17,6 +18,8 @@ import {
     AlertDialogTitle,
 } from '@/shared/ui/alert-dialog'
 import { Button } from '@/shared/ui/button'
+
+const DAY_SHORT_LABEL_WIDTH_CLASS = 'min-w-20 max-w-32'
 
 type DayListItem = Pick<TripDay, 'id' | 'shortLabel' | 'title'>
 
@@ -75,8 +78,14 @@ export const DayList: FC<DayListProps> = ({ days, selectedDayId, onSelect, onCre
                                 className='flex w-full min-w-0 items-center gap-2 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50'
                                 type='button'
                                 onClick={() => onSelect(day.id)}>
-                                <span className='font-mono text-xs tabular-nums'>{day.shortLabel}</span>
-                                <span className='min-w-0 flex-1 truncate text-xs'>{day.title}</span>
+                                <span
+                                    className={cn(
+                                        DAY_SHORT_LABEL_WIDTH_CLASS,
+                                        'shrink-0 truncate font-mono text-xs leading-4 text-muted-foreground tabular-nums',
+                                    )}>
+                                    {day.shortLabel}
+                                </span>
+                                <span className='min-w-0 flex-1 truncate text-xs leading-4 text-foreground'>{day.title}</span>
                             </button>
                         </SortableRow>
                     ))}

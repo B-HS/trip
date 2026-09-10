@@ -1,6 +1,7 @@
 'use client'
 
 import type { FC, PropsWithChildren } from 'react'
+import { EDITOR_LABEL_LINE_CLASS } from '@/features/trip-editor/editor-form'
 import { cn } from '@/shared/lib/utils'
 import { Field, FieldError, FieldLabel } from '@/shared/ui/field'
 
@@ -14,7 +15,7 @@ type EditorFieldProps = PropsWithChildren<{
 
 export const EditorField: FC<EditorFieldProps> = ({ label, htmlFor, error, hint, className, children }) => (
     <Field className={cn('gap-1.5', className)} data-invalid={error !== undefined}>
-        <FieldLabel className='text-xs font-medium text-muted-foreground' htmlFor={htmlFor}>
+        <FieldLabel className={cn(EDITOR_LABEL_LINE_CLASS, 'text-xs font-medium text-muted-foreground')} htmlFor={htmlFor}>
             {label}
         </FieldLabel>
         {children}

@@ -4,10 +4,9 @@ import { CalendarIcon, MapPinIcon, MoreHorizontalIcon, PencilIcon, PlaneIcon, Sq
 import Link from 'next/link'
 import type { FC } from 'react'
 import type { TripDestinationView } from '@/entities/trip/trip.type'
-import { TRIP_STATUS_BADGE_VARIANT, type TripStatus } from '@/features/trips/trip-status'
+import { TRIP_STATUS_TEXT_CLASS, type TripStatus } from '@/features/trips/trip-status'
 import { countryName } from '@/shared/constant/countries'
 import { cn } from '@/shared/lib/utils'
-import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/shared/ui/dropdown-menu'
 
@@ -50,7 +49,7 @@ export const TripCard: FC<TripCardProps> = ({
     onDelete,
     onToggleFavorite,
 }) => (
-    <article className='relative flex h-full flex-col gap-3 bg-card p-3 transition-colors focus-within:bg-accent hover:bg-accent'>
+    <article className='relative flex h-full min-w-0 flex-col gap-3 bg-card p-3 transition-colors focus-within:bg-accent hover:bg-accent'>
         <div className='flex items-start justify-between gap-2'>
             <div className='flex min-w-0 flex-col gap-1'>
                 {eyebrow !== null && <p className='truncate font-mono text-2xs tracking-widest text-muted-foreground uppercase'>{eyebrow}</p>}
@@ -102,16 +101,22 @@ export const TripCard: FC<TripCardProps> = ({
                 </DropdownMenu>
             </div>
         </div>
-        <div className='flex flex-wrap items-center gap-1.5'>
-            {status !== null && <Badge variant={TRIP_STATUS_BADGE_VARIANT[status.tone]}>{status.label}</Badge>}
-            <Badge variant='secondary'>{roleLabel}</Badge>
-        </div>
+        <p className='flex min-w-0 flex-wrap items-center gap-1.5 font-mono text-2xs break-keep text-muted-foreground'>
+            {status !== null && (
+                <>
+                    <span className={TRIP_STATUS_TEXT_CLASS[status.tone]}>{status.label}</span>
+                    <span aria-hidden>·</span>
+                </>
+            )}
+            <span>{roleLabel}</span>
+        </p>
         {destinations.length > 0 && (
-            <ul className='flex flex-wrap items-center gap-1.5'>
+            <ul className='flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5 text-2xs text-muted-foreground'>
                 {destinations.map((item, index) => (
-                    <li key={`${index}-${item.countryCode}`} className='flex items-center gap-1 bg-muted px-1.5 py-0.5 text-xs text-muted-foreground'>
-                        <span className='font-mono text-2xs tracking-widest'>{item.countryCode}</span>
-                        <span className='truncate'>{item.city ?? countryName(item.countryCode)}</span>
+                    <li key={`${index}-${item.countryCode}`} className='flex min-w-0 items-center gap-1'>
+                        {index > 0 && <span aria-hidden>·</span>}
+                        <span className='font-mono tracking-widest'>{item.countryCode}</span>
+                        <span className='truncate break-keep'>{item.city ?? countryName(item.countryCode)}</span>
                     </li>
                 ))}
             </ul>
@@ -135,7 +140,7 @@ export const TripCard: FC<TripCardProps> = ({
                 </div>
             )}
         </dl>
-        <p className='mt-auto font-mono text-2xs text-muted-foreground tabular-nums'>
+        <p className='mt-auto font-mono text-2xs break-keep text-muted-foreground tabular-nums'>
             일정 {scheduleCount} · 예매 {bookingCount} · {lengthLabel}
         </p>
     </article>

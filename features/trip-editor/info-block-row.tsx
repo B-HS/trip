@@ -11,6 +11,8 @@ import { Input } from '@/shared/ui/input'
 import { NativeSelect, NativeSelectOption } from '@/shared/ui/native-select'
 import { Textarea } from '@/shared/ui/textarea'
 
+const DAY_TABLE_HINT = '날짜별 일정으로 표를 자동 생성합니다. 별도 입력이 없습니다.'
+
 type InfoBlockRowProps = {
     sectionIndex: number
     blockIndex: number
@@ -41,9 +43,7 @@ export const InfoBlockRow: FC<InfoBlockRowProps> = ({ sectionIndex, blockIndex }
                 </NativeSelect>
             </EditorField>
             {isDayTable ? (
-                <p className='text-xs text-muted-foreground sm:col-span-1 lg:col-span-3'>
-                    날짜별 일정으로 표를 자동 생성합니다. 별도 입력이 없습니다.
-                </p>
+                <p className='self-center text-xs text-muted-foreground sm:col-span-1 lg:col-span-3'>{DAY_TABLE_HINT}</p>
             ) : (
                 <>
                     <EditorField label='강조 문구' htmlFor={`${fieldId}-emphasis`} error={errors?.emphasis?.message} className='lg:col-span-3'>

@@ -2,6 +2,7 @@ import { afterEach, describe, expect, mock, test } from 'bun:test'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { TripBasicsFormInput, TripBasicsFormValues } from '@/entities/trip/trip.validate'
 import { BasicsForm } from '@/features/trip-editor/basics-form'
+import { TooltipProvider } from '@/shared/ui/tooltip'
 
 const DEFAULT_VALUES = {
     title: '오사카 여행 노트',
@@ -25,7 +26,11 @@ const ROW_ANIMATION_SETTLE_MS = 300
 afterEach(cleanup)
 
 const renderForm = (onSubmit: (values: TripBasicsFormValues) => Promise<boolean>) =>
-    render(<BasicsForm defaultValues={DEFAULT_VALUES} onSubmit={onSubmit} isPending={false} />)
+    render(
+        <TooltipProvider>
+            <BasicsForm defaultValues={DEFAULT_VALUES} onSubmit={onSubmit} isPending={false} />
+        </TooltipProvider>,
+    )
 
 describe('BasicsForm', () => {
     test('기본값을 입력 필드에 채운다', () => {

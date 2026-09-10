@@ -82,17 +82,24 @@ describe('TripCard', () => {
         expect(screen.getByText('열람자')).toBeDefined()
     })
 
-    test('상태가 없으면 상태 배지를 그리지 않는다', () => {
+    test('상태가 없으면 상태 텍스트를 그리지 않는다', () => {
         render(<TripCard {...BASE_PROPS} status={null} />)
 
         expect(screen.queryByText('예정 D-22')).toBeNull()
+    })
+
+    test('상태와 역할을 배지 대신 한 줄 메타 텍스트로 보여준다', () => {
+        const { container } = render(<TripCard {...BASE_PROPS} />)
+
+        expect(container.querySelectorAll('[data-slot="badge"]').length).toBe(0)
+        expect(screen.getByText('예정 D-22').closest('p')?.contains(screen.getByText('소유자'))).toBe(true)
     })
 
     test('목적지를 나라 코드와 도시로 보여준다', () => {
         render(<TripCard {...BASE_PROPS} />)
 
         expect(screen.getByText('JP')).toBeDefined()
-        expect(screen.getAllByText('오사카').length).toBeGreaterThan(0)
+        expect(screen.getByText('JP').closest('li')?.textContent).toBe('JP오사카')
     })
 
     test('즐겨찾기 상태에 따라 토글 버튼 라벨이 바뀐다', () => {

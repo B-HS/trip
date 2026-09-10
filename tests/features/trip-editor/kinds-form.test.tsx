@@ -2,6 +2,7 @@ import { afterEach, describe, expect, mock, test } from 'bun:test'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { CSSProperties, PropsWithChildren, Ref } from 'react'
 import type { ScheduleKindInput, ScheduleKindsSaveValues } from '@/entities/trip/trip.validate'
+import { TooltipProvider } from '@/shared/ui/tooltip'
 
 type MotionStubProps = PropsWithChildren<{ className?: string; style?: CSSProperties; ref?: Ref<HTMLDivElement> }>
 
@@ -31,7 +32,11 @@ const DEFAULT_VALUES: ScheduleKindInput[] = [
 const settleRows = () => new Promise((resolve) => setTimeout(resolve, ROW_ANIMATION_SETTLE_MS))
 
 const renderForm = (onSubmit: (values: ScheduleKindsSaveValues) => Promise<boolean>, usageByKindId: Record<string, number> = {}) =>
-    render(<KindsForm defaultValues={DEFAULT_VALUES} usageByKindId={usageByKindId} onSubmit={onSubmit} isPending={false} />)
+    render(
+        <TooltipProvider>
+            <KindsForm defaultValues={DEFAULT_VALUES} usageByKindId={usageByKindId} onSubmit={onSubmit} isPending={false} />
+        </TooltipProvider>,
+    )
 
 afterEach(cleanup)
 

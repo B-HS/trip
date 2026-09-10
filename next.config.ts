@@ -9,12 +9,15 @@ const SECURITY_HEADERS = [
     { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
 ]
 
+const DEV_LOOPBACK_ORIGINS = ['localhost', '127.0.0.1', '[::1]']
+
 const uploadBaseUrl = process.env.R2_PUBLIC_BASE_URL
 
 const nextConfig: NextConfig = {
     reactCompiler: true,
     agentRules: false,
     typedRoutes: true,
+    allowedDevOrigins: DEV_LOOPBACK_ORIGINS,
     serverExternalPackages: ['mysql2'],
     images: { remotePatterns: uploadBaseUrl ? [new URL(`${uploadBaseUrl.replace(/\/+$/, '')}/**`)] : [] },
     headers: async () => [{ source: '/:path*', headers: SECURITY_HEADERS }],

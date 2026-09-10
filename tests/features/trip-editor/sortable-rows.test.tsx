@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { reorderItems, resolveReorder } from '@/features/trip-editor/reorder'
 import { SortableRow } from '@/features/trip-editor/sortable-row'
 import { SortableRows } from '@/features/trip-editor/sortable-rows'
+import { TooltipProvider } from '@/shared/ui/tooltip'
 
 const ROWS = [
     { id: 'row-a', label: '첫 행' },
@@ -16,13 +17,15 @@ afterEach(cleanup)
 
 const renderRows = (onRemove: (id: string) => void) =>
     render(
-        <SortableRows ids={ROW_IDS} onReorder={() => undefined}>
-            {ROWS.map((row, index) => (
-                <SortableRow key={row.id} id={row.id} index={index} removeLabel={`${row.label} 삭제`} onRemove={() => onRemove(row.id)}>
-                    <span>{row.label}</span>
-                </SortableRow>
-            ))}
-        </SortableRows>,
+        <TooltipProvider>
+            <SortableRows ids={ROW_IDS} onReorder={() => undefined}>
+                {ROWS.map((row, index) => (
+                    <SortableRow key={row.id} id={row.id} index={index} removeLabel={`${row.label} 삭제`} onRemove={() => onRemove(row.id)}>
+                        <span>{row.label}</span>
+                    </SortableRow>
+                ))}
+            </SortableRows>
+        </TooltipProvider>,
     )
 
 describe('resolveReorder', () => {

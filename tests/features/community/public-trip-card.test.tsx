@@ -37,6 +37,12 @@ const BASE_TRIP: PublicTripCardItem = {
 afterEach(cleanup)
 
 describe('PublicTripCard', () => {
+    test('카드가 자기 열 폭을 가득 채운다', () => {
+        const { container } = render(<PublicTripCard trip={BASE_TRIP} />)
+
+        expect(container.querySelector('article')?.className).toContain('w-full')
+    })
+
     test('제목 링크가 공개 트립 주소를 가리킨다', () => {
         render(<PublicTripCard trip={BASE_TRIP} />)
 
@@ -68,6 +74,23 @@ describe('PublicTripCard', () => {
         expect(screen.getByText('JP')).toBeDefined()
         expect(screen.getByRole('link', { name: '현석' }).getAttribute('href')).toBe('/u/hyunseok')
         expect(screen.getByText('7')).toBeDefined()
+    })
+
+    test('목적지를 나라 코드와 도시 메타 텍스트로 잇는다', () => {
+        render(
+            <PublicTripCard
+                trip={{
+                    ...BASE_TRIP,
+                    destinations: [
+                        { countryCode: 'JP', city: '오사카' },
+                        { countryCode: 'KR', city: '서울' },
+                    ],
+                }}
+            />,
+        )
+
+        expect(screen.getByText('JP').closest('li')?.textContent).toBe('JP오사카')
+        expect(screen.getByText('KR').closest('li')?.textContent).toBe('·KR서울')
     })
 
     test('머리말이 없으면 머리말 줄을 그리지 않는다', () => {

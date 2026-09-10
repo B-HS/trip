@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import type { BookingInput, BookingValues } from '@/entities/trip/trip.validate'
 import type { UploadedImage } from '@/entities/upload/upload.type'
 import { BookingsForm } from '@/features/trip-editor/bookings-form'
+import { TooltipProvider } from '@/shared/ui/tooltip'
 
 const UPLOAD_ID = '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d'
 const UPLOADED_URL = 'https://cdn.example.com/uploads/booking/2026/photo.jpg'
@@ -19,14 +20,16 @@ type RenderOptions = {
 
 const renderForm = ({ onSubmit = async () => true, isUploadEnabled = true, onUploadImage = async () => null }: RenderOptions = {}) =>
     render(
-        <BookingsForm
-            defaultValues={DEFAULT_VALUES}
-            onSubmit={onSubmit}
-            isPending={false}
-            isUploadEnabled={isUploadEnabled}
-            isUploading={false}
-            onUploadImage={onUploadImage}
-        />,
+        <TooltipProvider>
+            <BookingsForm
+                defaultValues={DEFAULT_VALUES}
+                onSubmit={onSubmit}
+                isPending={false}
+                isUploadEnabled={isUploadEnabled}
+                isUploading={false}
+                onUploadImage={onUploadImage}
+            />
+        </TooltipProvider>,
     )
 
 const addBooking = () => {

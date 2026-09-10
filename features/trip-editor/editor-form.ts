@@ -24,3 +24,5 @@ export const EDITOR_INPUT_CLASS = 'h-8'
 export const EDITOR_TEXTAREA_CLASS = 'min-h-16'
 
 export const EDITOR_GRID_CLASS = 'grid gap-3 sm:grid-cols-2'
+
+export const EDITOR_LABEL_LINE_CLASS = 'leading-4'

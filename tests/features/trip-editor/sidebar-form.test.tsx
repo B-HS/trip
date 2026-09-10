@@ -2,6 +2,7 @@ import { afterEach, describe, expect, mock, test } from 'bun:test'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { SidebarInput, SidebarValues } from '@/entities/trip/trip.validate'
 import { SidebarForm } from '@/features/trip-editor/sidebar-form'
+import { TooltipProvider } from '@/shared/ui/tooltip'
 
 const DEFAULT_VALUES = { sidebarNote: null, links: [] } satisfies SidebarInput
 
@@ -10,7 +11,11 @@ const ROW_ANIMATION_SETTLE_MS = 300
 afterEach(cleanup)
 
 const renderForm = (onSubmit: (values: SidebarValues) => Promise<boolean>) =>
-    render(<SidebarForm defaultValues={DEFAULT_VALUES} onSubmit={onSubmit} isPending={false} />)
+    render(
+        <TooltipProvider>
+            <SidebarForm defaultValues={DEFAULT_VALUES} onSubmit={onSubmit} isPending={false} />
+        </TooltipProvider>,
+    )
 
 const settleRows = () => new Promise((resolve) => setTimeout(resolve, ROW_ANIMATION_SETTLE_MS))
 

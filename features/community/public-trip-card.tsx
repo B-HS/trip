@@ -18,19 +18,18 @@ export const PublicTripCard: FC<PublicTripCardProps> = ({ trip }) => {
     const lengthLabel = formatTripLength({ startDate: trip.startDate, endDate: trip.endDate, nights: trip.customNights, days: trip.customDays })
 
     return (
-        <article className='relative flex h-full flex-col gap-2 bg-card p-3 transition-colors focus-within:bg-accent hover:bg-accent'>
+        <article className='relative flex h-full w-full min-w-0 flex-col gap-2 bg-card p-3 transition-colors focus-within:bg-accent hover:bg-accent'>
             {trip.eyebrow !== null && <p className='truncate font-mono text-2xs tracking-widest text-muted-foreground uppercase'>{trip.eyebrow}</p>}
             <Link className='min-w-0 rounded-none outline-none before:absolute before:inset-0 before:content-[""]' href={`/s/${trip.shareSlug}`}>
                 <h3 className='truncate text-sm font-medium text-card-foreground'>{trip.title}</h3>
             </Link>
             {trip.destinations.length > 0 && (
-                <ul className='flex flex-wrap items-center gap-1.5'>
+                <ul className='flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5 text-2xs text-muted-foreground'>
                     {trip.destinations.map((item, index) => (
-                        <li
-                            key={`${index}-${item.countryCode}`}
-                            className='flex items-center gap-1 bg-muted px-1.5 py-0.5 text-xs text-muted-foreground'>
-                            <span className='font-mono text-2xs tracking-widest'>{item.countryCode}</span>
-                            <span className='truncate'>{item.city ?? countryName(item.countryCode)}</span>
+                        <li key={`${index}-${item.countryCode}`} className='flex min-w-0 items-center gap-1'>
+                            {index > 0 && <span aria-hidden>·</span>}
+                            <span className='font-mono tracking-widest'>{item.countryCode}</span>
+                            <span className='truncate break-keep'>{item.city ?? countryName(item.countryCode)}</span>
                         </li>
                     ))}
                 </ul>
