@@ -1,6 +1,6 @@
 # ARCHITECTURE — trip
 
-> 최종 갱신: 2026-09-10 · 대응 커밋: `9f52a9c`(세션 4 후반 UI 정정 ADR-0034) + 4-4e 지구본 확장(ADR-0035, 미커밋 변경 · 마이그레이션 0007 은 적용됨)
+> 최종 갱신: 2026-09-10 · 대응 커밋: `9f52a9c`(세션 4 후반 UI 정정 ADR-0034) + 4-4e 지구본 확장(ADR-0035, `8b9fbd5` — origin/dev·prod 동기화, prod 배포 `dpl_8P8LFrBSrpJrA7NQQqxW1eNQqvYz` Ready · 마이그레이션 0007 은 적용됨)
 > 구현 정본. 코드와 어긋나면 코드를 고치거나 이 문서를 갱신한다. 결정의 배경·기각 대안은 `docs/acknowledge/README.md`.
 
 ## 1. 스택

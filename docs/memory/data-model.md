@@ -1,6 +1,6 @@
 # 데이터 모델 — trip
 
-> 최종 갱신: 2026-09-10 · 대응 커밋: `9f52a9c`(세션 4 후반 UI 정정) + 4-4e 지구본 확장(미커밋) · 마이그레이션 **0000~0007 적용됨**(공용 DB, 이력 8행), 테이블 32개 + 이력 테이블 · 구조 전체는 `docs/ARCHITECTURE.md`
+> 최종 갱신: 2026-09-10 · 대응 커밋: `9f52a9c`(세션 4 후반 UI 정정) + 4-4e 지구본 확장(ADR-0035, `8b9fbd5` — origin/dev·prod 동기화, prod 배포 `dpl_8P8LFrBSrpJrA7NQQqxW1eNQqvYz` Ready) · 마이그레이션 **0000~0007 적용됨**(공용 DB, 이력 8행), 테이블 32개 + 이력 테이블 · 구조 전체는 `docs/ARCHITECTURE.md`
 
 > 정본은 `shared/db/schema/{auth,trip,community}.ts`. 이 문서는 읽기용 요약이다. 모든 테이블은 `trip_` 프리픽스(`shared/db/table.ts` 의 `tripTable`).
 
