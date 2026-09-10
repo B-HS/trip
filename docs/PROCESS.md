@@ -1,6 +1,6 @@
 # PROCESS — trip
 
-> 최종 갱신: 2026-09-10 · 대응 커밋: `129999c`(로컬 dev, **미push** — origin/dev·prod 는 `196cd44`)
+> 최종 갱신: 2026-09-10 · 대응 커밋: `7adc2fa`(세션 4, 댓글 셀 행 분리) — 4-4c-3 종료 시 origin/dev·prod 에 push
 > 기준 문서: `~/.claude/convention/*.md`, `~/personal-llm/*.md`, `docs/HANDOFF.md`(세션 진입점), `docs/ARCHITECTURE.md`, `docs/acknowledge/README.md`, `docs/DESIGN.md`
 
 ## 완료 — 초기 구축 (2026-09-09, Phase 1~3)
@@ -46,7 +46,7 @@
         - [x] 4-4b. Workflow B(`wf_4da023f7-876`, 3 에이전트 순차·52분, 워크트리 미사용) → `8640392`: UI-A(프레임·홈·인트로 섹션·탐색·`/s/[slug]` 이동·좋아요·셸·proxy, 메인 트리) ∥ UI-B(게시판·글·댓글·채택·에디터 연결·프로필, 워크트리) → 메인 patch 이식
         - [x] 4-4c-1. Workflow C(`wf_8d07ef83-242`, 리뷰 4렌즈 17건 + 메인 결정 10건: route group `(shell)` 통합·`aria-current`·`Route<T>` 제네릭·`React.cache`·`findLatestPostsByBoard`·작성자 조회수 제외 등) → 검증 통과 → 문서·커밋(`e0aa431` ADR-0033, `8640392` UI)
         - [x] 4-4c-2. 브라우저 실측 1차(`docs/quality-assurance/2026-09-10-community-editor-checklist.md`): 에디터·글 CRUD·댓글·좋아요·탐색·프로필·설정 확인, 버그 2건 수정(ProseMirror attrs `$T` 직렬화 → `toPlainDocument`, 다이얼로그 submit 버블링)
-        - [ ] 4-4c-3. **사용자 지시로 여기서 중단(2026-09-10)**. 남은 것: 비로그인 표면 시각 확인, 질문 게시판 채택 실측, 삭제 흐름, 라이트 모드 재확인, QA 데이터 정리 → push·prod 머지
+        - [x] 4-4c-3. 세션 4(2026-09-10) 마무리: 남은 실측(라이트 모드 상세·게시판·프로필, 질문 게시판 채택 +2/+10 원장, 댓글·글 삭제, 비로그인 인트로 하단·글 상세 라이트·다크) → 사용자 지적 댓글 UI 정리(`7adc2fa`) → 문서 정정 → push·prod 머지·배포 확인. QA 데이터는 전부 유지(사용자 결정, 나중에 일괄 삭제). 미실측: 공개 헤더 액션 셀(`NEXT_PUBLIC_APP_URL` 이 :3000 이라 `useSession` 이 다른 서버로 감), 관리자 삭제 UI(관리자 계정 없음, 역할 로직은 단위 테스트)
     - [ ] 4-5. 로드맵 6 확장(ADR-0033 §3): 마이그레이션 0007(soft delete·신고·차단·원장 revoked), 채택 변경·취소(+포인트 회수), 댓글 수정, 신고·`/admin/reports`·밴, 사용자 간 차단, 사용자명 변경
 - [ ] 5단계. i18n ko·ja·en(ADR-0033 §4): next-intl, 프리픽스 as-needed, 쿠키, 언어 전환 셀, 전 문구·검증·toast·메타데이터 카탈로그화, 날짜·숫자 locale 포맷
 - [ ] 6단계. 인증 확장(ADR-0033 §2): Naver·GitHub OAuth, 이메일 인증(Cloudflare mail worker, 리서치 후), 약관·동의(`docs/legal/` ko→ja·en, korean-law-mcp)
@@ -62,7 +62,10 @@
 ### 진행 메모
 
 - Vercel: 브랜치 `prod`(Pro 플랜), 환경변수 `DATABASE_URL`·`BETTER_AUTH_SECRET`·`BETTER_AUTH_URL`·`NEXT_PUBLIC_APP_URL`(+선택 `SEED_OWNER_EMAIL`). 락파일 v1(ADR-0013, 의존성 추가 시 `npx bun@1.3.14 install`).
-- DB: 공용 MySQL(로컬·prod 동일). 마이그레이션 0000~0005 적용됨. 마이그레이션이 컬럼을 지우면 이전 배포 코드가 깨지므로 적용과 push·배포를 연달아 한다.
+- DB: 공용 MySQL(로컬·prod 동일). 마이그레이션 0000~0006 적용됨. 마이그레이션이 컬럼을 지우면 이전 배포 코드가 깨지므로 적용과 push·배포를 연달아 한다.
 - 공개 페이지 캐시: `PublicTrip` 형태(컬럼·관계)가 바뀌면 `entities/trip/trip.cache.ts` 의 `PUBLIC_TRIP_CACHE_VERSION` 을 올린다. 로컬 `updateTag` 는 prod 데이터 캐시를 비우지 못하고, Vercel 데이터 캐시는 배포를 넘어 유지된다.
-- 검증 계정: tester@example.com / 사용자명 tester(오사카 예시 트립, 공개 slug `osaka-qa`), throwaway `qa_session2_204103@example.com`.
+- 검증 계정: tester@example.com / 사용자명 tester(오사카 예시 트립, 공개 slug `osaka-qa`), throwaway `qa_session2_204103@example.com`(세션 4 채택 실측으로 포인트 12).
+- dev 서버(세션 4 결정): trip 은 **:7777**(`bun run dev -p 7777`). :3000 은 다른 프로젝트(gumba)가 쓴다. `.env` 의 `BETTER_AUTH_URL`·`NEXT_PUBLIC_APP_URL` 도 7777 로 맞춰야 로그인·로그아웃·공개 헤더 `useSession` 이 동작한다(사용자 작업, AI 는 `.env` 접근 불가).
+- QA 데이터(세션 4 결정): 공용 DB 의 QA 흔적(자유게시판 글 `050aa2f0`·댓글·좋아요, 질문 글 `ce90f6b2`·채택 댓글·원장 +2/+10, 오사카 트립 좋아요, tester 소개)은 전부 유지하고 나중에 한 번에 삭제한다.
+- 브라우저 캡처(세션 4): 백그라운드 탭에서는 motion 의 페이지 fade·reveal 이 늦게 끝나 옅게 찍힌다 → 캡처 전 `[style*="opacity"]{opacity:1!important;transform:none!important}` 스타일을 주입한다(측정용, 코드 아님). 비로그인 표면은 `http://[::1]:7777`(쿠키 분리, 확장 권한 허용)로 본다. 127.0.0.1 은 확장 권한이 없다.
 - 에이전트 운용(ADR-0031, 세션 3): `Agent` 도구 금지, 위임은 `Workflow` 의 `agent()` 로만. 구현 Opus max·리뷰 Opus high·리서치/사실 확인 Sonnet. 파일을 동시에 바꾸는 에이전트가 2개 이상일 때만 `isolation: 'worktree'`. 워크트리 결과는 `git -C <wt> diff HEAD` patch 를 `git apply --3way` 로 이식하고 신규 파일은 복사, 마이그레이션은 메인에서 `bun run db:generate` 로 다시 생성. 끝난 워크트리는 `git worktree remove --force`(push 와 같은 명령에 두면 가드 훅이 `-f`·"fast-forward" 문자열을 force push 로 오인해 차단하므로 분리).

@@ -1,6 +1,6 @@
 # ARCHITECTURE — trip
 
-> 최종 갱신: 2026-09-10 · 대응 커밋: `129999c`(로컬 dev, **미push** — origin/dev·prod 는 `196cd44`)
+> 최종 갱신: 2026-09-10 · 대응 커밋: `7adc2fa`(세션 4, 댓글 셀 행 분리) — 4-4c-3 종료 시 origin/dev·prod 에 push
 > 구현 정본. 코드와 어긋나면 코드를 고치거나 이 문서를 갱신한다. 결정의 배경·기각 대안은 `docs/acknowledge/README.md`.
 
 ## 1. 스택
@@ -20,7 +20,7 @@ app/
   layout.tsx            Theme·Motion·Query·Tooltip 프로바이더, Toaster, Analytics
   template.tsx          PageTransition(fade)
   not-found.tsx         404(panel 지구본)
-widgets/  app-shell(+app-frame) · auth · intro(+intro-community-sections) · trip-editor(basics·sidebar·travel·kinds·days·bookings·info·share 탭) · trip-viewer(+public-trip-actions·trip-like-button) · trips · community(community-home·explore-list·boards-index·board-list·post-detail-widget·comments-widget·post-form-widget) · profile(profile-page·profile-settings-widget)     (쿼리·mutation·router·권한. 목록·홈·프로필은 서버 컴포넌트가 repository 직접 호출)
+widgets/  app-shell(+app-frame·public-header-actions) · auth · intro(+intro-community-sections) · trip-editor(basics·sidebar·travel·kinds·days·bookings·info·share 탭) · trip-viewer(+public-trip-actions·trip-like-button) · trips · community(community-home·explore-list·boards-index·board-list·post-detail-widget·comments-widget·post-form-widget) · profile(profile-page·profile-settings-widget)     (쿼리·mutation·router·권한. 목록·홈·프로필은 서버 컴포넌트가 repository 직접 호출)
 features/ app-shell(+public-frame·nav-active) · auth · intro · trip-editor(폼·sortable·sidebar-form·kinds-form·booking-attachments-field) · trip-viewer · trips · editor(rich-editor·툴바·링크/YouTube URL 다이얼로그·rich-text-content) · community(board-badge·author-chip·like-cell·post-row·post-list·public-trip-card·public-trip-grid·pagination-cells·section-heading·search-form·post-header·comment-item·comment-list·comment-form·post-form(+post-form.schema)·community.constant) · profile(profile-header·profile-tabs·profile-image-field·profile-settings-form·profile.constant)     (순수 UI, props+콜백)
 entities/
   trip/     trip.type · trip.validate · trip.role(순수) · trip.access(server) · trip.tag · trip.order(순수, 낙관적 재배열) · trip.repository(+.days/.members/.favorites/.explore/.likes) · trip.cache · trip.action · trip.api · trip.query · trip.prefetch
@@ -143,4 +143,5 @@ docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · acknowledge/ · memor
 - 렌더: 목록·홈·프로필·인트로 섹션 = 서버 컴포넌트가 repository(요청 단위 `React.cache` 래퍼 `community.cache`·`profile.cache`)를 직접 읽어 완성 HTML. 댓글·좋아요 = 프리페치 + `useQuery`/낙관적 mutation. 글 작성·수정 = `RichEditor`(ADR-0027) + 서버 액션(`richTextDocumentSchema`, `isRichTextEmpty` 거부, `excerpt = richTextPlainText(body, 300)`), 상세 본문 = `renderRichTextHtml` → `RichTextContent`.
 - 프로필: `/u/[username]` 대문(`banner_url`)·사진(`image`)·표시 이름·소개·포인트 합계·가입일 + 탭(글/공개 트립/좋아요한 트립). `/settings/profile` 은 `profileUpdateSchema`(`avatarUploadId`·`bannerUploadId`: `undefined` 유지 / `null` 제거 / id 교체 — 서버가 본인 소유·kind 일치 업로드만 해석).
 - 링크형 탭·정렬 셀은 `aria-current='page'`(Button `cell` 크기에 스타일), 실제 토글 버튼은 `aria-pressed`. 목록은 오프셋 20 페이지네이션(무한 스크롤 미도입).
+- 댓글 항목(`features/community/comment-item.tsx`)은 내용 블록(`bg-card p-3`: 작성자 칩·채택 배지·본문)과 액션 셀 행(답글·채택·삭제 + `bg-card` 채움, 부모 `gap-px bg-background`)의 2블록이다. 셀 행을 카드 패딩 안에 넣으면 심이 한쪽만 생겨 ADR-0011 을 어긴다(세션 4 `7adc2fa`).
 - 4-5 확장 예정(ADR-0033 §3): 채택 변경·취소(원장 회수), 소프트 삭제, 댓글 수정, 신고·`/admin/reports`·밴, 사용자 간 차단, 사용자명 변경 — 마이그레이션 0007.

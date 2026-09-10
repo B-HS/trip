@@ -1,6 +1,6 @@
 # HANDOFF — 2026-09-10 세션 3 종료 스냅샷
 
-> 대응 커밋: `129999c`(로컬 dev). **origin/dev·origin/prod 는 `196cd44`(로드맵 7) 에 멈춰 있고, 그 뒤 로컬 커밋 5개(`f8474cc`·`c152820`·`e0aa431`·`8640392`·`129999c`)는 미push** — 사용자가 "지금 하는 것까지만 하고 멈춰" 로 중단시켰기 때문. 이 문서는 새 세션의 단일 진입점이며 매 핸드오프마다 덮어쓴다.
+> 대응 커밋: `7adc2fa`(세션 4). 세션 3 스냅샷을 세션 4(2026-09-10)가 부분 갱신했다 — 4-4c-3 마무리·push·prod 배포 결과는 `docs/PROCESS.md` 와 `docs/history/2026-09-10-session-4.md` 가 정본. 이 문서는 새 세션의 단일 진입점이며 매 핸드오프마다 덮어쓴다.
 > 복기 신뢰도: 세션 3 전체 대화 기준. Workflow 4건(에이전트 21개)의 산출은 최종 보고서 + 메인 재검증(typecheck·lint·prettier·test 433·build·브라우저 실측 1차) 기준.
 
 ## 1. 프로젝트 한 줄 정의
@@ -10,8 +10,8 @@
 ## 2. 현재 목표
 
 - 최종 목표: 여행 일정·예매·정보를 구조화해 관리·공유하고 커뮤니티·i18n·인증 확장·AI·SEO 까지(ADR-0033 §5 순서).
-- 단계(ADR-0033 §5): **4 로드맵 6 기본(완료, 미push) → 4-5 로드맵 6 확장 → 5 i18n(ko·ja·en) → 6 인증 확장(OAuth·이메일 인증·약관) → 7 AI(ADR-0029) → 8 SEO(ADR-0030)**. 로드맵 3 OSM 은 제거.
-- 현재 마일스톤: 4단계 4-4c-3 에서 중단. 커뮤니티·프로필 기본 구현·리뷰·수정·브라우저 실측 1차까지 끝났고 **남은 실측 → QA 데이터 정리 결정 → push·prod ff 머지** 가 다음이다.
+- 단계(ADR-0033 §5): **4 로드맵 6 기본(완료, 세션 4 push) → 4-5 로드맵 6 확장 → 5 i18n(ko·ja·en) → 6 인증 확장(OAuth·이메일 인증·약관) → 7 AI(ADR-0029) → 8 SEO(ADR-0030)**. 로드맵 3 OSM 은 제거.
+- 현재 마일스톤: 4단계 4-4c-3 을 세션 4 에서 마무리(남은 실측·댓글 UI 정리·push·prod 배포). 다음은 4-5 로드맵 6 확장(ADR-0034 예정).
 - 직전 작업: 브라우저 실측 중 버그 2건 수정(`129999c`) 후 사용자 지시로 정지, `/prepare-new` 로 이 문서 작성.
 
 ## 3. 완료 / 진행 중 / 미착수
@@ -29,8 +29,8 @@
 
 ### 진행 중 — 4-4c-3 (사용자 지시로 중단)
 
-- **다음 한 줄**: 사용자에게 QA 데이터 정리 여부를 1줄 객관식으로 확인(아래 §6-1) → 남은 실측(비로그인 표면 시각, 질문 게시판 채택, 글 삭제, 라이트 모드 재확인) → `git push origin dev` → `git checkout prod && git merge dev && git push origin prod && git checkout dev` → `mcp__plugin_vercel_vercel__get_deployment` 로 READY 확인 → `trip.gumyo.net` 스모크.
-- 워킹트리 clean. 워크트리 없음. Chrome 에 이 세션 탭 1개(`/boards/free/new`, 미저장 폼) 가 남아 있어 닫으면 이탈 확인이 뜰 수 있다.
+- **세션 4 진행**: §6-1 답 "전부 유지, 나중에 일괄 삭제" · dev 포트 7777 → 남은 실측 완료 → 댓글 UI 정리(`7adc2fa`) → 문서 정정 → push·prod 머지·배포 확인(결과는 PROCESS 4-4c-3).
+- 워킹트리 clean. 워크트리 없음.
 
 ### 미착수(순서대로)
 
@@ -66,7 +66,7 @@ Workflow C 메인 결정 10건(ADR-0032 구현 메모): `(shell)` 그룹 통합,
 
 ## 6. 미해결 질문 / 사용자 확인 필요 항목
 
-1. **QA 데이터 정리**(push 전 결정): 공용 DB 에 자유게시판 글 `050aa2f0-b09e-4daf-a3ff-38944c5eb10c`("세션 3 QA 글 - 수정됨", 댓글 1·좋아요 1, 오사카 트립 연결), 오사카 트립(`905b4695-…`) 좋아요 1(tester), tester 소개 문구가 남아 있다. A(추천): 글·댓글은 삭제 흐름 실측을 겸해 UI 로 삭제, 좋아요·소개는 유지 / B: 전부 유지 / C: 전부 삭제.
+1. **QA 데이터 정리**(세션 4 답: **전부 유지, 나중에 한 번에 삭제** — 질문 글 `ce90f6b2`·채택 댓글·원장 +2/+10 도 포함): 공용 DB 에 자유게시판 글 `050aa2f0-b09e-4daf-a3ff-38944c5eb10c`("세션 3 QA 글 - 수정됨", 댓글 1·좋아요 1, 오사카 트립 연결), 오사카 트립(`905b4695-…`) 좋아요 1(tester), tester 소개 문구가 남아 있다. A(추천): 글·댓글은 삭제 흐름 실측을 겸해 UI 로 삭제, 좋아요·소개는 유지 / B: 전부 유지 / C: 전부 삭제.
 2. 트립 첨부 인가 축소(소유자 또는 공개 트립) — 메인 결정, 4-5 에서 적용 예정. 이견 시 알려 달라.
 3. 채택 댓글 삭제 시 재채택 가능(KNOWN ISSUE) — 4-5 원장 회수와 함께 해소.
 4. 프로필 대문 `aspect-3/1` 높이 상한, 공개 트립 그리드 빈 열 채움 — 4-5 에서 처리 예정(디자인 이견 시).
@@ -78,9 +78,9 @@ Workflow C 메인 결정 10건(ADR-0032 구현 메모): `(shell)` 그룹 통합,
 ## 7. 환경 & 전제
 
 - Node 22 / Bun 1.4.0 로컬(락파일 v1, `packageManager bun@1.3.14`, 의존성 추가는 `npx bun@1.3.14 install`). Vercel Pro(team `team_ZNm5hw73FNPctUWAuifjdn2b`, project `prj_a0su9UvuXawlx9OEASFDvbGcDeMe`), CLI 56.5.0(구버전), `.vercel` 미링크.
-- 실행: `bun run dev`(:3000, 세션 3 종료 시점에 사용자의 `next-server` PID 25061 이 떠 있음 — 종료 금지) · `bun run build` · `bun run db:generate` · `bun run db:migrate` · `bun run admin:set <email>` · 검증 `bun run typecheck && bun run lint && bun run format:check && bun test`(433) `&& bun run build`.
+- 실행: `bun run dev -p 7777`(**:7777**, 세션 4 결정 — :3000 은 gumba 가 쓴다. `.env` 의 `BETTER_AUTH_URL`·`NEXT_PUBLIC_APP_URL` 도 7777 로 맞춰야 한다) · `bun run build` · `bun run db:generate` · `bun run db:migrate` · `bun run admin:set <email>` · 검증 `bun run typecheck && bun run lint && bun run format:check && bun test`(433) `&& bun run build`.
 - DB: 공용 MySQL 9.6 스키마 `trip`, 마이그레이션 0000~0006 적용(이력 7행), 테이블 32. 계정: tester@example.com(사용자명 tester, `role user`, 오사카 예시 트립 공개 slug `osaka-qa`, 소개 문구 있음), hyunseok(사용자 본인), qa_session2_204103@example.com(throwaway, 비밀번호 미기록). 관리자 계정 없음.
-- 브라우저: Chrome 의 localhost:3000 은 tester 로 로그인된 상태(세션 쿠키). 새 창 탭은 폭 1440 으로 `resize_window` 가 동작했으나 페이지 줌은 54%.
+- 브라우저: Chrome 의 localhost 는 tester 로 로그인된 상태(세션 쿠키, 포트 무관). 비로그인 표면은 `http://[::1]:7777` 로(쿠키 분리, 확장 권한 허용). localhost 탭 줌 54%. 백그라운드 탭에서는 motion fade 가 늦게 끝나 캡처 전 인라인 opacity 를 1 로 덮는 스타일을 주입한다.
 - 참조 원본: `docs/DESIGN.md`, `docs/osaka-trip-interactive.html`. 리서치: `docs/memory/research-2026-09-09-r2-ai-tiptap.md`, `docs/memory/research-2026-09-10-mail-i18n-auth.md`.
 
 ## 8. 다음 세션 TODO (우선순위 순)

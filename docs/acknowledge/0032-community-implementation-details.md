@@ -77,3 +77,4 @@ Workflow A(사실 확인 Sonnet → 데이터 계층 Opus max → 리뷰 2렌즈
 - 본문 이미지 `src` 는 http(s) 임의 호스트를 허용한다(외부 이미지 삽입 = 정상 기능, 트래킹 픽셀 위험은 수용). 좁히려면 `sanitizeRichTextHtml` 의 img 정책에 `R2_PUBLIC_BASE_URL` 프리픽스 화이트리스트를 추가하면 된다.
 - 구조 잔여: `AuthorChip`·`LikeCell` 은 `features/community` 에 두고 `widgets/trip-viewer` 가 참조한다(레이어 방향은 합법). 도메인 중립 슬라이스로 옮길지는 후속 판단. `withRouteErrorHandling` 은 새 라우트 3곳만 적용(기존 6곳은 try/catch).
 - 브라우저 실측 1차에서 발견한 버그 2건(ProseMirror `attrs` 직렬화, 다이얼로그 submit 버블링)은 ADR-0027 실측 메모 참고. 개선 후보: 프로필 대문 `aspect-3/1` 높이 상한, 공개 트립 그리드 빈 열 채움.
+- **세션 4(2026-09-10) 댓글 UI 정정(`7adc2fa`)**: 댓글 항목의 답글·채택·삭제 셀 행이 카드 패딩 안에 있어 심이 채움 블록 쪽 한 곳만 생기고 셀이 떠 보였다(사용자 지적). 내용 블록(`bg-card p-3`) + 별도 셀 행(`gap-px bg-background`)의 2블록으로 바꿔 글 액션 바·댓글 폼과 같은 규칙(ADR-0011·0023)을 따른다. 라이트·다크·중첩 답글 실측.
