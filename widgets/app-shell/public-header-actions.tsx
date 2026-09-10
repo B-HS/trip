@@ -13,29 +13,29 @@ export const PublicHeaderActions: FC = () => {
     return (
         <>
             <ThemeToggle />
-            {!isPending &&
-                (session ? (
-                    <div className='flex items-stretch gap-px bg-background'>
+            <div className='flex items-stretch gap-px bg-background'>
+                <Button variant='cell' size='cell' asChild>
+                    <Link href={EXPLORE_PATH}>탐색</Link>
+                </Button>
+                <Button variant='cell' size='cell' asChild>
+                    <Link href={BOARDS_PATH}>게시판</Link>
+                </Button>
+                {!isPending &&
+                    (session ? (
                         <Button variant='cell' size='cell' asChild>
                             <Link href={HOME_PATH}>홈</Link>
                         </Button>
-                    </div>
-                ) : (
-                    <div className='flex items-stretch gap-px bg-background'>
-                        <Button variant='cell' size='cell' asChild>
-                            <Link href={EXPLORE_PATH}>탐색</Link>
-                        </Button>
-                        <Button variant='cell' size='cell' asChild>
-                            <Link href={BOARDS_PATH}>게시판</Link>
-                        </Button>
-                        <Button variant='cell' size='cell' asChild>
-                            <Link href={LOGIN_PATH}>로그인</Link>
-                        </Button>
-                        <Button variant='cellPrimary' size='cell' asChild>
-                            <Link href={SIGNUP_PATH}>시작하기</Link>
-                        </Button>
-                    </div>
-                ))}
+                    ) : (
+                        <>
+                            <Button variant='cell' size='cell' asChild>
+                                <Link href={LOGIN_PATH}>로그인</Link>
+                            </Button>
+                            <Button variant='cellPrimary' size='cell' asChild>
+                                <Link href={SIGNUP_PATH}>시작하기</Link>
+                            </Button>
+                        </>
+                    ))}
+            </div>
         </>
     )
 }

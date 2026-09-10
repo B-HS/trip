@@ -10,6 +10,7 @@ import type { NavItemLink } from '@/features/app-shell/nav-item'
 import { NavRail } from '@/features/app-shell/nav-rail'
 import type { RailFavorite } from '@/features/app-shell/rail-favorite-item'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { BOARD_KIND_LABEL, DEFAULT_BOARDS } from '@/shared/constant/community'
 import { BOARDS_PATH, EXPLORE_PATH, HOME_PATH, LOGIN_PATH, NEW_TRIP_PATH, TRIPS_PATH } from '@/shared/constant/route'
 import { signOut } from '@/shared/lib/auth-client'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/shared/ui/sheet'
@@ -38,10 +39,18 @@ type AppShellProps = PropsWithChildren<{
     defaultCollapsed?: boolean
 }>
 
-const NAV_ITEMS: NavItemLink[] = [
+type BoardNavHref = `${typeof BOARDS_PATH}/${(typeof DEFAULT_BOARDS)[number]['key']}`
+
+const NAV_ITEMS: NavItemLink<BoardNavHref>[] = [
     { href: HOME_PATH, label: '홈', icon: HomeIcon },
     { href: EXPLORE_PATH, label: '탐색', icon: CompassIcon, matchPrefix: true },
-    { href: BOARDS_PATH, label: '게시판', icon: MessagesSquareIcon, matchPrefix: true },
+    {
+        href: BOARDS_PATH,
+        label: '게시판',
+        icon: MessagesSquareIcon,
+        matchPrefix: true,
+        children: DEFAULT_BOARDS.map((board) => ({ href: `${BOARDS_PATH}/${board.key}`, label: BOARD_KIND_LABEL[board.kind], matchPrefix: true })),
+    },
     { href: TRIPS_PATH, label: '트립 목록', icon: ListIcon },
     { href: NEW_TRIP_PATH, label: '새 트립', icon: PlusIcon },
 ]

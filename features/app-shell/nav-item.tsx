@@ -10,14 +10,21 @@ import { MOTION_EASE_STANDARD, MOTION_FADE_DURATION } from '@/shared/lib/motion'
 
 export const NAV_ACTIVE_LAYOUT_ID = 'app-shell-nav-active'
 
-export type NavItemLink = {
+export type NavChildLink<T extends string = string> = {
+    href: Route<T>
+    label: string
+    matchPrefix?: boolean
+}
+
+export type NavItemLink<T extends string = string> = {
     href: Route
     label: string
     icon: LucideIcon
     matchPrefix?: boolean
+    children?: NavChildLink<T>[]
 }
 
-type NavItemProps = Omit<NavItemLink, 'matchPrefix'> & {
+type NavItemProps = Omit<NavItemLink, 'matchPrefix' | 'children'> & {
     isActive: boolean
     isCollapsed: boolean
     onNavigate?: () => void
