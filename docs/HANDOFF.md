@@ -70,7 +70,7 @@ Workflow C 메인 결정 10건(ADR-0032 구현 메모): `(shell)` 그룹 통합,
 2. 트립 첨부 인가 축소(소유자 또는 공개 트립) — 메인 결정, 4-5 에서 적용 예정. 이견 시 알려 달라.
 3. 채택 댓글 삭제 시 재채택 가능(KNOWN ISSUE) — 4-5 원장 회수와 함께 해소.
 4. 프로필 대문 `aspect-3/1` 높이 상한, 공개 트립 그리드 빈 열 채움 — 4-5 에서 처리 예정(디자인 이견 시).
-5. `isomorphic-dompurify`(Node 에서 jsdom) → `dompurify` + happy-dom 창으로 교체 검토 — 서버 번들·콜드스타트 문제가 보이면.
+5. (세션 4 해결) sanitize 창은 `dompurify` + `jsdom` 26.1 정확 고정(Vercel 함수가 require(esm) 을 거부). happy-dom 창은 under-sanitize 로 기각 — `docs/bug/2026-09-10-post-detail-500-on-vercel.md`.
 6. Cloudflare Email Service 가 **Beta·Workers Paid 플랜** 필요(리서치 메모). 프로덕션 트랜잭션 메일에 쓰는 리스크 수용 여부, 발신 도메인(Cloudflare DNS 필수).
 7. 사용자 작업: `.env`·Vercel 에 `APP_ENCRYPTION_KEY`·`R2_*` 5개(**`R2_PUBLIC_BASE_URL` 은 빌드 타임에도 필요** — `next/image` `remotePatterns`), `.env.example` 이름, R2 커스텀 도메인, Vercel CLI 최신화 + `vercel link`, korean-law-mcp 설치·키(6단계 약관 작성용).
 8. 편집기 검증 문구 한국어화·일정 종류 `key` 노출(기존 보류 유지).

@@ -1,4 +1,6 @@
-import DOMPurify, { type Config, type ElementHook, type UponSanitizeElementHook } from 'isomorphic-dompurify'
+import 'server-only'
+import createDOMPurify, { type Config, type ElementHook, type UponSanitizeElementHook } from 'dompurify'
+import { JSDOM } from 'jsdom'
 import {
     RICH_TEXT_ALLOWED_ATTRIBUTES,
     RICH_TEXT_ALLOWED_TAGS,
@@ -35,13 +37,13 @@ const enforceLinkPolicy: ElementHook = (node) => {
     node.setAttribute('target', RICH_TEXT_LINK_TARGET)
 }
 
-export const sanitizeRichTextHtml = (html: string) => {
-    DOMPurify.addHook('uponSanitizeElement', dropUnsafeMedia)
-    DOMPurify.addHook('afterSanitizeAttributes', enforceLinkPolicy)
-    try {
-        return DOMPurify.sanitize(html, SANITIZE_CONFIG) as SanitizedRichTextHtml
-    } finally {
-        DOMPurify.removeHook('uponSanitizeElement', dropUnsafeMedia)
-        DOMPurify.removeHook('afterSanitizeAttributes', enforceLinkPolicy)
-    }
+const createRichTextPurifier = () => {
+    const purifier = createDOMPurify(new JSDOM('').window)
+    purifier.addHook('uponSanitizeElement', dropUnsafeMedia)
+    purifier.addHook('afterSanitizeAttributes', enforceLinkPolicy)
+    return purifier
 }
+
+const richTextPurifier = createRichTextPurifier()
+
+export const sanitizeRichTextHtml = (html: string) => richTextPurifier.sanitize(html, SANITIZE_CONFIG) as SanitizedRichTextHtml

@@ -37,3 +37,9 @@
 - **버그 발견·수정**: 서버 액션으로 보낸 본문에서 YouTube 노드의 `attrs` 가 `"$T"`(React Flight 임시 참조)로 직렬화돼 `richTextDocumentSchema` 가 "본문 형식이 올바르지 않습니다" 로 거부했다. 원인은 ProseMirror 가 노드 `attrs` 를 `Object.create(null)` 로 만들고, React 의 서버 액션 직렬화가 null 프로토타입 객체를 plain object 로 보지 않는 것. heading·image·codeBlock 등 attrs 가 있는 모든 노드가 같은 경로로 깨진다. `RichEditor.onUpdate` 가 `toPlainDocument`(JSON 왕복, `shared/lib/rich-text-document.ts`)로 정규화한 문서만 `onChange` 로 넘기도록 고쳤다(테스트 `toPlainDocument` 추가). bun 테스트가 plain 객체로만 검증해 잡지 못했던 사례.
 - 툴바 셀·링크/YouTube 다이얼로그·nocookie iframe 삽입·트립 첨부 Select·저장 바는 라이트 모드에서 정상 렌더. 브라우저 자동화의 Return 키가 툴바 버튼에 전달돼 문단 분리 대신 버튼이 눌리는 현상은 도구 한계(합성 keydown 으로는 ProseMirror 가 문단을 나눔).
 - **버그 발견·수정 2**: 링크·YouTube 다이얼로그의 `<form>` 제출 이벤트가 React 포털을 타고 바깥 글 작성 `<form>` 까지 버블링돼 글 폼 검증이 함께 실행됐다(제목 오류 표시). `RichEditorUrlDialog.handleSubmit` 에 `event.stopPropagation()` 을 추가했다(포털 안 중첩 폼은 React 트리 기준으로 이벤트가 전파된다).
+
+## 배포 장애 메모 (2026-09-10 세션 4) — sanitize 창을 dompurify + jsdom 26 으로
+
+- prod 글 상세 500: `isomorphic-dompurify` 의 jsdom 30 체인(`html-encoding-sniffer@6` → ESM 전용 `@exodus/bytes`)을 Vercel 함수 런타임이 `ERR_REQUIRE_ESM` 으로 거부. 상세는 `docs/bug/2026-09-10-post-detail-500-on-vercel.md`.
+- 결정: `isomorphic-dompurify` 를 빼고 `dompurify@3.4.15` + `jsdom@26.1.0`(CJS 체인, 정확 고정) 창을 `rich-text-sanitize.ts` 가 직접 만든다. 전용 인스턴스라 정책 훅은 생성 시 1회 등록하고 호출마다 add/remove 하지 않는다(구현 메모의 "호출 안에서 한정" 은 폐기). 모듈은 `server-only`.
+- 기각: `dompurify` + happy-dom 창 — happy-dom 이 `nodeName` 을 하위 클래스에서 재정의해 DOMPurify 3.4 의 clobbering 방어 getter 와 어긋나고, `NodeIterator` 가 제거된 노드 뒤를 방문하지 않아 under-sanitize 된다(실측). happy-dom 은 `@tiptap/html` 렌더 전용으로만 둔다.

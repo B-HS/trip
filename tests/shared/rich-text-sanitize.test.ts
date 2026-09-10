@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import DOMPurify from 'isomorphic-dompurify'
+
 import { sanitizeRichTextHtml } from '@/shared/lib/rich-text-sanitize'
 
 describe('sanitizeRichTextHtml', () => {
@@ -75,11 +75,13 @@ describe('sanitizeRichTextHtml', () => {
         expect<string>(sanitizeRichTextHtml('<pre><code class="language-fixed inset-0">본문</code></pre>')).toBe('<pre><code>본문</code></pre>')
     })
 
-    test('정책 훅은 다른 sanitize 호출로 새지 않는다', () => {
-        sanitizeRichTextHtml('<a href="https://example.com">링크</a>')
-        const other = DOMPurify.sanitize('<a href="mailto:a@example.com">메일</a>')
+    test('정책 훅이 전용 인스턴스에 고정돼 반복 호출해도 결과가 같다', () => {
+        const html = '<a href="mailto:a@example.com">메일</a><a href="https://example.com">링크</a>'
+        const first = sanitizeRichTextHtml(html)
+        const second = sanitizeRichTextHtml(html)
 
-        expect(other).toContain('mailto:a@example.com')
-        expect(other).not.toContain('target')
+        expect(first).toBe(second)
+        expect(first).not.toContain('mailto:')
+        expect(first).toContain('rel="noopener noreferrer"')
     })
 })
