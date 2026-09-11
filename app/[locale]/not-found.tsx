@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { NOT_FOUND_COPY } from '@/shared/constant/marketing'
 import { Button } from '@/shared/ui/button'
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia } from '@/shared/ui/empty'

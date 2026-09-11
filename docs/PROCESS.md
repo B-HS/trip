@@ -1,6 +1,6 @@
 # PROCESS — trip
 
-> 최종 갱신: 2026-09-11 · 대응 커밋: `e3d9bba`(4-5 커뮤니티 확장 **전체 완료** — 데이터 계층 `d62de70`~`181ab9c` + UI `a297162`~`e3d9bba`. 마이그레이션 0008 **DB 적용 완료**(이력 9행·`trip_report`·`trip_user_block`·`deleted_at`·enum `revoked` 실DB 확인). 검증 사다리 green: typecheck·lint·prettier·`bun test` **573 pass / 0 fail**)
+> 최종 갱신: 2026-09-11 · 대응 커밋: `e3d9bba`(4-5 커뮤니티 확장 **전체 완료** — 데이터 계층 `d62de70`~~`181ab9c` + UI `a297162`~~`e3d9bba`. 마이그레이션 0008 **DB 적용 완료**(이력 9행·`trip_report`·`trip_user_block`·`deleted_at`·enum `revoked` 실DB 확인). 검증 사다리 green: typecheck·lint·prettier·`bun test` **573 pass / 0 fail**)
 > 기준 문서: `~/.claude/convention/*.md`, `~/personal-llm/*.md`, `docs/HANDOFF.md`(세션 진입점), `docs/ARCHITECTURE.md`, `docs/acknowledge/README.md`, `docs/DESIGN.md`
 
 ## 완료 — 초기 구축 (2026-09-09, Phase 1~3)

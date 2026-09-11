@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import createNextIntlPlugin from 'next-intl/plugin'
 
 const SECURITY_HEADERS = [
     { key: 'X-Frame-Options', value: 'DENY' },
@@ -23,4 +24,6 @@ const nextConfig: NextConfig = {
     headers: async () => [{ source: '/:path*', headers: SECURITY_HEADERS }],
 }
 
-export default nextConfig
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
+
+export default withNextIntl(nextConfig)
