@@ -1,9 +1,16 @@
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { getServerSession } from '@/shared/lib/session'
 import { BoardsIndex } from '@/widgets/community/boards-index'
 
-export const metadata: Metadata = {
-    title: '게시판',
+type BoardsPageProps = {
+    params: Promise<{ locale: string }>
+}
+
+export const generateMetadata = async ({ params }: BoardsPageProps): Promise<Metadata> => {
+    const { locale } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.boards' })
+    return { title: t('title'), description: t('description') }
 }
 
 const BoardsPage = async () => {

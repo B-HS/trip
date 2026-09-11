@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { findBlockedUsersForUser } from '@/entities/community/community.repository.block'
 import { findProfileSettings } from '@/entities/profile/profile.repository'
@@ -6,8 +7,14 @@ import { getUploadConfig } from '@/shared/lib/r2'
 import { requireUser } from '@/shared/lib/session'
 import { ProfileSettingsWidget } from '@/widgets/profile/profile-settings-widget'
 
-export const metadata: Metadata = {
-    title: '프로필 설정',
+type ProfileSettingsPageProps = {
+    params: Promise<{ locale: string }>
+}
+
+export const generateMetadata = async ({ params }: ProfileSettingsPageProps): Promise<Metadata> => {
+    const { locale } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.profile' })
+    return { title: t('title'), description: t('description') }
 }
 
 const ProfileSettingsPage = async () => {

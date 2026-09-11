@@ -1,5 +1,6 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { getPostDetail } from '@/entities/community/community.cache'
 import { prefetchComments, prefetchPostLike } from '@/entities/community/community.prefetch'
@@ -13,16 +14,15 @@ import { PostDetailWidget } from '@/widgets/community/post-detail-widget'
 import { cn } from 'cn'
 
 type PostPageProps = {
-    params: Promise<{ key: string; postId: string }>
+    params: Promise<{ locale: string; key: string; postId: string }>
 }
 
-const NOT_FOUND_TITLE = '글을 찾을 수 없습니다'
-
 export const generateMetadata = async ({ params }: PostPageProps): Promise<Metadata> => {
-    const { key, postId } = await params
+    const { locale, key, postId } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.postNotFound' })
     const session = await getServerSession()
     const post = await getPostDetail(postId, session?.user.id ?? null)
-    return { title: post === null || post.boardKey !== key ? NOT_FOUND_TITLE : post.title }
+    return { title: post === null || post.boardKey !== key ? t('title') : post.title }
 }
 
 const PostPage = async ({ params }: PostPageProps) => {

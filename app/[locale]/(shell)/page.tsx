@@ -1,13 +1,18 @@
 import type { Metadata } from 'next'
-import { INTRO_METADATA } from '@/shared/constant/marketing'
+import { getTranslations } from 'next-intl/server'
 import { getServerSession } from '@/shared/lib/session'
 import { CommunityHome } from '@/widgets/community/community-home'
 import { IntroCommunitySections } from '@/widgets/intro/intro-community-sections'
 import { IntroWidget } from '@/widgets/intro/intro-widget'
 
-export const metadata: Metadata = {
-    title: INTRO_METADATA.title,
-    description: INTRO_METADATA.description,
+type HomePageProps = {
+    params: Promise<{ locale: string }>
+}
+
+export const generateMetadata = async ({ params }: HomePageProps): Promise<Metadata> => {
+    const { locale } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.home' })
+    return { title: t('title'), description: t('description') }
 }
 
 const HomePage = async () => {

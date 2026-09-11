@@ -1,5 +1,6 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { getBoardByKey } from '@/entities/community/community.cache'
 import { prefetchTripList } from '@/entities/trip/trip.prefetch'
@@ -9,11 +10,13 @@ import { requireUser } from '@/shared/lib/session'
 import { PostFormWidget } from '@/widgets/community/post-form-widget'
 
 type NewPostPageProps = {
-    params: Promise<{ key: string }>
+    params: Promise<{ locale: string; key: string }>
 }
 
-export const metadata: Metadata = {
-    title: '새 글 쓰기',
+export const generateMetadata = async ({ params }: NewPostPageProps): Promise<Metadata> => {
+    const { locale } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.postNew' })
+    return { title: t('title'), description: t('description') }
 }
 
 const NewPostPage = async ({ params }: NewPostPageProps) => {

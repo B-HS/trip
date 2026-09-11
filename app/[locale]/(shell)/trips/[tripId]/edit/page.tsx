@@ -1,4 +1,5 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
+import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { redirect } from '@/i18n/navigation'
 import { getTripRole } from '@/entities/trip/trip.access'
@@ -15,9 +16,10 @@ type TripEditPageProps = {
 }
 
 export const generateMetadata = async ({ params }: TripEditPageProps) => {
-    const { tripId } = await params
+    const { locale, tripId } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.tripEdit' })
     const detail = await getTripDetail(tripId)
-    return { title: detail === null ? '편집' : `편집 · ${detail.title}` }
+    return { title: detail === null ? t('title') : t('titleWithTrip', { title: detail.title }) }
 }
 
 const TripEditPage = async ({ params }: TripEditPageProps) => {

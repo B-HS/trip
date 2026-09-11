@@ -1,10 +1,16 @@
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { requireUser } from '@/shared/lib/session'
 import { TripCreateWidget } from '@/widgets/trips/trip-create-widget'
 
-export const metadata: Metadata = {
-    title: '새 트립',
-    description: '기본 정보로 빈 트립을 만들거나 오사카 예시 트립으로 시작합니다.',
+type NewTripPageProps = {
+    params: Promise<{ locale: string }>
+}
+
+export const generateMetadata = async ({ params }: NewTripPageProps): Promise<Metadata> => {
+    const { locale } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.tripNew' })
+    return { title: t('title'), description: t('description') }
 }
 
 const NewTripPage = async () => {

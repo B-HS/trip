@@ -1,5 +1,6 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { getPostDetail } from '@/entities/community/community.cache'
 import { canEditPost } from '@/entities/community/community.role'
@@ -10,11 +11,13 @@ import { requireUser } from '@/shared/lib/session'
 import { PostFormWidget } from '@/widgets/community/post-form-widget'
 
 type EditPostPageProps = {
-    params: Promise<{ key: string; postId: string }>
+    params: Promise<{ locale: string; key: string; postId: string }>
 }
 
-export const metadata: Metadata = {
-    title: '글 수정',
+export const generateMetadata = async ({ params }: EditPostPageProps): Promise<Metadata> => {
+    const { locale } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.postEdit' })
+    return { title: t('title'), description: t('description') }
 }
 
 const EditPostPage = async ({ params }: EditPostPageProps) => {

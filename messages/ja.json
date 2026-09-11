@@ -46,7 +46,60 @@
             "tagline": "Trip manager with structured data forms"
         }
     },
-    "auth": {},
+    "auth": {
+        "login": {
+            "cardTitle": "ログイン",
+            "cardDescription": "メールまたはユーザー名でログインしてください。",
+            "footerText": "アカウントがまだお持ちでない方",
+            "signupLink": "新規登録",
+            "identifierLabel": "メールまたはユーザー名",
+            "passwordLabel": "パスワード",
+            "showPassword": "パスワードを表示",
+            "hidePassword": "パスワードを隠す",
+            "submit": "ログイン",
+            "submitting": "ログイン中…"
+        },
+        "signup": {
+            "cardTitle": "新規登録",
+            "cardDescription": "アカウントを作成して旅行行程を整理しましょう。",
+            "footerText": "すでにアカウントをお持ちの方",
+            "loginLink": "ログイン",
+            "usernameLabel": "ユーザー名",
+            "usernameHint": "半角英小文字・数字・アンダースコア(_)・ピリオド(.)で{min}〜{max}文字。",
+            "emailLabel": "メール",
+            "passwordLabel": "パスワード",
+            "passwordConfirmLabel": "パスワード確認",
+            "submit": "新規登録",
+            "submitting": "登録中…"
+        },
+        "errors": {
+            "fallback": "リクエストを処理できませんでした。しばらくしてからもう一度お試しください。",
+            "USER_ALREADY_EXISTS": "このメールはすでに登録されています。",
+            "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "このメールはすでに登録されています。別のメールをご利用ください。",
+            "USER_NOT_FOUND": "アカウントが見つかりません。",
+            "INVALID_EMAIL": "メールの形式が正しくありません。",
+            "INVALID_EMAIL_OR_PASSWORD": "メールまたはパスワードが正しくありません。",
+            "INVALID_USERNAME_OR_PASSWORD": "ユーザー名またはパスワードが正しくありません。",
+            "INVALID_PASSWORD": "パスワードが正しくありません。",
+            "INVALID_USER": "アカウント情報が正しくありません。",
+            "PASSWORD_TOO_SHORT": "パスワードは8文字以上である必要があります。",
+            "PASSWORD_TOO_LONG": "パスワードは128文字以下である必要があります。",
+            "USERNAME_IS_ALREADY_TAKEN": "このユーザー名はすでに使用されています。別のユーザー名を入力してください。",
+            "USERNAME_TOO_SHORT": "ユーザー名は3文字以上である必要があります。",
+            "USERNAME_TOO_LONG": "ユーザー名は30文字以下である必要があります。",
+            "INVALID_USERNAME": "ユーザー名に使用できない文字が含まれています。",
+            "INVALID_DISPLAY_USERNAME": "表示用ユーザー名の形式が正しくありません。",
+            "USERNAME_IS_IMMUTABLE": "ユーザー名は変更できません。",
+            "CREDENTIAL_ACCOUNT_NOT_FOUND": "パスワードでログインできないアカウントです。",
+            "EMAIL_NOT_VERIFIED": "メール認証が必要です。",
+            "SESSION_EXPIRED": "セッションの有効期限が切れました。再度ログインしてください。",
+            "FAILED_TO_CREATE_USER": "アカウントを作成できませんでした。しばらくしてからもう一度お試しください。",
+            "FAILED_TO_CREATE_SESSION": "ログインセッションを作成できませんでした。しばらくしてからもう一度お試しください。",
+            "VALIDATION_ERROR": "入力値が正しくありません。",
+            "MISSING_FIELD": "必須入力項目が空です。",
+            "UNEXPECTED_ERROR": "リクエストを処理できませんでした。しばらくしてからもう一度お試しください。"
+        }
+    },
     "community": {
         "boardKind": {
             "free": "フリース",
@@ -72,5 +125,84 @@
     "profile": {},
     "admin": {},
     "validation": {},
-    "metadata": {}
+    "metadata": {
+        "home": {
+            "title": "旅行ノートをひとつの画面に",
+            "description": "日別の行程と移動時間、予約チェックリスト、旅行情報をひとまとめにして、同行者と一緒に整理します。"
+        },
+        "login": {
+            "title": "ログイン",
+            "description": "メールまたはユーザー名でトリップにログインします。"
+        },
+        "signup": {
+            "title": "新規登録",
+            "description": "トリップアカウントを作成して旅行行程を管理します。"
+        },
+        "explore": {
+            "title": "探索",
+            "description": "公開された旅行行程を見ることができます。"
+        },
+        "boards": {
+            "title": "掲示板",
+            "description": "フリース・質問・レビュー掲示板の最新投稿をまとめてチェック。"
+        },
+        "postNew": {
+            "title": "新規投稿",
+            "description": "掲示板に新しい投稿を書きます。"
+        },
+        "postEdit": {
+            "title": "投稿を編集",
+            "description": "書いた投稿を修正します。"
+        },
+        "postNotFound": {
+            "title": "投稿が見つかりません"
+        },
+        "boardNotFound": {
+            "title": "掲示板が見つかりません"
+        },
+        "trips": {
+            "title": "マイトリップ",
+            "description": "参加中のトリップ一覧を確認し、新しいトリップを作成します。"
+        },
+        "tripNew": {
+            "title": "新しいトリップ",
+            "description": "基本情報で空のトリップを作るか、大阪サンプルトリップで始められます。"
+        },
+        "tripEdit": {
+            "title": "編集",
+            "titleWithTrip": "編集 · {title}"
+        },
+        "tripDetail": {
+            "fallbackTitle": "トリップ",
+            "descriptionWithPeriod": "{destination} · {periodNote}",
+            "descriptionDefault": "{destination} 旅行行程"
+        },
+        "sharedTripNotFound": {
+            "title": "公開中の旅行が見つかりません"
+        },
+        "profile": {
+            "title": "プロフィール設定",
+            "description": "プロフィールで他の旅行者に表示される情報を管理します。"
+        },
+        "profileNotFound": {
+            "title": "プロフィールが見つかりません"
+        },
+        "adminReports": {
+            "title": "通報管理",
+            "description": "受理された通報を確認し処理します。"
+        },
+        "notFound": {
+            "eyebrow": "404",
+            "title": "お探しのページが見つかりません",
+            "description": "URLが変更されたか、すでに削除された可能性があります。下から移動先を選んでください。",
+            "goHome": "ホームへ",
+            "myTrips": "マイ旅行一覧"
+        }
+    },
+    "intro": {
+        "notFound": {
+            "primaryAction": "ホームへ",
+            "secondaryAction": "マイ旅行一覧"
+        }
+    }
 }

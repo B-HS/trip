@@ -1,33 +1,44 @@
+import { useTranslations } from 'next-intl'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { Suspense } from 'react'
 import { AuthCard } from '@/features/auth/auth-card'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { SignupWidget } from '@/widgets/auth/signup-widget'
 
-export const metadata: Metadata = {
-    title: '회원가입',
-    description: '트립 계정을 만들고 여행 일정을 관리합니다.',
+type SignupPageProps = {
+    params: Promise<{ locale: string }>
 }
 
-const SignupPage = () => (
-    <div className='grid min-h-[calc(100dvh-3rem)] place-items-center p-4'>
-        <AuthCard
-            title='회원가입'
-            description='계정을 만들고 여행 일정을 정리해 보세요.'
-            footer={
-                <>
-                    이미 계정이 있으신가요?{' '}
-                    <Link className='font-medium text-foreground underline' href='/login'>
-                        로그인
-                    </Link>
-                </>
-            }>
-            <Suspense fallback={<Skeleton className='h-96 w-full rounded-md' />}>
-                <SignupWidget />
-            </Suspense>
-        </AuthCard>
-    </div>
-)
+export const generateMetadata = async ({ params }: SignupPageProps): Promise<Metadata> => {
+    const { locale } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.signup' })
+    return { title: t('title'), description: t('description') }
+}
+
+const SignupPage = () => {
+    const t = useTranslations('auth.signup')
+
+    return (
+        <div className='grid min-h-[calc(100dvh-3rem)] place-items-center p-4'>
+            <AuthCard
+                title={t('cardTitle')}
+                description={t('cardDescription')}
+                footer={
+                    <>
+                        {t('footerText')}{' '}
+                        <Link className='font-medium text-foreground underline' href='/login'>
+                            {t('loginLink')}
+                        </Link>
+                    </>
+                }>
+                <Suspense fallback={<Skeleton className='h-96 w-full rounded-md' />}>
+                    <SignupWidget />
+                </Suspense>
+            </AuthCard>
+        </div>
+    )
+}
 
 export default SignupPage

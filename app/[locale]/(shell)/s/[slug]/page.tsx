@@ -1,5 +1,7 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
+import { openGraphLocale } from '@/i18n/routing'
 import { notFound } from 'next/navigation'
 import { getPublicTrip } from '@/entities/trip/trip.cache'
 import { prefetchTripLike } from '@/entities/trip/trip.prefetch'
@@ -11,23 +13,22 @@ import { PublicTripActions } from '@/widgets/trip-viewer/public-trip-actions'
 import { TripViewerWidget } from '@/widgets/trip-viewer/trip-viewer-widget'
 
 type SharedTripPageProps = {
-    params: Promise<{ slug: string }>
+    params: Promise<{ locale: string; slug: string }>
 }
 
-const NOT_FOUND_TITLE = '공개된 여행을 찾을 수 없습니다'
-
-const buildDescription = (destination: string, periodNote: string | null) =>
-    periodNote ? `${destination} · ${periodNote}` : `${destination} 여행 일정`
-
 export const generateMetadata = async ({ params }: SharedTripPageProps): Promise<Metadata> => {
-    const { slug } = await params
+    const { locale, slug } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.tripDetail' })
+    const notFoundTitle = await getTranslations({ locale, namespace: 'metadata.sharedTripNotFound' })
     const trip = await getPublicTrip(slug)
-    if (!trip) return { title: NOT_FOUND_TITLE }
-    const description = buildDescription(trip.destination, trip.periodNote)
+    if (!trip) return { title: notFoundTitle('title') }
+    const description = trip.periodNote
+        ? t('descriptionWithPeriod', { destination: trip.destination, periodNote: trip.periodNote })
+        : t('descriptionDefault', { destination: trip.destination })
     return {
         title: trip.title,
         description,
-        openGraph: { title: trip.title, description, siteName: SITE_NAME, locale: 'ko_KR', type: 'article' },
+        openGraph: { title: trip.title, description, siteName: SITE_NAME, locale: openGraphLocale(locale), type: 'article' },
     }
 }
 

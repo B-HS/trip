@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { getBoardByKey } from '@/entities/community/community.cache'
 import { findPostPage } from '@/entities/community/community.repository'
@@ -7,16 +8,15 @@ import { getServerSession } from '@/shared/lib/session'
 import { BoardList } from '@/widgets/community/board-list'
 
 type BoardPageProps = {
-    params: Promise<{ key: string }>
+    params: Promise<{ locale: string; key: string }>
     searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-const NOT_FOUND_TITLE = '게시판을 찾을 수 없습니다'
-
 export const generateMetadata = async ({ params }: BoardPageProps): Promise<Metadata> => {
-    const { key } = await params
+    const { locale, key } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.boardNotFound' })
     const board = await getBoardByKey(key)
-    return { title: board === null ? NOT_FOUND_TITLE : board.name }
+    return { title: board === null ? t('title') : board.name }
 }
 
 const BoardPage = async ({ params, searchParams }: BoardPageProps) => {

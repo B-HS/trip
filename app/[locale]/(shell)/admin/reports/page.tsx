@@ -1,5 +1,6 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { isAdminRole } from '@/entities/auth/auth.role'
 import { prefetchOpenReports } from '@/entities/community/community.prefetch'
@@ -10,11 +11,14 @@ import { requireUser } from '@/shared/lib/session'
 import { AdminReportsWidget } from '@/widgets/community/admin-reports-widget'
 
 type AdminReportsPageProps = {
+    params: Promise<{ locale: string }>
     searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export const metadata: Metadata = {
-    title: '신고 관리',
+export const generateMetadata = async ({ params }: AdminReportsPageProps): Promise<Metadata> => {
+    const { locale } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.adminReports' })
+    return { title: t('title'), description: t('description') }
 }
 
 const AdminReportsPage = async ({ searchParams }: AdminReportsPageProps) => {

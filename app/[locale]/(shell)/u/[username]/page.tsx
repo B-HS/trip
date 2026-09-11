@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { pageSchema } from '@/entities/community/community.validate'
 import { getProfileByUsername } from '@/entities/profile/profile.cache'
@@ -8,16 +9,15 @@ import { getServerSession } from '@/shared/lib/session'
 import { ProfilePage } from '@/widgets/profile/profile-page'
 
 type UserProfilePageProps = {
-    params: Promise<{ username: string }>
+    params: Promise<{ locale: string; username: string }>
     searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-const NOT_FOUND_TITLE = '프로필을 찾을 수 없습니다'
-
 export const generateMetadata = async ({ params }: UserProfilePageProps): Promise<Metadata> => {
-    const { username } = await params
+    const { locale, username } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.profileNotFound' })
     const profile = await getProfileByUsername(username)
-    return { title: profile === null ? NOT_FOUND_TITLE : profile.name }
+    return { title: profile === null ? t('title') : profile.name }
 }
 
 const UserProfilePage = async ({ params, searchParams }: UserProfilePageProps) => {

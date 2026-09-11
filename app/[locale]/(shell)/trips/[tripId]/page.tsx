@@ -1,5 +1,6 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { getTripRole } from '@/entities/trip/trip.access'
 import { getTripDetail } from '@/entities/trip/trip.cache'
@@ -12,7 +13,7 @@ import { getServerSession, requireUser } from '@/shared/lib/session'
 import { TripViewerWidget } from '@/widgets/trip-viewer/trip-viewer-widget'
 
 type TripDetailPageProps = {
-    params: Promise<{ tripId: string }>
+    params: Promise<{ locale: string; tripId: string }>
     searchParams: Promise<{ view?: string; day?: string }>
 }
 
@@ -23,17 +24,20 @@ const resolveDayOrdinal = (value: string | undefined) => {
     return Number.isInteger(parsed) ? parsed : undefined
 }
 
-const FALLBACK_TITLE = '여행'
-
 export const generateMetadata = async ({ params }: TripDetailPageProps): Promise<Metadata> => {
-    const { tripId } = await params
+    const { locale, tripId } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.tripDetail' })
+    const fallbackTitle = t('fallbackTitle')
     const session = await getServerSession()
-    if (!session) return { title: FALLBACK_TITLE }
+    if (!session) return { title: fallbackTitle }
     const role = await getTripRole(tripId, session.user.id)
-    if (!role) return { title: FALLBACK_TITLE }
+    if (!role) return { title: fallbackTitle }
     const trip = await getTripDetail(tripId)
-    if (!trip) return { title: FALLBACK_TITLE }
-    return { title: trip.title, description: trip.periodNote ? `${trip.destination} · ${trip.periodNote}` : `${trip.destination} 여행 일정` }
+    if (!trip) return { title: fallbackTitle }
+    const description = trip.periodNote
+        ? t('descriptionWithPeriod', { destination: trip.destination, periodNote: trip.periodNote })
+        : t('descriptionDefault', { destination: trip.destination })
+    return { title: trip.title, description }
 }
 
 const TripDetailPage = async ({ params, searchParams }: TripDetailPageProps) => {

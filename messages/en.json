@@ -46,7 +46,60 @@
             "tagline": "Trip manager with structured data forms"
         }
     },
-    "auth": {},
+    "auth": {
+        "login": {
+            "cardTitle": "Log in",
+            "cardDescription": "Log in with your email or username.",
+            "footerText": "Don't have an account yet?",
+            "signupLink": "Sign up",
+            "identifierLabel": "Email or username",
+            "passwordLabel": "Password",
+            "showPassword": "Show password",
+            "hidePassword": "Hide password",
+            "submit": "Log in",
+            "submitting": "Logging in…"
+        },
+        "signup": {
+            "cardTitle": "Sign up",
+            "cardDescription": "Create an account and start organizing your trips.",
+            "footerText": "Already have an account?",
+            "loginLink": "Log in",
+            "usernameLabel": "Username",
+            "usernameHint": "{min}–{max} characters: lowercase letters, numbers, underscore (_) and period (.).",
+            "emailLabel": "Email",
+            "passwordLabel": "Password",
+            "passwordConfirmLabel": "Confirm password",
+            "submit": "Sign up",
+            "submitting": "Signing up…"
+        },
+        "errors": {
+            "fallback": "We couldn't process your request. Please try again later.",
+            "USER_ALREADY_EXISTS": "This email is already registered.",
+            "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "This email is already registered. Please use another email.",
+            "USER_NOT_FOUND": "Account not found.",
+            "INVALID_EMAIL": "The email format is invalid.",
+            "INVALID_EMAIL_OR_PASSWORD": "Incorrect email or password.",
+            "INVALID_USERNAME_OR_PASSWORD": "Incorrect username or password.",
+            "INVALID_PASSWORD": "Incorrect password.",
+            "INVALID_USER": "Invalid account information.",
+            "PASSWORD_TOO_SHORT": "Password must be at least 8 characters.",
+            "PASSWORD_TOO_LONG": "Password must be 128 characters or fewer.",
+            "USERNAME_IS_ALREADY_TAKEN": "That username is already taken. Please choose another.",
+            "USERNAME_TOO_SHORT": "Username must be at least 3 characters.",
+            "USERNAME_TOO_LONG": "Username must be 30 characters or fewer.",
+            "INVALID_USERNAME": "The username contains invalid characters.",
+            "INVALID_DISPLAY_USERNAME": "The display username format is invalid.",
+            "USERNAME_IS_IMMUTABLE": "The username cannot be changed.",
+            "CREDENTIAL_ACCOUNT_NOT_FOUND": "This account cannot sign in with a password.",
+            "EMAIL_NOT_VERIFIED": "Email verification is required.",
+            "SESSION_EXPIRED": "Your session has expired. Please log in again.",
+            "FAILED_TO_CREATE_USER": "We couldn't create the account. Please try again later.",
+            "FAILED_TO_CREATE_SESSION": "We couldn't create the login session. Please try again later.",
+            "VALIDATION_ERROR": "The input is invalid.",
+            "MISSING_FIELD": "A required field is empty.",
+            "UNEXPECTED_ERROR": "We couldn't process your request. Please try again later."
+        }
+    },
     "community": {
         "boardKind": {
             "free": "Free",
@@ -72,5 +125,84 @@
     "profile": {},
     "admin": {},
     "validation": {},
-    "metadata": {}
+    "metadata": {
+        "home": {
+            "title": "Your travel notes on one screen",
+            "description": "Day-by-day itineraries, travel times, booking checklists and trip info — organized in one place with your travel companions."
+        },
+        "login": {
+            "title": "Log in",
+            "description": "Log in to your trips with email or username."
+        },
+        "signup": {
+            "title": "Sign up",
+            "description": "Create a trip account and manage your itineraries."
+        },
+        "explore": {
+            "title": "Explore",
+            "description": "Browse publicly shared trip itineraries."
+        },
+        "boards": {
+            "title": "Boards",
+            "description": "Recent posts from the free, Q&A and review boards."
+        },
+        "postNew": {
+            "title": "New post",
+            "description": "Write a new post on the board."
+        },
+        "postEdit": {
+            "title": "Edit post",
+            "description": "Edit your post."
+        },
+        "postNotFound": {
+            "title": "Post not found"
+        },
+        "boardNotFound": {
+            "title": "Board not found"
+        },
+        "trips": {
+            "title": "My trips",
+            "description": "Review the trips you're part of and start a new one."
+        },
+        "tripNew": {
+            "title": "New trip",
+            "description": "Create an empty trip with basic info, or start from the Osaka sample trip."
+        },
+        "tripEdit": {
+            "title": "Edit",
+            "titleWithTrip": "Edit · {title}"
+        },
+        "tripDetail": {
+            "fallbackTitle": "Trip",
+            "descriptionWithPeriod": "{destination} · {periodNote}",
+            "descriptionDefault": "{destination} trip itinerary"
+        },
+        "sharedTripNotFound": {
+            "title": "Public trip not found"
+        },
+        "profile": {
+            "title": "Profile settings",
+            "description": "Manage the information other travelers see on your profile."
+        },
+        "profileNotFound": {
+            "title": "Profile not found"
+        },
+        "adminReports": {
+            "title": "Report moderation",
+            "description": "Review and handle submitted reports."
+        },
+        "notFound": {
+            "eyebrow": "404",
+            "title": "We couldn't find that page",
+            "description": "The address may have changed or the page may have been deleted. Choose where to go next below.",
+            "goHome": "Go home",
+            "myTrips": "My trips"
+        }
+    },
+    "intro": {
+        "notFound": {
+            "primaryAction": "Go home",
+            "secondaryAction": "My trips"
+        }
+    }
 }
