@@ -12,8 +12,8 @@ import { ApiError } from '@/shared/lib/api-response'
 import { buildPage } from '@/shared/lib/pagination'
 import { richTextPlainText } from '@/shared/lib/rich-text-document'
 
-const BOARD_NOT_FOUND = '게시판을 찾을 수 없습니다.'
-const POST_NOT_FOUND = '글을 찾을 수 없습니다.'
+const BOARD_NOT_FOUND = 'error.boardNotFound'
+const POST_NOT_FOUND = 'error.postNotFound'
 const LIKE_SPECIAL_PATTERN = /[\\%_]/g
 
 type PostListRow = {

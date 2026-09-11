@@ -143,7 +143,7 @@ export const hideReportTargetAction = async (reportId: string) => {
         assertAdmin(user)
         const id = postIdSchema.parse(reportId)
         const report = await findReportById(id)
-        if (report.kind === 'user') throw new ApiError('VALIDATION_ERROR', '사용자 신고는 숨김 처리할 수 없습니다.')
+        if (report.kind === 'user') throw new ApiError('VALIDATION_ERROR', 'error.cannotHideUserReport')
         await softDeleteTarget(report.kind, report.targetId)
         await markReportHandled(id, user.id, 'hidden')
         await revalidatePost(report.kind === 'post' ? report.targetId : await findPostIdByCommentId(report.targetId))
@@ -189,7 +189,7 @@ export const blockUserAction = async (blockedId: string) => {
     const user = await requireUser()
     return runAction(async () => {
         const id = postIdSchema.parse(blockedId)
-        if (id === user.id) throw new ApiError('VALIDATION_ERROR', '자기 자신을 차단할 수 없습니다.')
+        if (id === user.id) throw new ApiError('VALIDATION_ERROR', 'error.cannotBlockSelf')
         return blockUser(user.id, id)
     })
 }

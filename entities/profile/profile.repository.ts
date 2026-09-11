@@ -13,8 +13,8 @@ import { ApiError } from '@/shared/lib/api-response'
 const NO_POINTS = 0
 const AVATAR_KIND: UploadKind = 'avatar'
 const BANNER_KIND: UploadKind = 'banner'
-const PROFILE_NOT_FOUND = '프로필을 찾을 수 없습니다.'
-const UPLOAD_NOT_FOUND = '업로드한 이미지를 찾을 수 없습니다.'
+const PROFILE_NOT_FOUND = 'error.profileNotFound'
+const UPLOAD_NOT_FOUND = 'error.uploadNotFound'
 
 const profileSettingsColumns = { name: user.name, username: user.username, image: user.image, bannerUrl: user.bannerUrl, bio: user.bio }
 

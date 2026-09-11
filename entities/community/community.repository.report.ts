@@ -9,8 +9,8 @@ import { user } from '@/shared/db/schema/auth'
 import { tripComment, tripPost, tripReport } from '@/shared/db/schema/community'
 import { ApiError } from '@/shared/lib/api-response'
 
-const REPORT_DUPLICATE = '이미 신고한 대상입니다.'
-const REPORT_NOT_FOUND = '신고를 찾을 수 없습니다.'
+const REPORT_DUPLICATE = 'error.reportDuplicate'
+const REPORT_NOT_FOUND = 'error.reportNotFound'
 
 const targetUser = alias(user, 'target_user')
 
@@ -89,9 +89,9 @@ const targetLabelOf = (row: {
     commentDeletedAt: Date | null
     targetUsername: string | null
 }) => {
-    if (row.kind === 'post') return row.postTitle === null || row.postDeletedAt !== null ? '(삭제된 글)' : row.postTitle
-    if (row.kind === 'comment') return row.commentBody === null || row.commentDeletedAt !== null ? '(삭제된 댓글)' : row.commentBody
-    return row.targetUsername === null ? '(탈퇴한 사용자)' : row.targetUsername
+    if (row.kind === 'post') return row.postTitle === null || row.postDeletedAt !== null ? 'error.deletedPost' : row.postTitle
+    if (row.kind === 'comment') return row.commentBody === null || row.commentDeletedAt !== null ? 'error.deletedComment' : row.commentBody
+    return row.targetUsername === null ? 'error.withdrawnUser' : row.targetUsername
 }
 
 export const findReportById = async (reportId: string) => {

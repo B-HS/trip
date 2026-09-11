@@ -2,6 +2,8 @@
 
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
+import { translateMessage } from '@/shared/lib/message-key'
 import {
     acceptCommentAction,
     banReportedUserAction,
@@ -42,37 +44,40 @@ export const usePostLike = (postId: string) => useQuery({ ...postLikeQueryOption
 
 export const useCreateComment = (postId: string) => {
     const queryClient = useQueryClient()
+    const t = useTranslations()
     return useMutation({
         mutationFn: async (input: CommentCreateInput) => unwrapActionResult(await createCommentAction(postId, input)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.COMMUNITY.COMMENTS(postId) })
-            toast.success('댓글을 남겼습니다.')
+            toast.success(t('community.toast.commentCreated'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useDeleteComment = (postId: string) => {
     const queryClient = useQueryClient()
+    const t = useTranslations()
     return useMutation({
         mutationFn: async (commentId: string) => unwrapActionResult(await deleteCommentAction(commentId)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.COMMUNITY.COMMENTS(postId) })
-            toast.success('댓글을 삭제했습니다.')
+            toast.success(t('community.toast.commentDeleted'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useAcceptComment = (postId: string) => {
     const queryClient = useQueryClient()
+    const t = useTranslations()
     return useMutation({
         mutationFn: async (commentId: string) => unwrapActionResult(await acceptCommentAction(postId, commentId)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.COMMUNITY.COMMENTS(postId) })
-            toast.success('답변을 채택했습니다.')
+            toast.success(t('community.toast.accepted'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
@@ -87,58 +92,68 @@ export const useTogglePostLike = (postId: string) => {
     )
 }
 
-export const useCreatePost = () =>
-    useMutation({
+export const useCreatePost = () => {
+    const t = useTranslations()
+    return useMutation({
         mutationFn: async (input: PostCreateInput) => unwrapActionResult(await createPostAction(input)),
-        onSuccess: () => toast.success('글을 등록했습니다.'),
-        onError: (error) => toast.error(error.message),
+        onSuccess: () => toast.success(t('community.toast.postCreated')),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
+}
 
-export const useUpdatePost = (postId: string) =>
-    useMutation({
+export const useUpdatePost = (postId: string) => {
+    const t = useTranslations()
+    return useMutation({
         mutationFn: async (input: PostUpdateInput) => unwrapActionResult(await updatePostAction(postId, input)),
-        onSuccess: () => toast.success('글을 수정했습니다.'),
-        onError: (error) => toast.error(error.message),
+        onSuccess: () => toast.success(t('community.toast.postUpdated')),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
+}
 
-export const useSubmitReport = () =>
-    useMutation({
+export const useSubmitReport = () => {
+    const t = useTranslations()
+    return useMutation({
         mutationFn: async (input: ReportCreateInput) => unwrapActionResult(await submitReportAction(input)),
-        onSuccess: () => toast.success('신고를 접수했습니다.'),
-        onError: (error) => toast.error(error.message),
+        onSuccess: () => toast.success(t('community.toast.reportSubmitted')),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
+}
 
-export const useBlockUser = () =>
-    useMutation({
+export const useBlockUser = () => {
+    const t = useTranslations()
+    return useMutation({
         mutationFn: async (blockedId: string) => unwrapActionResult(await blockUserAction(blockedId)),
-        onSuccess: () => toast.success('사용자를 차단했습니다.'),
-        onError: (error) => toast.error(error.message),
+        onSuccess: () => toast.success(t('community.toast.blocked')),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
+}
 
 const invalidateOpenReports = (queryClient: ReturnType<typeof useQueryClient>, page: number) =>
     queryClient.invalidateQueries({ queryKey: QUERY_KEY.REPORT.LIST(page) })
 
 export const useHideReportTarget = (page: number) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (reportId: string) => unwrapActionResult(await hideReportTargetAction(reportId)),
         onSuccess: () => {
             invalidateOpenReports(queryClient, page)
-            toast.success('대상 글을 숨겼습니다.')
+            toast.success(t('community.toast.postHidden'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useDismissReport = (page: number) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (reportId: string) => unwrapActionResult(await dismissReportAction(reportId)),
         onSuccess: () => {
             invalidateOpenReports(queryClient, page)
-            toast.success('신고를 기각했습니다.')
+            toast.success(t('community.toast.reportDismissed'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
@@ -148,52 +163,58 @@ export const useBanReportedUser = (page: number) => {
         mutationFn: async (reportId: string) => unwrapActionResult(await banReportedUserAction(reportId)),
         onSuccess: () => {
             invalidateOpenReports(queryClient, page)
-            toast.success('사용자를 차단했습니다.')
+            toast.success(t('community.toast.blocked'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
+    const t = useTranslations()
 }
 
 export const useUnbanUser = (page: number) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (userId: string) => unwrapActionResult(await unbanUserAction(userId)),
         onSuccess: () => {
             invalidateOpenReports(queryClient, page)
-            toast.success('사용자 차단을 해제했습니다.')
+            toast.success(t('community.toast.unblocked'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useRestorePost = (page: number) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (postId: string) => unwrapActionResult(await restorePostAction(postId)),
         onSuccess: () => {
             invalidateOpenReports(queryClient, page)
-            toast.success('글을 복구했습니다.')
+            toast.success(t('community.toast.postRestored'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
-export const useUnblockUser = () =>
-    useMutation({
+export const useUnblockUser = () => {
+    const t = useTranslations()
+    return useMutation({
         mutationFn: async (blockedId: string) => unwrapActionResult(await unblockUserAction(blockedId)),
-        onSuccess: () => toast.success('차단을 해제했습니다.'),
-        onError: (error) => toast.error(error.message),
+        onSuccess: () => toast.success(t('community.toast.unblocked')),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
+}
 
 export const useDeletePost = () => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (postId: string) => unwrapActionResult(await deletePostAction(postId)),
         onSuccess: (data) => {
             queryClient.removeQueries({ queryKey: QUERY_KEY.COMMUNITY.COMMENTS(data.id) })
             queryClient.removeQueries({ queryKey: QUERY_KEY.COMMUNITY.POST_LIKE(data.id) })
-            toast.success('글을 삭제했습니다.')
+            toast.success(t('community.toast.postDeleted'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }

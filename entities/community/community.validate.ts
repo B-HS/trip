@@ -22,9 +22,9 @@ const DEFAULT_EXPLORE_SORT = 'recent'
 export const boardKeySchema = z
     .string()
     .trim()
-    .min(1, '게시판을 선택해 주세요.')
-    .max(BOARD_KEY_MAX_LENGTH, `게시판 주소는 ${BOARD_KEY_MAX_LENGTH}자 이하여야 합니다.`)
-    .regex(BOARD_KEY_PATTERN, '게시판 주소는 영문 소문자, 숫자, 하이픈(-)만 사용할 수 있습니다.')
+    .min(1, 'validation.boardRequired')
+    .max(BOARD_KEY_MAX_LENGTH, 'validation.boardKeyTooLong')
+    .regex(BOARD_KEY_PATTERN, 'validation.boardKeyPattern')
 
 export const postIdSchema = z.uuid()
 
@@ -34,11 +34,11 @@ export const likeFlagSchema = z.boolean()
 
 export const pageSchema = z.coerce.number().int().min(FIRST_PAGE).catch(FIRST_PAGE)
 
-export const postBodySchema = richTextDocumentSchema.refine((body) => !isRichTextEmpty(body), '본문을 입력해 주세요.')
+export const postBodySchema = richTextDocumentSchema.refine((body) => !isRichTextEmpty(body), 'validation.bodyRequired')
 
 export const postCreateSchema = z.object({
     boardKey: boardKeySchema,
-    title: z.string().trim().min(1, '제목을 입력해 주세요.').max(POST_TITLE_MAX_LENGTH, `제목은 ${POST_TITLE_MAX_LENGTH}자 이하로 입력해 주세요.`),
+    title: z.string().trim().min(1, 'validation.titleRequired').max(POST_TITLE_MAX_LENGTH, 'validation.titleTooLong'),
     body: postBodySchema,
     tripId: z.uuid().nullable().default(null),
 })
@@ -47,7 +47,7 @@ export const postUpdateSchema = postCreateSchema.omit({ boardKey: true })
 
 export const commentCreateSchema = z.object({
     parentId: z.uuid().nullable().default(null),
-    body: z.string().trim().min(1, '댓글을 입력해 주세요.').max(COMMENT_BODY_MAX_LENGTH, `댓글은 ${COMMENT_BODY_MAX_LENGTH}자 이하로 입력해 주세요.`),
+    body: z.string().trim().min(1, 'validation.commentRequired').max(COMMENT_BODY_MAX_LENGTH, 'validation.commentTooLong'),
 })
 
 export const postSearchSchema = z.object({
@@ -61,10 +61,10 @@ export const exploreSearchSchema = z.object({
 })
 
 export const reportCreateSchema = z.object({
-    kind: z.enum(REPORT_KINDS, '신고 유형을 선택해 주세요.'),
-    targetId: z.uuid('신고 대상을 찾을 수 없습니다.'),
-    reason: z.enum(REPORT_REASONS, '신고 사유를 선택해 주세요.'),
-    memo: z.string().trim().max(REPORT_MEMO_MAX_LENGTH, `메모는 ${REPORT_MEMO_MAX_LENGTH}자 이하로 입력해 주세요.`).nullable().default(null),
+    kind: z.enum(REPORT_KINDS, 'validation.reportKindRequired'),
+    targetId: z.uuid('validation.reportTargetNotFound'),
+    reason: z.enum(REPORT_REASONS, 'validation.reportReasonRequired'),
+    memo: z.string().trim().max(REPORT_MEMO_MAX_LENGTH, 'validation.memoTooLong').nullable().default(null),
 })
 
 export type BoardKeyInput = z.input<typeof boardKeySchema>

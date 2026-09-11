@@ -13,10 +13,10 @@ import { user } from '@/shared/db/schema/auth'
 import { tripBoard, tripComment, tripPointLedger, tripPost } from '@/shared/db/schema/community'
 import { ApiError } from '@/shared/lib/api-response'
 
-const POST_NOT_FOUND = '글을 찾을 수 없습니다.'
-const COMMENT_NOT_FOUND = '댓글을 찾을 수 없습니다.'
-const PARENT_NOT_FOUND = '답글을 달 댓글을 찾을 수 없습니다.'
-const ALREADY_ACCEPTED = '이미 채택된 댓글입니다.'
+const POST_NOT_FOUND = 'error.postNotFound'
+const COMMENT_NOT_FOUND = 'error.commentNotFound'
+const PARENT_NOT_FOUND = 'error.parentCommentNotFound'
+const ALREADY_ACCEPTED = 'error.alreadyAccepted'
 
 const lockPost = async (tx: TripTransaction, postId: string) => {
     const [row] = await tx

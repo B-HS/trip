@@ -287,6 +287,20 @@
             "loading": "Loading reports…",
             "error": "Failed to load reports.",
             "retry": "Try again"
+        },
+        "toast": {
+            "commentCreated": "Comment posted.",
+            "commentDeleted": "Comment deleted.",
+            "accepted": "Answer accepted.",
+            "postCreated": "Post published.",
+            "postUpdated": "Post updated.",
+            "postDeleted": "Post deleted.",
+            "postRestored": "Post restored.",
+            "postHidden": "Reported post hidden.",
+            "reportSubmitted": "Report submitted.",
+            "reportDismissed": "Report dismissed.",
+            "blocked": "User blocked.",
+            "unblocked": "User unblocked."
         }
     },
     "trip": {},
@@ -335,6 +349,10 @@
             "upload": "Upload image",
             "uploading": "Uploading…",
             "remove": "Remove"
+        },
+        "toast": {
+            "saved": "Profile saved.",
+            "usernameChanged": "Username changed."
         }
     },
     "admin": {},

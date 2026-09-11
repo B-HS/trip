@@ -1,6 +1,8 @@
 'use client'
 'use no memo'
 
+import { useTranslations } from 'next-intl'
+
 import { zodResolver } from '@hookform/resolvers/zod'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useState, type FC } from 'react'
@@ -21,14 +23,15 @@ export const LoginForm: FC<LoginFormProps> = ({ onSubmit, isPending }) => {
     const form = useForm<LoginValues>({ resolver: zodResolver(loginSchema), defaultValues: { identifier: '', password: '' } })
 
     const { errors } = form.formState
-    const passwordToggleLabel = isPasswordVisible ? '비밀번호 숨기기' : '비밀번호 보기'
+    const t = useTranslations('auth.login')
+    const passwordToggleLabel = isPasswordVisible ? t('hidePassword') : t('showPassword')
     const handleSubmit = form.handleSubmit(async (values) => setErrorMessage(await onSubmit(values)))
 
     return (
         <form className='flex flex-col gap-4' onSubmit={handleSubmit} noValidate>
             <FieldGroup className='gap-4'>
                 <Field data-invalid={!!errors.identifier}>
-                    <FieldLabel htmlFor='login-identifier'>이메일 또는 사용자명</FieldLabel>
+                    <FieldLabel htmlFor='login-identifier'>{t('identifierLabel')}</FieldLabel>
                     <Input
                         id='login-identifier'
                         autoComplete='username'
@@ -39,7 +42,7 @@ export const LoginForm: FC<LoginFormProps> = ({ onSubmit, isPending }) => {
                     <FieldError errors={[errors.identifier]} />
                 </Field>
                 <Field data-invalid={!!errors.password}>
-                    <FieldLabel htmlFor='login-password'>비밀번호</FieldLabel>
+                    <FieldLabel htmlFor='login-password'>{t('passwordLabel')}</FieldLabel>
                     <div className='relative'>
                         <Input
                             id='login-password'
@@ -70,7 +73,7 @@ export const LoginForm: FC<LoginFormProps> = ({ onSubmit, isPending }) => {
             )}
             <div className='flex gap-px bg-background'>
                 <Button className='flex-1' type='submit' variant='cellPrimary' size='cell' disabled={isPending}>
-                    {isPending ? '로그인 중…' : '로그인'}
+                    {isPending ? t('submitting') : t('submit')}
                 </Button>
             </div>
         </form>

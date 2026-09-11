@@ -7,7 +7,7 @@ import { ApiError } from '@/shared/lib/api-response'
 import { runAction } from '@/shared/lib/action-result'
 import { requireUser } from '@/shared/lib/session'
 
-const USERNAME_TAKEN = '이미 사용 중인 사용자명입니다. 다른 사용자명을 입력해 주세요.'
+const USERNAME_TAKEN = 'error.usernameTaken'
 
 export const updateProfileAction = async (input: ProfileUpdateInput) => {
     const user = await requireUser()
@@ -23,7 +23,7 @@ export const changeUsernameAction = async (input: UsernameChangeInput) => {
     const user = await requireUser()
     return runAction(async () => {
         const username = usernameChangeSchema.parse(input)
-        if (username === user.username) throw new ApiError('VALIDATION_ERROR', '현재 사용자명과 같습니다.')
+        if (username === user.username) throw new ApiError('VALIDATION_ERROR', 'error.sameUsernameAsCurrent')
         if (await isUsernameTaken(username)) throw new ApiError('VALIDATION_ERROR', USERNAME_TAKEN)
         const settings = await changeUsername(user.id, username)
         revalidatePath('/settings/profile')

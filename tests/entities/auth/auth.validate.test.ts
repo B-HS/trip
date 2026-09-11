@@ -62,6 +62,6 @@ describe('signupSchema', () => {
         const result = signupSchema.safeParse({ ...validSignupValues, passwordConfirm: 'trip-9999' })
         expect(result.success).toBe(false)
         expect(result.error?.issues[0]?.path).toEqual(['passwordConfirm'])
-        expect(result.error?.issues[0]?.message).toBe('비밀번호가 일치하지 않습니다.')
+        expect(result.error?.issues[0]?.message).toBe('validation.passwordMismatch')
     })
 })

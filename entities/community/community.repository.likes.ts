@@ -5,7 +5,7 @@ import { getDb } from '@/shared/db/client'
 import { tripPost, tripPostLike } from '@/shared/db/schema/community'
 import { ApiError } from '@/shared/lib/api-response'
 
-const POST_NOT_FOUND = '글을 찾을 수 없습니다.'
+const POST_NOT_FOUND = 'error.postNotFound'
 
 export const findPostLikeState = async (postId: string, userId: string | null) => {
     const [post] = await getDb().select({ likeCount: tripPost.likeCount }).from(tripPost).where(eq(tripPost.id, postId)).limit(1)

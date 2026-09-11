@@ -274,6 +274,20 @@
             "loading": "신고를 불러오는 중입니다.",
             "error": "신고를 불러오지 못했습니다.",
             "retry": "다시 시도"
+        },
+        "toast": {
+            "commentCreated": "댓글을 남겼습니다.",
+            "commentDeleted": "댓글을 삭제했습니다.",
+            "accepted": "답변을 채택했습니다.",
+            "postCreated": "글을 등록했습니다.",
+            "postUpdated": "글을 수정했습니다.",
+            "postDeleted": "글을 삭제했습니다.",
+            "postRestored": "글을 복구했습니다.",
+            "postHidden": "대상 글을 숨겼습니다.",
+            "reportSubmitted": "신고를 접수했습니다.",
+            "reportDismissed": "신고를 기각했습니다.",
+            "blocked": "사용자를 차단했습니다.",
+            "unblocked": "사용자 차단을 해제했습니다."
         }
     },
     "trip": {},
@@ -322,6 +336,10 @@
             "upload": "이미지 업로드",
             "uploading": "올리는 중…",
             "remove": "제거"
+        },
+        "toast": {
+            "saved": "프로필을 저장했습니다.",
+            "usernameChanged": "사용자명을 변경했습니다."
         }
     },
     "admin": {},

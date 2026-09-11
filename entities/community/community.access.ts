@@ -8,9 +8,9 @@ import { tripBoard, tripComment, tripPost } from '@/shared/db/schema/community'
 import { trip } from '@/shared/db/schema/trip'
 import { ApiError } from '@/shared/lib/api-response'
 
-const POST_NOT_FOUND = '글을 찾을 수 없습니다.'
-const COMMENT_NOT_FOUND = '댓글을 찾을 수 없습니다.'
-const TRIP_NOT_FOUND = '여행을 찾을 수 없습니다.'
+const POST_NOT_FOUND = 'error.postNotFound'
+const COMMENT_NOT_FOUND = 'error.commentNotFound'
+const TRIP_NOT_FOUND = 'error.tripNotFound'
 
 const findPostWithBoard = async (postId: string) => {
     const [row] = await getDb()

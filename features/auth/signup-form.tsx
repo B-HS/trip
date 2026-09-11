@@ -1,6 +1,8 @@
 'use client'
 'use no memo'
 
+import { useTranslations } from 'next-intl'
+
 import { zodResolver } from '@hookform/resolvers/zod'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useState, type FC } from 'react'
@@ -24,7 +26,8 @@ export const SignupForm: FC<SignupFormProps> = ({ onSubmit, isPending }) => {
     const form = useForm<SignupValues>({ resolver: zodResolver(signupSchema), defaultValues: SIGNUP_DEFAULT_VALUES })
 
     const { errors } = form.formState
-    const passwordToggleLabel = isPasswordVisible ? '비밀번호 숨기기' : '비밀번호 보기'
+    const t = useTranslations('auth.signup')
+    const passwordToggleLabel = isPasswordVisible ? t('hidePassword') : t('showPassword')
     const passwordInputType = isPasswordVisible ? 'text' : 'password'
     const handleSubmit = form.handleSubmit(async (values) => setErrorMessage(await onSubmit(values)))
 
@@ -32,7 +35,7 @@ export const SignupForm: FC<SignupFormProps> = ({ onSubmit, isPending }) => {
         <form className='flex flex-col gap-4' onSubmit={handleSubmit} noValidate>
             <FieldGroup className='gap-4'>
                 <Field data-invalid={!!errors.username}>
-                    <FieldLabel htmlFor='signup-username'>사용자명</FieldLabel>
+                    <FieldLabel htmlFor='signup-username'>{t('usernameLabel')}</FieldLabel>
                     <Input
                         id='signup-username'
                         autoComplete='username'
@@ -40,13 +43,11 @@ export const SignupForm: FC<SignupFormProps> = ({ onSubmit, isPending }) => {
                         aria-invalid={!!errors.username}
                         {...form.register('username')}
                     />
-                    <FieldDescription>
-                        영문 소문자, 숫자, 밑줄(_), 마침표(.)로 {USERNAME_MIN_LENGTH}~{USERNAME_MAX_LENGTH}자입니다.
-                    </FieldDescription>
+                    <FieldDescription>{t('usernameHint', { min: USERNAME_MIN_LENGTH, max: USERNAME_MAX_LENGTH })}</FieldDescription>
                     <FieldError errors={[errors.username]} />
                 </Field>
                 <Field data-invalid={!!errors.email}>
-                    <FieldLabel htmlFor='signup-email'>이메일</FieldLabel>
+                    <FieldLabel htmlFor='signup-email'>{t('emailLabel')}</FieldLabel>
                     <Input
                         id='signup-email'
                         type='email'
@@ -58,7 +59,7 @@ export const SignupForm: FC<SignupFormProps> = ({ onSubmit, isPending }) => {
                     <FieldError errors={[errors.email]} />
                 </Field>
                 <Field data-invalid={!!errors.password}>
-                    <FieldLabel htmlFor='signup-password'>비밀번호</FieldLabel>
+                    <FieldLabel htmlFor='signup-password'>{t('passwordLabel')}</FieldLabel>
                     <div className='relative'>
                         <Input
                             id='signup-password'
@@ -82,7 +83,7 @@ export const SignupForm: FC<SignupFormProps> = ({ onSubmit, isPending }) => {
                     <FieldError errors={[errors.password]} />
                 </Field>
                 <Field data-invalid={!!errors.passwordConfirm}>
-                    <FieldLabel htmlFor='signup-password-confirm'>비밀번호 확인</FieldLabel>
+                    <FieldLabel htmlFor='signup-password-confirm'>{t('passwordConfirmLabel')}</FieldLabel>
                     <Input
                         id='signup-password-confirm'
                         type={passwordInputType}
@@ -100,7 +101,7 @@ export const SignupForm: FC<SignupFormProps> = ({ onSubmit, isPending }) => {
             )}
             <div className='flex gap-px bg-background'>
                 <Button className='flex-1' type='submit' variant='cellPrimary' size='cell' disabled={isPending}>
-                    {isPending ? '가입 중…' : '회원가입'}
+                    {isPending ? t('submitting') : t('submit')}
                 </Button>
             </div>
         </form>

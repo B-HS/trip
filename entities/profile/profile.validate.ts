@@ -13,9 +13,9 @@ export const profileUpdateSchema = z.object({
     name: z
         .string()
         .trim()
-        .min(PROFILE_NAME_MIN_LENGTH, `표시 이름은 ${PROFILE_NAME_MIN_LENGTH}자 이상 입력해 주세요.`)
-        .max(PROFILE_NAME_MAX_LENGTH, `표시 이름은 ${PROFILE_NAME_MAX_LENGTH}자 이하로 입력해 주세요.`),
-    bio: z.string().trim().max(PROFILE_BIO_MAX_LENGTH, `소개는 ${PROFILE_BIO_MAX_LENGTH}자 이하로 입력해 주세요.`).nullable().default(null),
+        .min(PROFILE_NAME_MIN_LENGTH, 'validation.profileNameTooShort')
+        .max(PROFILE_NAME_MAX_LENGTH, 'validation.profileNameTooLong'),
+    bio: z.string().trim().max(PROFILE_BIO_MAX_LENGTH, 'validation.bioTooLong').nullable().default(null),
     avatarUploadId: z.uuid().nullable().optional(),
     bannerUploadId: z.uuid().nullable().optional(),
 })
@@ -24,9 +24,9 @@ export const usernameChangeSchema = z
     .string()
     .trim()
     .toLowerCase()
-    .min(USERNAME_MIN_LENGTH, `사용자명은 ${USERNAME_MIN_LENGTH}자 이상 입력해 주세요.`)
-    .max(USERNAME_MAX_LENGTH, `사용자명은 ${USERNAME_MAX_LENGTH}자 이하로 입력해 주세요.`)
-    .regex(USERNAME_PATTERN, '사용자명은 영문 소문자, 숫자, 밑줄(_), 마침표(.)만 사용할 수 있습니다.')
+    .min(USERNAME_MIN_LENGTH, 'validation.usernameTooShort')
+    .max(USERNAME_MAX_LENGTH, 'validation.usernameTooLong')
+    .regex(USERNAME_PATTERN, 'validation.usernamePattern')
 
 export type ProfileUpdateInput = z.input<typeof profileUpdateSchema>
 export type ProfileUpdateValues = z.output<typeof profileUpdateSchema>
