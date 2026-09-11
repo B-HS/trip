@@ -1,6 +1,6 @@
 # ARCHITECTURE — trip
 
-> 최종 갱신: 2026-09-10 · 대응 커밋: `8b9fbd5`(4-4e 지구본 확장 ADR-0035, origin/dev·prod 동기화, prod 배포 `dpl_8P8LFrBSrpJrA7NQQqxW1eNQqvYz` Ready · 마이그레이션 0007 은 적용됨) + 4-4f 공개 게시판 메뉴·섹션 배경 계층·auto-fit 그리드(ADR-0036, **미커밋**)
+> 최종 갱신: 2026-09-11 · 대응 커밋: `181ab9c`(4-5 커뮤니티 확장 데이터 계층 ADR-0037 — 마이그레이션 0008 생성·추가 전용 SQL 검증, **DB 미적용**(`DATABASE_URL` 부재) · UI 는 후속)
 > 구현 정본. 코드와 어긋나면 코드를 고치거나 이 문서를 갱신한다. 결정의 배경·기각 대안은 `docs/acknowledge/README.md`.
 
 ## 1. 스택
@@ -27,8 +27,8 @@ entities/
   user-state/ user-state.type · .repository · .action · .api · .query
   upload/   upload.type · upload.api(multipart POST) · upload.query(useUploadImage)
   auth/     auth.validate · auth.error · auth.role(isAdminRole, 순수)
-  community/ community.type · community.validate · community.role(순수) · community.access(server) · community.repository(+.comments/.likes) · community.cache(React cache) · community.action · community.api · community.query · community.prefetch
-  profile/  profile.type · profile.validate(profileUpdateSchema·PROFILE_TABS·resolveProfileTab) · profile.repository · profile.cache · profile.action · profile.query
+  community/ community.type · community.validate(+reportCreateSchema) · community.role(순수, +canAttachTrip·isBlockedAuthor) · community.comment(순수, projectComments) · community.point(순수, buildAcceptanceLedger·buildRevocationLedger) · community.access(server, +assertAdmin·assertTripAttachable=소유|공개) · community.repository(+.comments/.likes/.block/.report) · community.cache(React cache, +getBlockedIds) · community.action · community.api · community.query · community.prefetch
+  profile/  profile.type · profile.validate(profileUpdateSchema·usernameChangeSchema·PROFILE_TABS·resolveProfileTab) · profile.repository(+isUsernameTaken·changeUsername) · profile.cache · profile.action(+changeUsernameAction) · profile.query
 shared/
   db/       client.ts(mysql2 풀 싱글턴) · table.ts(`trip_` creator) · schema/{auth,trip,community}.ts(auth↔trip↔community 는 지연 콜백 참조라 순환 import 허용) · schema.ts(합성) · accept-invites.ts(가입 시 초대 수락)
   lib/      env.ts(getEnv, R2_* 는 선택) · auth.ts(getAuth) · auth-client.ts · session.ts · api-response.ts · action-result.ts · fetch.ts(clientFetch, FormData 허용) · query-client.ts · query-provider.tsx · motion.ts · trip-template.ts(+parseTripTemplateJson) · trip-length.ts(몇박 며칠) · r2.ts(server-only, getUploadConfig·putObject·deleteObject) · upload-validation.ts(순수 검증) · utils.ts(npm `cn` 재export) · rich-text-extensions.ts(Tiptap 확장 목록·스키마) · rich-text-document.ts(JSON 검증·정규화·평문·빈 문서 판정, zod 스키마) · rich-text-sanitize.ts(server-only, dompurify + jsdom 26 전용 창, 화이트리스트 + 훅, `SanitizedRichTextHtml` 브랜드 타입) · rich-text-html.ts(server-only, `generateHTML` → sanitize) · pagination.ts(buildPage) · date-range.ts(weekRange·monthRange) · trip-date-range.ts · trip-route-label.ts · like-mutation.ts(좋아요 낙관적 mutation 팩토리) · search-param.ts(replaceSearchParam — history.replaceState 로 쿼리 1개 갱신·삭제, 목록 `?route=`·뷰어 `?view=`·`?day=` 공용) · route-handler.ts(withRouteErrorHandling — 새 라우트 3곳만 적용, 기존 6곳은 try/catch 잔존)
@@ -37,7 +37,7 @@ shared/
   ui/       shadcn 55개(+ button `cell`·`cellPrimary`·`cellDestructive` 변형, `cell`·`cellIcon` 크기) + theme-provider · theme-toggle · motion-provider · motion/(7 프리미티브) · three/(지구본 — globe-math·globe-geography·globe-variant·globe-interaction·css-color·use-globe-theme·trip-globe(+scene·lazy))
 tests/    bun test 미러 구조(entities · features · shared · widgets) + setup.ts(happy-dom 전역 등록, `server-only` 를 빈 모듈로 mock, 자식 프레임 네비게이션 비활성)
 scripts/  migrate.ts · seed.ts · set-admin.ts(`bun run admin:set <email>`)
-drizzle/  0000(초기 20 테이블) · 0001(destination·favorite) · 0002(nights·days) · 0003(sidebar_link·sidebar_note) · 0004(schedule_kind + 데이터 이관, kind 컬럼 삭제) · 0005(upload·booking_attachment) · 0006(board·post·comment·post_like·like·point_ledger + user role/ban/bio/banner, session impersonated_by, trip like_count, 게시판 3행 시드) · 0007(trip departure_airport_code, ALTER 1개) + meta
+drizzle/  0000(초기 20 테이블) · 0001(destination·favorite) · 0002(nights·days) · 0003(sidebar_link·sidebar_note) · 0004(schedule_kind + 데이터 이관, kind 컬럼 삭제) · 0005(upload·booking_attachment) · 0006(board·post·comment·post_like·like·point_ledger + user role/ban/bio/banner, session impersonated_by, trip like_count, 게시판 3행 시드) · 0007(trip departure_airport_code, ALTER 1개) · 0008(report·user_block 테이블 + post/comment deleted_at + point_ledger reason +revoked, 추가 전용, **미적용**) + meta
 docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · env(환경변수 키·발급 안내) · acknowledge/ · memory/ · history/ · feedback/ · quality-assurance/ · DESIGN.md · osaka-trip-interactive.html
 ```
 
@@ -104,7 +104,7 @@ docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · env(환경변수 키�
 | viewer           | O              | O                  | X    | X              | X    |
 | 공개 링크 방문자 | `/s/[slug]` 만 | X                  | X    | X              | X    |
 
-커뮤니티(ADR-0028·0032): 게시판·글·댓글·프로필·탐색·공개 트립은 비로그인 열람. 글 작성·댓글·좋아요(글·공개 트립)·프로필 편집은 로그인. 글 수정은 작성자만, 글·댓글 삭제는 작성자 또는 admin(`role`), 채택은 질문 게시판 글 작성자가 타인의 최상위 댓글 1건(되돌릴 수 없음). 트립 첨부는 view 권한이 있는 트립만. 서버 액션이 전부 재검사한다(`community.access.ts`).
+커뮤니티(ADR-0028·0032·0037): 게시판·글·댓글·프로필·탐색·공개 트립은 비로그인 열람. 글 작성·댓글·좋아요(글·공개 트립)·프로필 편집·신고 제출·차단/차단 해제는 로그인. 글 수정은 작성자만, 글·댓글 삭제(소프트)는 작성자 또는 admin(`role`), 삭제 복구·신고 처리(hide/dismiss/ban/unban)·차단 목록 조회 외 admin 작업은 `assertAdmin`. 채택은 질문 게시판 글 작성자가 타인의 최상위 댓글 1건, **변경 가능**(재채택 시 옛 댓글 회수 -10). 트립 첨부는 **작성자 소유이거나 공개 트립**만(`canAttachTrip`). 차단(`trip_user_block`, 단방향): 차단한 사람에게 차단당한 사람의 글·댓글이 어떤 표면에도 보이지 않는다(목록 SQL `notInArray` + 댓글 `projectComments`). 사용자명 변경은 본인만(`changeUsernameAction`). 서버 액션이 전부 재검사한다(`community.access.ts`).
 
 ## 7. 사용자별 상태
 
@@ -146,11 +146,11 @@ docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · env(환경변수 키�
 ## 13. 커뮤니티·프로필 (ADR-0028·0032·0033)
 
 - 데이터: `shared/db/schema/community.ts`(board·post·comment·post_like·like·point_ledger), `entities/community/*`(글·댓글·좋아요·포인트), `entities/profile/*`, `entities/trip/trip.repository.explore.ts`(공개 트립 카드·홈 섹션)·`.likes.ts`. 정본 요약은 `docs/memory/data-model.md`.
-- 규칙: 답변 +2 는 질문 글에 타인의 첫 최상위 댓글 1회(원장 unique), 채택 +10 은 `accepted_comment_id` 로 글당 1회·되돌릴 수 없음. 카운터는 행 잠금 트랜잭션에서 COUNT 동기화, `view_count` 는 작성자 제외 매 조회 +1. LIKE 검색은 `\ % _` 이스케이프. 공개 GET 응답은 id·name·username·image 만.
+- 규칙: 답변 +2 는 질문 글에 타인의 첫 최상위 댓글 1회(원장 unique, 회수하지 않음), 채택 +10 은 `accepted_comment_id` 로 글당 1회·**변경 가능** — 재채택 시 옛 댓글에 -10 `revoked`(ref 옛 댓글) 후 새 댓글 +10, 채택 댓글 소프트 삭제 시 -10 `revoked` + `accepted_comment_id` null(ADR-0037, 4-4 KNOWN ISSUE 해소). 카운터는 행 잠금(`SELECT … FOR UPDATE`) 트랜잭션에서 삭제 제외 COUNT 동기화, `view_count` 는 작성자 제외 매 조회 +1. LIKE 검색은 `\ % _` 이스케이프. 공개 GET 응답은 id·name·username·image 만.
 - 렌더: 목록·홈·프로필·인트로 섹션 = 서버 컴포넌트가 repository(요청 단위 `React.cache` 래퍼 `community.cache`·`profile.cache`)를 직접 읽어 완성 HTML. 댓글·좋아요 = 프리페치 + `useQuery`/낙관적 mutation. 글 작성·수정 = `RichEditor`(ADR-0027) + 서버 액션(`richTextDocumentSchema`, `isRichTextEmpty` 거부, `excerpt = richTextPlainText(body, 300)`), 상세 본문 = `renderRichTextHtml` → `RichTextContent`.
 - 프로필: `/u/[username]` 대문(`banner_url`)·사진(`image`)·표시 이름·소개·포인트 합계·가입일 + 탭(글/공개 트립/좋아요한 트립). `/settings/profile` 은 `profileUpdateSchema`(`avatarUploadId`·`bannerUploadId`: `undefined` 유지 / `null` 제거 / id 교체 — 서버가 본인 소유·kind 일치 업로드만 해석).
 - 링크형 탭·정렬 셀은 `aria-current='page'`(Button `cell` 크기에 스타일), 실제 토글 버튼은 `aria-pressed`. 목록은 오프셋 20 페이지네이션(무한 스크롤 미도입).
 - 댓글 항목(`features/community/comment-item.tsx`)은 내용 블록(`bg-card p-3`: 작성자 칩·채택 배지·본문)과 액션 셀 행(답글·채택·삭제 + `bg-card` 채움, 부모 `gap-px bg-background`)의 2블록이다. 셀 행을 카드 패딩 안에 넣으면 심이 한쪽만 생겨 ADR-0011 을 어긴다(세션 4 `7adc2fa`).
 - 게시판 진입 경로는 넷이다(ADR-0036): 앱 셸 레일 tree(로그인) · 공개 헤더 드롭다운(비로그인) · 커뮤니티 홈·인트로 최신 글 섹션의 `BoardCells` · `/boards` 인덱스 포털. 넷 다 `DEFAULT_BOARDS` 한 상수를 읽으므로 게시판을 추가하면 마이그레이션 시드와 이 상수를 함께 고치는 것으로 전부 따라온다.
 - 프로필 탭 목록은 탭별 `SectionHeading` 스트립을 갖는다(ADR-0036). 목록 자체(`PostList`·`PublicTripGrid`)와 페이지네이션 셀은 그대로다.
-- 4-5 확장 예정(ADR-0033 §3): 채택 변경·취소(원장 회수), 소프트 삭제, 댓글 수정, 신고·`/admin/reports`·밴, 사용자 간 차단, 사용자명 변경 — 마이그레이션 0008(0007 은 출발 공항이 썼다).
+- 4-5 확장 데이터 계층 완료(ADR-0037, 마이그레이션 0008 생성·미적용): 소프트 삭제(`deleted_at` — 사용자-facing 읽기 전부 SQL 제외, 답글 있는 삭제 댓글은 `community.comment.ts` 의 `projectComments` 가 `isDeleted: true`·`body: null` 자리 표시, admin `restorePostAction` 복구), 신고(`trip_report` UNIQUE(reporter,kind,target)·중복 VALIDATION_ERROR, `submitReportAction` + admin `hideReportTargetAction`·`dismissReportAction`·`banReportedUserAction`(better-auth `banUser`)·`unbanUserAction`, `findOpenReportsPage`·`countOpenReports` 대상 미리보기 포함), 차단(`trip_user_block` 단방향 — `blockUserAction`·`unblockUserAction`, 목록 `notInArray` + `findBlockedIdsForUser`/`getBlockedIds` cache), 사용자명 변경(`changeUsernameAction` `^[a-z0-9_.]+$` 3~30·중복 검사), 트립 첨부 소유자|공개(`canAttachTrip`, `findAttachTripOptions`). **확장 UI(4-5b)와 `bun run db:migrate` 는 후속**(이 환경에 `DATABASE_URL` 없음).
