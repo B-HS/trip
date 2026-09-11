@@ -5,8 +5,9 @@ import {
     postCreateSchema,
     postSearchSchema,
     postUpdateSchema,
+    reportCreateSchema,
 } from '@/entities/community/community.validate'
-import { COMMENT_BODY_MAX_LENGTH, POST_TITLE_MAX_LENGTH, SEARCH_QUERY_MAX_LENGTH } from '@/shared/constant/community'
+import { COMMENT_BODY_MAX_LENGTH, POST_TITLE_MAX_LENGTH, REPORT_MEMO_MAX_LENGTH, SEARCH_QUERY_MAX_LENGTH } from '@/shared/constant/community'
 import { EMPTY_RICH_TEXT_DOCUMENT, type RichTextDocument } from '@/shared/lib/rich-text-document'
 
 const TRIP_ID = '0f2f4b3a-4b1e-4f0a-9b3d-3f4c9d1e6a11'
@@ -107,5 +108,36 @@ describe('exploreSearchSchema', () => {
 
     test('모르는 정렬은 최신순으로 되돌린다', () => {
         expect(exploreSearchSchema.parse({ sort: 'oldest' }).sort).toBe('recent')
+    })
+})
+
+describe('reportCreateSchema', () => {
+    const validReport = { kind: 'post', targetId: TRIP_ID, reason: 'spam' }
+
+    test('올바른 신고면 통과하고 메모 기본값은 null 이다', () => {
+        const result = reportCreateSchema.safeParse(validReport)
+        expect(result.success).toBe(true)
+        expect(result.data?.memo).toBeNull()
+    })
+
+    test('모르는 신고 유형은 실패한다', () => {
+        expect(reportCreateSchema.safeParse({ ...validReport, kind: 'trip' }).success).toBe(false)
+    })
+
+    test('모르는 신고 사유는 실패한다', () => {
+        expect(reportCreateSchema.safeParse({ ...validReport, reason: 'rude' }).success).toBe(false)
+    })
+
+    test('신고 대상 id 가 uuid 가 아니면 실패한다', () => {
+        expect(reportCreateSchema.safeParse({ ...validReport, targetId: 'post-1' }).success).toBe(false)
+    })
+
+    test('메모가 최대 길이를 넘으면 실패한다', () => {
+        expect(reportCreateSchema.safeParse({ ...validReport, memo: 'a'.repeat(REPORT_MEMO_MAX_LENGTH + 1) }).success).toBe(false)
+    })
+
+    test('댓글·사용자 신고를 통과시킨다', () => {
+        expect(reportCreateSchema.safeParse({ ...validReport, kind: 'comment' }).success).toBe(true)
+        expect(reportCreateSchema.safeParse({ ...validReport, kind: 'user' }).success).toBe(true)
     })
 })

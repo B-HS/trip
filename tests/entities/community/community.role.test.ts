@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { canAcceptComment, canEditPost, canManageComment, canManagePost } from '@/entities/community/community.role'
+import { canAcceptComment, canAttachTrip, canEditPost, isBlockedAuthor, canManageComment, canManagePost } from '@/entities/community/community.role'
 import { ADMIN_ROLE, DEFAULT_USER_ROLE } from '@/shared/constant/auth'
 
 const AUTHOR_ID = 'author-1'
@@ -93,5 +93,46 @@ describe('canAcceptComment', () => {
 
     test('비로그인은 채택할 수 없다', () => {
         expect(canAcceptComment(null, qnaPost, answer)).toBe(false)
+    })
+})
+
+describe('canAttachTrip', () => {
+    const ownPrivateTrip = { ownerId: AUTHOR_ID, isPublic: false }
+    const ownPublicTrip = { ownerId: AUTHOR_ID, isPublic: true }
+    const otherPrivateTrip = { ownerId: OTHER_ID, isPublic: false }
+    const otherPublicTrip = { ownerId: OTHER_ID, isPublic: true }
+
+    test('본인 소유 비공개 트립도 첨부할 수 있다', () => {
+        expect(canAttachTrip(author, ownPrivateTrip)).toBe(true)
+    })
+
+    test('남의 공개 트립은 첨부할 수 있다', () => {
+        expect(canAttachTrip(author, otherPublicTrip)).toBe(true)
+    })
+
+    test('남의 비공개 트립은 첨부할 수 없다', () => {
+        expect(canAttachTrip(author, otherPrivateTrip)).toBe(false)
+    })
+
+    test('관리자여도 남의 비공개 트립은 첨부할 수 없다', () => {
+        expect(canAttachTrip(admin, otherPrivateTrip)).toBe(false)
+    })
+
+    test('비로그인은 첨부할 수 없다', () => {
+        expect(canAttachTrip(null, ownPublicTrip)).toBe(false)
+    })
+})
+
+describe('isBlockedAuthor', () => {
+    test('차단 목록에 있으면 참이다', () => {
+        expect(isBlockedAuthor(new Set([OTHER_ID]), OTHER_ID)).toBe(true)
+    })
+
+    test('차단 목록에 없으면 거짓이다', () => {
+        expect(isBlockedAuthor(new Set([OTHER_ID]), AUTHOR_ID)).toBe(false)
+    })
+
+    test('빈 목록은 아무도 차단하지 않는다', () => {
+        expect(isBlockedAuthor(new Set(), AUTHOR_ID)).toBe(false)
     })
 })

@@ -42,7 +42,7 @@ describe('PublicFrame', () => {
             </PublicFrame>,
         )
 
-        expect(screen.getByRole('contentinfo').textContent).toContain('2026 Trip')
+        expect(screen.getByRole('contentinfo').textContent).toContain('© 2026')
     })
 
     test('공개 표면 클래스를 최상위에 유지한다', () => {
