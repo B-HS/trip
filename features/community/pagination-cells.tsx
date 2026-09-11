@@ -1,7 +1,7 @@
+import { useTranslations } from 'next-intl'
 import type { Route } from 'next'
 import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
-import { NEXT_PAGE_LABEL, PAGINATION_LABEL, PREV_PAGE_LABEL } from '@/features/community/community.constant'
 import { Button } from '@/shared/ui/button'
 
 const FIRST_PAGE = 1
@@ -15,17 +15,18 @@ export type PaginationCellsProps = {
 }
 
 export const PaginationCells: FC<PaginationCellsProps> = ({ page, pageCount, buildHref }) => {
+    const t = useTranslations('community.pagination')
     if (pageCount <= SINGLE_PAGE_COUNT) return null
 
     return (
-        <nav className='flex gap-px bg-background' aria-label={PAGINATION_LABEL}>
+        <nav className='flex gap-px bg-background' aria-label={t('aria')}>
             {page <= FIRST_PAGE ? (
                 <Button variant='cell' size='cell' disabled>
-                    {PREV_PAGE_LABEL}
+                    {t('prev')}
                 </Button>
             ) : (
                 <Button variant='cell' size='cell' asChild>
-                    <Link href={buildHref(page - PAGE_STEP)}>{PREV_PAGE_LABEL}</Link>
+                    <Link href={buildHref(page - PAGE_STEP)}>{t('prev')}</Link>
                 </Button>
             )}
             <p className='flex min-h-10 items-center bg-card px-4 font-mono text-xs text-muted-foreground tabular-nums'>
@@ -33,11 +34,11 @@ export const PaginationCells: FC<PaginationCellsProps> = ({ page, pageCount, bui
             </p>
             {page >= pageCount ? (
                 <Button variant='cell' size='cell' disabled>
-                    {NEXT_PAGE_LABEL}
+                    {t('next')}
                 </Button>
             ) : (
                 <Button variant='cell' size='cell' asChild>
-                    <Link href={buildHref(page + PAGE_STEP)}>{NEXT_PAGE_LABEL}</Link>
+                    <Link href={buildHref(page + PAGE_STEP)}>{t('next')}</Link>
                 </Button>
             )}
         </nav>

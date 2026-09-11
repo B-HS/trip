@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { useRouter } from '@/i18n/navigation'
 import { useState, type FC, type MouseEvent } from 'react'
@@ -26,19 +27,6 @@ import {
 } from '@/shared/ui/alert-dialog'
 import { Button } from '@/shared/ui/button'
 
-const EDIT_LABEL = '수정'
-const DELETE_LABEL = '삭제'
-const DELETING_LABEL = '삭제 중…'
-const CANCEL_LABEL = '취소'
-const LIST_LABEL = '목록'
-const REPORT_LABEL = '신고'
-const BLOCK_LABEL = '차단'
-const BLOCKING_LABEL = '차단 중…'
-const DELETE_TITLE = '글을 삭제할까요?'
-const DELETE_DESCRIPTION = '이 글과 댓글이 함께 삭제되어 목록에서 숨겨집니다.'
-const BLOCK_TITLE = '이 사용자를 차단할까요?'
-const BLOCK_DESCRIPTION = '차단하면 이 사용자의 글과 댓글을 더 이상 볼 수 없습니다.'
-
 export type PostDetailWidgetProps = {
     post: PostDetailView
     html: SanitizedRichTextHtml
@@ -46,6 +34,8 @@ export type PostDetailWidgetProps = {
 }
 
 export const PostDetailWidget: FC<PostDetailWidgetProps> = ({ post, html, viewer }) => {
+    const t = useTranslations('community.post')
+    const tMod = useTranslations('community.moderation')
     const [isDeleteOpen, setIsDeleteOpen] = useState(false)
     const [isReportOpen, setIsReportOpen] = useState(false)
     const [isBlockOpen, setIsBlockOpen] = useState(false)
@@ -94,41 +84,41 @@ export const PostDetailWidget: FC<PostDetailWidgetProps> = ({ post, html, viewer
                 />
                 {canEditPost(viewer, post.author.id) && (
                     <Button variant='cell' size='cell' asChild>
-                        <Link href={`/boards/${post.boardKey}/${post.id}/edit`}>{EDIT_LABEL}</Link>
+                        <Link href={`/boards/${post.boardKey}/${post.id}/edit`}>{t('edit')}</Link>
                     </Button>
                 )}
                 {canManagePost(viewer, post.author.id) && (
                     <Button type='button' variant='cellDestructive' size='cell' onClick={() => setIsDeleteOpen(true)}>
-                        {DELETE_LABEL}
+                        {t('delete')}
                     </Button>
                 )}
                 {canModerate && (
                     <Button type='button' variant='cell' size='cell' onClick={() => setIsReportOpen(true)}>
-                        {REPORT_LABEL}
+                        {tMod('report')}
                     </Button>
                 )}
                 {canModerate && (
                     <Button type='button' variant='cell' size='cell' onClick={() => setIsBlockOpen(true)}>
-                        {BLOCK_LABEL}
+                        {tMod('block')}
                     </Button>
                 )}
                 <Button variant='cell' size='cell' asChild>
-                    <Link href={`/boards/${post.boardKey}`}>{LIST_LABEL}</Link>
+                    <Link href={`/boards/${post.boardKey}`}>{t('list')}</Link>
                 </Button>
                 <div aria-hidden className='min-w-0 flex-1 bg-card' />
             </div>
             <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
                 <AlertDialogContent className='rounded-none'>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>{DELETE_TITLE}</AlertDialogTitle>
-                        <AlertDialogDescription>{DELETE_DESCRIPTION}</AlertDialogDescription>
+                        <AlertDialogTitle>{t('deleteTitle')}</AlertDialogTitle>
+                        <AlertDialogDescription>{t('deleteDescription')}</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className='gap-px bg-background sm:ml-auto sm:w-fit'>
                         <AlertDialogCancel variant='cell' size='cell' disabled={deletePost.isPending}>
-                            {CANCEL_LABEL}
+                            {t('cancel')}
                         </AlertDialogCancel>
                         <AlertDialogAction variant='cellDestructive' size='cell' disabled={deletePost.isPending} onClick={handleDelete}>
-                            {deletePost.isPending ? DELETING_LABEL : DELETE_LABEL}
+                            {deletePost.isPending ? t('deleting') : t('delete')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -137,15 +127,15 @@ export const PostDetailWidget: FC<PostDetailWidgetProps> = ({ post, html, viewer
             <AlertDialog open={isBlockOpen} onOpenChange={setIsBlockOpen}>
                 <AlertDialogContent className='rounded-none'>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>{BLOCK_TITLE}</AlertDialogTitle>
-                        <AlertDialogDescription>{BLOCK_DESCRIPTION}</AlertDialogDescription>
+                        <AlertDialogTitle>{t('blockTitle')}</AlertDialogTitle>
+                        <AlertDialogDescription>{t('blockDescription')}</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className='gap-px bg-background sm:ml-auto sm:w-fit'>
                         <AlertDialogCancel variant='cell' size='cell' disabled={blockUser.isPending}>
-                            {CANCEL_LABEL}
+                            {t('cancel')}
                         </AlertDialogCancel>
                         <AlertDialogAction variant='cellDestructive' size='cell' disabled={blockUser.isPending} onClick={handleBlock}>
-                            {blockUser.isPending ? BLOCKING_LABEL : BLOCK_LABEL}
+                            {blockUser.isPending ? tMod('blocking') : tMod('block')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

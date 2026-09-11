@@ -1,9 +1,9 @@
 import { CalendarIcon, HeartIcon, MapPinIcon, PlaneIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import type { PublicTripCard as PublicTripCardItem } from '@/entities/trip/trip.type'
 import { AuthorChip } from '@/features/community/author-chip'
-import { LIKE_COUNT_LABEL } from '@/features/community/community.constant'
 import { countryName } from '@/shared/constant/countries'
 import { formatTripDateRange } from '@/shared/lib/trip-date-range'
 import { formatTripLength } from '@/shared/lib/trip-length'
@@ -14,6 +14,8 @@ export type PublicTripCardProps = {
 }
 
 export const PublicTripCard: FC<PublicTripCardProps> = ({ trip }) => {
+    const t = useTranslations('community.tripCard')
+    const tCounts = useTranslations('community.counts')
     const routeLabel = resolveTripRouteLabel(trip.flights)
     const lengthLabel = formatTripLength({ startDate: trip.startDate, endDate: trip.endDate, nights: trip.customNights, days: trip.customDays })
 
@@ -36,12 +38,12 @@ export const PublicTripCard: FC<PublicTripCardProps> = ({ trip }) => {
             )}
             <dl className='flex flex-col gap-1 text-xs text-muted-foreground'>
                 <div className='flex min-w-0 items-center gap-1.5'>
-                    <dt className='sr-only'>목적지</dt>
+                    <dt className='sr-only'>{t('destination')}</dt>
                     <MapPinIcon className='size-3 shrink-0' aria-hidden />
                     <dd className='truncate'>{trip.destination}</dd>
                 </div>
                 <div className='flex min-w-0 items-center gap-1.5'>
-                    <dt className='sr-only'>기간</dt>
+                    <dt className='sr-only'>{t('period')}</dt>
                     <CalendarIcon className='size-3 shrink-0' aria-hidden />
                     <dd className='truncate font-mono tabular-nums'>
                         {formatTripDateRange(trip)} · {lengthLabel}
@@ -49,7 +51,7 @@ export const PublicTripCard: FC<PublicTripCardProps> = ({ trip }) => {
                 </div>
                 {routeLabel !== null && (
                     <div className='flex min-w-0 items-center gap-1.5'>
-                        <dt className='sr-only'>경로</dt>
+                        <dt className='sr-only'>{t('route')}</dt>
                         <PlaneIcon className='size-3 shrink-0' aria-hidden />
                         <dd className='truncate font-mono'>{routeLabel}</dd>
                     </div>
@@ -61,7 +63,7 @@ export const PublicTripCard: FC<PublicTripCardProps> = ({ trip }) => {
                 </span>
                 <span className='flex shrink-0 items-center gap-1 font-mono tabular-nums'>
                     <HeartIcon className='size-3' aria-hidden />
-                    <span className='sr-only'>{LIKE_COUNT_LABEL}</span>
+                    <span className='sr-only'>{tCounts('like')}</span>
                     {trip.likeCount}
                 </span>
             </div>

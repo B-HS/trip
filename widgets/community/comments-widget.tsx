@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { useRouter } from '@/i18n/navigation'
 import { useState, type FC, type MouseEvent } from 'react'
@@ -18,7 +19,6 @@ import { ReportDialog, type ReportFormValues } from '@/features/community/report
 import type { CommentItemView } from '@/features/community/comment-item'
 import { CommentForm } from '@/features/community/comment-form'
 import { CommentList, type CommentNode } from '@/features/community/comment-list'
-import { COMMENT_COUNT_LABEL } from '@/features/community/community.constant'
 import { QUERY_KEY } from '@/shared/constant/query-key'
 import { LOGIN_PATH } from '@/shared/constant/route'
 import {
@@ -35,26 +35,6 @@ import { Button } from '@/shared/ui/button'
 
 const FIRST_FORM_KEY = 0
 const FORM_KEY_STEP = 1
-const EMPTY_COMMENT_LABEL = '아직 댓글이 없습니다.'
-const LOADING_COMMENT_LABEL = '댓글을 불러오는 중입니다.'
-const ERROR_COMMENT_LABEL = '댓글을 불러오지 못했습니다.'
-const RETRY_LABEL = '다시 시도'
-const COMMENT_PLACEHOLDER = '댓글을 입력해 주세요.'
-const REPLY_PLACEHOLDER = '답글을 입력해 주세요.'
-const SIGNED_OUT_LABEL = '로그인 후 댓글 쓰기'
-const CANCEL_LABEL = '취소'
-const DELETE_LABEL = '삭제'
-const DELETING_LABEL = '삭제 중…'
-const DELETE_TITLE = '댓글을 삭제할까요?'
-const DELETE_DESCRIPTION = '이 댓글과 답글이 함께 삭제되어 목록에서 숨겨집니다.'
-const ACCEPT_LABEL = '채택'
-const ACCEPTING_LABEL = '채택 중…'
-const ACCEPT_TITLE = '이 답변을 채택할까요?'
-const ACCEPT_DESCRIPTION = '다른 답변이 채택되어 있으면 채택이 이 답변으로 이동합니다.'
-const BLOCK_LABEL = '차단'
-const BLOCKING_LABEL = '차단 중…'
-const BLOCK_TITLE = '이 사용자를 차단할까요?'
-const BLOCK_DESCRIPTION = '차단하면 이 사용자의 글과 댓글을 더 이상 볼 수 없습니다.'
 
 export type CommentsPost = Pick<PostDetail, 'boardKey' | 'boardKind' | 'hasAcceptedComment'> & {
     authorId: PostAuthor['id']
@@ -92,6 +72,27 @@ const buildNodes = (comments: CommentView[], post: CommentsPost, viewer: Communi
 }
 
 export const CommentsWidget: FC<CommentsWidgetProps> = ({ postId, post, viewer }) => {
+    const t = useTranslations('community')
+    const EMPTY_COMMENT_LABEL = t('comments.empty')
+    const LOADING_COMMENT_LABEL = t('comments.loading')
+    const ERROR_COMMENT_LABEL = t('comments.error')
+    const RETRY_LABEL = t('comments.retry')
+    const COMMENT_PLACEHOLDER = t('comments.placeholder')
+    const REPLY_PLACEHOLDER = t('comments.replyPlaceholder')
+    const SIGNED_OUT_LABEL = t('comments.signedOut')
+    const CANCEL_LABEL = t('comments.cancel')
+    const DELETE_LABEL = t('comments.delete')
+    const DELETING_LABEL = t('comments.deleting')
+    const DELETE_TITLE = t('comments.deleteTitle')
+    const DELETE_DESCRIPTION = t('comments.deleteDescription')
+    const ACCEPT_LABEL = t('comments.accept')
+    const ACCEPTING_LABEL = t('comments.accepting')
+    const ACCEPT_TITLE = t('comments.acceptTitle')
+    const ACCEPT_DESCRIPTION = t('comments.acceptDescription')
+    const BLOCK_LABEL = t('moderation.block')
+    const BLOCKING_LABEL = t('moderation.blocking')
+    const BLOCK_TITLE = t('moderation.blockTitle')
+    const BLOCK_DESCRIPTION = t('moderation.blockDescription')
     const [replyTargetId, setReplyTargetId] = useState<string | null>(null)
     const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
     const [acceptTargetId, setAcceptTargetId] = useState<string | null>(null)
@@ -142,7 +143,7 @@ export const CommentsWidget: FC<CommentsWidgetProps> = ({ postId, post, viewer }
     return (
         <section className='flex flex-col gap-px'>
             <h2 className='bg-card p-3 text-sm font-medium'>
-                {COMMENT_COUNT_LABEL} <span className='font-mono tabular-nums'>{visibleCount}</span>
+                {t('counts.comment')} <span className='font-mono tabular-nums'>{visibleCount}</span>
             </h2>
             {comments.isError ? (
                 <div className='flex flex-wrap items-stretch gap-px bg-background'>

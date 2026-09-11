@@ -1,10 +1,10 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
 import { useState, type FC, type MouseEvent } from 'react'
 import { useBlockUser, useSubmitReport, useUnblockUser } from '@/entities/community/community.query'
 import { ReportDialog, type ReportFormValues } from '@/features/community/report-dialog'
-import { BLOCK_LABEL, BLOCKING_LABEL, REPORT_LABEL, UNBLOCK_LABEL } from '@/features/community/community.constant'
 import {
     AlertDialog,
     AlertDialogAction,
@@ -17,16 +17,17 @@ import {
 } from '@/shared/ui/alert-dialog'
 import { Button } from '@/shared/ui/button'
 
-const BLOCK_TITLE = '이 사용자를 차단할까요?'
-const BLOCK_DESCRIPTION = '차단하면 이 사용자의 글과 댓글을 더 이상 볼 수 없습니다.'
-const CANCEL_LABEL = '취소'
-
 export type ProfileModerationWidgetProps = {
     userId: string
     isBlocked: boolean
 }
 
 export const ProfileModerationWidget: FC<ProfileModerationWidgetProps> = ({ userId, isBlocked }) => {
+    const t = useTranslations('community.moderation')
+    const BLOCK_TITLE = t('blockTitle')
+    const BLOCK_DESCRIPTION = t('blockDescription')
+    const CANCEL_LABEL = t('cancel')
+    const BLOCKING_LABEL = t('blocking')
     const [isBlockOpen, setIsBlockOpen] = useState(false)
     const [isReportOpen, setIsReportOpen] = useState(false)
     const router = useRouter()
@@ -58,15 +59,15 @@ export const ProfileModerationWidget: FC<ProfileModerationWidgetProps> = ({ user
                         size='cell'
                         disabled={unblockUser.isPending}
                         onClick={() => unblockUser.mutate(userId, { onSuccess: () => router.refresh() })}>
-                        {UNBLOCK_LABEL}
+                        {t('unblock')}
                     </Button>
                 ) : (
                     <Button type='button' variant='cell' size='cell' onClick={() => setIsBlockOpen(true)}>
-                        {BLOCK_LABEL}
+                        {t('block')}
                     </Button>
                 )}
                 <Button type='button' variant='cell' size='cell' onClick={() => setIsReportOpen(true)}>
-                    {REPORT_LABEL}
+                    {t('report')}
                 </Button>
                 <div aria-hidden className='min-w-0 flex-1 bg-card' />
             </div>
@@ -81,7 +82,7 @@ export const ProfileModerationWidget: FC<ProfileModerationWidgetProps> = ({ user
                             {CANCEL_LABEL}
                         </AlertDialogCancel>
                         <AlertDialogAction variant='cellDestructive' size='cell' disabled={blockUser.isPending} onClick={handleBlock}>
-                            {blockUser.isPending ? BLOCKING_LABEL : BLOCK_LABEL}
+                            {blockUser.isPending ? BLOCKING_LABEL : t('block')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

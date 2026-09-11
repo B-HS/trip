@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
 import type { FC } from 'react'
 import { useCreatePost, useUpdatePost } from '@/entities/community/community.query'
@@ -12,9 +13,6 @@ import { EMPTY_RICH_TEXT_DOCUMENT } from '@/shared/lib/rich-text-document'
 
 const UPLOAD_KIND = 'post'
 const NO_POST_ID = ''
-const CREATE_TITLE = '새 글 쓰기'
-const EDIT_TITLE = '글 수정'
-const DESCRIPTION = '제목과 본문을 작성하고, 필요하면 내 트립을 연결할 수 있습니다.'
 
 export type PostFormBoard = Pick<Board, 'key' | 'name'>
 
@@ -22,6 +20,7 @@ export type PostFormWidgetProps =
     { mode: 'create'; board: PostFormBoard; isUploadEnabled: boolean } | { mode: 'edit'; post: PostDetail; isUploadEnabled: boolean }
 
 export const PostFormWidget: FC<PostFormWidgetProps> = (props) => {
+    const t = useTranslations('community.post')
     const router = useRouter()
     const tripList = useTripList()
     const uploadImage = useUploadImage(UPLOAD_KIND)
@@ -56,8 +55,8 @@ export const PostFormWidget: FC<PostFormWidgetProps> = (props) => {
         <div className='flex flex-1 flex-col gap-px'>
             <section className='flex flex-col gap-1 bg-card p-3'>
                 <p className='font-mono text-2xs tracking-widest text-muted-foreground uppercase'>{board.name}</p>
-                <h1 className='text-2xl font-semibold tracking-tight'>{props.mode === 'edit' ? EDIT_TITLE : CREATE_TITLE}</h1>
-                <p className='text-xs text-muted-foreground'>{DESCRIPTION}</p>
+                <h1 className='text-2xl font-semibold tracking-tight'>{props.mode === 'edit' ? t('formEditTitle') : t('formCreateTitle')}</h1>
+                <p className='text-xs text-muted-foreground'>{t('formDescription')}</p>
             </section>
             <PostForm
                 defaultValues={defaultValues}

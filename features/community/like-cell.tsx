@@ -1,8 +1,8 @@
 import { HeartIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import type { Route } from 'next'
 import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
-import { LIKE_COUNT_LABEL } from '@/features/community/community.constant'
 import { Button } from '@/shared/ui/button'
 
 export type LikeCellProps = {
@@ -14,10 +14,11 @@ export type LikeCellProps = {
 }
 
 export const LikeCell: FC<LikeCellProps> = ({ count, isLiked, isPending, loginHref, onToggle }) => {
+    const t = useTranslations('community.counts')
     const label = (
         <>
             <HeartIcon aria-hidden />
-            <span className='sr-only'>{LIKE_COUNT_LABEL}</span>
+            <span className='sr-only'>{t('like')}</span>
             <span className='font-mono tabular-nums'>{count}</span>
         </>
     )
