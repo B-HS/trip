@@ -290,7 +290,53 @@
         }
     },
     "trip": {},
-    "profile": {},
+    "profile": {
+        "settings": {
+            "title": "Profile settings",
+            "description": "Information other travelers see on your profile."
+        },
+        "tabs": {
+            "posts": "Posts",
+            "trips": "Public trips",
+            "likes": "Liked trips",
+            "aria": "Profile tabs"
+        },
+        "sections": {
+            "posts": "Posts written",
+            "trips": "Public trips",
+            "likes": "Liked trips"
+        },
+        "header": {
+            "points": "Points",
+            "joined": "Joined"
+        },
+        "blocked": {
+            "title": "Blocked users",
+            "description": "Posts and comments from blocked users are hidden.",
+            "empty": "No blocked users."
+        },
+        "username": {
+            "title": "Change username",
+            "description": "3-30 characters: lowercase letters, numbers, underscores (_) and periods (.).",
+            "label": "New username",
+            "placeholder": "new_username",
+            "submit": "Change username",
+            "submitting": "Changing…"
+        },
+        "form": {
+            "name": "Display name",
+            "bio": "Bio",
+            "avatar": "Photo",
+            "banner": "Banner",
+            "submit": "Save",
+            "submitting": "Saving…"
+        },
+        "image": {
+            "upload": "Upload image",
+            "uploading": "Uploading…",
+            "remove": "Remove"
+        }
+    },
     "admin": {},
     "validation": {
         "identifierRequired": "Enter your email or username.",

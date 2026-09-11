@@ -290,7 +290,53 @@
         }
     },
     "trip": {},
-    "profile": {},
+    "profile": {
+        "settings": {
+            "title": "プロフィール設定",
+            "description": "プロフィールで他の旅行者に表示される情報です。"
+        },
+        "tabs": {
+            "posts": "投稿",
+            "trips": "公開トリップ",
+            "likes": "いいねしたトリップ",
+            "aria": "プロフィールタブ"
+        },
+        "sections": {
+            "posts": "書いた投稿",
+            "trips": "公開トリップ",
+            "likes": "いいねしたトリップ"
+        },
+        "header": {
+            "points": "ポイント",
+            "joined": "登録日"
+        },
+        "blocked": {
+            "title": "ブロックしたユーザー",
+            "description": "ブロックしたユーザーの投稿とコメントは表示されません。",
+            "empty": "ブロックしたユーザーはいません。"
+        },
+        "username": {
+            "title": "ユーザー名変更",
+            "description": "半角英小文字・数字・アンダースコア(_)・ピリオド(.)で3〜30文字。",
+            "label": "新しいユーザー名",
+            "placeholder": "new_username",
+            "submit": "ユーザー名を変更",
+            "submitting": "変更中…"
+        },
+        "form": {
+            "name": "表示名",
+            "bio": "自己紹介",
+            "avatar": "写真",
+            "banner": "大画像",
+            "submit": "保存",
+            "submitting": "保存中…"
+        },
+        "image": {
+            "upload": "画像アップロード",
+            "uploading": "アップロード中…",
+            "remove": "削除"
+        }
+    },
     "admin": {},
     "validation": {
         "identifierRequired": "メールまたはユーザー名を入力してください。",

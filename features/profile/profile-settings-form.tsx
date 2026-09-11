@@ -2,6 +2,7 @@
 'use no memo'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslations } from 'next-intl'
 import type { FC } from 'react'
 import { useForm } from 'react-hook-form'
 import type { z } from 'zod'
@@ -17,12 +18,6 @@ import { Textarea } from '@/shared/ui/textarea'
 
 const NAME_FIELD_ID = 'profile-name'
 const BIO_FIELD_ID = 'profile-bio'
-const NAME_LABEL = '표시 이름'
-const BIO_LABEL = '소개'
-const AVATAR_LABEL = '사진'
-const BANNER_LABEL = '대문'
-const SUBMIT_LABEL = '저장'
-const SUBMITTING_LABEL = '저장 중…'
 
 const profileSettingsFormSchema = profileUpdateSchema.pick({ name: true, bio: true })
 
@@ -40,6 +35,7 @@ export type ProfileSettingsFormProps = {
 }
 
 export const ProfileSettingsForm: FC<ProfileSettingsFormProps> = ({ defaultValues, avatar, banner, isPending, onSubmit }) => {
+    const t = useTranslations('profile.form')
     const form = useForm<ProfileSettingsFormInput, unknown, ProfileSettingsFormValues>({
         resolver: zodResolver(profileSettingsFormSchema),
         defaultValues,
@@ -56,7 +52,7 @@ export const ProfileSettingsForm: FC<ProfileSettingsFormProps> = ({ defaultValue
     return (
         <form className='flex flex-col gap-px bg-background' onSubmit={handleSubmit} noValidate>
             <div className='flex flex-col gap-3 bg-card p-3'>
-                <EditorField label={NAME_LABEL} htmlFor={NAME_FIELD_ID} error={errors.name?.message}>
+                <EditorField label={t('name')} htmlFor={NAME_FIELD_ID} error={errors.name?.message}>
                     <Input
                         id={NAME_FIELD_ID}
                         className={EDITOR_INPUT_CLASS}
@@ -65,7 +61,7 @@ export const ProfileSettingsForm: FC<ProfileSettingsFormProps> = ({ defaultValue
                         {...form.register('name')}
                     />
                 </EditorField>
-                <EditorField label={BIO_LABEL} htmlFor={BIO_FIELD_ID} error={errors.bio?.message}>
+                <EditorField label={t('bio')} htmlFor={BIO_FIELD_ID} error={errors.bio?.message}>
                     <Textarea
                         id={BIO_FIELD_ID}
                         className='min-h-24'
@@ -76,12 +72,12 @@ export const ProfileSettingsForm: FC<ProfileSettingsFormProps> = ({ defaultValue
                 </EditorField>
             </div>
             <div className='flex flex-col gap-4 bg-card p-3'>
-                <ProfileImageField label={AVATAR_LABEL} shape='avatar' {...avatar} />
-                <ProfileImageField label={BANNER_LABEL} shape='banner' {...banner} />
+                <ProfileImageField label={t('avatar')} shape='avatar' {...avatar} />
+                <ProfileImageField label={t('banner')} shape='banner' {...banner} />
             </div>
             <div className='flex flex-wrap items-stretch gap-px bg-background'>
                 <Button type='submit' variant='cellPrimary' size='cell' disabled={isPending}>
-                    {isPending ? SUBMITTING_LABEL : SUBMIT_LABEL}
+                    {isPending ? t('submitting') : t('submit')}
                 </Button>
                 <div aria-hidden className='min-w-0 flex-1 bg-card' />
             </div>

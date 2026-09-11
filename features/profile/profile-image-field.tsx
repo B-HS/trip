@@ -1,15 +1,13 @@
 'use client'
 
 import { UserIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { useRef, type ChangeEvent, type FC } from 'react'
-import { UPLOAD_DISABLED_HINT, UPLOAD_IMAGE_ACCEPT } from '@/shared/constant/upload'
+import { UPLOAD_IMAGE_ACCEPT } from '@/shared/constant/upload'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 
-const UPLOAD_LABEL = '이미지 업로드'
-const UPLOADING_LABEL = '올리는 중…'
-const REMOVE_LABEL = '제거'
 const BANNER_SIZES = '(max-width: 1024px) 100vw, 640px'
 
 export type ProfileImageFieldProps = {
@@ -23,6 +21,8 @@ export type ProfileImageFieldProps = {
 }
 
 export const ProfileImageField: FC<ProfileImageFieldProps> = ({ label, shape, previewUrl, isUploadEnabled, isUploading, onUpload, onRemove }) => {
+    const t = useTranslations('profile.image')
+    const tError = useTranslations('error')
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -54,14 +54,14 @@ export const ProfileImageField: FC<ProfileImageFieldProps> = ({ label, shape, pr
                     size='cell'
                     disabled={!isUploadEnabled || isUploading}
                     onClick={() => fileInputRef.current?.click()}>
-                    {isUploading ? UPLOADING_LABEL : UPLOAD_LABEL}
+                    {isUploading ? t('uploading') : t('upload')}
                 </Button>
                 <Button type='button' variant='cell' size='cell' disabled={previewUrl === null} onClick={onRemove}>
-                    {REMOVE_LABEL}
+                    {t('remove')}
                 </Button>
                 <div aria-hidden className='min-w-0 flex-1 bg-card' />
             </div>
-            {!isUploadEnabled && <p className='text-xs text-muted-foreground'>{UPLOAD_DISABLED_HINT}</p>}
+            {!isUploadEnabled && <p className='text-xs text-muted-foreground'>{tError('uploadDisabled')}</p>}
             <input ref={fileInputRef} className='hidden' type='file' accept={UPLOAD_IMAGE_ACCEPT} aria-label={label} onChange={handleFileChange} />
         </div>
     )

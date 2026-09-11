@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
 import { useState, type FC } from 'react'
 import { useUnblockUser } from '@/entities/community/community.query'
@@ -16,7 +17,6 @@ const AVATAR_KIND = 'avatar'
 const BANNER_KIND = 'banner'
 const KEEP_IMAGE = 'keep'
 const REMOVE_IMAGE = 'remove'
-const DESCRIPTION = '프로필에서 다른 여행자에게 보이는 정보입니다.'
 
 type ProfileImageState = typeof KEEP_IMAGE | typeof REMOVE_IMAGE | UploadedImage
 
@@ -39,6 +39,7 @@ export type ProfileSettingsWidgetProps = {
 }
 
 export const ProfileSettingsWidget: FC<ProfileSettingsWidgetProps> = ({ settings, blockedUsers, isUploadEnabled }) => {
+    const t = useTranslations('profile.settings')
     const [avatarState, setAvatarState] = useState<ProfileImageState>(KEEP_IMAGE)
     const [bannerState, setBannerState] = useState<ProfileImageState>(KEEP_IMAGE)
     const router = useRouter()
@@ -61,8 +62,8 @@ export const ProfileSettingsWidget: FC<ProfileSettingsWidgetProps> = ({ settings
         <div className='flex flex-1 flex-col gap-px'>
             <section className='flex flex-col gap-1 bg-card p-3'>
                 <p className='font-mono text-2xs tracking-widest text-muted-foreground uppercase'>PROFILE</p>
-                <h1 className='text-2xl font-semibold tracking-tight'>프로필 설정</h1>
-                <p className='text-xs text-muted-foreground'>{DESCRIPTION}</p>
+                <h1 className='text-2xl font-semibold tracking-tight'>{t('title')}</h1>
+                <p className='text-xs text-muted-foreground'>{t('description')}</p>
             </section>
             <ProfileSettingsForm
                 defaultValues={{ name: settings.name, bio: settings.bio }}

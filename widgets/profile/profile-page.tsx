@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server'
 import { getBlockedIds } from '@/entities/community/community.cache'
 import { findPostsByAuthor } from '@/entities/community/community.repository'
 import { findLikedTrips, findPublicTripsByOwner } from '@/entities/profile/profile.repository'
@@ -10,9 +11,7 @@ import { SectionHeading } from '@/features/community/section-heading'
 import { ProfileHeader } from '@/features/profile/profile-header'
 import { ProfileModerationWidget } from '@/widgets/profile/profile-moderation-widget'
 import { ProfileTabs } from '@/features/profile/profile-tabs'
-import { EMPTY_LIKED_TRIP_LABEL, EMPTY_POST_LABEL, EMPTY_TRIP_LABEL, PAGE_PARAM, PROFILE_TAB_PARAM } from '@/shared/constant/community'
-
-const TAB_SECTION_TITLE = { posts: '작성한 글', trips: '공개 트립', likes: '좋아요한 트립' } as const satisfies Record<ProfileTab, string>
+import { PAGE_PARAM, PROFILE_TAB_PARAM } from '@/shared/constant/community'
 
 const findTripPage = async (tab: ProfileTab, userId: string, page: number) => {
     if (tab === 'trips') return findPublicTripsByOwner(userId, page)
@@ -30,6 +29,8 @@ export type ProfilePageProps = {
 }
 
 export const ProfilePage = async ({ profile, username, tab, page, isOwner, viewerId = null }: ProfilePageProps) => {
+    const t = await getTranslations('profile')
+    const tEmpty = await getTranslations('community.empty')
     const [posts, trips] = await Promise.all([
         tab === 'posts' ? findPostsByAuthor(profile.id, page, viewerId) : Promise.resolve(null),
         findTripPage(tab, profile.id, page),
@@ -44,9 +45,9 @@ export const ProfilePage = async ({ profile, username, tab, page, isOwner, viewe
             {canModerate && <ProfileModerationWidget userId={profile.id} isBlocked={isBlocked} />}
             <ProfileTabs activeTab={tab} />
             <section className='flex flex-col gap-px'>
-                <SectionHeading title={TAB_SECTION_TITLE[tab]} />
-                {posts !== null && <PostList posts={posts.items} showBoard emptyLabel={EMPTY_POST_LABEL} />}
-                {trips !== null && <PublicTripGrid trips={trips.items} emptyLabel={tab === 'likes' ? EMPTY_LIKED_TRIP_LABEL : EMPTY_TRIP_LABEL} />}
+                <SectionHeading title={t(`sections.${tab}`)} />
+                {posts !== null && <PostList posts={posts.items} showBoard emptyLabel={tEmpty('post')} />}
+                {trips !== null && <PublicTripGrid trips={trips.items} emptyLabel={tab === 'likes' ? tEmpty('likedTrip') : tEmpty('trip')} />}
             </section>
             {pageInfo !== null && (
                 <PaginationCells

@@ -2,8 +2,6 @@ import { useTranslations } from 'next-intl'
 import type { FC } from 'react'
 import type { PostAuthor } from '@/entities/community/community.type'
 import { AuthorChip } from '@/features/community/author-chip'
-
-import { BLOCKED_EMPTY_LABEL, BLOCKED_SECTION_DESCRIPTION, BLOCKED_SECTION_TITLE } from '@/features/profile/profile.constant'
 import { Button } from '@/shared/ui/button'
 
 export type BlockedUsersSectionProps = {
@@ -14,16 +12,17 @@ export type BlockedUsersSectionProps = {
 
 export const BlockedUsersSection: FC<BlockedUsersSectionProps> = ({ users, isPending, onUnblock }) => {
     const t = useTranslations('community.moderation')
+    const tBlocked = useTranslations('profile.blocked')
 
     return (
         <section className='flex flex-col gap-px'>
             <div className='flex min-w-0 flex-1 flex-col gap-1 bg-muted p-3'>
-                <h2 className='text-sm font-medium'>{BLOCKED_SECTION_TITLE}</h2>
-                <p className='text-xs text-muted-foreground'>{BLOCKED_SECTION_DESCRIPTION}</p>
+                <h2 className='text-sm font-medium'>{tBlocked('title')}</h2>
+                <p className='text-xs text-muted-foreground'>{tBlocked('description')}</p>
             </div>
             {users.length === 0 ? (
                 <div className='flex flex-wrap items-stretch gap-px bg-background'>
-                    <p className='flex min-h-10 min-w-0 flex-1 items-center bg-card px-4 text-xs text-muted-foreground'>{BLOCKED_EMPTY_LABEL}</p>
+                    <p className='flex min-h-10 min-w-0 flex-1 items-center bg-card px-4 text-xs text-muted-foreground'>{tBlocked('empty')}</p>
                 </div>
             ) : (
                 <ul className='flex flex-col gap-px bg-background'>
