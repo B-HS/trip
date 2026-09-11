@@ -10,6 +10,11 @@ export const canManagePost = (viewer: CommunityViewer | null, authorId: string) 
 
 export const canManageComment = (viewer: CommunityViewer | null, authorId: string) => isOwnerOrAdmin(viewer, authorId)
 
+export const canAttachTrip = (viewer: CommunityViewer | null, trip: { ownerId: string; isPublic: boolean }) =>
+    viewer !== null && (viewer.id === trip.ownerId || trip.isPublic)
+
+export const isBlockedAuthor = (blockedIds: ReadonlySet<string>, authorId: string) => blockedIds.has(authorId)
+
 export const canAcceptComment = (
     viewer: CommunityViewer | null,
     post: { authorId: string; boardKind: BoardKind },

@@ -69,6 +69,18 @@ export const updateProfile = async (userId: string, values: ProfileUpdateValues)
     return settings
 }
 
+export const isUsernameTaken = async (username: string) => {
+    const [row] = await getDb().select({ id: user.id }).from(user).where(eq(user.username, username)).limit(1)
+    return row !== undefined
+}
+
+export const changeUsername = async (userId: string, username: string) => {
+    await getDb().update(user).set({ username }).where(eq(user.id, userId))
+    const settings = await findProfileSettings(userId)
+    if (settings === null) throw new ApiError('NOT_FOUND', PROFILE_NOT_FOUND)
+    return settings
+}
+
 export const findPublicTripsByOwner = async (userId: string, page: number) =>
     findPublicTripCardPage(and(publicTripCondition(), eq(trip.ownerId, userId)), page)
 

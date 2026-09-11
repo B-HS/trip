@@ -1,24 +1,30 @@
 import 'server-only'
-import { and, eq } from 'drizzle-orm'
-import { canAcceptComment, canEditPost, canManageComment, canManagePost } from '@/entities/community/community.role'
+import { and, eq, isNull } from 'drizzle-orm'
+import { canAcceptComment, canAttachTrip, canEditPost, canManageComment, canManagePost } from '@/entities/community/community.role'
 import type { CommunityViewer } from '@/entities/community/community.type'
-import { assertTripAccess } from '@/entities/trip/trip.access'
+import { isAdminRole } from '@/entities/auth/auth.role'
 import { getDb } from '@/shared/db/client'
 import { tripBoard, tripComment, tripPost } from '@/shared/db/schema/community'
+import { trip } from '@/shared/db/schema/trip'
 import { ApiError } from '@/shared/lib/api-response'
 
 const POST_NOT_FOUND = '글을 찾을 수 없습니다.'
 const COMMENT_NOT_FOUND = '댓글을 찾을 수 없습니다.'
+const TRIP_NOT_FOUND = '여행을 찾을 수 없습니다.'
 
 const findPostWithBoard = async (postId: string) => {
     const [row] = await getDb()
         .select({ post: tripPost, board: { key: tripBoard.key, kind: tripBoard.kind } })
         .from(tripPost)
         .innerJoin(tripBoard, eq(tripPost.boardId, tripBoard.id))
-        .where(eq(tripPost.id, postId))
+        .where(and(eq(tripPost.id, postId), isNull(tripPost.deletedAt)))
         .limit(1)
     if (!row) throw new ApiError('NOT_FOUND', POST_NOT_FOUND)
     return { ...row.post, boardKey: row.board.key, boardKind: row.board.kind }
+}
+
+export const assertAdmin = (viewer: CommunityViewer) => {
+    if (!isAdminRole(viewer.role)) throw new ApiError('FORBIDDEN')
 }
 
 export const assertPostEdit = async (postId: string, viewer: CommunityViewer) => {
@@ -34,7 +40,11 @@ export const assertPostManage = async (postId: string, viewer: CommunityViewer) 
 }
 
 export const assertCommentManage = async (commentId: string, viewer: CommunityViewer) => {
-    const [row] = await getDb().select().from(tripComment).where(eq(tripComment.id, commentId)).limit(1)
+    const [row] = await getDb()
+        .select()
+        .from(tripComment)
+        .where(and(eq(tripComment.id, commentId), isNull(tripComment.deletedAt)))
+        .limit(1)
     if (!row) throw new ApiError('NOT_FOUND', COMMENT_NOT_FOUND)
     if (!canManageComment(viewer, row.authorId)) throw new ApiError('FORBIDDEN')
     return row
@@ -50,11 +60,16 @@ export const assertCommentAccept = async (postId: string, commentId: string, vie
         .from(tripComment)
         .innerJoin(tripPost, eq(tripComment.postId, tripPost.id))
         .innerJoin(tripBoard, eq(tripPost.boardId, tripBoard.id))
-        .where(and(eq(tripComment.id, commentId), eq(tripComment.postId, postId)))
+        .where(and(eq(tripComment.id, commentId), eq(tripComment.postId, postId), isNull(tripComment.deletedAt), isNull(tripPost.deletedAt)))
         .limit(1)
     if (!row) throw new ApiError('NOT_FOUND', COMMENT_NOT_FOUND)
     if (!canAcceptComment(viewer, { authorId: row.post.authorId, boardKind: row.board.kind }, row.comment)) throw new ApiError('FORBIDDEN')
     return row.comment
 }
 
-export const assertTripAttachable = async (tripId: string, userId: string) => assertTripAccess(tripId, userId, 'view')
+export const assertTripAttachable = async (tripId: string, userId: string) => {
+    const [row] = await getDb().select({ ownerId: trip.ownerId, isPublic: trip.isPublic }).from(trip).where(eq(trip.id, tripId)).limit(1)
+    if (!row) throw new ApiError('NOT_FOUND', TRIP_NOT_FOUND)
+    if (!canAttachTrip({ id: userId }, row)) throw new ApiError('FORBIDDEN')
+    return row
+}

@@ -18,6 +18,7 @@ const BASE_COMMENT = {
     parentId: null,
     body: '두 시간이면 충분합니다.',
     isAccepted: false,
+    isDeleted: false,
     author: { id: 'user-2', name: '지연', username: 'jiyeon', image: null },
     createdAt: '2026-09-10T05:00:00.000Z',
     canManage: false,

@@ -6,6 +6,9 @@ import {
     EXPLORE_SORTS,
     PAGE_PARAM,
     POST_TITLE_MAX_LENGTH,
+    REPORT_MEMO_MAX_LENGTH,
+    REPORT_KINDS,
+    REPORT_REASONS,
     SEARCH_QUERY_MAX_LENGTH,
     SEARCH_QUERY_PARAM,
     SORT_PARAM,
@@ -57,6 +60,13 @@ export const exploreSearchSchema = z.object({
     [SORT_PARAM]: z.enum(EXPLORE_SORTS).catch(DEFAULT_EXPLORE_SORT),
 })
 
+export const reportCreateSchema = z.object({
+    kind: z.enum(REPORT_KINDS, '신고 유형을 선택해 주세요.'),
+    targetId: z.uuid('신고 대상을 찾을 수 없습니다.'),
+    reason: z.enum(REPORT_REASONS, '신고 사유를 선택해 주세요.'),
+    memo: z.string().trim().max(REPORT_MEMO_MAX_LENGTH, `메모는 ${REPORT_MEMO_MAX_LENGTH}자 이하로 입력해 주세요.`).nullable().default(null),
+})
+
 export type BoardKeyInput = z.input<typeof boardKeySchema>
 export type PostCreateInput = z.input<typeof postCreateSchema>
 export type PostCreateValues = z.output<typeof postCreateSchema>
@@ -68,3 +78,5 @@ export type PostSearchInput = z.input<typeof postSearchSchema>
 export type PostSearchValues = z.output<typeof postSearchSchema>
 export type ExploreSearchInput = z.input<typeof exploreSearchSchema>
 export type ExploreSearchValues = z.output<typeof exploreSearchSchema>
+export type ReportCreateInput = z.input<typeof reportCreateSchema>
+export type ReportCreateValues = z.output<typeof reportCreateSchema>
