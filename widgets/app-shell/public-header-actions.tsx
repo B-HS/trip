@@ -10,6 +10,7 @@ import { BOARDS_PATH, EXPLORE_PATH, HOME_PATH, LOGIN_PATH, SIGNUP_PATH } from '@
 import { useSession } from '@/shared/lib/auth-client'
 import { Button } from '@/shared/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/shared/ui/dropdown-menu'
+import { LocaleSwitcher } from '@/widgets/app-shell/locale-switcher'
 import { ThemeToggle } from '@/shared/ui/theme-toggle'
 
 const BOARD_MENU_CONTENT_CLASS = 'flex min-w-36 flex-col gap-px rounded-none bg-background p-px shadow-none ring-0'
@@ -34,6 +35,7 @@ export const PublicHeaderActions: FC = () => {
     return (
         <>
             <ThemeToggle />
+            <LocaleSwitcher />
             <div className='flex items-stretch gap-px bg-background'>
                 <Button variant='cell' size='cell' asChild>
                     <Link href={EXPLORE_PATH}>{t('nav.explore')}</Link>

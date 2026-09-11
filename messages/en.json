@@ -44,6 +44,14 @@
         },
         "footer": {
             "tagline": "Trip manager with structured data forms"
+        },
+        "localeSwitcher": {
+            "menuAria": "Select language",
+            "names": {
+                "ko": "ko",
+                "en": "english",
+                "ja": "日本語"
+            }
         }
     },
     "auth": {
