@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { useState, type FC } from 'react'
 import { useUnblockUser } from '@/entities/community/community.query'
 import type { PostAuthor } from '@/entities/community/community.type'

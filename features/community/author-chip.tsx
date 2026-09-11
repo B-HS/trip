@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import type { PostAuthor } from '@/entities/community/community.type'
 import { POST_DATE_FORMAT } from '@/features/community/community.constant'

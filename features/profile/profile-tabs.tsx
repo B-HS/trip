@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import { PROFILE_TABS, type ProfileTab } from '@/entities/profile/profile.validate'
 import { PROFILE_TAB_LABEL, PROFILE_TABS_LABEL } from '@/features/profile/profile.constant'

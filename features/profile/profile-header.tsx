@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import type { PublicProfile } from '@/entities/profile/profile.type'
 import { PROFILE_SETTINGS_LABEL } from '@/features/profile/profile.constant'

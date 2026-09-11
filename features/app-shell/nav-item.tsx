@@ -3,7 +3,7 @@
 import type { LucideIcon } from 'lucide-react'
 import { motion } from 'motion/react'
 import type { Route } from 'next'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import { cn } from '@/shared/lib/utils'
 import { MOTION_EASE_STANDARD, MOTION_FADE_DURATION } from '@/shared/lib/motion'

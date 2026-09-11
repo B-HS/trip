@@ -2,8 +2,8 @@
 
 import { PlusIcon, SparklesIcon, XIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { Link } from '@/i18n/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { useEffect, useState, type FC } from 'react'
 import { useCreateTripFromTemplate, useToggleFavorite, useTripList } from '@/entities/trip/trip.query'
 import { TripCard } from '@/features/trips/trip-card'

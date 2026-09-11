@@ -1,7 +1,7 @@
 'use client'
 
 import { StarIcon } from 'lucide-react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import { cn } from '@/shared/lib/utils'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'

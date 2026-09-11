@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import type { Board, PostPage } from '@/entities/community/community.type'
 import { EMPTY_SEARCH_POST_LABEL } from '@/features/community/community.constant'

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { NAV_ACTIVE_LAYOUT_ID, type NavChildLink } from '@/features/app-shell/nav-item'
 import { MOTION_EASE_STANDARD, MOTION_FADE_DURATION } from '@/shared/lib/motion'
 import { cn } from '@/shared/lib/utils'

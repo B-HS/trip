@@ -1,7 +1,8 @@
 'use client'
 
 import type { Route } from 'next'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { useState, type FC } from 'react'
 import { getAuthErrorMessage } from '@/entities/auth/auth.error'
 import type { LoginValues } from '@/entities/auth/auth.validate'

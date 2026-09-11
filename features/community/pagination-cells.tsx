@@ -1,5 +1,5 @@
 import type { Route } from 'next'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import { NEXT_PAGE_LABEL, PAGINATION_LABEL, PREV_PAGE_LABEL } from '@/features/community/community.constant'
 import { Button } from '@/shared/ui/button'

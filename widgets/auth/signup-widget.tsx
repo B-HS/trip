@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { useState, type FC } from 'react'
 import { getAuthErrorMessage } from '@/entities/auth/auth.error'
 import type { SignupValues } from '@/entities/auth/auth.validate'

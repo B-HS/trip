@@ -1,7 +1,73 @@
 {
-    "common": {},
+    "common": {
+        "nav": {
+            "home": "ホーム",
+            "explore": "探索",
+            "boards": "掲示板",
+            "boardsAll": "掲示板すべて",
+            "trips": "トリップ一覧",
+            "newTrip": "新しいトリップ",
+            "mainMenu": "メインメニュー",
+            "favorites": "お気に入り",
+            "favoritesEmpty": "一覧で☆を押すと追加されます",
+            "openNav": "ナビゲーションメニューを開く",
+            "navigationMenu": "ナビゲーションメニュー",
+            "navigationMenuDescription": "トリップの主要画面へ移動します。",
+            "expandSidebar": "サイドバーを展開",
+            "collapseSidebar": "サイドバーを折りたたむ"
+        },
+        "userMenu": {
+            "accountMenu": "アカウントメニューを開く",
+            "profile": "マイプロフィール",
+            "profileSettings": "プロフィール設定",
+            "signOut": "ログアウト",
+            "theme": "テーマ",
+            "reduceMotion": "モーションを減らす"
+        },
+        "actions": {
+            "start": "はじめる",
+            "login": "ログイン",
+            "home": "ホーム",
+            "cancel": "キャンセル",
+            "confirm": "確定",
+            "delete": "削除",
+            "deleting": "削除中…",
+            "edit": "編集",
+            "open": "開く",
+            "save": "保存",
+            "saving": "保存中…",
+            "retry": "再試行"
+        },
+        "themeToggle": {
+            "toLight": "ライトモードに切り替え",
+            "toDark": "ダークモードに切り替え"
+        },
+        "footer": {
+            "tagline": "Trip manager with structured data forms"
+        }
+    },
     "auth": {},
-    "community": {},
+    "community": {
+        "boardKind": {
+            "free": "フリース",
+            "qna": "質問",
+            "review": "レビュー"
+        },
+        "boards": {
+            "free": {
+                "name": "フリースボード",
+                "description": "旅行の話を自由に語り合うスペースです。"
+            },
+            "qna": {
+                "name": "質問ボード",
+                "description": "旅行の準備で気になることを質問してください。"
+            },
+            "review": {
+                "name": "旅行レビュー",
+                "description": "行った旅行のレビューを残してください。"
+            }
+        }
+    },
     "trip": {},
     "profile": {},
     "admin": {},

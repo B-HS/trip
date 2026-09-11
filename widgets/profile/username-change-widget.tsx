@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { useState, type FC, type FormEvent } from 'react'
 import { useChangeUsername } from '@/entities/profile/profile.query'
 import { usernameChangeSchema } from '@/entities/profile/profile.validate'

@@ -1,5 +1,5 @@
 import type { Route } from 'next'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { MORE_LABEL } from '@/features/community/community.constant'
 import { Button } from '@/shared/ui/button'
 

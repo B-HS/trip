@@ -1,7 +1,7 @@
 'use client'
 
 import { PlusIcon, SparklesIcon } from 'lucide-react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import type { ComponentProps, FC } from 'react'
 import { Button } from '@/shared/ui/button'
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from '@/shared/ui/empty'

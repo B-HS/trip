@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import { DEFAULT_BOARDS } from '@/shared/constant/community'
 import { BOARDS_PATH } from '@/shared/constant/route'

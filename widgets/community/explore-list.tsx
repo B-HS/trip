@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { findPublicTripPage } from '@/entities/trip/trip.repository.explore'
 import { PaginationCells } from '@/features/community/pagination-cells'
 import { PublicTripGrid } from '@/features/community/public-trip-grid'

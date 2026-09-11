@@ -1,7 +1,60 @@
 {
-    "common": {},
+    "common": {
+        "nav": {
+            "home": "홈",
+            "explore": "탐색",
+            "boards": "게시판",
+            "boardsAll": "게시판 전체",
+            "trips": "트립 목록",
+            "newTrip": "새 트립",
+            "mainMenu": "주요 메뉴",
+            "favorites": "즐겨찾기",
+            "favoritesEmpty": "목록에서 별표를 눌러 추가하세요",
+            "openNav": "탐색 메뉴 열기",
+            "navigationMenu": "탐색 메뉴",
+            "navigationMenuDescription": "트립의 주요 화면으로 이동합니다.",
+            "expandSidebar": "사이드바 펼치기",
+            "collapseSidebar": "사이드바 접기"
+        },
+        "userMenu": {
+            "accountMenu": "계정 메뉴 열기",
+            "profile": "내 프로필",
+            "profileSettings": "프로필 설정",
+            "signOut": "로그아웃",
+            "theme": "테마",
+            "reduceMotion": "모션 줄이기"
+        },
+        "actions": {
+            "start": "시작하기",
+            "login": "로그인",
+            "home": "홈"
+        },
+        "footer": {
+            "tagline": "Trip manager with structured data forms"
+        }
+    },
     "auth": {},
-    "community": {},
+    "community": {
+        "boardKind": {
+            "free": "자유",
+            "qna": "질문",
+            "review": "후기"
+        },
+        "boards": {
+            "free": {
+                "name": "자유게시판",
+                "description": "여행 이야기를 자유롭게 나누는 공간입니다."
+            },
+            "qna": {
+                "name": "질문게시판",
+                "description": "여행 준비 중 궁금한 점을 물어보세요."
+            },
+            "review": {
+                "name": "여행 후기",
+                "description": "다녀온 여행의 후기를 남겨 주세요."
+            }
+        }
+    },
     "trip": {},
     "profile": {},
     "admin": {},

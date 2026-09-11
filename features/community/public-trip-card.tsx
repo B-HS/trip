@@ -1,5 +1,5 @@
 import { CalendarIcon, HeartIcon, MapPinIcon, PlaneIcon } from 'lucide-react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import type { PublicTripCard as PublicTripCardItem } from '@/entities/trip/trip.type'
 import { AuthorChip } from '@/features/community/author-chip'

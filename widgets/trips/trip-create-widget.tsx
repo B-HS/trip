@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import type { FC } from 'react'
 import { useCreateTrip, useCreateTripFromTemplate } from '@/entities/trip/trip.query'
 import type { TripCreateValues } from '@/entities/trip/trip.validate'

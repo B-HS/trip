@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import { INTRO_CTA } from '@/shared/constant/marketing'
 import { Button } from '@/shared/ui/button'

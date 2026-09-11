@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { Link } from '@/i18n/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { useState, type FC, type MouseEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useBlockUser, useComments, useDeletePost, usePostLike, useSubmitReport, useTogglePostLike } from '@/entities/community/community.query'

@@ -1,7 +1,73 @@
 {
-    "common": {},
+    "common": {
+        "nav": {
+            "home": "Home",
+            "explore": "Explore",
+            "boards": "Boards",
+            "boardsAll": "All boards",
+            "trips": "My trips",
+            "newTrip": "New trip",
+            "mainMenu": "Main menu",
+            "favorites": "Favorites",
+            "favoritesEmpty": "Star a trip in the list to add it here",
+            "openNav": "Open navigation menu",
+            "navigationMenu": "Navigation menu",
+            "navigationMenuDescription": "Jump to the main trip screens.",
+            "expandSidebar": "Expand sidebar",
+            "collapseSidebar": "Collapse sidebar"
+        },
+        "userMenu": {
+            "accountMenu": "Open account menu",
+            "profile": "My profile",
+            "profileSettings": "Profile settings",
+            "signOut": "Sign out",
+            "theme": "Theme",
+            "reduceMotion": "Reduce motion"
+        },
+        "actions": {
+            "start": "Get started",
+            "login": "Log in",
+            "home": "Home",
+            "cancel": "Cancel",
+            "confirm": "Confirm",
+            "delete": "Delete",
+            "deleting": "Deleting…",
+            "edit": "Edit",
+            "open": "Open",
+            "save": "Save",
+            "saving": "Saving…",
+            "retry": "Try again"
+        },
+        "themeToggle": {
+            "toLight": "Switch to light mode",
+            "toDark": "Switch to dark mode"
+        },
+        "footer": {
+            "tagline": "Trip manager with structured data forms"
+        }
+    },
     "auth": {},
-    "community": {},
+    "community": {
+        "boardKind": {
+            "free": "Free",
+            "qna": "Q&A",
+            "review": "Reviews"
+        },
+        "boards": {
+            "free": {
+                "name": "Free board",
+                "description": "A place to share travel stories freely."
+            },
+            "qna": {
+                "name": "Q&A board",
+                "description": "Ask anything about trip planning."
+            },
+            "review": {
+                "name": "Travel reviews",
+                "description": "Leave a review of a trip you took."
+            }
+        }
+    },
     "trip": {},
     "profile": {},
     "admin": {},

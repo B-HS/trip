@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, useScroll, useTransform } from 'motion/react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { type FC, useRef } from 'react'
 import { INTRO_HERO } from '@/shared/constant/marketing'
 import { Button } from '@/shared/ui/button'

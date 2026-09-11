@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { useState, type FC, type MouseEvent } from 'react'
 import { useBlockUser, useSubmitReport, useUnblockUser } from '@/entities/community/community.query'
 import { ReportDialog, type ReportFormValues } from '@/features/community/report-dialog'

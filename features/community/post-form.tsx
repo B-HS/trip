@@ -3,7 +3,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Route } from 'next'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import type { UploadedImage } from '@/entities/upload/upload.type'
 import { postFormSchema, type PostFormInput, type PostFormValues } from '@/features/community/post-form.schema'

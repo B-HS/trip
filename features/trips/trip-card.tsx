@@ -1,7 +1,7 @@
 'use client'
 
 import { CalendarIcon, MapPinIcon, MoreHorizontalIcon, PencilIcon, PlaneIcon, SquarePenIcon, StarIcon, Trash2Icon } from 'lucide-react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import type { TripDestinationView } from '@/entities/trip/trip.type'
 import { TRIP_STATUS_TEXT_CLASS, type TripStatus } from '@/features/trips/trip-status'
