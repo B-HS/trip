@@ -53,8 +53,20 @@ export const DEFAULT_BOARDS = [
 export const POINT_ANSWER = 2
 export const POINT_ACCEPTED = 10
 
-export const POINT_REASONS = ['answer', 'accepted'] as const
+export const POINT_REASONS = ['answer', 'accepted', 'revoked'] as const
 export type PointReason = (typeof POINT_REASONS)[number]
+
+export const REPORT_KINDS = ['post', 'comment', 'user'] as const
+export type ReportKind = (typeof REPORT_KINDS)[number]
+
+export const REPORT_REASONS = ['spam', 'harassment', 'obscenity', 'defamation', 'illegal', 'privacy', 'other'] as const
+export type ReportReason = (typeof REPORT_REASONS)[number]
+
+export const REPORT_STATUSES = ['open', 'hidden', 'dismissed', 'banned'] as const
+export type ReportStatus = (typeof REPORT_STATUSES)[number]
+
+export const REPORT_TARGET_ID_MAX_LENGTH = 36
+export const REPORT_MEMO_MAX_LENGTH = 500
 
 export const PAGE_SIZE = 20
 

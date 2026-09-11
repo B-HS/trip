@@ -8,6 +8,11 @@ import {
     POINT_REASONS,
     POST_EXCERPT_MAX_LENGTH,
     POST_TITLE_MAX_LENGTH,
+    REPORT_KINDS,
+    REPORT_MEMO_MAX_LENGTH,
+    REPORT_REASONS,
+    REPORT_STATUSES,
+    REPORT_TARGET_ID_MAX_LENGTH,
 } from '@/shared/constant/community'
 import { user } from '@/shared/db/schema/auth'
 import { trip } from '@/shared/db/schema/trip'
@@ -55,6 +60,7 @@ export const tripPost = tripTable(
         likeCount: int('like_count').notNull().default(0),
         commentCount: int('comment_count').notNull().default(0),
         acceptedCommentId: varchar('accepted_comment_id', { length: 36 }),
+        deletedAt: timestamp('deleted_at', { fsp: 3 }),
         createdAt: createdAt(),
         updatedAt: updatedAt(),
     },
@@ -78,10 +84,47 @@ export const tripComment = tripTable(
         parentId: varchar('parent_id', { length: 36 }).references((): AnyMySqlColumn => tripComment.id, { onDelete: 'cascade' }),
         body: text('body').notNull(),
         isAccepted: boolean('is_accepted').default(false).notNull(),
+        deletedAt: timestamp('deleted_at', { fsp: 3 }),
         createdAt: createdAt(),
         updatedAt: updatedAt(),
     },
     (table) => [index('comment_post_id_idx').on(table.postId), index('comment_author_id_idx').on(table.authorId)],
+)
+
+export const tripReport = tripTable(
+    'report',
+    {
+        id: id(),
+        reporterId: varchar('reporter_id', { length: 36 })
+            .notNull()
+            .references(() => user.id, { onDelete: 'cascade' }),
+        kind: mysqlEnum('kind', REPORT_KINDS).notNull(),
+        targetId: varchar('target_id', { length: REPORT_TARGET_ID_MAX_LENGTH }).notNull(),
+        reason: mysqlEnum('reason', REPORT_REASONS).notNull(),
+        memo: varchar('memo', { length: REPORT_MEMO_MAX_LENGTH }),
+        status: mysqlEnum('status', REPORT_STATUSES).notNull().default('open'),
+        handledBy: varchar('handled_by', { length: 36 }).references(() => user.id, { onDelete: 'set null' }),
+        handledAt: timestamp('handled_at', { fsp: 3 }),
+        createdAt: createdAt(),
+    },
+    (table) => [
+        uniqueIndex('report_reporter_kind_target_idx').on(table.reporterId, table.kind, table.targetId),
+        index('report_status_created_at_idx').on(table.status, table.createdAt),
+    ],
+)
+
+export const tripUserBlock = tripTable(
+    'user_block',
+    {
+        blockerId: varchar('blocker_id', { length: 36 })
+            .notNull()
+            .references(() => user.id, { onDelete: 'cascade' }),
+        blockedId: varchar('blocked_id', { length: 36 })
+            .notNull()
+            .references(() => user.id, { onDelete: 'cascade' }),
+        createdAt: createdAt(),
+    },
+    (table) => [primaryKey({ columns: [table.blockerId, table.blockedId] }), index('user_block_blocked_id_idx').on(table.blockedId)],
 )
 
 export const tripPostLike = tripTable(
@@ -158,4 +201,14 @@ export const tripLikeRelations = relations(tripLike, ({ one }) => ({
 
 export const tripPointLedgerRelations = relations(tripPointLedger, ({ one }) => ({
     user: one(user, { fields: [tripPointLedger.userId], references: [user.id] }),
+}))
+
+export const tripReportRelations = relations(tripReport, ({ one }) => ({
+    reporter: one(user, { fields: [tripReport.reporterId], references: [user.id] }),
+    handler: one(user, { fields: [tripReport.handledBy], references: [user.id], relationName: 'reportHandler' }),
+}))
+
+export const tripUserBlockRelations = relations(tripUserBlock, ({ one }) => ({
+    blocker: one(user, { fields: [tripUserBlock.blockerId], references: [user.id], relationName: 'blockerBlocks' }),
+    blocked: one(user, { fields: [tripUserBlock.blockedId], references: [user.id], relationName: 'blockedByBlocker' }),
 }))
