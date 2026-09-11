@@ -4,15 +4,18 @@ import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/r
 import { toast } from 'sonner'
 import {
     acceptCommentAction,
+    blockUserAction,
     createCommentAction,
     createPostAction,
     deleteCommentAction,
     deletePostAction,
+    submitReportAction,
     togglePostLikeAction,
+    unblockUserAction,
     updatePostAction,
 } from '@/entities/community/community.action'
 import { fetchComments, fetchPostLike } from '@/entities/community/community.api'
-import type { CommentCreateInput, PostCreateInput, PostUpdateInput } from '@/entities/community/community.validate'
+import type { CommentCreateInput, PostCreateInput, PostUpdateInput, ReportCreateInput } from '@/entities/community/community.validate'
 import { QUERY_KEY } from '@/shared/constant/query-key'
 import { unwrapActionResult } from '@/shared/lib/action-result'
 import { likeToggleMutationOptions } from '@/shared/lib/like-mutation'
@@ -85,6 +88,27 @@ export const useUpdatePost = (postId: string) =>
     useMutation({
         mutationFn: async (input: PostUpdateInput) => unwrapActionResult(await updatePostAction(postId, input)),
         onSuccess: () => toast.success('글을 수정했습니다.'),
+        onError: (error) => toast.error(error.message),
+    })
+
+export const useSubmitReport = () =>
+    useMutation({
+        mutationFn: async (input: ReportCreateInput) => unwrapActionResult(await submitReportAction(input)),
+        onSuccess: () => toast.success('신고를 접수했습니다.'),
+        onError: (error) => toast.error(error.message),
+    })
+
+export const useBlockUser = () =>
+    useMutation({
+        mutationFn: async (blockedId: string) => unwrapActionResult(await blockUserAction(blockedId)),
+        onSuccess: () => toast.success('사용자를 차단했습니다.'),
+        onError: (error) => toast.error(error.message),
+    })
+
+export const useUnblockUser = () =>
+    useMutation({
+        mutationFn: async (blockedId: string) => unwrapActionResult(await unblockUserAction(blockedId)),
+        onSuccess: () => toast.success('차단을 해제했습니다.'),
         onError: (error) => toast.error(error.message),
     })
 

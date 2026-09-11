@@ -1,13 +1,15 @@
 import type { FC } from 'react'
 import type { CommentView } from '@/entities/community/community.type'
 import { AuthorChip } from '@/features/community/author-chip'
-import { ACCEPTED_LABEL } from '@/features/community/community.constant'
+import { ACCEPTED_LABEL, DELETED_COMMENT_LABEL } from '@/features/community/community.constant'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 
 const REPLY_LABEL = '답글'
 const DELETE_LABEL = '삭제'
 const ACCEPT_LABEL = '채택'
+const REPORT_LABEL = '신고'
+const BLOCK_LABEL = '차단'
 
 export type CommentItemView = CommentView & {
     canManage: boolean
@@ -19,10 +21,13 @@ export type CommentItemProps = {
     onDelete: () => void
     onAccept: () => void
     onReply?: () => void
+    onReport?: () => void
+    onBlock?: () => void
 }
 
-export const CommentItem: FC<CommentItemProps> = ({ comment, onDelete, onAccept, onReply }) => {
-    const hasActions = onReply !== undefined || comment.canAccept || comment.canManage
+export const CommentItem: FC<CommentItemProps> = ({ comment, onDelete, onAccept, onReply, onReport, onBlock }) => {
+    const hasActions =
+        !comment.isDeleted && (onReply !== undefined || comment.canAccept || comment.canManage || onReport !== undefined || onBlock !== undefined)
 
     return (
         <article className='flex flex-col gap-px'>
@@ -31,7 +36,11 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onDelete, onAccept,
                     <AuthorChip author={comment.author} createdAt={comment.createdAt} />
                     {comment.isAccepted && <Badge variant='secondary'>{ACCEPTED_LABEL}</Badge>}
                 </div>
-                <p className='text-sm break-keep whitespace-pre-wrap'>{comment.body}</p>
+                {comment.isDeleted ? (
+                    <p className='text-sm text-muted-foreground italic'>{DELETED_COMMENT_LABEL}</p>
+                ) : (
+                    <p className='text-sm break-keep whitespace-pre-wrap'>{comment.body}</p>
+                )}
             </div>
             {hasActions && (
                 <div className='flex flex-wrap items-stretch gap-px bg-background'>
@@ -43,6 +52,16 @@ export const CommentItem: FC<CommentItemProps> = ({ comment, onDelete, onAccept,
                     {comment.canAccept && (
                         <Button type='button' variant='cellPrimary' size='cell' onClick={onAccept}>
                             {ACCEPT_LABEL}
+                        </Button>
+                    )}
+                    {onReport !== undefined && (
+                        <Button type='button' variant='cell' size='cell' onClick={onReport}>
+                            {REPORT_LABEL}
+                        </Button>
+                    )}
+                    {onBlock !== undefined && (
+                        <Button type='button' variant='cell' size='cell' onClick={onBlock}>
+                            {BLOCK_LABEL}
                         </Button>
                     )}
                     {comment.canManage && (

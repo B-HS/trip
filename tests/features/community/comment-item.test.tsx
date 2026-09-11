@@ -73,6 +73,22 @@ describe('CommentItem', () => {
         expect(screen.getByText('채택됨')).toBeDefined()
     })
 
+    test('삭제된 댓글은 자리 표시자를 보여주고 액션 셀을 숨긴다', () => {
+        render(
+            <CommentItem
+                comment={{ ...BASE_COMMENT, isDeleted: true, body: null }}
+                onDelete={noop}
+                onAccept={noop}
+                onReply={noop}
+                onReport={noop}
+                onBlock={noop}
+            />,
+        )
+
+        expect(screen.getByText('삭제된 댓글')).toBeDefined()
+        expect(screen.queryByRole('button')).toBeNull()
+    })
+
     test('삭제와 채택 셀을 누르면 각 핸들러를 부른다', () => {
         const calls: string[] = []
         render(

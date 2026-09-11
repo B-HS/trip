@@ -1,14 +1,25 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState, type FC, type MouseEvent } from 'react'
-import { useAcceptComment, useComments, useCreateComment, useDeleteComment } from '@/entities/community/community.query'
+import { useQueryClient } from '@tanstack/react-query'
+import {
+    useAcceptComment,
+    useBlockUser,
+    useComments,
+    useCreateComment,
+    useDeleteComment,
+    useSubmitReport,
+} from '@/entities/community/community.query'
 import { canAcceptComment, canManageComment } from '@/entities/community/community.role'
 import type { CommentView, CommunityViewer, PostAuthor, PostDetail } from '@/entities/community/community.type'
+import { ReportDialog, type ReportFormValues } from '@/features/community/report-dialog'
 import type { CommentItemView } from '@/features/community/comment-item'
 import { CommentForm } from '@/features/community/comment-form'
 import { CommentList, type CommentNode } from '@/features/community/comment-list'
 import { COMMENT_COUNT_LABEL } from '@/features/community/community.constant'
+import { QUERY_KEY } from '@/shared/constant/query-key'
 import { LOGIN_PATH } from '@/shared/constant/route'
 import {
     AlertDialog,
@@ -35,11 +46,15 @@ const CANCEL_LABEL = '취소'
 const DELETE_LABEL = '삭제'
 const DELETING_LABEL = '삭제 중…'
 const DELETE_TITLE = '댓글을 삭제할까요?'
-const DELETE_DESCRIPTION = '이 댓글과 답글이 함께 삭제됩니다. 되돌릴 수 없습니다.'
+const DELETE_DESCRIPTION = '이 댓글과 답글이 함께 삭제되어 목록에서 숨겨집니다.'
 const ACCEPT_LABEL = '채택'
 const ACCEPTING_LABEL = '채택 중…'
 const ACCEPT_TITLE = '이 답변을 채택할까요?'
-const ACCEPT_DESCRIPTION = '채택은 되돌릴 수 없습니다. 글마다 한 번만 채택할 수 있습니다.'
+const ACCEPT_DESCRIPTION = '다른 답변이 채택되어 있으면 채택이 이 답변으로 이동합니다.'
+const BLOCK_LABEL = '차단'
+const BLOCKING_LABEL = '차단 중…'
+const BLOCK_TITLE = '이 사용자를 차단할까요?'
+const BLOCK_DESCRIPTION = '차단하면 이 사용자의 글과 댓글을 더 이상 볼 수 없습니다.'
 
 export type CommentsPost = Pick<PostDetail, 'boardKey' | 'boardKind' | 'hasAcceptedComment'> & {
     authorId: PostAuthor['id']
@@ -51,46 +66,50 @@ export type CommentsWidgetProps = {
     viewer: CommunityViewer | null
 }
 
-const toItemView = (comment: CommentView, post: CommentsPost, viewer: CommunityViewer | null, hasAccepted: boolean) =>
+const toItemView = (comment: CommentView, post: CommentsPost, viewer: CommunityViewer | null) =>
     ({
         ...comment,
         canManage: canManageComment(viewer, comment.author.id),
-        canAccept:
-            !hasAccepted &&
-            canAcceptComment(
-                viewer,
-                { authorId: post.authorId, boardKind: post.boardKind },
-                { authorId: comment.author.id, parentId: comment.parentId, isAccepted: comment.isAccepted },
-            ),
+        canAccept: canAcceptComment(
+            viewer,
+            { authorId: post.authorId, boardKind: post.boardKind },
+            { authorId: comment.author.id, parentId: comment.parentId, isAccepted: comment.isAccepted },
+        ),
     }) satisfies CommentItemView
 
-const buildNodes = (comments: CommentView[], post: CommentsPost, viewer: CommunityViewer | null, hasAccepted: boolean) => {
+const buildNodes = (comments: CommentView[], post: CommentsPost, viewer: CommunityViewer | null) => {
     const replies = comments.reduce(
         (groups, comment) =>
             comment.parentId === null
                 ? groups
-                : groups.set(comment.parentId, [...(groups.get(comment.parentId) ?? []), toItemView(comment, post, viewer, hasAccepted)]),
+                : groups.set(comment.parentId, [...(groups.get(comment.parentId) ?? []), toItemView(comment, post, viewer)]),
         new Map<string, CommentItemView[]>(),
     )
 
     return comments
         .filter((comment) => comment.parentId === null)
-        .map((comment) => ({ ...toItemView(comment, post, viewer, hasAccepted), replies: replies.get(comment.id) ?? [] }) satisfies CommentNode)
+        .map((comment) => ({ ...toItemView(comment, post, viewer), replies: replies.get(comment.id) ?? [] }) satisfies CommentNode)
 }
 
 export const CommentsWidget: FC<CommentsWidgetProps> = ({ postId, post, viewer }) => {
     const [replyTargetId, setReplyTargetId] = useState<string | null>(null)
     const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
     const [acceptTargetId, setAcceptTargetId] = useState<string | null>(null)
+    const [blockTargetId, setBlockTargetId] = useState<string | null>(null)
+    const [reportTargetId, setReportTargetId] = useState<string | null>(null)
     const [formKey, setFormKey] = useState(FIRST_FORM_KEY)
     const comments = useComments(postId)
     const createComment = useCreateComment(postId)
     const deleteComment = useDeleteComment(postId)
     const acceptComment = useAcceptComment(postId)
+    const submitReport = useSubmitReport()
+    const blockUser = useBlockUser()
+    const queryClient = useQueryClient()
+    const router = useRouter()
 
     const items = comments.data ?? []
-    const hasAccepted = post.hasAcceptedComment || items.some((item) => item.isAccepted)
-    const nodes = buildNodes(items, post, viewer, hasAccepted)
+    const visibleCount = items.filter((item) => !item.isDeleted).length
+    const nodes = buildNodes(items, post, viewer)
     const handleCreate = (body: string) =>
         createComment.mutate({ parentId: null, body }, { onSuccess: () => setFormKey((key) => key + FORM_KEY_STEP) })
     const handleReply = (parentId: string, body: string) => createComment.mutate({ parentId, body }, { onSuccess: () => setReplyTargetId(null) })
@@ -104,11 +123,26 @@ export const CommentsWidget: FC<CommentsWidgetProps> = ({ postId, post, viewer }
         if (acceptTargetId === null) return
         acceptComment.mutate(acceptTargetId, { onSuccess: () => setAcceptTargetId(null) })
     }
+    const handleReport = (values: ReportFormValues) => {
+        if (reportTargetId === null) return
+        submitReport.mutate({ kind: 'comment', targetId: reportTargetId, ...values }, { onSuccess: () => setReportTargetId(null) })
+    }
+    const handleBlock = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault()
+        if (blockTargetId === null) return
+        blockUser.mutate(blockTargetId, {
+            onSuccess: () => {
+                setBlockTargetId(null)
+                queryClient.invalidateQueries({ queryKey: QUERY_KEY.COMMUNITY.COMMENTS(postId) })
+                router.refresh()
+            },
+        })
+    }
 
     return (
         <section className='flex flex-col gap-px'>
             <h2 className='bg-card p-3 text-sm font-medium'>
-                {COMMENT_COUNT_LABEL} <span className='font-mono tabular-nums'>{items.length}</span>
+                {COMMENT_COUNT_LABEL} <span className='font-mono tabular-nums'>{visibleCount}</span>
             </h2>
             {comments.isError ? (
                 <div className='flex flex-wrap items-stretch gap-px bg-background'>
@@ -130,6 +164,9 @@ export const CommentsWidget: FC<CommentsWidgetProps> = ({ postId, post, viewer }
                     onReplySubmit={handleReply}
                     onDelete={setDeleteTargetId}
                     onAccept={setAcceptTargetId}
+                    viewerId={viewer?.id ?? null}
+                    onReport={setReportTargetId}
+                    onBlock={setBlockTargetId}
                 />
             )}
             {viewer === null ? (
@@ -174,6 +211,28 @@ export const CommentsWidget: FC<CommentsWidgetProps> = ({ postId, post, viewer }
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            <AlertDialog open={blockTargetId !== null} onOpenChange={(open) => !open && setBlockTargetId(null)}>
+                <AlertDialogContent className='rounded-none'>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{BLOCK_TITLE}</AlertDialogTitle>
+                        <AlertDialogDescription>{BLOCK_DESCRIPTION}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className='gap-px bg-background sm:ml-auto sm:w-fit'>
+                        <AlertDialogCancel variant='cell' size='cell' disabled={blockUser.isPending}>
+                            {CANCEL_LABEL}
+                        </AlertDialogCancel>
+                        <AlertDialogAction variant='cellDestructive' size='cell' disabled={blockUser.isPending} onClick={handleBlock}>
+                            {blockUser.isPending ? BLOCKING_LABEL : BLOCK_LABEL}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <ReportDialog
+                open={reportTargetId !== null}
+                isPending={submitReport.isPending}
+                onClose={() => setReportTargetId(null)}
+                onSubmit={handleReport}
+            />
         </section>
     )
 }
