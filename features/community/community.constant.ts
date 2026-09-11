@@ -1,6 +1,12 @@
-import type { ReportReason } from '@/shared/constant/community'
+import type { ReportKind, ReportReason } from '@/shared/constant/community'
 
 export const POST_DATE_FORMAT = 'YYYY.MM.DD HH:mm'
+
+export const REPORT_KIND_LABEL = {
+    post: '글',
+    comment: '댓글',
+    user: '사용자',
+} as const satisfies Record<ReportKind, string>
 
 export const VIEW_COUNT_LABEL = '조회'
 export const LIKE_COUNT_LABEL = '좋아요'
@@ -13,7 +19,12 @@ export const REPORT_CANCEL_LABEL = '취소'
 export const REPORT_TITLE = '신고를 접수할까요?'
 export const REPORT_DESCRIPTION = '신고 내용은 관리자 검토에 사용됩니다.'
 export const BLOCK_LABEL = '차단'
+export const BLOCKING_LABEL = '차단 중…'
 export const UNBLOCK_LABEL = '차단 해제'
+export const HIDE_LABEL = '숨김'
+export const DISMISS_LABEL = '기각'
+export const UNBAN_LABEL = '차단해제'
+export const RESTORE_LABEL = '게시글 복구'
 
 export const REPORT_REASON_LABEL = {
     spam: '스팸',

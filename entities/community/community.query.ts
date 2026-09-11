@@ -4,17 +4,22 @@ import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/r
 import { toast } from 'sonner'
 import {
     acceptCommentAction,
+    banReportedUserAction,
     blockUserAction,
     createCommentAction,
     createPostAction,
     deleteCommentAction,
     deletePostAction,
+    dismissReportAction,
+    hideReportTargetAction,
+    restorePostAction,
     submitReportAction,
     togglePostLikeAction,
+    unbanUserAction,
     unblockUserAction,
     updatePostAction,
 } from '@/entities/community/community.action'
-import { fetchComments, fetchPostLike } from '@/entities/community/community.api'
+import { fetchComments, fetchOpenReports, fetchPostLike } from '@/entities/community/community.api'
 import type { CommentCreateInput, PostCreateInput, PostUpdateInput, ReportCreateInput } from '@/entities/community/community.validate'
 import { QUERY_KEY } from '@/shared/constant/query-key'
 import { unwrapActionResult } from '@/shared/lib/action-result'
@@ -25,6 +30,11 @@ export const commentsQueryOptions = (postId: string) =>
 
 export const postLikeQueryOptions = (postId: string) =>
     queryOptions({ queryKey: QUERY_KEY.COMMUNITY.POST_LIKE(postId), queryFn: () => fetchPostLike(postId) })
+
+export const openReportsQueryOptions = (page: number) =>
+    queryOptions({ queryKey: QUERY_KEY.REPORT.LIST(page), queryFn: () => fetchOpenReports(page) })
+
+export const useOpenReports = (page: number) => useQuery(openReportsQueryOptions(page))
 
 export const useComments = (postId: string) => useQuery({ ...commentsQueryOptions(postId), enabled: postId.length > 0 })
 
@@ -104,6 +114,69 @@ export const useBlockUser = () =>
         onSuccess: () => toast.success('사용자를 차단했습니다.'),
         onError: (error) => toast.error(error.message),
     })
+
+const invalidateOpenReports = (queryClient: ReturnType<typeof useQueryClient>, page: number) =>
+    queryClient.invalidateQueries({ queryKey: QUERY_KEY.REPORT.LIST(page) })
+
+export const useHideReportTarget = (page: number) => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: async (reportId: string) => unwrapActionResult(await hideReportTargetAction(reportId)),
+        onSuccess: () => {
+            invalidateOpenReports(queryClient, page)
+            toast.success('대상 글을 숨겼습니다.')
+        },
+        onError: (error) => toast.error(error.message),
+    })
+}
+
+export const useDismissReport = (page: number) => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: async (reportId: string) => unwrapActionResult(await dismissReportAction(reportId)),
+        onSuccess: () => {
+            invalidateOpenReports(queryClient, page)
+            toast.success('신고를 기각했습니다.')
+        },
+        onError: (error) => toast.error(error.message),
+    })
+}
+
+export const useBanReportedUser = (page: number) => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: async (reportId: string) => unwrapActionResult(await banReportedUserAction(reportId)),
+        onSuccess: () => {
+            invalidateOpenReports(queryClient, page)
+            toast.success('사용자를 차단했습니다.')
+        },
+        onError: (error) => toast.error(error.message),
+    })
+}
+
+export const useUnbanUser = (page: number) => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: async (userId: string) => unwrapActionResult(await unbanUserAction(userId)),
+        onSuccess: () => {
+            invalidateOpenReports(queryClient, page)
+            toast.success('사용자 차단을 해제했습니다.')
+        },
+        onError: (error) => toast.error(error.message),
+    })
+}
+
+export const useRestorePost = (page: number) => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: async (postId: string) => unwrapActionResult(await restorePostAction(postId)),
+        onSuccess: () => {
+            invalidateOpenReports(queryClient, page)
+            toast.success('글을 복구했습니다.')
+        },
+        onError: (error) => toast.error(error.message),
+    })
+}
 
 export const useUnblockUser = () =>
     useMutation({

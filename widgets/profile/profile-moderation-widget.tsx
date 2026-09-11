@@ -17,7 +17,6 @@ import {
 } from '@/shared/ui/alert-dialog'
 import { Button } from '@/shared/ui/button'
 
-const BLOCK_LABEL_PENDING = '차단 중…'
 const BLOCK_TITLE = '이 사용자를 차단할까요?'
 const BLOCK_DESCRIPTION = '차단하면 이 사용자의 글과 댓글을 더 이상 볼 수 없습니다.'
 const CANCEL_LABEL = '취소'
@@ -82,7 +81,7 @@ export const ProfileModerationWidget: FC<ProfileModerationWidgetProps> = ({ user
                             {CANCEL_LABEL}
                         </AlertDialogCancel>
                         <AlertDialogAction variant='cellDestructive' size='cell' disabled={blockUser.isPending} onClick={handleBlock}>
-                            {blockUser.isPending ? BLOCK_LABEL_PENDING : BLOCK_LABEL}
+                            {blockUser.isPending ? BLOCKING_LABEL : BLOCK_LABEL}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

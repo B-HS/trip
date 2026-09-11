@@ -17,4 +17,8 @@ export const QUERY_KEY = {
         COMMENTS: (postId: string) => ['community', 'comments', postId],
         POST_LIKE: (postId: string) => ['community', 'post-like', postId],
     },
+    REPORT: {
+        ALL: ['report'],
+        LIST: (page: number) => ['report', 'list', page],
+    },
 } as const
