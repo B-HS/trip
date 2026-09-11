@@ -20,23 +20,25 @@ const NOT_FOUND_TITLE = '글을 찾을 수 없습니다'
 
 export const generateMetadata = async ({ params }: PostPageProps): Promise<Metadata> => {
     const { key, postId } = await params
-    const post = await getPostDetail(postId)
+    const session = await getServerSession()
+    const post = await getPostDetail(postId, session?.user.id ?? null)
     return { title: post === null || post.boardKey !== key ? NOT_FOUND_TITLE : post.title }
 }
 
 const PostPage = async ({ params }: PostPageProps) => {
     const { key, postId } = await params
-    const post = await getPostDetail(postId)
+    const session = await getServerSession()
+    const viewerId = session?.user.id ?? null
+    const post = await getPostDetail(postId, viewerId)
     if (post === null || post.boardKey !== key) notFound()
 
-    const session = await getServerSession()
     const viewer: CommunityViewer | null = session === null ? null : { id: session.user.id, role: session.user.role }
     if (viewer?.id !== post.author.id) await incrementPostView(post.id)
 
     const { body, ...postView } = post
     const html = renderRichTextHtml(body)
     const queryClient = getQueryClient()
-    await Promise.all([prefetchComments(queryClient, post.id), prefetchPostLike(queryClient, post.id, viewer?.id ?? null)])
+    await Promise.all([prefetchComments(queryClient, post.id, viewerId), prefetchPostLike(queryClient, post.id, viewerId)])
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>

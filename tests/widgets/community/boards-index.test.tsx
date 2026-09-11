@@ -13,7 +13,7 @@ mock.module('next/link', () => ({ default: LinkStub }))
 
 const { BoardsIndex } = await import('@/widgets/community/boards-index')
 
-const renderIndex = async () => render(await BoardsIndex())
+const renderIndex = async () => render(await BoardsIndex({ viewerId: null }))
 
 afterEach(cleanup)
 

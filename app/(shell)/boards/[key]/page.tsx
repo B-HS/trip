@@ -25,7 +25,8 @@ const BoardPage = async ({ params, searchParams }: BoardPageProps) => {
     const board = await getBoardByKey(key)
     if (board === null) notFound()
 
-    const [posts, session] = await Promise.all([findPostPage({ boardKey: board.key, page, q }), getServerSession()])
+    const session = await getServerSession()
+    const posts = await findPostPage({ boardKey: board.key, page, q, viewerId: session?.user.id ?? null })
 
     return <BoardList board={board} posts={posts} query={q} isSignedIn={session !== null} />
 }

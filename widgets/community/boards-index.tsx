@@ -6,9 +6,15 @@ import { EMPTY_POST_LABEL } from '@/shared/constant/community'
 const BOARD_PREVIEW_LIMIT = 5
 const BOARD_MORE_LABEL = '게시판 열기'
 
-export const BoardsIndex = async () => {
+export type BoardsIndexProps = {
+    viewerId?: string | null
+}
+
+export const BoardsIndex = async ({ viewerId = null }: BoardsIndexProps) => {
     const boards = await findBoards()
-    const previews = await Promise.all(boards.map(async (board) => ({ board, posts: await findLatestPostsByBoard(board.key, BOARD_PREVIEW_LIMIT) })))
+    const previews = await Promise.all(
+        boards.map(async (board) => ({ board, posts: await findLatestPostsByBoard(board.key, BOARD_PREVIEW_LIMIT, viewerId) })),
+    )
 
     return (
         <div className='flex flex-1 flex-col gap-px'>

@@ -12,12 +12,16 @@ const TODAY_FORMAT = 'YYYY-MM-DD'
 const REVIEW_BOARD_KIND: BoardKind = 'review'
 const REVIEW_BOARD_PATH = '/boards/review'
 
-export const CommunityHome = async () => {
+export type CommunityHomeProps = {
+    viewerId?: string | null
+}
+
+export const CommunityHome = async ({ viewerId = null }: CommunityHomeProps) => {
     const today = dayjs().format(TODAY_FORMAT)
     const [trips, posts, reviews] = await Promise.all([
         findPublicTripsForHome(today),
-        findLatestPosts(HOME_POST_LIMIT),
-        findLatestPosts(HOME_REVIEW_LIMIT, REVIEW_BOARD_KIND),
+        findLatestPosts(HOME_POST_LIMIT, undefined, viewerId),
+        findLatestPosts(HOME_REVIEW_LIMIT, REVIEW_BOARD_KIND, viewerId),
     ])
 
     return (

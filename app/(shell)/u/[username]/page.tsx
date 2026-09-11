@@ -27,13 +27,16 @@ const UserProfilePage = async ({ params, searchParams }: UserProfilePageProps) =
 
     const session = await getServerSession()
 
+    const viewerId = session?.user.id ?? null
+
     return (
         <ProfilePage
             profile={profile}
             username={profile.username ?? username}
             tab={resolveProfileTab(search[PROFILE_TAB_PARAM])}
             page={pageSchema.parse(search[PAGE_PARAM])}
-            isOwner={session?.user.id === profile.id}
+            isOwner={viewerId === profile.id}
+            viewerId={viewerId}
         />
     )
 }

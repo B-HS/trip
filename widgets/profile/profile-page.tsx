@@ -24,10 +24,11 @@ export type ProfilePageProps = {
     tab: ProfileTab
     page: number
     isOwner: boolean
+    viewerId?: string | null
 }
 
-export const ProfilePage = async ({ profile, username, tab, page, isOwner }: ProfilePageProps) => {
-    const posts = tab === 'posts' ? await findPostsByAuthor(profile.id, page) : null
+export const ProfilePage = async ({ profile, username, tab, page, isOwner, viewerId = null }: ProfilePageProps) => {
+    const posts = tab === 'posts' ? await findPostsByAuthor(profile.id, page, viewerId) : null
     const trips = await findTripPage(tab, profile.id, page)
     const pageInfo = posts ?? trips
 

@@ -13,7 +13,7 @@ mock.module('next/link', () => ({ default: LinkStub }))
 
 const { CommunityHome } = await import('@/widgets/community/community-home')
 
-const renderHome = async () => render(await CommunityHome())
+const renderHome = async () => render(await CommunityHome({ viewerId: null }))
 
 afterEach(cleanup)
 

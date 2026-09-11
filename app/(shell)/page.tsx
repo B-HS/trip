@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 const HomePage = async () => {
     const session = await getServerSession()
-    if (session) return <CommunityHome />
+    if (session) return <CommunityHome viewerId={session.user.id} />
 
     return (
         <>
