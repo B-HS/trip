@@ -2,17 +2,21 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, type FC } from 'react'
+import { useUnblockUser } from '@/entities/community/community.query'
+import type { PostAuthor } from '@/entities/community/community.type'
 import { useUpdateProfile } from '@/entities/profile/profile.query'
 import type { ProfileSettings } from '@/entities/profile/profile.type'
 import { useUploadImage } from '@/entities/upload/upload.query'
 import type { UploadedImage } from '@/entities/upload/upload.type'
+import { BlockedUsersSection } from '@/features/profile/blocked-users-section'
 import { ProfileSettingsForm, type ProfileSettingsFormValues } from '@/features/profile/profile-settings-form'
+import { UsernameChangeWidget } from '@/widgets/profile/username-change-widget'
 
 const AVATAR_KIND = 'avatar'
 const BANNER_KIND = 'banner'
 const KEEP_IMAGE = 'keep'
 const REMOVE_IMAGE = 'remove'
-const DESCRIPTION = '프로필에서 다른 여행자에게 보이는 정보입니다. 사용자명은 바꿀 수 없습니다.'
+const DESCRIPTION = '프로필에서 다른 여행자에게 보이는 정보입니다.'
 
 type ProfileImageState = typeof KEEP_IMAGE | typeof REMOVE_IMAGE | UploadedImage
 
@@ -30,16 +34,18 @@ const toPreviewUrl = (state: ProfileImageState, currentUrl: string | null) => {
 
 export type ProfileSettingsWidgetProps = {
     settings: ProfileSettings
+    blockedUsers: PostAuthor[]
     isUploadEnabled: boolean
 }
 
-export const ProfileSettingsWidget: FC<ProfileSettingsWidgetProps> = ({ settings, isUploadEnabled }) => {
+export const ProfileSettingsWidget: FC<ProfileSettingsWidgetProps> = ({ settings, blockedUsers, isUploadEnabled }) => {
     const [avatarState, setAvatarState] = useState<ProfileImageState>(KEEP_IMAGE)
     const [bannerState, setBannerState] = useState<ProfileImageState>(KEEP_IMAGE)
     const router = useRouter()
     const uploadAvatar = useUploadImage(AVATAR_KIND)
     const uploadBanner = useUploadImage(BANNER_KIND)
     const updateProfile = useUpdateProfile()
+    const unblockUser = useUnblockUser()
 
     const handleSubmit = async (values: ProfileSettingsFormValues) => {
         try {
@@ -76,6 +82,12 @@ export const ProfileSettingsWidget: FC<ProfileSettingsWidgetProps> = ({ settings
                 }}
                 isPending={updateProfile.isPending}
                 onSubmit={handleSubmit}
+            />
+            <UsernameChangeWidget currentUsername={settings.username} />
+            <BlockedUsersSection
+                users={blockedUsers}
+                isPending={unblockUser.isPending}
+                onUnblock={(userId) => unblockUser.mutate(userId, { onSuccess: () => router.refresh() })}
             />
             <div aria-hidden className='min-h-0 flex-1 bg-card' />
         </div>

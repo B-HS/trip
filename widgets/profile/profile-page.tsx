@@ -1,3 +1,4 @@
+import { getBlockedIds } from '@/entities/community/community.cache'
 import { findPostsByAuthor } from '@/entities/community/community.repository'
 import { findLikedTrips, findPublicTripsByOwner } from '@/entities/profile/profile.repository'
 import type { ProfileTab } from '@/entities/profile/profile.validate'
@@ -7,6 +8,7 @@ import { PostList } from '@/features/community/post-list'
 import { PublicTripGrid } from '@/features/community/public-trip-grid'
 import { SectionHeading } from '@/features/community/section-heading'
 import { ProfileHeader } from '@/features/profile/profile-header'
+import { ProfileModerationWidget } from '@/widgets/profile/profile-moderation-widget'
 import { ProfileTabs } from '@/features/profile/profile-tabs'
 import { EMPTY_LIKED_TRIP_LABEL, EMPTY_POST_LABEL, EMPTY_TRIP_LABEL, PAGE_PARAM, PROFILE_TAB_PARAM } from '@/shared/constant/community'
 
@@ -28,13 +30,18 @@ export type ProfilePageProps = {
 }
 
 export const ProfilePage = async ({ profile, username, tab, page, isOwner, viewerId = null }: ProfilePageProps) => {
-    const posts = tab === 'posts' ? await findPostsByAuthor(profile.id, page, viewerId) : null
-    const trips = await findTripPage(tab, profile.id, page)
+    const [posts, trips] = await Promise.all([
+        tab === 'posts' ? findPostsByAuthor(profile.id, page, viewerId) : Promise.resolve(null),
+        findTripPage(tab, profile.id, page),
+    ])
     const pageInfo = posts ?? trips
+    const canModerate = viewerId !== null && !isOwner
+    const isBlocked = viewerId === null ? false : (await getBlockedIds(viewerId)).includes(profile.id)
 
     return (
         <div className='flex flex-1 flex-col gap-px'>
             <ProfileHeader profile={profile} username={username} isOwner={isOwner} />
+            {canModerate && <ProfileModerationWidget userId={profile.id} isBlocked={isBlocked} />}
             <ProfileTabs activeTab={tab} />
             <section className='flex flex-col gap-px'>
                 <SectionHeading title={TAB_SECTION_TITLE[tab]} />

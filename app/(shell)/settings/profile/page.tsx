@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { findBlockedUsersForUser } from '@/entities/community/community.repository.block'
 import { findProfileSettings } from '@/entities/profile/profile.repository'
 import { getUploadConfig } from '@/shared/lib/r2'
 import { requireUser } from '@/shared/lib/session'
@@ -11,10 +12,10 @@ export const metadata: Metadata = {
 
 const ProfileSettingsPage = async () => {
     const user = await requireUser()
-    const settings = await findProfileSettings(user.id)
+    const [settings, blockedUsers] = await Promise.all([findProfileSettings(user.id), findBlockedUsersForUser(user.id)])
     if (settings === null) notFound()
 
-    return <ProfileSettingsWidget settings={settings} isUploadEnabled={getUploadConfig() !== null} />
+    return <ProfileSettingsWidget settings={settings} blockedUsers={blockedUsers} isUploadEnabled={getUploadConfig() !== null} />
 }
 
 export default ProfileSettingsPage

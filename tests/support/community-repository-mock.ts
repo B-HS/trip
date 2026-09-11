@@ -42,6 +42,16 @@ mock.module('@/entities/community/community.repository', () => ({
     findBoards: async () => [MOCK_BOARD],
     findLatestPostsByBoard: async () => [],
     findPostsByAuthor: async () => MOCK_POST_PAGE,
+    findPostPage: async () => MOCK_POST_PAGE,
+    findPostDetail: async () => null,
+    findBoardByKey: async () => MOCK_BOARD,
+    findBoardKeyByPostId: async () => MOCK_BOARD.key,
+    incrementPostView: async () => {},
+    createPost: async () => ({ id: 'post-1' }),
+    updatePost: async () => ({ id: 'post-1' }),
+    deletePost: async () => ({ id: 'post-1' }),
+    restorePost: async () => ({ id: 'post-1' }),
+    findAttachTripOptions: async () => [],
 }))
 
 mock.module('@/entities/trip/trip.repository.explore', () => ({

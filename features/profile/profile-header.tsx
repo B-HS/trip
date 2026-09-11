@@ -21,7 +21,7 @@ export type ProfileHeaderProps = {
 
 export const ProfileHeader: FC<ProfileHeaderProps> = ({ profile, username, isOwner }) => (
     <header className='flex flex-col gap-px'>
-        <div className='relative aspect-3/1 w-full bg-muted'>
+        <div className='relative aspect-3/1 max-h-64 w-full bg-muted'>
             {profile.bannerUrl !== null && <Image className='object-cover' src={profile.bannerUrl} alt='' sizes={BANNER_SIZES} fill />}
         </div>
         <div className='flex flex-col gap-2 bg-card p-3'>
