@@ -1,6 +1,5 @@
 'use client'
 
-import { useMemo } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from 'cn'
 import { useTranslations } from 'next-intl'
@@ -137,7 +136,7 @@ function FieldError({
     errors?: Array<{ message?: string } | undefined>
 }) {
     const t = useTranslations()
-    const content = useMemo(() => {
+    const content = (() => {
         if (children) {
             return children
         }
@@ -158,7 +157,7 @@ function FieldError({
                 {uniqueErrors.map((error, index) => error?.message && <li key={index}>{translateMessage(t, error.message)}</li>)}
             </ul>
         )
-    }, [children, errors, t])
+    })()
 
     if (!content) {
         return null

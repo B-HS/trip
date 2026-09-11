@@ -68,26 +68,19 @@ function Carousel({ orientation = 'horizontal', opts, setApi, plugins, className
         () => false,
     )
 
-    const scrollPrev = React.useCallback(() => {
-        api?.scrollPrev()
-    }, [api])
+    const scrollPrev = () => api?.scrollPrev()
 
-    const scrollNext = React.useCallback(() => {
-        api?.scrollNext()
-    }, [api])
+    const scrollNext = () => api?.scrollNext()
 
-    const handleKeyDown = React.useCallback(
-        (event: React.KeyboardEvent<HTMLDivElement>) => {
-            if (event.key === 'ArrowLeft') {
-                event.preventDefault()
-                scrollPrev()
-            } else if (event.key === 'ArrowRight') {
-                event.preventDefault()
-                scrollNext()
-            }
-        },
-        [scrollPrev, scrollNext],
-    )
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === 'ArrowLeft') {
+            event.preventDefault()
+            scrollPrev()
+        } else if (event.key === 'ArrowRight') {
+            event.preventDefault()
+            scrollNext()
+        }
+    }
 
     React.useEffect(() => {
         if (!api || !setApi) return
