@@ -495,5 +495,156 @@
         "deletedComment": "(삭제된 댓글)",
         "withdrawnUser": "(탈퇴한 사용자)",
         "noTarget": "(대상 없음)"
+    },
+    "tripViewer": {
+        "memoIdle": "입력하면 자동 저장됩니다.",
+        "memoSaving": "저장 중…",
+        "memoSaved": "저장됨",
+        "publicNotice": "공개 보기 · 편집·체크는 로그인한 멤버만 가능합니다.",
+        "loadFailed": "여행을 불러오지 못했습니다",
+        "requestFailed": "요청이 실패했습니다. 잠시 후 다시 시도하세요.",
+        "printAll": "전체 일정 인쇄",
+        "noDays": "등록된 날짜가 없습니다.",
+        "resetTitle": "이 날짜의 완료 체크를 모두 초기화할까요?",
+        "resetDescription": "{title}의 완료 표시가 모두 해제됩니다. 다른 날짜와 메모는 그대로 유지됩니다.",
+        "defaultDayTitle": "선택한 날짜",
+        "reset": "초기화",
+        "cancel": "취소",
+        "infoTitle": "여행 정보와 확인 사항",
+        "viewTabsAria": "보기 선택",
+        "bookingsTitle": "예매 체크리스트",
+        "storageHint": "완료 표시는 내 계정에 저장됩니다. 체크해도 실제 예약·결제는 진행되지 않습니다.",
+        "attachmentAlt": "예매 첨부 이미지",
+        "completedRatioMark": "{ratio} 완료 표시",
+        "completedRatioAria": "예매 완료 표시 수",
+        "bookingCheckAria": "{title} 완료 표시",
+        "planStatusNote": "계획 작성 시 상태: {status}",
+        "dayNavAria": "여행 날짜",
+        "prevDayAria": "이전 날짜 보기",
+        "nextDayAria": "다음 날짜 보기",
+        "pickDateAria": "달력에서 날짜 선택",
+        "scheduleDoneAria": "{time} {title} 완료",
+        "mapOpenAria": "{title} Google 지도에서 열기",
+        "openMap": "지도 열기",
+        "minutesUnit": "{minutes}분",
+        "completedCount": "{ratio} 완료",
+        "dayProgressAria": "{title} 일정 완료율",
+        "showCompleted": "완료 표시",
+        "hideCompleted": "완료 숨기기",
+        "resetChecks": "체크 초기화",
+        "itemLabel": "항목",
+        "verifiedLabel": "확인된 내용",
+        "travelTimeCalc": "이동시간 계산",
+        "emptyDayTitle": "등록된 일정이 없습니다",
+        "emptyDayDescription": "이 날은 아직 비어 있습니다.",
+        "dayMemo": "이날 메모",
+        "dayMemoPlaceholder": "예약번호, 식당, 준비물 등을 적어두세요",
+        "sidebarCompleted": "{ratio} 일정 완료",
+        "sidebarProgressAria": "전체 일정 완료율",
+        "sidebarDestinations": "목적지",
+        "sidebarConfirmedFlights": "확정 항공편",
+        "sidebarDepartures": "모든 날의 출발점",
+        "sidebarLodgingMap": "숙소 위치 확인",
+        "sidebarLinks": "링크",
+        "sidebarVerifiedOn": "정보 확인 {date}",
+        "tableDate": "날짜",
+        "tableMorning": "오전",
+        "tableAfternoon": "오후",
+        "tableEvening": "저녁",
+        "dateFormat": "M월 D일",
+        "dateFormatShort": "D일"
+    },
+    "trips": {
+        "list": {
+            "title": "내 트립",
+            "description": "참여 중인 트립을 모아 봅니다. 카드를 열면 일정과 예매 체크리스트로 이동합니다.",
+            "globeHint": "목적지나 항공편을 등록하면 전체 경로가 지구본에 표시됩니다.",
+            "newTrip": "새 트립",
+            "creating": "만드는 중…",
+            "template": "오사카 예시 트립 만들기",
+            "removeRouteFilter": "{code} 필터 해제",
+            "stats": {
+                "count": "트립 수",
+                "schedules": "일정 수",
+                "bookings": "예매 항목",
+                "ongoing": "진행 중"
+            }
+        },
+        "create": {
+            "title": "새 트립",
+            "description": "기본 정보만 먼저 만들고 편집기에서 일정을 채우거나, 예시 트립으로 바로 시작하세요.",
+            "blank": "빈 트립 만들기",
+            "templateTitle": "예시로 시작하기",
+            "templateDescription": "원본 오사카 일정을 그대로 옮긴 예시입니다. 만든 뒤 편집기에서 날짜와 일정을 원하는 대로 바꿀 수 있습니다.",
+            "days": "{n}일",
+            "schedules": "{n}개 일정",
+            "routes": "{n}개 이동 경로",
+            "bookings": "{n}개 예매 항목",
+            "labels": {
+                "title": "제목",
+                "destination": "목적지",
+                "country": "나라",
+                "countryHint": "여행하는 순서대로 나라와 도시를 추가하세요. 지구본 경로에 사용됩니다.",
+                "city": "도시",
+                "cityOptional": "도시 (선택)",
+                "removeCity": "{index}번째 도시 삭제",
+                "removeCountry": "{index}번째 나라 삭제",
+                "addCountry": "나라 추가",
+                "eyebrow": "한 줄 소개",
+                "eyebrowHint": "목록과 상세 화면의 제목 위에 표시됩니다. 비워 둬도 됩니다.",
+                "startDate": "시작일",
+                "endDate": "종료일",
+                "periodNote": "기간 메모",
+                "submit": "트립 만들기",
+                "submitting": "만드는 중…"
+            },
+            "placeholders": {
+                "title": "오사카 여행 노트",
+                "destination": "오사카",
+                "periodNote": "6박 7일 · 예비일 하루"
+            }
+        },
+        "empty": {
+            "title": "아직 트립이 없습니다",
+            "description": "새 트립을 만들거나 오사카 예시 트립으로 구조를 먼저 살펴보세요.",
+            "newTrip": "새 트립",
+            "creating": "만드는 중…",
+            "template": "오사카 예시 트립 만들기"
+        },
+        "error": {
+            "title": "트립 목록을 불러오지 못했습니다",
+            "retry": "다시 시도",
+            "retrying": "다시 불러오는 중…"
+        },
+        "card": {
+            "favoriteAdd": "즐겨찾기 추가",
+            "favoriteRemove": "즐겨찾기 해제",
+            "menuAria": "{title} 메뉴 열기",
+            "open": "열기",
+            "edit": "편집",
+            "delete": "삭제",
+            "destination": "목적지",
+            "period": "기간",
+            "route": "경로",
+            "meta": "일정 {scheduleCount} · 예매 {bookingCount} · {lengthLabel}"
+        },
+        "status": {
+            "upcoming": "예정 D-{days}",
+            "done": "완료",
+            "ongoing": "진행 중"
+        },
+        "length": {
+            "nightsDays": "{nights}박 {days}일"
+        },
+        "summary": {
+            "more": "외 {count}개"
+        },
+        "deleteDialog": {
+            "title": "트립을 삭제할까요?",
+            "description": "{title}의 날짜별 일정과 예매 목록, 멤버가 함께 삭제됩니다. 되돌릴 수 없습니다.",
+            "cancel": "취소",
+            "delete": "삭제",
+            "deleting": "삭제 중…"
+        }
     }
 }

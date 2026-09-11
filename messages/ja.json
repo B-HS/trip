@@ -508,5 +508,156 @@
         "deletedComment": "（削除されたコメント）",
         "withdrawnUser": "（退会したユーザー）",
         "noTarget": "（対象なし）"
+    },
+    "tripViewer": {
+        "memoIdle": "入力すると自動保存されます。",
+        "memoSaving": "保存中…",
+        "memoSaved": "保存済み",
+        "publicNotice": "公開表示 · 編集・チェックはログインしたメンバーのみ可能です。",
+        "loadFailed": "旅行を読み込めませんでした",
+        "requestFailed": "リクエストに失敗しました。しばらくしてからもう一度お試しください。",
+        "printAll": "全体行程を印刷",
+        "noDays": "登録された日付がありません。",
+        "resetTitle": "この日の完了チェックをすべて初期化しますか？",
+        "resetDescription": "{title}の完了マークがすべて解除されます。他の日付とメモはそのまま維持されます。",
+        "defaultDayTitle": "選択した日",
+        "reset": "初期化",
+        "cancel": "キャンセル",
+        "infoTitle": "旅行情報と確認事項",
+        "viewTabsAria": "表示選択",
+        "bookingsTitle": "予約チェックリスト",
+        "storageHint": "完了マークは自分のアカウントに保存されます。チェックしても実際の予約・決済は行われません。",
+        "attachmentAlt": "予約添付画像",
+        "completedRatioMark": "{ratio} 完了表示",
+        "completedRatioAria": "予約完了表示数",
+        "bookingCheckAria": "{title} を完了表示",
+        "planStatusNote": "計画作成時の状態: {status}",
+        "dayNavAria": "旅行の日付",
+        "prevDayAria": "前の日を見る",
+        "nextDayAria": "次の日を見る",
+        "pickDateAria": "カレンダーで日付を選択",
+        "scheduleDoneAria": "{time} {title} 完了",
+        "mapOpenAria": "{title} を Google マップで開く",
+        "openMap": "地図を開く",
+        "minutesUnit": "{minutes}分",
+        "completedCount": "{ratio} 完了",
+        "dayProgressAria": "{title} 行程完了率",
+        "showCompleted": "完了表示",
+        "hideCompleted": "完了を隠す",
+        "resetChecks": "チェックを初期化",
+        "itemLabel": "項目",
+        "verifiedLabel": "確認済み内容",
+        "travelTimeCalc": "移動時間計算",
+        "emptyDayTitle": "登録された行程がありません",
+        "emptyDayDescription": "この日はまだ空です。",
+        "dayMemo": "この日のメモ",
+        "dayMemoPlaceholder": "予約番号、レストラン、持ち物などを書き留めてください",
+        "sidebarCompleted": "{ratio} 行程完了",
+        "sidebarProgressAria": "全体行程完了率",
+        "sidebarDestinations": "目的地",
+        "sidebarConfirmedFlights": "確定便",
+        "sidebarDepartures": "毎日の出発点",
+        "sidebarLodgingMap": "宿の位置を確認",
+        "sidebarLinks": "リンク",
+        "sidebarVerifiedOn": "情報確認 {date}",
+        "tableDate": "日付",
+        "tableMorning": "午前",
+        "tableAfternoon": "午後",
+        "tableEvening": "夕方",
+        "dateFormat": "M月D日",
+        "dateFormatShort": "D日"
+    },
+    "trips": {
+        "list": {
+            "title": "マイトリップ",
+            "description": "参加中のトリップをまとめて見ます。カードを開くと行程と予約チェックリストへ移動します。",
+            "globeHint": "目的地や航空便を登録すると全体ルートが地球儀に表示されます。",
+            "newTrip": "新しいトリップ",
+            "creating": "作成中…",
+            "template": "大阪サンプルトリップを作る",
+            "removeRouteFilter": "{code} フィルターを解除",
+            "stats": {
+                "count": "トリップ数",
+                "schedules": "行程数",
+                "bookings": "予約項目",
+                "ongoing": "進行中"
+            }
+        },
+        "create": {
+            "title": "新しいトリップ",
+            "description": "基本情報だけ先に作って編集器で行程を埋めるか、サンプルトリップで今すぐ始めましょう。",
+            "blank": "空のトリップを作る",
+            "templateTitle": "サンプルで始める",
+            "templateDescription": "原版大阪行程をそのまま移したサンプルです。作成後、編集器で日付と行程を自由に変えられます。",
+            "days": "{n}日間",
+            "schedules": "{n}件の行程",
+            "routes": "{n}件の移動ルート",
+            "bookings": "{n}件の予約項目",
+            "labels": {
+                "title": "タイトル",
+                "destination": "目的地",
+                "country": "国",
+                "countryHint": "旅行する順番대로国と都市を追加してください。地球儀ルートに使用されます。",
+                "city": "都市",
+                "cityOptional": "都市（任意）",
+                "removeCity": "{index}番目の都市を削除",
+                "removeCountry": "{index}番目の国を削除",
+                "addCountry": "国を追加",
+                "eyebrow": "一行紹介",
+                "eyebrowHint": "一覧と詳細画面のタイトル上に表示されます。空でも構いません。",
+                "startDate": "開始日",
+                "endDate": "終了日",
+                "periodNote": "期間メモ",
+                "submit": "トリップを作る",
+                "submitting": "作成中…"
+            },
+            "placeholders": {
+                "title": "大阪旅行ノート",
+                "destination": "大阪",
+                "periodNote": "6泊7日 · 予備日1日"
+            }
+        },
+        "empty": {
+            "title": "まだトリップがありません",
+            "description": "新しいトリップを作るか、大阪サンプルトリップで構造を先に眺めてください。",
+            "newTrip": "新しいトリップ",
+            "creating": "作成中…",
+            "template": "大阪サンプルトリップを作る"
+        },
+        "error": {
+            "title": "トリップ一覧を読み込めませんでした",
+            "retry": "再試行",
+            "retrying": "再読み込み中…"
+        },
+        "card": {
+            "favoriteAdd": "お気に入りに追加",
+            "favoriteRemove": "お気に入りから解除",
+            "menuAria": "{title} メニューを開く",
+            "open": "開く",
+            "edit": "編集",
+            "delete": "削除",
+            "destination": "目的地",
+            "period": "期間",
+            "route": "経路",
+            "meta": "行程 {scheduleCount} · 予約 {bookingCount} · {lengthLabel}"
+        },
+        "status": {
+            "upcoming": "予定 D-{days}",
+            "done": "完了",
+            "ongoing": "進行中"
+        },
+        "length": {
+            "nightsDays": "{nights}泊 {days}日"
+        },
+        "summary": {
+            "more": "他 {count}件"
+        },
+        "deleteDialog": {
+            "title": "このトリップを削除しますか？",
+            "description": "{title}の日別行程と予約一覧、メンバーが一緒に削除されます。元に戻せません。",
+            "cancel": "キャンセル",
+            "delete": "削除",
+            "deleting": "削除中…"
+        }
     }
 }

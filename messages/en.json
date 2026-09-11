@@ -508,5 +508,156 @@
         "deletedComment": "(deleted comment)",
         "withdrawnUser": "(withdrawn user)",
         "noTarget": "(no target)"
+    },
+    "tripViewer": {
+        "memoIdle": "Auto-saves as you type.",
+        "memoSaving": "Saving…",
+        "memoSaved": "Saved",
+        "publicNotice": "Public view · editing and checks are for signed-in members only.",
+        "loadFailed": "Failed to load the trip",
+        "requestFailed": "The request failed. Please try again shortly.",
+        "printAll": "Print full itinerary",
+        "noDays": "No dates registered.",
+        "resetTitle": "Reset all completion checks for this day?",
+        "resetDescription": "Completion marks for {title} will be cleared. Other days and notes stay as they are.",
+        "defaultDayTitle": "Selected day",
+        "reset": "Reset",
+        "cancel": "Cancel",
+        "infoTitle": "Travel info and confirmations",
+        "viewTabsAria": "View selection",
+        "bookingsTitle": "Booking checklist",
+        "storageHint": "Completion marks are saved to your account. Checking does not make real bookings or payments.",
+        "attachmentAlt": "Booking attachment image",
+        "completedRatioMark": "{ratio} marked done",
+        "completedRatioAria": "Bookings marked done",
+        "bookingCheckAria": "Mark {title} done",
+        "planStatusNote": "Status when plan is written: {status}",
+        "dayNavAria": "Trip dates",
+        "prevDayAria": "View previous day",
+        "nextDayAria": "View next day",
+        "pickDateAria": "Pick a date in the calendar",
+        "scheduleDoneAria": "{time} {title} done",
+        "mapOpenAria": "Open {title} in Google Maps",
+        "openMap": "Open map",
+        "minutesUnit": "{minutes} min",
+        "completedCount": "{ratio} done",
+        "dayProgressAria": "{title} schedule completion",
+        "showCompleted": "Show done",
+        "hideCompleted": "Hide done",
+        "resetChecks": "Reset checks",
+        "itemLabel": "Item",
+        "verifiedLabel": "Verified",
+        "travelTimeCalc": "Travel time calculation",
+        "emptyDayTitle": "No schedules registered",
+        "emptyDayDescription": "This day is still empty.",
+        "dayMemo": "Day memo",
+        "dayMemoPlaceholder": "Write reservation numbers, restaurants, preparations, etc.",
+        "sidebarCompleted": "{ratio} schedules done",
+        "sidebarProgressAria": "Overall schedule completion",
+        "sidebarDestinations": "Destinations",
+        "sidebarConfirmedFlights": "Confirmed flights",
+        "sidebarDepartures": "Departure points of every day",
+        "sidebarLodgingMap": "Check lodging location",
+        "sidebarLinks": "Links",
+        "sidebarVerifiedOn": "Info verified {date}",
+        "tableDate": "Date",
+        "tableMorning": "Morning",
+        "tableAfternoon": "Afternoon",
+        "tableEvening": "Evening",
+        "dateFormat": "MMM D",
+        "dateFormatShort": "D"
+    },
+    "trips": {
+        "list": {
+            "title": "My trips",
+            "description": "Browse the trips you are part of. Open a card to jump to the itinerary and booking checklist.",
+            "globeHint": "Register destinations or flights and the full route appears on the globe.",
+            "newTrip": "New trip",
+            "creating": "Creating…",
+            "template": "Create the Osaka sample trip",
+            "removeRouteFilter": "Clear {code} filter",
+            "stats": {
+                "count": "Trips",
+                "schedules": "Schedules",
+                "bookings": "Bookings",
+                "ongoing": "Ongoing"
+            }
+        },
+        "create": {
+            "title": "New trip",
+            "description": "Create with the basics first and fill the itinerary in the editor, or start right away with the sample trip.",
+            "blank": "Create a blank trip",
+            "templateTitle": "Start with the sample",
+            "templateDescription": "A sample that mirrors the original Osaka itinerary. After creating, you can change dates and schedules in the editor.",
+            "days": "{n} days",
+            "schedules": "{n} schedules",
+            "routes": "{n} routes",
+            "bookings": "{n} bookings",
+            "labels": {
+                "title": "Title",
+                "destination": "Destination",
+                "country": "Country",
+                "countryHint": "Add countries and cities in travel order. Used for the globe route.",
+                "city": "City",
+                "cityOptional": "City (optional)",
+                "removeCity": "Remove city #{index}",
+                "removeCountry": "Remove country #{index}",
+                "addCountry": "Add country",
+                "eyebrow": "One-line intro",
+                "eyebrowHint": "Shown above the title on list and detail screens. You can leave it empty.",
+                "startDate": "Start date",
+                "endDate": "End date",
+                "periodNote": "Period note",
+                "submit": "Create trip",
+                "submitting": "Creating…"
+            },
+            "placeholders": {
+                "title": "Osaka travel notes",
+                "destination": "Osaka",
+                "periodNote": "6 nights 7 days · 1 spare day"
+            }
+        },
+        "empty": {
+            "title": "No trips yet",
+            "description": "Create a new trip or explore the structure with the Osaka sample trip.",
+            "newTrip": "New trip",
+            "creating": "Creating…",
+            "template": "Create the Osaka sample trip"
+        },
+        "error": {
+            "title": "Failed to load the trip list",
+            "retry": "Try again",
+            "retrying": "Reloading…"
+        },
+        "card": {
+            "favoriteAdd": "Add to favorites",
+            "favoriteRemove": "Remove from favorites",
+            "menuAria": "Open menu for {title}",
+            "open": "Open",
+            "edit": "Edit",
+            "delete": "Delete",
+            "destination": "Destination",
+            "period": "Period",
+            "route": "Route",
+            "meta": "{scheduleCount} schedules · {bookingCount} bookings · {lengthLabel}"
+        },
+        "status": {
+            "upcoming": "Starts in D-{days}",
+            "done": "Done",
+            "ongoing": "Ongoing"
+        },
+        "length": {
+            "nightsDays": "{nights} nights {days} days"
+        },
+        "summary": {
+            "more": "and {count} more"
+        },
+        "deleteDialog": {
+            "title": "Delete this trip?",
+            "description": "The itinerary, bookings and members of {title} will be deleted together. This cannot be undone.",
+            "cancel": "Cancel",
+            "delete": "Delete",
+            "deleting": "Deleting…"
+        }
     }
 }

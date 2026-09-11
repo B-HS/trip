@@ -26,6 +26,19 @@ let pathnameSnapshot = '/'
 
 mock.module('next/link', () => ({ default: LinkStub }))
 mock.module('next/navigation', () => ({ usePathname: () => pathnameSnapshot }))
+mock.module('@/i18n/navigation', () => ({
+    Link: LinkStub,
+    usePathname: () => pathnameSnapshot,
+    useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {}, back: () => {}, forward: () => {}, refresh: () => {} }),
+    redirect: () => {
+        throw new Error('NEXT_REDIRECT')
+    },
+}))
+mock.module('@/i18n/navigation', () => ({
+    Link: LinkStub,
+    usePathname: () => pathnameSnapshot,
+    useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {}, back: () => {}, forward: () => {}, refresh: () => {} }),
+}))
 mock.module('@/shared/lib/auth-client', () => ({ useSession: () => sessionSnapshot }))
 mock.module('@/shared/ui/dropdown-menu', () => ({
     DropdownMenu: Passthrough,
