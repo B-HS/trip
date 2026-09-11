@@ -6,11 +6,11 @@ export const metadata: Metadata = {
 }
 
 const BoardsPage = () => {
-    return <div className='max-w-7xl mx-auto'>
-        <BoardsIndex />
-    </div>
-
+    return (
+        <div className='mx-auto max-w-7xl'>
+            <BoardsIndex />
+        </div>
+    )
 }
-
 
 export default BoardsPage

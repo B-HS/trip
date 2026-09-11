@@ -40,7 +40,7 @@ const PostPage = async ({ params }: PostPageProps) => {
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
-            <div className={cn('flex flex-1 flex-col gap-px', !session?.user.id && 'max-w-7xl mx-auto')}>
+            <div className={cn('flex flex-1 flex-col gap-px', !session?.user.id && 'mx-auto max-w-7xl')}>
                 <PostDetailWidget post={postView} html={html} viewer={viewer} />
                 <CommentsWidget
                     postId={post.id}
