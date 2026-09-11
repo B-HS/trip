@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import type { FC } from 'react'
 import type { ReportView } from '@/entities/community/community.type'
 import { AuthorChip } from '@/features/community/author-chip'
@@ -5,6 +6,7 @@ import {
     BLOCK_LABEL,
     DISMISS_LABEL,
     HIDE_LABEL,
+    POST_DATE_FORMAT,
     REPORT_KIND_LABEL,
     REPORT_REASON_LABEL,
     RESTORE_LABEL,
@@ -30,7 +32,7 @@ export const ReportRow: FC<ReportRowProps> = ({ report, isPending, onHide, onDis
                 <Badge variant='secondary'>{REPORT_KIND_LABEL[report.kind]}</Badge>
                 <Badge variant='outline'>{REPORT_REASON_LABEL[report.reason]}</Badge>
                 <time className='tabular-nums' dateTime={report.createdAt}>
-                    {report.createdAt.slice(0, 16).replace('T', ' ')}
+                    {dayjs(report.createdAt).format(POST_DATE_FORMAT)}
                 </time>
             </div>
             <p className='text-sm break-keep'>{report.targetLabel ?? '(대상 없음)'}</p>
