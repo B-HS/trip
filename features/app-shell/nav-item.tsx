@@ -2,7 +2,6 @@
 
 import type { LucideIcon } from 'lucide-react'
 import { motion } from 'motion/react'
-import type { Route } from 'next'
 import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import { cn } from '@/shared/lib/utils'
@@ -11,13 +10,13 @@ import { MOTION_EASE_STANDARD, MOTION_FADE_DURATION } from '@/shared/lib/motion'
 export const NAV_ACTIVE_LAYOUT_ID = 'app-shell-nav-active'
 
 export type NavChildLink<T extends string = string> = {
-    href: Route<T>
+    href: T
     label: string
     matchPrefix?: boolean
 }
 
 export type NavItemLink<T extends string = string> = {
-    href: Route
+    href: string
     label: string
     icon: LucideIcon
     matchPrefix?: boolean

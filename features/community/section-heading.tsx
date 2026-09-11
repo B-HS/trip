@@ -1,12 +1,11 @@
 import { useTranslations } from 'next-intl'
-import type { Route } from 'next'
 import { Link } from '@/i18n/navigation'
 import { Button } from '@/shared/ui/button'
 
 export type SectionHeadingProps<T extends string> = {
     title: string
     description?: string
-    moreHref?: Route<T>
+    moreHref?: T
     moreLabel?: string
 }
 

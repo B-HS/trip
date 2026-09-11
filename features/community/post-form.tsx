@@ -3,7 +3,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
-import type { Route } from 'next'
 import { Link } from '@/i18n/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import type { UploadedImage } from '@/entities/upload/upload.type'
@@ -30,7 +29,7 @@ export type PostFormTrip = {
 export type PostFormProps<T extends string> = {
     defaultValues: PostFormInput
     trips: PostFormTrip[]
-    cancelHref: Route<T>
+    cancelHref: T
     isUploadEnabled: boolean
     isUploading: boolean
     isPending: boolean

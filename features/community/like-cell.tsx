@@ -1,6 +1,5 @@
 import { HeartIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import type { Route } from 'next'
 import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import { Button } from '@/shared/ui/button'
@@ -9,7 +8,7 @@ export type LikeCellProps = {
     count: number
     isLiked: boolean
     isPending: boolean
-    loginHref: Route | null
+    loginHref: string | null
     onToggle: () => void
 }
 

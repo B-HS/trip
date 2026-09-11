@@ -1,11 +1,10 @@
 import { useTranslations } from 'next-intl'
-import type { Route } from 'next'
 import { SEARCH_QUERY_MAX_LENGTH, SEARCH_QUERY_PARAM } from '@/shared/constant/community'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 
 export type SearchFormProps<T extends string> = {
-    action: Route<T>
+    action: T
     defaultQuery: string
     placeholder?: string
 }

@@ -17,7 +17,7 @@ const BOARD_MENU_CONTENT_CLASS = 'flex min-w-36 flex-col gap-px rounded-none bg-
 const BOARD_MENU_ITEM_CLASS =
     'rounded-none bg-card px-4 py-2.5 text-xs font-medium focus:bg-muted focus:text-foreground aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground'
 
-type BoardMenuHref = `${typeof BOARDS_PATH}/${(typeof DEFAULT_BOARDS)[number]['key']}`
+type BoardMenuHref = typeof BOARDS_PATH | `${typeof BOARDS_PATH}/${(typeof DEFAULT_BOARDS)[number]['key']}`
 
 type BoardMenuItem = NavActiveTarget<BoardMenuHref> & { label: string }
 

@@ -1,5 +1,4 @@
 import { useTranslations } from 'next-intl'
-import type { Route } from 'next'
 import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import { Button } from '@/shared/ui/button'
@@ -11,7 +10,7 @@ const PAGE_STEP = 1
 export type PaginationCellsProps = {
     page: number
     pageCount: number
-    buildHref: (page: number) => Route
+    buildHref: (page: number) => string
 }
 
 export const PaginationCells: FC<PaginationCellsProps> = ({ page, pageCount, buildHref }) => {
