@@ -43,9 +43,9 @@ CREATE TABLE `trip_developer_api_rate_limit` (
 	CONSTRAINT `trip_developer_api_rate_limit_token_id_bucket_pk` PRIMARY KEY(`token_id`,`bucket`)
 );
 --> statement-breakpoint
-ALTER TABLE `trip_developer_api_idempotency` ADD CONSTRAINT `trip_developer_api_idempotency_token_id_trip_developer_api_token_id_fk` FOREIGN KEY (`token_id`) REFERENCES `trip_developer_api_token`(`id`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `trip_developer_api_idempotency` ADD CONSTRAINT `developer_api_idempotency_token_fk` FOREIGN KEY (`token_id`) REFERENCES `trip_developer_api_token`(`id`) ON DELETE cascade ON UPDATE no action;
 --> statement-breakpoint
-ALTER TABLE `trip_developer_api_rate_limit` ADD CONSTRAINT `trip_developer_api_rate_limit_token_id_trip_developer_api_token_id_fk` FOREIGN KEY (`token_id`) REFERENCES `trip_developer_api_token`(`id`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `trip_developer_api_rate_limit` ADD CONSTRAINT `developer_api_rate_limit_token_fk` FOREIGN KEY (`token_id`) REFERENCES `trip_developer_api_token`(`id`) ON DELETE cascade ON UPDATE no action;
 --> statement-breakpoint
 CREATE INDEX `developer_api_idempotency_claimed_idx` ON `trip_developer_api_idempotency` (`claimed_at`);
 --> statement-breakpoint
