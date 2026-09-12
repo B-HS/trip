@@ -5,7 +5,10 @@ import { getEnv } from '@/shared/lib/env'
 
 export const enqueueAiJob = async (jobId: string) => {
     const env = getEnv()
-    if (env.VERCEL_ENV || env.VERCEL_QUEUE_REGION) {
+    // The SDK obtains its bearer token from Vercel OIDC. A region alone is not
+    // enough to authenticate a local process, so use the documented REST
+    // fallback whenever explicit queue credentials are supplied outside Vercel.
+    if (env.VERCEL_ENV) {
         await send('ai-job', { jobId }, { idempotencyKey: jobId, retentionSeconds: 24 * 60 * 60, region: env.VERCEL_QUEUE_REGION as never })
         return
     }

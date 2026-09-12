@@ -29,6 +29,7 @@ export async function GET() {
         `- [Home](${SITE_URL}/): Product overview and public community highlights.`,
         `- [Explore](${SITE_URL}/explore): Public travel itineraries.`,
         `- [Boards](${SITE_URL}/boards): Public community boards and discussions.`,
+        `- [Developer docs](${SITE_URL}/developers): Public owner-scoped API guide and OpenAPI specification link.`,
         `- [Sitemap](${SITE_URL}/sitemap.xml): Complete crawlable URL index with locale alternates.`,
     ]
 

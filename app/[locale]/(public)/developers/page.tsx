@@ -19,9 +19,9 @@ export default async function DevelopersPage() {
                 <h1 className='max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl'>{t('title')}</h1>
                 <p className='max-w-2xl text-base text-muted-foreground'>{t('description')}</p>
                 <div className='flex flex-wrap gap-px bg-background'>
-                    <Link href='/api/v1/openapi.json' className='bg-primary px-4 py-3 text-sm text-primary-foreground'>
+                    <a href='/api/v1/openapi.json' className='bg-primary px-4 py-3 text-sm text-primary-foreground'>
                         {t('openapi')}
-                    </Link>
+                    </a>
                     <Link href='/login' className='bg-card px-4 py-3 text-sm'>
                         {t('getStarted')}
                     </Link>
