@@ -1,5 +1,5 @@
 import { CalendarIcon, HeartIcon, MapPinIcon, PlaneIcon } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import type { FC } from 'react'
 import type { PublicTripCard as PublicTripCardItem } from '@/entities/trip/trip.type'
@@ -16,8 +16,12 @@ export type PublicTripCardProps = {
 export const PublicTripCard: FC<PublicTripCardProps> = ({ trip }) => {
     const t = useTranslations('community.tripCard')
     const tCounts = useTranslations('community.counts')
+    const locale = useLocale()
     const routeLabel = resolveTripRouteLabel(trip.flights)
-    const lengthLabel = formatTripLength({ startDate: trip.startDate, endDate: trip.endDate, nights: trip.customNights, days: trip.customDays })
+    const lengthLabel = formatTripLength(
+        { startDate: trip.startDate, endDate: trip.endDate, nights: trip.customNights, days: trip.customDays },
+        locale,
+    )
 
     return (
         <article className='relative flex h-full w-full min-w-0 flex-col gap-2 bg-card p-3 transition-colors focus-within:bg-accent hover:bg-accent'>
@@ -31,7 +35,7 @@ export const PublicTripCard: FC<PublicTripCardProps> = ({ trip }) => {
                         <li key={`${index}-${item.countryCode}`} className='flex min-w-0 items-center gap-1'>
                             {index > 0 && <span aria-hidden>·</span>}
                             <span className='font-mono tracking-widest'>{item.countryCode}</span>
-                            <span className='truncate break-keep'>{item.city ?? countryName(item.countryCode)}</span>
+                            <span className='truncate break-keep'>{item.city ?? countryName(item.countryCode, locale)}</span>
                         </li>
                     ))}
                 </ul>
@@ -46,7 +50,7 @@ export const PublicTripCard: FC<PublicTripCardProps> = ({ trip }) => {
                     <dt className='sr-only'>{t('period')}</dt>
                     <CalendarIcon className='size-3 shrink-0' aria-hidden />
                     <dd className='truncate font-mono tabular-nums'>
-                        {formatTripDateRange(trip)} · {lengthLabel}
+                        {formatTripDateRange(trip, locale)} · {lengthLabel}
                     </dd>
                 </div>
                 {routeLabel !== null && (
