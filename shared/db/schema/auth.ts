@@ -1,5 +1,6 @@
 import { relations } from 'drizzle-orm'
-import { boolean, index, text, timestamp, varchar, type AnyMySqlColumn } from 'drizzle-orm/mysql-core'
+import { boolean, index, text, timestamp, uniqueIndex, varchar, type AnyMySqlColumn } from 'drizzle-orm/mysql-core'
+import { LEGAL_DOCUMENTS } from '@/shared/constant/legal'
 import { DEFAULT_USER_ROLE, USER_ROLE_MAX_LENGTH } from '@/shared/constant/auth'
 import { PROFILE_BANNER_URL_MAX_LENGTH, PROFILE_BIO_MAX_LENGTH } from '@/shared/constant/community'
 import { tripUpload } from '@/shared/db/schema/trip'
@@ -87,9 +88,29 @@ export const verification = tripTable(
     (table) => [index('verification_identifier_idx').on(table.identifier)],
 )
 
+export const userConsent = tripTable(
+    'user_consent',
+    {
+        id: varchar('id', { length: 36 })
+            .primaryKey()
+            .$defaultFn(() => crypto.randomUUID()),
+        userId: varchar('user_id', { length: 36 })
+            .notNull()
+            .references(() => user.id, { onDelete: 'cascade' }),
+        document: varchar('document', { length: 32 }).notNull().$type<(typeof LEGAL_DOCUMENTS)[number]>(),
+        version: varchar('version', { length: 32 }).notNull(),
+        acceptedAt: timestamp('accepted_at', { fsp: 3 }).defaultNow().notNull(),
+    },
+    (table) => [
+        uniqueIndex('user_consent_user_document_version_idx').on(table.userId, table.document, table.version),
+        index('user_consent_user_id_idx').on(table.userId),
+    ],
+)
+
 export const userRelations = relations(user, ({ many }) => ({
     sessions: many(session),
     accounts: many(account),
+    consents: many(userConsent),
 }))
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -98,4 +119,8 @@ export const sessionRelations = relations(session, ({ one }) => ({
 
 export const accountRelations = relations(account, ({ one }) => ({
     user: one(user, { fields: [account.userId], references: [user.id] }),
+}))
+
+export const userConsentRelations = relations(userConsent, ({ one }) => ({
+    user: one(user, { fields: [userConsent.userId], references: [user.id] }),
 }))

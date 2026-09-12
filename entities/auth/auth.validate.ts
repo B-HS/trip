@@ -28,3 +28,10 @@ export const signupSchema = z
 
 export type LoginValues = z.infer<typeof loginSchema>
 export type SignupValues = z.infer<typeof signupSchema>
+
+export const signupWithConsentSchema = signupSchema.extend({
+    acceptTerms: z.boolean().refine((value) => value, 'validation.termsRequired'),
+    acceptPrivacy: z.boolean().refine((value) => value, 'validation.privacyRequired'),
+})
+
+export type SignupFormValues = z.infer<typeof signupWithConsentSchema>

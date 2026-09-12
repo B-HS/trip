@@ -5,20 +5,25 @@
 
 ## 1. 전체 키
 
-| 키                     | 필수           | 용도                                                                               | 발급·생성 방법                                                                 | 로컬 `.env` | Vercel Production | 빌드 타임 |
-| ---------------------- | -------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ----------- | ----------------- | --------- |
-| `DATABASE_URL`         | 필수           | MySQL 접속 문자열. drizzle 클라이언트·마이그레이션·시드가 쓴다                     | DB 제공자의 접속 정보로 조립: `mysql://user:password@host:3306/database`       | O           | O                 | △         |
-| `BETTER_AUTH_SECRET`   | 필수           | better-auth 세션·토큰 서명 키                                                      | `openssl rand -base64 32`                                                      | O           | O                 | X         |
-| `BETTER_AUTH_URL`      | 필수           | 인증 서버의 기준 URL(`baseURL`). 소셜 콜백 주소의 기준이 된다                      | 로컬은 `http://localhost:7777`, 배포는 `https://trip.gumyo.net`                | O           | O                 | X         |
-| `NEXT_PUBLIC_APP_URL`  | 필수           | 브라우저 authClient 의 `baseURL`. `NEXT_PUBLIC_` 이라 클라이언트 번들에 인라인된다 | `BETTER_AUTH_URL` 과 **같은 오리진**으로 맞춘다                                | O           | O                 | **O**     |
-| `SEED_OWNER_EMAIL`     | 선택           | `bun run db:seed` 가 오사카 예시 트립을 붙일 계정 이메일                           | 이미 가입된 계정의 이메일. 비워 두면 `db:seed` 가 안내만 하고 끝난다           | O           | 불필요            | X         |
-| `R2_ACCOUNT_ID`        | 선택(5개 묶음) | R2 S3 엔드포인트 계정 ID                                                           | Cloudflare 대시보드 → R2 개요 우측의 계정 ID                                   | O           | O                 | X         |
-| `R2_ACCESS_KEY_ID`     | 선택(5개 묶음) | R2 API 토큰의 Access Key ID                                                        | Cloudflare → R2 → **Manage R2 API Tokens** → Object Read & Write 토큰 발급     | O           | O                 | X         |
-| `R2_SECRET_ACCESS_KEY` | 선택(5개 묶음) | 위 토큰의 Secret Access Key                                                        | 같은 화면에서 발급 시 **한 번만** 표시된다                                     | O           | O                 | X         |
-| `R2_BUCKET`            | 선택(5개 묶음) | 업로드 대상 버킷 이름                                                              | Cloudflare → R2 → 버킷 생성 시 정한 이름                                       | O           | O                 | X         |
-| `R2_PUBLIC_BASE_URL`   | 선택(5개 묶음) | 업로드 결과를 읽는 공개 URL. `next/image` 원격 패턴이 여기서 만들어진다            | 버킷에 **커스텀 도메인**을 연결해 그 주소를 쓴다(`r2.dev` 는 개발용, ADR-0026) | O           | O                 | **O**     |
-| `APP_ENCRYPTION_KEY`   | 선택(7단계)    | AI 프로바이더 키를 AES-256-GCM 으로 암호화·복호화                                  | `openssl rand -base64 32`(base64 32바이트)                                     | O           | O                 | X         |
-| `NODE_ENV`             | 자동           | 실행 모드. `env.ts` 가 기본값 `development` 로 검증만 한다                         | **직접 넣지 않는다.** Next 가 `dev`/`build` 에 맞춰 설정한다                   | X           | X                 | X         |
+| 키                                          | 필수           | 용도                                                                               | 발급·생성 방법                                                                 | 로컬 `.env` | Vercel Production | 빌드 타임 |
+| ------------------------------------------- | -------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ----------- | ----------------- | --------- |
+| `DATABASE_URL`                              | 필수           | MySQL 접속 문자열. drizzle 클라이언트·마이그레이션·시드가 쓴다                     | DB 제공자의 접속 정보로 조립: `mysql://user:password@host:3306/database`       | O           | O                 | △         |
+| `BETTER_AUTH_SECRET`                        | 필수           | better-auth 세션·토큰 서명 키                                                      | `openssl rand -base64 32`                                                      | O           | O                 | X         |
+| `BETTER_AUTH_URL`                           | 필수           | 인증 서버의 기준 URL(`baseURL`). 소셜 콜백 주소의 기준이 된다                      | 로컬은 `http://localhost:7777`, 배포는 `https://trip.gumyo.net`                | O           | O                 | X         |
+| `NEXT_PUBLIC_APP_URL`                       | 필수           | 브라우저 authClient 의 `baseURL`. `NEXT_PUBLIC_` 이라 클라이언트 번들에 인라인된다 | `BETTER_AUTH_URL` 과 **같은 오리진**으로 맞춘다                                | O           | O                 | **O**     |
+| `SEED_OWNER_EMAIL`                          | 선택           | `bun run db:seed` 가 오사카 예시 트립을 붙일 계정 이메일                           | 이미 가입된 계정의 이메일. 비워 두면 `db:seed` 가 안내만 하고 끝난다           | O           | 불필요            | X         |
+| `R2_ACCOUNT_ID`                             | 선택(5개 묶음) | R2 S3 엔드포인트 계정 ID                                                           | Cloudflare 대시보드 → R2 개요 우측의 계정 ID                                   | O           | O                 | X         |
+| `R2_ACCESS_KEY_ID`                          | 선택(5개 묶음) | R2 API 토큰의 Access Key ID                                                        | Cloudflare → R2 → **Manage R2 API Tokens** → Object Read & Write 토큰 발급     | O           | O                 | X         |
+| `R2_SECRET_ACCESS_KEY`                      | 선택(5개 묶음) | 위 토큰의 Secret Access Key                                                        | 같은 화면에서 발급 시 **한 번만** 표시된다                                     | O           | O                 | X         |
+| `R2_BUCKET`                                 | 선택(5개 묶음) | 업로드 대상 버킷 이름                                                              | Cloudflare → R2 → 버킷 생성 시 정한 이름                                       | O           | O                 | X         |
+| `R2_PUBLIC_BASE_URL`                        | 선택(5개 묶음) | 업로드 결과를 읽는 공개 URL. `next/image` 원격 패턴이 여기서 만들어진다            | 버킷에 **커스텀 도메인**을 연결해 그 주소를 쓴다(`r2.dev` 는 개발용, ADR-0026) | O           | O                 | **O**     |
+| `APP_ENCRYPTION_KEY`                        | 선택(7단계)    | AI 프로바이더 키를 AES-256-GCM 으로 암호화·복호화                                  | `openssl rand -base64 32`(base64 32바이트)                                     | O           | O                 | X         |
+| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | 선택(6단계)    | GitHub 소셜 로그인. 두 값을 모두 넣을 때만 로그인 화면에 표시                      | GitHub Settings → Developer settings → OAuth Apps                              | O           | O                 | X         |
+| `NAVER_CLIENT_ID` / `NAVER_CLIENT_SECRET`   | 선택(6단계)    | 네이버 소셜 로그인. 두 값을 모두 넣을 때만 로그인 화면에 표시                      | 네이버 개발자센터 → 애플리케이션 등록                                          | O           | O                 | X         |
+| `EMAIL_WORKER_URL`                          | 선택(6단계)    | 인증 메일을 전달할 Cloudflare Worker HTTPS URL                                     | `cloudflare/mail-worker` 배포 URL                                              | O           | O                 | X         |
+| `EMAIL_WORKER_TOKEN`                        | 선택(6단계)    | Worker `SEND_SECRET`과 같은 Bearer 토큰                                            | Worker secret으로 생성한 난수                                                  | O           | O                 | X         |
+| `EMAIL_FROM`                                | 선택(6단계)    | 인증 메일 발신 주소. Worker 설정의 `EMAIL_FROM`과 같아야 한다                      | Cloudflare Email Service에 온보딩한 `trip.gumyo.net` 주소                      | O           | O                 | X         |
+| `NODE_ENV`                                  | 자동           | 실행 모드. `env.ts` 가 기본값 `development` 로 검증만 한다                         | **직접 넣지 않는다.** Next 가 `dev`/`build` 에 맞춰 설정한다                   | X           | X                 | X         |
 
 - 빌드 타임 **O**: `next build` 가 값을 읽어 결과물에 고정한다. 값을 바꾸면 **재배포(재빌드)** 해야 반영된다.
 - 빌드 타임 **△**: 빌드 중 정적 생성이 DB 에 닿으면 필요하다. Vercel 은 빌드에도 환경변수를 주입하므로 실무상 항상 설정해 둔다.
@@ -26,7 +31,7 @@
 
 ## 2. `.env.example` 에 넣을 블록
 
-`.env.example` 은 AI 의 도구 권한으로 읽기·쓰기가 모두 차단돼 있다(ADR-0026 구현 메모에도 같은 제약이 기록돼 있다). 현재 파일에는 처음 5개 키만 있으므로, 아래 블록을 **그대로 복사해 `.env.example` 전체를 대체**한다. 값이 아니라 키 이름과 설명만 담겨 있다.
+`.env.example` 은 AI 의 도구 권한으로 읽기·쓰기가 모두 차단돼 있다(ADR-0026 구현 메모에도 같은 제약이 기록돼 있다). 아래 블록은 필수·선택 키를 모두 포함하므로 필요하면 `.env.example` 전체를 대체한다. 값이 아니라 키 이름과 설명만 담겨 있다.
 
 ```dotenv
 # 필수 — MySQL 접속 문자열. 예: mysql://user:password@host:3306/trip
@@ -55,6 +60,17 @@ R2_PUBLIC_BASE_URL=
 # 선택 — AI 키 암호화용 base64 32바이트. `openssl rand -base64 32`
 # 7단계(AI) 전까지는 쓰이지 않는다
 APP_ENCRYPTION_KEY=
+
+# 선택 — OAuth. ID와 secret을 모두 채운 provider만 로그인 화면에 표시된다
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+NAVER_CLIENT_ID=
+NAVER_CLIENT_SECRET=
+
+# 선택 — Cloudflare Email Worker. 세 값을 모두 채우면 이메일 인증이 활성화된다
+EMAIL_WORKER_URL=
+EMAIL_WORKER_TOKEN=
+EMAIL_FROM=
 ```
 
 ## 3. 지금 사용자가 채워야 할 것
@@ -76,16 +92,14 @@ APP_ENCRYPTION_KEY=
 - 7단계(AI) 구현 전까지는 없어도 앱이 동작한다. 키가 없으면 AI 키 등록 화면이 비활성화된다.
 - 값을 바꾸면 이미 저장된 AI 키를 복호화할 수 없다. 교체 시 저장된 키를 다시 등록해야 한다.
 
-## 4. 다음 단계에서 생길 것
+## 4. 6단계 인증 확장 설정
 
-아직 `shared/lib/env.ts` 에 없는 키다. 해당 단계 착수 시 스키마에 추가하며 이름을 확정하고 이 문서를 갱신한다.
-
-| 단계              | 키(예정)                                                     | 발급처                                              | 비고                                                                                 |
-| ----------------- | ------------------------------------------------------------ | --------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| 6단계 인증 확장   | `GITHUB_CLIENT_ID` · `GITHUB_CLIENT_SECRET`                  | GitHub → Settings → Developer settings → OAuth Apps | 콜백 URL 은 `{BETTER_AUTH_URL}/api/auth/callback/github`                             |
-| 6단계 인증 확장   | `NAVER_CLIENT_ID` · `NAVER_CLIENT_SECRET`                    | 네이버 개발자센터 → 애플리케이션 등록               | 콜백 URL 은 `{BETTER_AUTH_URL}/api/auth/callback/naver`(better-auth 1.7.3 기준)      |
-| 6단계 이메일 인증 | Cloudflare 메일 Worker 엔드포인트 URL · 호출용 Bearer 시크릿 | Cloudflare Workers(Email Service, Workers Paid)     | Worker 쪽 `SEND_SECRET` 과 **같은 값**을 Vercel 에도 넣어 비교한다. 키 이름은 미확정 |
-| 7단계 AI          | `APP_ENCRYPTION_KEY`                                         | 직접 생성                                           | 위 3절 참고                                                                          |
+| 단계              | 키                                                       | 발급처                                              | 비고                                                                            |
+| ----------------- | -------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------- |
+| 6단계 인증 확장   | `GITHUB_CLIENT_ID` · `GITHUB_CLIENT_SECRET`              | GitHub → Settings → Developer settings → OAuth Apps | 콜백 URL 은 `{BETTER_AUTH_URL}/api/auth/callback/github`                        |
+| 6단계 인증 확장   | `NAVER_CLIENT_ID` · `NAVER_CLIENT_SECRET`                | 네이버 개발자센터 → 애플리케이션 등록               | 콜백 URL 은 `{BETTER_AUTH_URL}/api/auth/callback/naver`(better-auth 1.7.3 기준) |
+| 6단계 이메일 인증 | `EMAIL_WORKER_URL` · `EMAIL_WORKER_TOKEN` · `EMAIL_FROM` | Cloudflare Workers(Email Service, Workers Paid)     | Worker `SEND_SECRET`과 `EMAIL_FROM`을 각각 같은 값으로 맞춘다                   |
+| 7단계 AI          | `APP_ENCRYPTION_KEY`                                     | 직접 생성                                           | 위 3절 참고                                                                     |
 
 출처: ADR-0033 §2, `docs/memory/research-2026-09-10-mail-i18n-auth.md`. 리서치 메모의 `[미확인]` 항목(임의 수신자 발송 가능 여부 등)은 착수 시 실제 발송으로 검증한다.
 

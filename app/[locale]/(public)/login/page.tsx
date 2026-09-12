@@ -6,6 +6,9 @@ import { Suspense } from 'react'
 import { AuthCard } from '@/features/auth/auth-card'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { LoginWidget } from '@/widgets/auth/login-widget'
+import type { SocialProvider } from '@/shared/constant/auth'
+import { getAuthCapabilities } from '@/shared/lib/auth-capabilities'
+import { getEnv } from '@/shared/lib/env'
 
 type LoginPageProps = {
     params: Promise<{ locale: string }>
@@ -19,6 +22,7 @@ export const generateMetadata = async ({ params }: LoginPageProps): Promise<Meta
 
 const LoginPage = () => {
     const t = useTranslations('auth.login')
+    const socialProviders = getAuthCapabilities(getEnv()).socialProviders as readonly SocialProvider[]
 
     return (
         <div className='grid min-h-[calc(100dvh-3rem)] place-items-center p-4'>
@@ -34,7 +38,7 @@ const LoginPage = () => {
                     </>
                 }>
                 <Suspense fallback={<Skeleton className='h-56 w-full rounded-md' />}>
-                    <LoginWidget />
+                    <LoginWidget socialProviders={socialProviders} />
                 </Suspense>
             </AuthCard>
         </div>

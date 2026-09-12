@@ -64,6 +64,13 @@
       "when": 1789131759597,
       "tag": "0008_needy_victor_mancha",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1789203168422,
+      "tag": "0010_trip-consent",
+      "breakpoints": true
     }
   ]
 }

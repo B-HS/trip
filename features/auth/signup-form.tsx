@@ -2,29 +2,38 @@
 'use no memo'
 
 import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/navigation'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useState, type FC } from 'react'
-import { useForm } from 'react-hook-form'
-import { signupSchema, type SignupValues } from '@/entities/auth/auth.validate'
+import { Controller, useForm } from 'react-hook-form'
+import { signupWithConsentSchema, type SignupFormValues } from '@/entities/auth/auth.validate'
 import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from '@/shared/constant/auth'
 import { translateMessage } from '@/shared/lib/message-key'
+import { Checkbox } from '@/shared/ui/checkbox'
 import { Button } from '@/shared/ui/button'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/shared/ui/field'
 import { Input } from '@/shared/ui/input'
 
 type SignupFormProps = {
-    onSubmit: (values: SignupValues) => Promise<string | null>
+    onSubmit: (values: SignupFormValues) => Promise<string | null>
     isPending: boolean
 }
 
-const SIGNUP_DEFAULT_VALUES: SignupValues = { username: '', email: '', password: '', passwordConfirm: '' }
+const SIGNUP_DEFAULT_VALUES: SignupFormValues = {
+    username: '',
+    email: '',
+    password: '',
+    passwordConfirm: '',
+    acceptTerms: false,
+    acceptPrivacy: false,
+}
 
 export const SignupForm: FC<SignupFormProps> = ({ onSubmit, isPending }) => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-    const form = useForm<SignupValues>({ resolver: zodResolver(signupSchema), defaultValues: SIGNUP_DEFAULT_VALUES })
+    const form = useForm<SignupFormValues>({ resolver: zodResolver(signupWithConsentSchema), defaultValues: SIGNUP_DEFAULT_VALUES })
 
     const { errors } = form.formState
     const t = useTranslations('auth.signup')
@@ -94,6 +103,58 @@ export const SignupForm: FC<SignupFormProps> = ({ onSubmit, isPending }) => {
                         {...form.register('passwordConfirm')}
                     />
                     <FieldError errors={[errors.passwordConfirm]} />
+                </Field>
+                <Field data-invalid={!!errors.acceptTerms} orientation='horizontal' className='items-start gap-2'>
+                    <Controller
+                        control={form.control}
+                        name='acceptTerms'
+                        render={({ field }) => (
+                            <Checkbox
+                                id='signup-terms'
+                                checked={field.value}
+                                onCheckedChange={(checked) => field.onChange(checked === true)}
+                                onBlur={field.onBlur}
+                                aria-invalid={!!errors.acceptTerms}
+                            />
+                        )}
+                    />
+                    <div className='flex min-w-0 flex-1 flex-col gap-1'>
+                        <FieldLabel htmlFor='signup-terms' className='font-normal'>
+                            {t('termsAgreement')}
+                        </FieldLabel>
+                        <FieldDescription>
+                            <Link className='underline' href='/terms'>
+                                {t('termsLink')}
+                            </Link>
+                        </FieldDescription>
+                        <FieldError errors={[errors.acceptTerms]} />
+                    </div>
+                </Field>
+                <Field data-invalid={!!errors.acceptPrivacy} orientation='horizontal' className='items-start gap-2'>
+                    <Controller
+                        control={form.control}
+                        name='acceptPrivacy'
+                        render={({ field }) => (
+                            <Checkbox
+                                id='signup-privacy'
+                                checked={field.value}
+                                onCheckedChange={(checked) => field.onChange(checked === true)}
+                                onBlur={field.onBlur}
+                                aria-invalid={!!errors.acceptPrivacy}
+                            />
+                        )}
+                    />
+                    <div className='flex min-w-0 flex-1 flex-col gap-1'>
+                        <FieldLabel htmlFor='signup-privacy' className='font-normal'>
+                            {t('privacyAgreement')}
+                        </FieldLabel>
+                        <FieldDescription>
+                            <Link className='underline' href='/privacy'>
+                                {t('privacyLink')}
+                            </Link>
+                        </FieldDescription>
+                        <FieldError errors={[errors.acceptPrivacy]} />
+                    </div>
                 </Field>
             </FieldGroup>
             {errorMessage && (

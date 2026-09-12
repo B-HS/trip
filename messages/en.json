@@ -65,7 +65,10 @@
             "showPassword": "Show password",
             "hidePassword": "Hide password",
             "submit": "Log in",
-            "submitting": "Logging in…"
+            "submitting": "Logging in…",
+            "socialDescription": "You can also sign in with a social account.",
+            "socialUnavailable": "Social sign-in will be available after the administrator configures it.",
+            "social": { "github": "Continue with GitHub", "naver": "Continue with Naver" }
         },
         "signup": {
             "cardTitle": "Sign up",
@@ -77,6 +80,10 @@
             "emailLabel": "Email",
             "passwordLabel": "Password",
             "passwordConfirmLabel": "Confirm password",
+            "termsAgreement": "I agree to the Terms of Service.",
+            "privacyAgreement": "I agree to the Privacy Policy and confirm that I am at least 14 years old.",
+            "termsLink": "Terms of Service",
+            "privacyLink": "Privacy Policy",
             "submit": "Sign up",
             "submitting": "Signing up…"
         },
@@ -100,6 +107,9 @@
             "USERNAME_IS_IMMUTABLE": "The username cannot be changed.",
             "CREDENTIAL_ACCOUNT_NOT_FOUND": "This account cannot sign in with a password.",
             "EMAIL_NOT_VERIFIED": "Email verification is required.",
+            "VERIFICATION_EMAIL_NOT_ENABLED": "Email verification is not configured yet.",
+            "CONSENT_VERSION_MISMATCH": "Please agree to the latest documents.",
+            "CONSENT_SAVE_FAILED": "We couldn't save your agreements. Please try again.",
             "SESSION_EXPIRED": "Your session has expired. Please log in again.",
             "FAILED_TO_CREATE_USER": "We couldn't create the account. Please try again later.",
             "FAILED_TO_CREATE_SESSION": "We couldn't create the login session. Please try again later.",
@@ -107,6 +117,41 @@
             "MISSING_FIELD": "A required field is empty.",
             "UNEXPECTED_ERROR": "We couldn't process your request. Please try again later."
         }
+    },
+    "legal": {
+        "effectiveDate": "Effective date: September 12, 2026",
+        "terms": {
+            "title": "Terms of Service",
+            "intro": "Trip helps people structure, record and share travel itineraries.",
+            "service": "You must provide accurate account information and respect other people using the service.",
+            "account": "You are responsible for protecting your account and password and for activity performed through your account.",
+            "content": "You keep ownership of itineraries and posts you create. You grant Trip permission to display that content as needed to operate the service.",
+            "moderation": "Content that is illegal, infringes rights or disrupts the service may be hidden or removed without prior notice.",
+            "changes": "When the service or these terms change, the new version will be posted here. Important changes will be announced in the service.",
+            "contact": "Contact: Trip operations team"
+        },
+        "privacy": {
+            "title": "Privacy Policy",
+            "intro": "Trip processes the minimum personal information needed to provide the service.",
+            "collected": "At sign-up we collect your email, username and password hash. We also store itineraries, posts and access records created while you use the service.",
+            "purpose": "We use this information for account authentication, itinerary and community features, security and abuse prevention.",
+            "retention": "We delete information promptly after account deletion or the purpose of processing ends, except where law requires retention.",
+            "sharing": "We do not sell or share personal information except where required by law or with processors needed to provide the service.",
+            "rights": "You may request access to, correction of or deletion of your personal information.",
+            "contact": "Contact: Trip operations team"
+        }
+    },
+    "verification": {
+        "title": "Verify your email",
+        "success": "Your email has been verified. You can now use Trip.",
+        "invalid": "This verification link is invalid or has expired.",
+        "resendTitle": "Resend verification email",
+        "emailLabel": "Email",
+        "emailPlaceholder": "trip@example.com",
+        "resend": "Send verification email",
+        "sending": "Sending…",
+        "sent": "We sent a verification email. Check your inbox.",
+        "login": "Back to log in"
     },
     "community": {
         "boardKind": {
@@ -409,7 +454,9 @@
         "invalidUrl": "Not a valid URL format.",
         "tooSmall": "Value is too small.",
         "tooLarge": "Value is too large.",
-        "required": "This field is required."
+        "required": "This field is required.",
+        "termsRequired": "Please agree to the Terms of Service.",
+        "privacyRequired": "Please agree to the Privacy Policy."
     },
     "metadata": {
         "home": {
@@ -424,6 +471,8 @@
             "title": "Sign up",
             "description": "Create a trip account and manage your itineraries."
         },
+        "terms": { "title": "Terms of Service", "description": "Trip Terms of Service." },
+        "privacy": { "title": "Privacy Policy", "description": "Trip Privacy Policy." },
         "explore": {
             "title": "Explore",
             "description": "Browse publicly shared trip itineraries."

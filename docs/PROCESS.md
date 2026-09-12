@@ -1,6 +1,6 @@
 # PROCESS — trip
 
-> 최종 갱신: 2026-09-12 · i18n 2차 작업 트리: intro/marketing·trips·trip-editor·trip-viewer·rich-editor·toast 카탈로그화, locale별 포맷, 로그인 셸 언어 전환, React Compiler 규칙 강제. 검증 결과는 `docs/HANDOFF.md` 기준.
+> 최종 갱신: 2026-09-12 · 인증 확장 6단계 구현: 조건부 GitHub·Naver OAuth, Cloudflare Email Worker 이메일 인증, 가입 필수 약관 동의·법적 페이지, `trip_user_consent` 마이그레이션 0010 생성. 검증 결과는 `docs/HANDOFF.md` 기준.
 > 기준 문서: `~/.claude/convention/*.md`, `~/personal-llm/*.md`, `docs/HANDOFF.md`(세션 진입점), `docs/ARCHITECTURE.md`, `docs/acknowledge/README.md`, `docs/DESIGN.md`
 
 ## 완료 — 초기 구축 (2026-09-09, Phase 1~3)
@@ -59,7 +59,7 @@
     - [x] 5-1. 골격(커밋 `13cc729`·`f8697db`·`8357c52`·`7084333`): next-intl 4.14.4, `defineRouting` as-needed(ko 기본), proxy 합성(i18n 307 통과 → 로케일 제거 pathname 인증 → `next=` 프리픽스 보존), `app/[locale]/` 재구조화, i18n navigation 스윕(usePathname non-prefixed), 헤더 언어 전환기(NEXT_LOCALE 쿠키), typed routes 해제(`d664734`)
     - [x] 5-2. 도메인 카탈로그화(커밋 `2d2dc97`·`92ac2df`·`17a53b2`·`6de4134`): common·metadata·app 페이지, community 전역(게시판·글·댓글·신고·차단·admin), profile, auth 폼·위젯. entities·폼 문자열 → `validation.*`·`error.*`·`auth.errors.*`·`community.toast.*`·`profile.toast.*` 키 + `translateMessage` 표시 번역. `ja` 카탈로그 한국어 혼입 교정. memo 훅 제거(`bc78656`)
     - [x] 5-3. trip 도메인 2차(2026-09-12): intro/marketing·trips·trip-editor·trip-viewer·rich-editor·toast 카탈로그화, locale별 날짜·요일·기간·국가명, 새 여행 기본 일정 종류 locale 저장, 렌더 중 state 갱신 제거. 강제 유지 규칙은 `docs/CONVENTIONS.md`.
-- [ ] 6단계. 인증 확장(ADR-0033 §2): Naver·GitHub OAuth, 이메일 인증(Cloudflare mail worker, 리서치 후), 약관·동의(`docs/legal/` ko→ja·en, korean-law-mcp)
+- [x] 6단계. 인증 확장(ADR-0033 §2, ADR-0039): 조건부 Naver·GitHub OAuth, Cloudflare Email Worker 이메일 인증, 가입 필수 약관·개인정보 동의 및 다국어 법적 페이지. 운영 환경변수 주입·마이그레이션 0010 적용·실제 메일 발송 검증은 배포 작업으로 남음.
 - [ ] 7단계. 로드맵 4 AI(ADR-0029: Vercel Queues, 자기 키만, AES-GCM, `APP_ENCRYPTION_KEY` 없이 구현 후 키 등록 시 테스트)
 - [ ] 8단계. 로드맵 10 SEO·GEO·JSON-LD·Analytics·Speed Insights(ADR-0030, hreflang·locale 별 sitemap 포함)
 
@@ -67,12 +67,12 @@
 
 - [ ] QA 잔여: 모바일 Sheet 닫힘 포커스 복귀, 편집기 검증 오류 문구 한국어화(사용자가 직접 본 뒤 결정), 일정 종류 `key` 입력란 노출 여부, R2 설정 후 이미지 업로드
 - [x] 로드맵 3 OSM 은 제거(ADR-0033 §1), 7 의 OAuth·이메일 인증·약관은 6단계로 착수(ADR-0033 §2)
-- [ ] 사용자 작업: 환경변수는 **`docs/env.md` 가 정본**이다(키 목록·발급 방법·`.env.example` 에 붙여 넣을 블록·빌드 타임 여부). 지금 채울 것은 R2 5개와 `APP_ENCRYPTION_KEY`(§3), `.env.example` 갱신(§2, AI 는 `.env*` 접근 불가), R2 커스텀 도메인 연결. 그 외 Vercel CLI 링크(`vercel link`, Queues 로컬 개발용)
+- [ ] 사용자 작업: 환경변수는 **`docs/env.md` 가 정본**이다. R2·`APP_ENCRYPTION_KEY`와 함께 OAuth·Email Worker 키를 운영 환경에 주입하고, R2 커스텀 도메인을 연결한다. AI 는 `.env*`를 읽지 않는다.
 
 ### 진행 메모
 
-- Vercel: 브랜치 `prod`(Pro 플랜), 환경변수 `DATABASE_URL`·`BETTER_AUTH_SECRET`·`BETTER_AUTH_URL`·`NEXT_PUBLIC_APP_URL`(+선택 `SEED_OWNER_EMAIL`). 락파일 v1(ADR-0013, 의존성 추가 시 `npx bun@1.3.14 install`).
-- DB: 공용 MySQL(로컬·prod 동일). 마이그레이션 **0000~0008** 적용됨(이력 9행). 0008 은 추가 전용(테이블 2·`deleted_at` 2·enum widened 1·FK 4·인덱스 2)으로 `.env` 발급 후 적용 완료 — 실DB에서 이력 9행·`trip_report`·`trip_user_block`·`deleted_at`·enum `revoked` 재확인. 마이그레이션이 컬럼을 지우면 이전 배포 코드가 깨지므로 적용과 push·배포를 연달아 한다.
+- Vercel: 브랜치 `prod`(Pro 플랜), 환경변수는 `docs/env.md` 정본을 따른다. 락파일 v1(ADR-0013, 의존성 추가 시 `npx bun@1.3.14 install`).
+- DB: 공용 MySQL(로컬·prod 동일). 마이그레이션 **0000~0008** 적용됨(이력 9행), 인증 동의용 `0010_trip-consent.sql`은 생성했으나 이 세션에서 DB에는 적용하지 않았다. 운영 배포 전 `bun run db:migrate`로 적용하고 이력 10행 및 `trip_user_consent`를 확인한다.
 - 공개 페이지 캐시: `PublicTrip` 형태(컬럼·관계)가 바뀌면 `entities/trip/trip.cache.ts` 의 `PUBLIC_TRIP_CACHE_VERSION` 을 올린다(현재 `'4'`, 0007 출발 공항 컬럼으로 올렸다). 로컬 `updateTag` 는 prod 데이터 캐시를 비우지 못하고, Vercel 데이터 캐시는 배포를 넘어 유지된다.
 - 검증 계정: tester@example.com / 사용자명 tester(오사카 예시 트립, 공개 slug `osaka-qa`), throwaway `qa_session2_204103@example.com`(세션 4 채택 실측으로 포인트 12).
 - dev 서버(세션 4 결정): trip 은 **:7777**(`bun run dev -p 7777`). :3000 은 다른 프로젝트(gumba)가 쓴다. `.env` 의 `BETTER_AUTH_URL`·`NEXT_PUBLIC_APP_URL` 도 7777 로 맞춰야 로그인·로그아웃·공개 헤더 `useSession` 이 동작한다(사용자 작업, AI 는 `.env` 접근 불가).

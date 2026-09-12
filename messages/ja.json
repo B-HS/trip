@@ -65,7 +65,10 @@
             "showPassword": "パスワードを表示",
             "hidePassword": "パスワードを隠す",
             "submit": "ログイン",
-            "submitting": "ログイン中…"
+            "submitting": "ログイン中…",
+            "socialDescription": "ソーシャルアカウントでもログインできます。",
+            "socialUnavailable": "ソーシャルログインは管理者の設定後に利用できます。",
+            "social": { "github": "GitHubでログイン", "naver": "Naverでログイン" }
         },
         "signup": {
             "cardTitle": "新規登録",
@@ -77,6 +80,10 @@
             "emailLabel": "メール",
             "passwordLabel": "パスワード",
             "passwordConfirmLabel": "パスワード確認",
+            "termsAgreement": "利用規約に同意します。",
+            "privacyAgreement": "プライバシーポリシーに同意し、14歳以上であることを確認します。",
+            "termsLink": "利用規約",
+            "privacyLink": "プライバシーポリシー",
             "submit": "新規登録",
             "submitting": "登録中…"
         },
@@ -100,6 +107,9 @@
             "USERNAME_IS_IMMUTABLE": "ユーザー名は変更できません。",
             "CREDENTIAL_ACCOUNT_NOT_FOUND": "パスワードでログインできないアカウントです。",
             "EMAIL_NOT_VERIFIED": "メール認証が必要です。",
+            "VERIFICATION_EMAIL_NOT_ENABLED": "メール認証がまだ設定されていません。",
+            "CONSENT_VERSION_MISMATCH": "最新の文書に同意してください。",
+            "CONSENT_SAVE_FAILED": "同意内容を保存できませんでした。もう一度お試しください。",
             "SESSION_EXPIRED": "セッションの有効期限が切れました。再度ログインしてください。",
             "FAILED_TO_CREATE_USER": "アカウントを作成できませんでした。しばらくしてからもう一度お試しください。",
             "FAILED_TO_CREATE_SESSION": "ログインセッションを作成できませんでした。しばらくしてからもう一度お試しください。",
@@ -107,6 +117,41 @@
             "MISSING_FIELD": "必須入力項目が空です。",
             "UNEXPECTED_ERROR": "リクエストを処理できませんでした。しばらくしてからもう一度お試しください。"
         }
+    },
+    "legal": {
+        "effectiveDate": "施行日：2026年9月12日",
+        "terms": {
+            "title": "利用規約",
+            "intro": "Tripは旅行行程を整理・記録・共有できるサービスです。",
+            "service": "利用者は正確なアカウント情報を提供し、他の利用者の権利を尊重してください。",
+            "account": "アカウントとパスワードの管理責任は利用者にあります。アカウントで行われた活動について利用者が責任を負います。",
+            "content": "利用者が作成した行程や投稿の権利は利用者に帰属します。利用者はサービス運営に必要な範囲でTripがコンテンツを表示することを許諾します。",
+            "moderation": "違法・権利侵害・サービス運営を妨げるコンテンツは、事前通知なく非表示または削除されることがあります。",
+            "changes": "サービスや規約を変更する場合は、このページに新しい版を掲載します。重要な変更はサービス内でお知らせします。",
+            "contact": "お問い合わせ：Trip運営チーム"
+        },
+        "privacy": {
+            "title": "プライバシーポリシー",
+            "intro": "Tripはサービス提供に必要な最小限の個人情報を取り扱います。",
+            "collected": "登録時にメールアドレス、ユーザー名、パスワードハッシュを収集し、利用中に作成した行程・投稿とアクセス記録を保存します。",
+            "purpose": "情報はアカウント認証、行程・コミュニティ機能の提供、安全管理と不正利用防止に使用します。",
+            "retention": "退会または処理目的の達成後、速やかに削除します。法令により保存が必要な情報は定められた期間保管します。",
+            "sharing": "法令上の義務またはサービス提供に必要な委託先との共有を除き、個人情報を販売・共有しません。",
+            "rights": "利用者は自身の個人情報の開示・訂正・削除を請求できます。",
+            "contact": "お問い合わせ：Trip運営チーム"
+        }
+    },
+    "verification": {
+        "title": "メールアドレスを認証",
+        "success": "メールアドレスが認証されました。Tripをご利用いただけます。",
+        "invalid": "認証リンクが無効または期限切れです。",
+        "resendTitle": "認証メールを再送",
+        "emailLabel": "メール",
+        "emailPlaceholder": "trip@example.com",
+        "resend": "認証メールを送信",
+        "sending": "送信中…",
+        "sent": "認証メールを送信しました。受信トレイをご確認ください。",
+        "login": "ログインに戻る"
     },
     "community": {
         "boardKind": {
@@ -409,7 +454,9 @@
         "invalidUrl": "正しいURL形式ではありません。",
         "tooSmall": "値が小さすぎます。",
         "tooLarge": "値が大きすぎます。",
-        "required": "必須入力項目です。"
+        "required": "必須入力項目です。",
+        "termsRequired": "利用規約に同意してください。",
+        "privacyRequired": "プライバシーポリシーに同意してください。"
     },
     "metadata": {
         "home": {
@@ -424,6 +471,8 @@
             "title": "新規登録",
             "description": "トリップアカウントを作成して旅行行程を管理します。"
         },
+        "terms": { "title": "利用規約", "description": "Trip利用規約です。" },
+        "privacy": { "title": "プライバシーポリシー", "description": "Tripプライバシーポリシーです。" },
         "explore": {
             "title": "探索",
             "description": "公開された旅行行程を見ることができます。"

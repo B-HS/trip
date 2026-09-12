@@ -6,6 +6,7 @@ import { useState, type FC } from 'react'
 import { getAuthErrorMessage } from '@/entities/auth/auth.error'
 import type { LoginValues } from '@/entities/auth/auth.validate'
 import { LoginForm } from '@/features/auth/login-form'
+import type { SocialProvider } from '@/shared/constant/auth'
 import { HOME_PATH } from '@/shared/constant/route'
 import { signIn } from '@/shared/lib/auth-client'
 
@@ -15,7 +16,9 @@ const CONTROL_CHARACTER_PATTERN = /[\u0000-\u001f\u007f]/
 
 const isInternalPath = (path: string) => INTERNAL_PATH_PATTERN.test(path) && !CONTROL_CHARACTER_PATTERN.test(path)
 
-export const LoginWidget: FC = () => {
+type LoginWidgetProps = { socialProviders: readonly SocialProvider[] }
+
+export const LoginWidget: FC<LoginWidgetProps> = ({ socialProviders }) => {
     const [isPending, setIsPending] = useState(false)
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -39,5 +42,10 @@ export const LoginWidget: FC = () => {
         return null
     }
 
-    return <LoginForm onSubmit={handleSubmit} isPending={isPending} />
+    const handleSocialSubmit = async (provider: SocialProvider) => {
+        const { error } = await signIn.social({ provider, callbackURL: redirectPath })
+        return error ? getAuthErrorMessage(error.code) : null
+    }
+
+    return <LoginForm onSubmit={handleSubmit} onSocialSubmit={handleSocialSubmit} socialProviders={socialProviders} isPending={isPending} />
 }

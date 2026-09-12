@@ -1,6 +1,6 @@
-# HANDOFF — 2026-09-12 i18n 2차 작업 스냅샷
+# HANDOFF — 2026-09-12 인증 확장 6단계 구현 스냅샷
 
-> 현재 작업 트리는 아직 커밋·배포하지 않았다. i18n 2차와 React Compiler/컨벤션 감사를 완료했고 typecheck·lint·prettier·`bun test` **579 pass / 0 fail**·Webpack 프로덕션 빌드(34 pages)를 통과했다. 빌드 서버 스모크도 `/`·`/en`·`/ja` 200 + `<html lang>`·히어로 번역 확인, `/trips`·`/en/trips`·`/ja/trips`의 locale 보존 로그인 리다이렉트 확인까지 완료했다. 기본 Turbopack 빌드는 최적화 단계 정지가 반복되어 `bun run build`를 `next build --webpack`으로 고정했다.
+> 인증 확장 구현은 아직 커밋·배포하지 않았다. 조건부 GitHub·Naver OAuth, Cloudflare Email Worker 이메일 인증, 가입 필수 약관·개인정보 동의, 다국어 법적 페이지와 `trip_user_consent` 마이그레이션 0010을 추가했다. typecheck·lint·prettier·`bun test` **585 pass / 0 fail**·Webpack 프로덕션 빌드(44 pages)를 통과했다. OAuth/Worker 운영 키가 없으면 기능은 비활성화되고 로그인 화면에 안내가 표시된다. 마이그레이션 0010은 생성만 했으며 DB 적용과 실제 메일 발송 검증은 운영 작업으로 남아 있다.
 
 ## 1. 프로젝트 한 줄 정의
 
@@ -8,7 +8,7 @@
 
 ## 2. 현재 목표
 
-5단계 i18n 2차까지 완료했다. 다음 단계는 6단계 인증 확장(OAuth·이메일), 7단계 AI, 8단계 SEO다.
+5단계 i18n 2차와 6단계 인증 확장 구현까지 완료했다. 다음은 운영 환경 설정·마이그레이션 적용·배포 검증 후 7단계 AI, 8단계 SEO다.
 
 ## 3. 완료 / 진행 중 / 미착수
 
@@ -31,15 +31,23 @@
 - `docs/CONVENTIONS.md`를 강제 규칙 정본으로 추가하고 ESLint가 `useMemo`·`useCallback`·`React.memo`를 오류로 차단한다. RHF `register()`의 `'use no memo'` 예외만 ADR-0018에 따라 유지한다.
 - 자동 검증: 세 카탈로그 재귀 키 동등성 및 en/ja 한글 혼입 테스트를 추가했다.
 
+### 6단계 인증 확장 (ADR-0039) — 코드 구현 완료, 운영 설정 대기
+
+- `shared/lib/auth-capabilities.ts`가 OAuth와 이메일 Worker 설정을 모두 확인한다. GitHub·Naver는 ID와 secret이 모두 있을 때만 better-auth에 등록되고 로그인 화면에 노출된다.
+- 이메일 Worker가 설정되면 better-auth가 가입·로그인 시 인증 메일을 발송하고 `/verify-email`에서 재발송할 수 있다. 설정이 없을 때는 기존 이메일 로그인 동작을 유지한다.
+- `/api/auth/sign-up`이 가입 요청과 현재 약관 버전을 검증하고 `trip_user_consent`에 이용약관·개인정보 처리방침 동의를 기록한다. `/terms`, `/privacy`, `/verify-email`은 ko·en·ja 카탈로그를 사용한다.
+- Cloudflare Worker 예시는 `cloudflare/mail-worker/`에 있으며 bearer 인증, 발신 주소 검증, `SEND_EMAIL` 바인딩을 포함한다. 법적 초안은 `docs/legal/`에 있다.
+
 ### 미착수(순서대로)
 
-1. **6단계 인증 확장**: OAuth(Google 등) — 키 미확보 상태이므로 **비활성+관리자 안내 문구**로 구현, env 주입 시 활성화. 이메일 발송은 Cloudflare Email Service(Beta·Workers Paid 리스크 수용됨, 발송 도메인 `trip.gumyo.net` 확정).
+1. 운영 환경변수 주입, 마이그레이션 0010 적용, Cloudflare Email Service 실제 발송 및 OAuth 콜백 스모크.
 2. **7단계 AI**, **8단계 SEO**(hreflang·metadata 완성 포함).
 
 ## 4. 의사결정 요약 (상세·기각 대안은 `docs/acknowledge/`)
 
 - ADR-0037: 소프트 삭제·신고 `trip_report`·차단 `trip_user_block`·채택 회수 `revoked`(-10)·닉네임 변경 — 전부 구현·배포됨.
 - ADR-0038: next-intl as-needed ko 기본, proxy 합성 순서(i18n 307 통과 → 로케일 제거 pathname 으로 인증 → `next=` 프리픽스 보존), 메시지 키 체계(`validation.`/`error.`/`auth.errors.`/`*.toast.` + `translateMessage`), typed routes 해제, trip 도메인 2차 완료.
+- ADR-0039: 설정이 있는 OAuth만 활성화하고, Email Worker가 있을 때만 이메일 인증을 요구하며, 가입 시 현재 법적 문서 버전을 동의 테이블에 기록한다.
 - 사용자 결정(2026-09-11): i18n path prefix+proxy 합성 / dayjs 서버측 per-request / zod errorMap+키 / Email Service 수용(trip.gumyo.net) / OAuth 키 없음→비활성+안내.
 
 ## 5. 사용자 방향성 & 작업 규칙
@@ -59,14 +67,14 @@
 
 - Bun 1.4.2, Next 16.3.4(dev는 Turbopack, 프로덕션 빌드는 Webpack), next-intl 4.14.4, zod 4.5.4, drizzle mysql(`trip_` prefix), dev 서버 `:7777`.
 - task 위임: 카테고리는 `oh-my-opencode.jsonc` 고정으로 복원 전까지 `subagent_type=general` 사용 권장(카테고리 모델 매핑은 재시작 후 jsonc 반영).
-- 마이그레이션 상태: 0000~0008 적용(이력 9행). `drizzle-kit push` 금지, `bun run db:generate`/`db:migrate`만.
+- 마이그레이션 상태: 0000~0008 적용(이력 9행), 0010 인증 동의 SQL 생성·미적용. `drizzle-kit push` 금지, `bun run db:generate`/`db:migrate`만.
 
 ## 8. 다음 세션 TODO (우선순위 순)
 
-1. 현재 i18n 2차 작업 트리 리뷰·커밋 후 dev→prod 배포 스모크(`/en/trips`·`/ja/trips`와 로그인 사용자 메뉴 언어 전환 포함).
-2. 6단계 인증 확장(OAuth 비활성+안내, Email Service 발송 `trip.gumyo.net`).
+1. 인증 확장 작업 트리를 커밋하고 dev→prod로 머지·push한다.
+2. 운영자가 `docs/env.md`의 OAuth·Email Worker 키를 주입하고 0010을 적용한 뒤 콜백·실제 수신 메일을 스모크한다.
 3. 7·8단계.
 
 ## 9. 문서 지도
 
-`docs/CONVENTIONS.md`(React Compiler·i18n·리팩터링 강제 규칙)·`docs/PROCESS.md`(작업 체크리스트)·`docs/ARCHITECTURE.md`(구조)·`docs/roadmap.md`(진행 표)·`docs/acknowledge/`(ADR 0001~0038)·`docs/memory/`(data-model·research 메모)·`docs/history/`(세션 로그)·`docs/DESIGN.md`(비주얼 SSOT)·`docs/env.md`(env 발급).
+`docs/CONVENTIONS.md`(React Compiler·i18n·리팩터링 강제 규칙)·`docs/PROCESS.md`(작업 체크리스트)·`docs/ARCHITECTURE.md`(구조)·`docs/roadmap.md`(진행 표)·`docs/acknowledge/`(ADR 0001~0039)·`docs/memory/`(data-model·research 메모)·`docs/history/`(세션 로그)·`docs/DESIGN.md`(비주얼 SSOT)·`docs/env.md`(env 발급).

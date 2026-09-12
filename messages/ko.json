@@ -65,7 +65,10 @@
             "showPassword": "비밀번호 보기",
             "hidePassword": "비밀번호 숨기기",
             "submit": "로그인",
-            "submitting": "로그인 중…"
+            "submitting": "로그인 중…",
+            "socialDescription": "소셜 계정으로도 로그인할 수 있습니다.",
+            "socialUnavailable": "소셜 로그인은 관리자 설정 후 사용할 수 있습니다.",
+            "social": { "github": "GitHub로 로그인", "naver": "네이버로 로그인" }
         },
         "signup": {
             "cardTitle": "회원가입",
@@ -77,6 +80,10 @@
             "emailLabel": "이메일",
             "passwordLabel": "비밀번호",
             "passwordConfirmLabel": "비밀번호 확인",
+            "termsAgreement": "서비스 이용약관에 동의합니다.",
+            "privacyAgreement": "개인정보 처리방침에 동의하고 만 14세 이상임을 확인합니다.",
+            "termsLink": "서비스 이용약관",
+            "privacyLink": "개인정보 처리방침",
             "submit": "회원가입",
             "submitting": "가입 중…"
         },
@@ -100,6 +107,9 @@
             "USERNAME_IS_IMMUTABLE": "사용자명은 변경할 수 없습니다.",
             "CREDENTIAL_ACCOUNT_NOT_FOUND": "비밀번호로 로그인할 수 없는 계정입니다.",
             "EMAIL_NOT_VERIFIED": "이메일 인증이 필요합니다.",
+            "VERIFICATION_EMAIL_NOT_ENABLED": "이메일 인증 기능이 아직 설정되지 않았습니다.",
+            "CONSENT_VERSION_MISMATCH": "최신 약관에 동의해 주세요.",
+            "CONSENT_SAVE_FAILED": "약관 동의를 저장하지 못했습니다. 다시 시도해 주세요.",
             "SESSION_EXPIRED": "세션이 만료되었습니다. 다시 로그인해 주세요.",
             "FAILED_TO_CREATE_USER": "계정을 만들지 못했습니다. 잠시 후 다시 시도해 주세요.",
             "FAILED_TO_CREATE_SESSION": "로그인 세션을 만들지 못했습니다. 잠시 후 다시 시도해 주세요.",
@@ -107,6 +117,41 @@
             "MISSING_FIELD": "필수 입력값이 비어 있습니다.",
             "UNEXPECTED_ERROR": "요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요."
         }
+    },
+    "legal": {
+        "effectiveDate": "시행일: 2026년 9월 12일",
+        "terms": {
+            "title": "서비스 이용약관",
+            "intro": "Trip은 여행 일정을 구조화해 기록하고 공유할 수 있는 서비스입니다.",
+            "service": "서비스 이용자는 정확한 계정 정보를 제공하고 다른 이용자의 권리를 존중해야 합니다.",
+            "account": "계정과 비밀번호의 관리 책임은 이용자에게 있습니다. 이용자는 자신의 계정으로 발생한 활동에 책임을 집니다.",
+            "content": "이용자가 작성한 일정과 게시글의 권리는 이용자에게 있습니다. 이용자는 서비스 운영에 필요한 범위에서 콘텐츠를 표시할 수 있도록 허락합니다.",
+            "moderation": "불법·권리 침해·서비스 운영을 방해하는 콘텐츠는 사전 통지 없이 숨김 또는 삭제될 수 있습니다.",
+            "changes": "서비스와 약관이 변경되면 이 페이지에 새 버전을 게시합니다. 중요한 변경은 서비스 안에서 안내합니다.",
+            "contact": "문의: Trip 운영팀"
+        },
+        "privacy": {
+            "title": "개인정보 처리방침",
+            "intro": "Trip은 서비스 제공에 필요한 최소한의 개인정보를 처리합니다.",
+            "collected": "가입 시 이메일, 사용자명, 비밀번호 해시를 수집하고 서비스 이용 과정에서 작성한 일정·게시글과 접속 기록을 저장합니다.",
+            "purpose": "수집한 정보는 계정 인증, 일정·커뮤니티 기능 제공, 보안과 부정 이용 방지에 사용합니다.",
+            "retention": "회원 탈퇴 또는 처리 목적 달성 시 지체 없이 삭제합니다. 법령에 따라 보관해야 하는 정보는 해당 기간 동안 별도로 보관합니다.",
+            "sharing": "법령상 의무가 있거나 서비스 제공에 필요한 처리자와의 경우를 제외하고 개인정보를 판매하거나 공유하지 않습니다.",
+            "rights": "이용자는 자신의 개인정보 열람·수정·삭제를 요청할 수 있습니다.",
+            "contact": "문의: Trip 운영팀"
+        }
+    },
+    "verification": {
+        "title": "이메일 주소 인증",
+        "success": "이메일 주소가 인증되었습니다. 이제 Trip을 사용할 수 있습니다.",
+        "invalid": "인증 링크가 만료되었거나 올바르지 않습니다.",
+        "resendTitle": "인증 메일 다시 받기",
+        "emailLabel": "이메일",
+        "emailPlaceholder": "trip@example.com",
+        "resend": "인증 메일 보내기",
+        "sending": "보내는 중…",
+        "sent": "인증 메일을 보냈습니다. 받은 편지함을 확인해 주세요.",
+        "login": "로그인으로 돌아가기"
     },
     "community": {
         "boardKind": {
@@ -409,7 +454,9 @@
         "invalidUrl": "올바른 주소 형식이 아닙니다.",
         "tooSmall": "값이 너무 작습니다.",
         "tooLarge": "값이 너무 큽니다.",
-        "required": "필수 입력값입니다."
+        "required": "필수 입력값입니다.",
+        "termsRequired": "서비스 이용약관에 동의해 주세요.",
+        "privacyRequired": "개인정보 처리방침에 동의해 주세요."
     },
     "metadata": {
         "home": {
@@ -424,6 +471,8 @@
             "title": "회원가입",
             "description": "트립 계정을 만들고 여행 일정을 관리합니다."
         },
+        "terms": { "title": "서비스 이용약관", "description": "Trip 서비스 이용약관입니다." },
+        "privacy": { "title": "개인정보 처리방침", "description": "Trip 개인정보 처리방침입니다." },
         "explore": {
             "title": "탐색",
             "description": "공개된 여행 일정을 둘러봅니다."

@@ -1,0 +1,10 @@
+name = "trip-mail-worker"
+main = "src/index.ts"
+compatibility_date = "2026-09-12"
+
+[vars]
+EMAIL_FROM = "noreply@trip.gumyo.net"
+
+[[send_email]]
+name = "SEND_EMAIL"
+destination_address = "noreply@trip.gumyo.net"

@@ -11,3 +11,6 @@ export type UserRole = (typeof USER_ROLES)[number]
 export const USER_ROLE_MAX_LENGTH = 32
 export const DEFAULT_USER_ROLE = 'user'
 export const ADMIN_ROLE = 'admin'
+
+export const SOCIAL_PROVIDERS = ['github', 'naver'] as const
+export type SocialProvider = (typeof SOCIAL_PROVIDERS)[number]

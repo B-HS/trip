@@ -18,6 +18,13 @@ const envSchema = z.object({
     R2_SECRET_ACCESS_KEY: optionalText,
     R2_BUCKET: optionalText,
     R2_PUBLIC_BASE_URL: optionalUrl,
+    GITHUB_CLIENT_ID: optionalText,
+    GITHUB_CLIENT_SECRET: optionalText,
+    NAVER_CLIENT_ID: optionalText,
+    NAVER_CLIENT_SECRET: optionalText,
+    EMAIL_WORKER_URL: optionalUrl,
+    EMAIL_WORKER_TOKEN: optionalText,
+    EMAIL_FROM: optionalText,
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 })
 
