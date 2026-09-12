@@ -1,6 +1,7 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
+import { useTranslations } from 'next-intl'
 import { type FC, useEffect, useRef, useState } from 'react'
 import { cn } from '@/shared/lib/utils'
 import {
@@ -10,7 +11,7 @@ import {
     type GlobePointerPosition,
     placeGlobeTooltip,
 } from '@/shared/ui/three/globe-interaction'
-import { describeGlobeRoutes, formatGlobeRouteLabel, type GlobeRouteInput, resolveGlobeRoutes } from '@/shared/ui/three/globe-math'
+import { formatGlobeRouteLabel, type GlobeRouteInput, resolveGlobeRoutes } from '@/shared/ui/three/globe-math'
 import { GLOBE_VARIANT_CONFIG, type GlobeVariant } from '@/shared/ui/three/globe-variant'
 import { TripGlobeScene } from '@/shared/ui/three/trip-globe-scene'
 import { useReducedMotionPreference } from '@/shared/hooks/use-motion-preference'
@@ -45,6 +46,7 @@ export const TripGlobe: FC<TripGlobeProps> = ({
     onRouteSelect,
     className,
 }) => {
+    const t = useTranslations('tripViewer')
     const containerRef = useRef<HTMLDivElement>(null)
     const tooltipRef = useRef<HTMLDivElement>(null)
     const containerSizeRef = useRef<GlobeBoxSize | null>(null)
@@ -159,7 +161,13 @@ export const TripGlobe: FC<TripGlobeProps> = ({
                     ))}
                 </ul>
             )}
-            <p className='sr-only'>{describeGlobeRoutes(resolvedRoutes)}</p>
+            <p className='sr-only'>
+                {resolvedRoutes.length === 0
+                    ? t('globeEmpty')
+                    : t('globeDescription', {
+                          routes: resolvedRoutes.map((route) => t('globeRoute', { from: route.from.label, to: route.to.label })).join(', '),
+                      })}
+            </p>
         </div>
     )
 }
