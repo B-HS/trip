@@ -18,7 +18,7 @@ const BoardsPage = async () => {
     const session = await getServerSession()
 
     return (
-        <div className='mx-auto max-w-7xl'>
+        <div className={session === null ? 'mx-auto w-full max-w-7xl' : 'w-full'}>
             <BoardsIndex viewerId={session?.user.id ?? null} />
         </div>
     )
