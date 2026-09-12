@@ -9,6 +9,7 @@ import { useState, type FC } from 'react'
 import { useForm } from 'react-hook-form'
 import { signupSchema, type SignupValues } from '@/entities/auth/auth.validate'
 import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from '@/shared/constant/auth'
+import { translateMessage } from '@/shared/lib/message-key'
 import { Button } from '@/shared/ui/button'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/shared/ui/field'
 import { Input } from '@/shared/ui/input'
@@ -27,6 +28,7 @@ export const SignupForm: FC<SignupFormProps> = ({ onSubmit, isPending }) => {
 
     const { errors } = form.formState
     const t = useTranslations('auth.signup')
+    const tMessage = useTranslations()
     const passwordToggleLabel = isPasswordVisible ? t('hidePassword') : t('showPassword')
     const passwordInputType = isPasswordVisible ? 'text' : 'password'
     const handleSubmit = form.handleSubmit(async (values) => setErrorMessage(await onSubmit(values)))
@@ -96,7 +98,7 @@ export const SignupForm: FC<SignupFormProps> = ({ onSubmit, isPending }) => {
             </FieldGroup>
             {errorMessage && (
                 <p className='text-sm text-destructive' role='alert'>
-                    {errorMessage}
+                    {translateMessage(tMessage, errorMessage)}
                 </p>
             )}
             <div className='flex gap-px bg-background'>

@@ -8,6 +8,7 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useState, type FC } from 'react'
 import { useForm } from 'react-hook-form'
 import { loginSchema, type LoginValues } from '@/entities/auth/auth.validate'
+import { translateMessage } from '@/shared/lib/message-key'
 import { Button } from '@/shared/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/shared/ui/field'
 import { Input } from '@/shared/ui/input'
@@ -24,6 +25,7 @@ export const LoginForm: FC<LoginFormProps> = ({ onSubmit, isPending }) => {
 
     const { errors } = form.formState
     const t = useTranslations('auth.login')
+    const tMessage = useTranslations()
     const passwordToggleLabel = isPasswordVisible ? t('hidePassword') : t('showPassword')
     const handleSubmit = form.handleSubmit(async (values) => setErrorMessage(await onSubmit(values)))
 
@@ -68,7 +70,7 @@ export const LoginForm: FC<LoginFormProps> = ({ onSubmit, isPending }) => {
             </FieldGroup>
             {errorMessage && (
                 <p className='text-sm text-destructive' role='alert'>
-                    {errorMessage}
+                    {translateMessage(tMessage, errorMessage)}
                 </p>
             )}
             <div className='flex gap-px bg-background'>
