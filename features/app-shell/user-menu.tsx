@@ -1,8 +1,9 @@
 'use client'
 
-import { LogOutIcon, SettingsIcon, UserIcon } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { Link } from '@/i18n/navigation'
+import { LanguagesIcon, LogOutIcon, SettingsIcon, UserIcon } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
+import { Link, usePathname, useRouter } from '@/i18n/navigation'
+import { routing, type AppLocale } from '@/i18n/routing'
 import type { FC } from 'react'
 import { setMotionPreference, useMotionPreference } from '@/shared/hooks/use-motion-preference'
 import { PROFILE_SETTINGS_PATH } from '@/shared/constant/route'
@@ -14,6 +15,9 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
 import { Label } from '@/shared/ui/label'
@@ -51,6 +55,12 @@ const MotionPreferenceToggle: FC = () => {
 
 export const UserMenu: FC<UserMenuProps> = ({ name, email, username, image, isCollapsed, onSignOut }) => {
     const t = useTranslations('common.userMenu')
+    const tLocale = useTranslations('common.localeSwitcher')
+    const locale = useLocale()
+    const pathname = usePathname()
+    const router = useRouter()
+
+    const switchLocale = (next: AppLocale) => router.replace(pathname, { locale: next })
 
     return (
         <div className={cn('flex h-12 shrink-0 items-center px-3', isCollapsed && 'justify-center px-0')}>
@@ -79,6 +89,20 @@ export const UserMenu: FC<UserMenuProps> = ({ name, email, username, image, isCo
                         <ThemeToggle variant='outline' />
                     </div>
                     <MotionPreferenceToggle />
+                    <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>
+                            <LanguagesIcon />
+                            {tLocale('menuAria')}
+                            <span className='ml-auto text-xs text-muted-foreground'>{tLocale(`names.${locale}`)}</span>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                            {routing.locales.map((item) => (
+                                <DropdownMenuItem key={item} aria-current={item === locale ? 'true' : undefined} onSelect={() => switchLocale(item)}>
+                                    {tLocale(`names.${item}`)}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuSubContent>
+                    </DropdownMenuSub>
                     <DropdownMenuSeparator />
                     {username !== null && (
                         <DropdownMenuItem asChild>
