@@ -715,7 +715,18 @@
         "deletedPost": "（削除された投稿）",
         "deletedComment": "（削除されたコメント）",
         "withdrawnUser": "（退会したユーザー）",
-        "noTarget": "（対象なし）"
+        "noTarget": "（対象なし）",
+        "rateLimited": "リクエストが多すぎます。しばらくしてから再試行してください。",
+        "invalidApiToken": "API トークンが無効または期限切れです。",
+        "apiTokenScopeRequired": "この API トークンには必要な scope がありません。",
+        "invalidApiTokenScopes": "対応する API トークンの scope を 1 つ以上選択してください。",
+        "invalidApiTokenLabel": "有効な API トークン名を入力してください。",
+        "apiTokenLimit": "有効な API トークン数の上限に達しました。",
+        "apiTokenNotFound": "API トークンが見つかりません。",
+        "invalidApiTokenExpiry": "API トークンの有効期限は未来にしてください。",
+        "invalidJson": "リクエスト本文は有効な JSON である必要があります。",
+        "idempotencyKeyRequired": "有効な Idempotency-Key ヘッダーが必要です。",
+        "idempotencyKeyConflict": "その Idempotency-Key は別のリクエストで使用済みです。"
     },
     "toasts": {
         "tripCreated": "旅行を作成しました。",
@@ -1245,5 +1256,46 @@
             "delete": "削除",
             "deleting": "削除中…"
         }
+    },
+    "developerApi": {
+        "title": "開発者 API",
+        "description": "自動化と AI エージェント用の個人アクセストークンを管理します。",
+        "create": "トークンを作成",
+        "label": "トークン名",
+        "labelPlaceholder": "旅行プランアシスタント",
+        "scopes": "権限",
+        "read": "旅行を読む",
+        "write": "旅行を書き込む",
+        "inspect": "トークンを確認",
+        "expires": "有効期限（任意）",
+        "never": "期限なし",
+        "active": "有効",
+        "revoked": "無効化済み",
+        "revoke": "無効化",
+        "revokeConfirm": "このトークンを無効化しますか？既存のクライアントは停止します。",
+        "created": "トークンを作成しました",
+        "copyWarning": "今すぐコピーしてください。再表示できません。",
+        "copy": "トークンをコピー",
+        "copied": "コピー済み",
+        "empty": "開発者トークンはまだありません。",
+        "error": "開発者トークンを変更できませんでした。"
+    },
+    "developerPortal": {
+        "title": "落ち着いて役立つ旅行自動化を作る",
+        "description": "旅行ツール、連携、AI エージェントのための明快な所有者限定 API です。読み取りから始め、計画を確認してから書き込みを追加します。",
+        "openapi": "OpenAPI を見る",
+        "getStarted": "始める",
+        "authenticationTitle": "認証",
+        "authentication": "個人アクセストークンは一度だけ表示し、Authorization ヘッダーだけで送信します。URL にトークンを置かないでください。",
+        "scopesTitle": "最小限の権限",
+        "scopes": "作業に必要な最小の scope だけを使います。すべてのリソースはトークン所有者の旅行に限定されます。",
+        "agentTitle": "エージェント向け",
+        "agent": "決定的な JSON、安定したエラーコード、ページネーション、冪等な書き込み、OpenAPI で計画と確認を予測可能にします。",
+        "quickstartTitle": "2 分で始める",
+        "quickstart": "設定でトークンを作成し、サーバー専用の secret store に保存してから、最初の旅行リクエスト前に introspection を呼び出します。",
+        "safetyTitle": "安全な初期設定",
+        "safety": "まず読み取ります。削除や全置換は変更内容を要約して確認を求めます。新しい変更には新しい冪等キー、再試行には同じキーを使います。",
+        "limitsTitle": "予測できる制限",
+        "limits": "標準のトークン別制限は 1 分あたり読み取り 60 回・書き込み 20 回です。rate-limit ヘッダーを守り、429 ではバックオフします。"
     }
 }

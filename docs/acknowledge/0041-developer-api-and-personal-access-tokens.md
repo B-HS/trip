@@ -1,0 +1,32 @@
+# ADR-0041 — Versioned developer API and personal access tokens (2026-09-12)
+
+## 배경
+
+자동화와 AI 에이전트가 사용자의 여행 데이터를 읽고, 사용자의 명시적인 승인 아래 구조화된 트립을 생성·교체할 수 있는 공개 API가 필요하다. 세션 쿠키를 외부 클라이언트에 재사용하거나 공개 공유 링크로 쓰기에는 소유권·범위·회수·감사 경계가 부족하다.
+
+## 결정
+
+- 공개 표면은 `/api/v1`로 명시적으로 버전 관리한다. `/api/v1/openapi.json`은 OpenAPI 3.1 JSON 정본이다.
+- API는 `trip_pat_` 접두어를 가진 256-bit 난수 bearer 토큰을 사용한다. 원문은 발급 응답에서 한 번만 반환하고 DB에는 SHA-256 digest와 prefix/last4 메타데이터만 저장한다. Authorization 헤더 외 위치(쿼리·경로·로그)는 허용하지 않는다.
+- 토큰은 사용자 소유이며 `trips:read`, `trips:write`, `token:inspect` 범위를 가진다. 모든 트립 API는 토큰 주체의 **소유 트립만** 반환·변경하며 멤버 권한을 우회하지 않는다. 모든 쓰기는 기존 `tripTemplateSchema`, `createTrip*`, `replaceTripFromTemplate`, `deleteTrip` 도메인 서비스를 사용한다.
+- 목록은 `page`/`page_size`(최대 100) 오프셋 페이지네이션과 `items`, `page`, `pageSize`, `total`, `pageCount`를 사용한다. 오류는 기존 `success:false` 계약과 안정적인 코드로 반환한다.
+- 생성·교체·삭제에는 `Idempotency-Key`가 필요하다. 현재 배포가 외부 상태 저장소를 전제하지 않도록 24시간 프로세스 로컬 캐시를 제공하고, 멀티 인스턴스 환경에서 정확한 한 번 처리가 필요해지는 시점에 공유 저장소로 승격한다.
+- 토큰별 슬라이딩 윈도우 rate limit(읽기 60회/분, 쓰기 20회/분)을 적용하고 `X-RateLimit-*` 헤더와 429를 반환한다. 이는 기본 애플리케이션 경계이며 운영 edge/WAF 한도를 대체하지 않는다.
+- `/settings/api`에서 토큰을 생성·목록·폐기한다. 기본 만료는 관리 UI가 선택하도록 두고, 운영 권장값은 365일 이내다.
+
+## 이유와 보안 근거
+
+Next.js 16은 Route Handler의 `params`를 비동기 API로만 제공하므로 모든 동적 API 라우트는 `await context.params`를 사용한다. OpenAPI 3.1의 HTTP bearer security scheme으로 자동화 클라이언트의 발견 가능성을 유지한다. OWASP는 bearer 토큰의 TLS 전송·안전한 저장, 공개 API의 per-key quota, 슬라이딩 윈도우를 권고한다. 해시만 저장하면 DB 유출 시 원문을 바로 재사용할 수 없고, 256-bit 난수는 추측 공격에 충분한 여유를 준다. `timingSafeEqual`은 검증 비교에 사용하며 길이가 다른 입력은 먼저 거부한다.
+
+공식 근거: [Next.js 16 async Request APIs](https://nextjs.org/docs/app/guides/upgrading/version-16), [OpenAPI Specification](https://spec.openapis.org/oas/latest.html), [OWASP Password Storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html), [OWASP Bot Management / Rate Limiting](https://cheatsheetseries.owasp.org/cheatsheets/Bot_Management_and_Anti-Automation_Cheat_Sheet.html).
+
+## 기각한 대안
+
+- 세션 쿠키를 API 인증으로 재사용: 브라우저 CSRF·수명·회수 모델이 외부 자동화에 부적합하다.
+- JWT: 즉시 폐기와 토큰 목록 UI가 필요하고 서명 키·claim 검증 복잡도가 늘어난다. opaque hash token으로 시작한다.
+- 쿼리 파라미터 토큰: 프록시·브라우저 기록·Referer로 유출될 수 있으므로 금지한다.
+- 외부 Redis rate limit: 첫 버전에서 유료 서비스와 운영 키를 강제하지 않고, 경계가 명확한 프로세스 로컬 한도를 먼저 제공한다.
+
+## 통합 메모
+
+`0010_trip-consent.sql`과 Phase 7 AI migration `0011_ai.sql` 다음으로 이 마이그레이션은 `0012`로 provision한다. 통합자는 스냅샷·journal 순서를 확인한 뒤 한 번만 생성·적용하고, 멀티 인스턴스 배포 전 idempotency/rate-limit 캐시를 공유 저장소로 교체해야 한다.

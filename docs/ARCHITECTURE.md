@@ -1,5 +1,9 @@
 # ARCHITECTURE — trip
 
+## Phase 9 developer API
+
+`/api/v1` is a versioned, bearer-token-only public API. Its resource boundary is the authenticated token owner's trips; it never treats a member role or a public share link as API ownership. OpenAPI 3.1 is served at `/api/v1/openapi.json`, while token lifecycle UI is `/settings/api` and the human/AI guide is `/developers`. See ADR-0041 and `docs/developer-api.md` for scopes, pagination, idempotency, and migration 0012.
+
 > 최종 갱신: 2026-09-12 · 대응 범위: 인증 확장 ADR-0039 — 조건부 OAuth·Email Worker 이메일 인증·가입 동의·법적 페이지·마이그레이션 0010 생성(**DB 미적용**)
 > 구현 정본. 코드와 어긋나면 코드를 고치거나 이 문서를 갱신한다. 결정의 배경·기각 대안은 `docs/acknowledge/README.md`.
 > 빌드 메모(2026-09-12): `next build`의 Turbopack 경로가 최적화 단계에서 정지하는 현상이 반복 재현되어 검증·배포용 `bun run build`는 `next build --webpack`으로 고정한다. React Compiler는 빌드 엔진과 별개로 `reactCompiler: true`를 유지한다.
@@ -31,14 +35,14 @@ entities/
   community/ community.type · community.validate(+reportCreateSchema) · community.role(순수, +canAttachTrip·isBlockedAuthor) · community.comment(순수, projectComments) · community.point(순수, buildAcceptanceLedger·buildRevocationLedger) · community.access(server, +assertAdmin·assertTripAttachable=소유|공개) · community.repository(+.comments/.likes/.block/.report) · community.cache(React cache, +getBlockedIds) · community.action · community.api · community.query · community.prefetch
   profile/  profile.type · profile.validate(profileUpdateSchema·usernameChangeSchema·PROFILE_TABS·resolveProfileTab) · profile.repository(+isUsernameTaken·changeUsername) · profile.cache · profile.action(+changeUsernameAction) · profile.query
 shared/
-  db/       client.ts(mysql2 풀 싱글턴) · table.ts(`trip_` creator) · schema/{auth,trip,community}.ts(auth↔trip↔community 는 지연 콜백 참조라 순환 import 허용) · schema.ts(합성) · accept-invites.ts(가입 시 초대 수락)
+  db/       client.ts(mysql2 풀 싱글턴) · table.ts(`trip_` creator) · schema/{auth,trip,community,ai,developer-api}.ts(auth↔trip↔community↔AI↔developer API 는 지연 콜백 참조라 순환 import 허용) · schema.ts(합성) · accept-invites.ts(가입 시 초대 수락)
   lib/      env.ts(getEnv, R2_* 는 선택) · auth.ts(getAuth) · auth-client.ts · auth-capabilities.ts · email.ts(Cloudflare Worker 발송) · session.ts · api-response.ts · action-result.ts · fetch.ts(clientFetch, FormData 허용) · query-client.ts · query-provider.tsx · motion.ts · trip-template.ts(+parseTripTemplateJson) · trip-length.ts(몇박 며칠) · r2.ts(server-only, getUploadConfig·putObject·deleteObject) · upload-validation.ts(순수 검증) · utils.ts(npm `cn` 재export) · rich-text-extensions.ts(Tiptap 확장 목록·스키마) · rich-text-document.ts(JSON 검증·정규화·평문·빈 문서 판정, zod 스키마) · rich-text-sanitize.ts(server-only, dompurify + jsdom 26 전용 창, 화이트리스트 + 훅, `SanitizedRichTextHtml` 브랜드 타입) · rich-text-html.ts(server-only, `generateHTML` → sanitize) · pagination.ts(buildPage) · date-range.ts(weekRange·monthRange) · trip-date-range.ts · trip-route-label.ts · like-mutation.ts(좋아요 낙관적 mutation 팩토리) · search-param.ts(replaceSearchParam — history.replaceState 로 쿼리 1개 갱신·삭제, 목록 `?route=`·뷰어 `?view=`·`?day=` 공용) · route-handler.ts(withRouteErrorHandling — 새 라우트 3곳만 적용, 기존 6곳은 try/catch 잔존)
   hooks/    use-mobile · use-motion-preference · use-unsaved-changes · use-pointer(useFinePointer, `(pointer: fine)` 미디어 쿼리)
   constant/ trip.ts(DEFAULT_SCHEDULE_KINDS·색 토큰 등) · rich-text.ts(허용 태그·속성, YouTube 임베드 프리픽스, 크기, JSON 길이 상한) · community.ts(게시판 3종·포인트·페이지 크기·홈 한도·URL 파라미터 키·빈 문구) · route.ts(정적 경로 상수) · upload.ts · auth.ts · site.ts · query.ts · query-key.ts · airports.ts · countries.ts · marketing.ts · template/osaka.ts
   ui/       shadcn 55개(+ button `cell`·`cellPrimary`·`cellDestructive` 변형, `cell`·`cellIcon` 크기) + theme-provider · theme-toggle · motion-provider · motion/(7 프리미티브) · three/(지구본 — globe-math·globe-geography·globe-variant·globe-interaction·css-color·use-globe-theme·trip-globe(+scene·lazy))
 tests/    bun test 미러 구조(entities · features · shared · widgets) + setup.ts(happy-dom 전역 등록, `server-only` 를 빈 모듈로 mock, 자식 프레임 네비게이션 비활성)
 scripts/  migrate.ts · seed.ts · set-admin.ts(`bun run admin:set <email>`)
-drizzle/  0000(초기 20 테이블) · 0001(destination·favorite) · 0002(nights·days) · 0003(sidebar_link·sidebar_note) · 0004(schedule_kind + 데이터 이관, kind 컬럼 삭제) · 0005(upload·booking_attachment) · 0006(board·post·comment·post_like·like·point_ledger + user role/ban/bio/banner, session impersonated_by, trip like_count, 게시판 3행 시드) · 0007(trip departure_airport_code, ALTER 1개) · 0008(report·user_block 테이블 + post/comment deleted_at + point_ledger reason +revoked, 추가 전용) · 0010(user_consent, **미적용**) + meta
+drizzle/  0000(초기 20 테이블) · 0001(destination·favorite) · 0002(nights·days) · 0003(sidebar_link·sidebar_note) · 0004(schedule_kind + 데이터 이관, kind 컬럼 삭제) · 0005(upload·booking_attachment) · 0006(board·post·comment·post_like·like·point_ledger + user role/ban/bio/banner, session impersonated_by, trip like_count, 게시판 3행 시드) · 0007(trip departure_airport_code, ALTER 1개) · 0008(report·user_block 테이블 + post/comment deleted_at + point_ledger reason + revoked, 추가 전용) · 0010(user_consent) → 0011(ai key/conversation/message/job/usage/proposal) → 0012(developer API token), 모두 **미적용** + meta snapshots/journal
 docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · env(환경변수 키·발급 안내) · acknowledge/ · memory/ · history/ · feedback/ · quality-assurance/ · DESIGN.md · osaka-trip-interactive.html
 ```
 

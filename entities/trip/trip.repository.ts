@@ -315,11 +315,12 @@ export const saveScheduleKinds = async (tripId: string, list: ScheduleKindValues
     })
 }
 
-export const findTripSummariesForUser = async (userId: string) => {
+export const findTripSummariesForUser = async (userId: string, ownedOnly = false) => {
     const db = getDb()
     const memberTripIds = db.select({ tripId: tripMember.tripId }).from(tripMember).where(eq(tripMember.userId, userId))
     const rows = await db.query.trip.findMany({
-        where: (fields, { eq: equals, or, inArray: within }) => or(equals(fields.ownerId, userId), within(fields.id, memberTripIds)),
+        where: (fields, { eq: equals, or, inArray: within }) =>
+            ownedOnly ? equals(fields.ownerId, userId) : or(equals(fields.ownerId, userId), within(fields.id, memberTripIds)),
         orderBy: (fields, { desc }) => [desc(fields.startDate), desc(fields.createdAt)],
         with: {
             members: { where: (fields, { eq: equals }) => equals(fields.userId, userId), columns: { role: true } },

@@ -5,6 +5,7 @@ import { DEFAULT_USER_ROLE, USER_ROLE_MAX_LENGTH } from '@/shared/constant/auth'
 import { PROFILE_BANNER_URL_MAX_LENGTH, PROFILE_BIO_MAX_LENGTH } from '@/shared/constant/community'
 import { tripUpload } from '@/shared/db/schema/trip'
 import { tripTable } from '@/shared/db/table'
+import { developerApiToken } from '@/shared/db/schema/developer-api'
 
 export const user = tripTable('user', {
     id: varchar('id', { length: 36 }).primaryKey(),
@@ -111,6 +112,7 @@ export const userRelations = relations(user, ({ many }) => ({
     sessions: many(session),
     accounts: many(account),
     consents: many(userConsent),
+    developerApiTokens: many(developerApiToken),
 }))
 
 export const sessionRelations = relations(session, ({ one }) => ({

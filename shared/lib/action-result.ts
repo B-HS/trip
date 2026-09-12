@@ -11,7 +11,7 @@ import {
 } from '@/shared/lib/api-response'
 
 export const toErrorResponse = (error: unknown): ApiErrorResponse => {
-    if (isApiError(error)) return errorResponse(error.code, error.message)
+    if (isApiError(error)) return errorResponse(error.code, error.message, error.details)
     if (error instanceof z.ZodError) return errorResponse('VALIDATION_ERROR', error.issues[0]?.message ?? API_ERROR_MESSAGE.VALIDATION_ERROR)
     console.error(error)
     return errorResponse('INTERNAL_ERROR')

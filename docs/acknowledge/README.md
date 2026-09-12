@@ -44,3 +44,5 @@
 - [ADR-0037 — 커뮤니티 확장: 소프트 삭제·신고·차단·채택 회수·사용자명 변경 (2026-09-11)](0037-community-expansion-soft-delete-reports-blocks-revoked-username.md)
 - [ADR-0038 — i18n 1차: next-intl 라우팅·카탈로그 키 체계·남은 범위 (2026-09-11)](0038-i18n-next-intl-routing-message-keys-and-scope.md)
 - [ADR-0039 — 인증 확장: 조건부 OAuth·Email Worker·법적 동의 (2026-09-12)](0039-auth-expansion-oauth-email-consent.md)
+- [ADR-0040 — Phase 7 AI 구현·공식 provider API 결정 (2026-09-12)](0040-ai-implementation.md)
+- [ADR-0041 — 버전 개발자 API·개인용 액세스 토큰 (2026-09-12)](0041-developer-api-and-personal-access-tokens.md)

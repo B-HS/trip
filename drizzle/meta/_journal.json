@@ -78,6 +78,13 @@
       "when": 1789206649431,
       "tag": "0011_ai",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1789208015726,
+      "tag": "0012_developer-api-tokens",
+      "breakpoints": true
     }
   ]
 }

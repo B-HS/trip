@@ -718,7 +718,18 @@
         "deletedPost": "(deleted post)",
         "deletedComment": "(deleted comment)",
         "withdrawnUser": "(withdrawn user)",
-        "noTarget": "(no target)"
+        "noTarget": "(no target)",
+        "rateLimited": "Too many requests. Try again later.",
+        "invalidApiToken": "The API token is invalid or expired.",
+        "apiTokenScopeRequired": "This API token does not have the required scope.",
+        "invalidApiTokenScopes": "Choose at least one supported API token scope.",
+        "invalidApiTokenLabel": "Enter a valid API token label.",
+        "apiTokenLimit": "You have reached the active API token limit.",
+        "apiTokenNotFound": "API token not found.",
+        "invalidApiTokenExpiry": "The API token expiry must be in the future.",
+        "invalidJson": "The request body must be valid JSON.",
+        "idempotencyKeyRequired": "A valid Idempotency-Key header is required.",
+        "idempotencyKeyConflict": "That Idempotency-Key was already used for a different request."
     },
     "toasts": {
         "tripCreated": "Trip created.",
@@ -1248,5 +1259,46 @@
             "delete": "Delete",
             "deleting": "Deleting…"
         }
+    },
+    "developerApi": {
+        "title": "Developer API",
+        "description": "Create personal access tokens for safe automation and AI agents.",
+        "create": "Create token",
+        "label": "Token label",
+        "labelPlaceholder": "My itinerary assistant",
+        "scopes": "Scopes",
+        "read": "Read trips",
+        "write": "Write trips",
+        "inspect": "Inspect token",
+        "expires": "Expires (optional)",
+        "never": "Never",
+        "active": "Active",
+        "revoked": "Revoked",
+        "revoke": "Revoke",
+        "revokeConfirm": "Revoke this token? Existing clients will stop working.",
+        "created": "Token created",
+        "copyWarning": "Copy this token now. It will not be shown again.",
+        "copy": "Copy token",
+        "copied": "Copied",
+        "empty": "No developer tokens yet.",
+        "error": "Could not update developer tokens."
+    },
+    "developerPortal": {
+        "title": "Build calm, useful travel automations",
+        "description": "A clear, owner-scoped API for trip tools, integrations, and AI agents. Start with read access and add writes only when a person approves the plan.",
+        "openapi": "View OpenAPI",
+        "getStarted": "Get started",
+        "authenticationTitle": "Authentication",
+        "authentication": "Personal access tokens are shown once and sent only in the Authorization header. Never place a token in a URL.",
+        "scopesTitle": "Small permissions",
+        "scopes": "Use the smallest scope set that completes the job. Every resource is restricted to the token owner's trips.",
+        "agentTitle": "Ready for agents",
+        "agent": "Deterministic JSON, stable error codes, pagination, idempotent writes, and an OpenAPI document make planning and confirmation predictable.",
+        "quickstartTitle": "A two-minute quickstart",
+        "quickstart": "Create a token in settings, save it in a server-side secret store, then call the introspection endpoint before your first trip request.",
+        "safetyTitle": "Safety by default",
+        "safety": "Read first. Summarize destructive changes and ask for confirmation. Use a new idempotency key for each new mutation and the same key for retries.",
+        "limitsTitle": "Predictable limits",
+        "limits": "The default per-token limit is 60 reads and 20 writes per minute. Respect rate-limit headers and back off on 429 responses."
     }
 }

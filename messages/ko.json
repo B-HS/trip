@@ -715,7 +715,18 @@
         "deletedPost": "(삭제된 글)",
         "deletedComment": "(삭제된 댓글)",
         "withdrawnUser": "(탈퇴한 사용자)",
-        "noTarget": "(대상 없음)"
+        "noTarget": "(대상 없음)",
+        "rateLimited": "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+        "invalidApiToken": "API 토큰이 올바르지 않거나 만료되었습니다.",
+        "apiTokenScopeRequired": "이 API 토큰에 필요한 권한이 없습니다.",
+        "invalidApiTokenScopes": "지원되는 API 토큰 권한을 하나 이상 선택하세요.",
+        "invalidApiTokenLabel": "올바른 API 토큰 이름을 입력하세요.",
+        "apiTokenLimit": "활성 API 토큰 한도에 도달했습니다.",
+        "apiTokenNotFound": "API 토큰을 찾을 수 없습니다.",
+        "invalidApiTokenExpiry": "API 토큰 만료일은 미래여야 합니다.",
+        "invalidJson": "요청 본문은 올바른 JSON이어야 합니다.",
+        "idempotencyKeyRequired": "올바른 Idempotency-Key 헤더가 필요합니다.",
+        "idempotencyKeyConflict": "Idempotency-Key가 다른 요청에 이미 사용되었습니다."
     },
     "toasts": {
         "tripCreated": "여행을 만들었습니다.",
@@ -1245,5 +1256,46 @@
             "delete": "삭제",
             "deleting": "삭제 중…"
         }
+    },
+    "developerApi": {
+        "title": "개발자 API",
+        "description": "자동화와 AI 에이전트를 위한 개인용 액세스 토큰을 관리합니다.",
+        "create": "토큰 만들기",
+        "label": "토큰 이름",
+        "labelPlaceholder": "내 일정 도우미",
+        "scopes": "권한",
+        "read": "트립 읽기",
+        "write": "트립 쓰기",
+        "inspect": "토큰 확인",
+        "expires": "만료일(선택)",
+        "never": "만료 없음",
+        "active": "사용 중",
+        "revoked": "폐기됨",
+        "revoke": "폐기",
+        "revokeConfirm": "이 토큰을 폐기할까요? 기존 클라이언트가 더 이상 작동하지 않습니다.",
+        "created": "토큰이 생성되었습니다",
+        "copyWarning": "지금 복사하세요. 다시 표시되지 않습니다.",
+        "copy": "토큰 복사",
+        "copied": "복사됨",
+        "empty": "아직 개발자 토큰이 없습니다.",
+        "error": "개발자 토큰을 변경하지 못했습니다."
+    },
+    "developerPortal": {
+        "title": "차분하고 유용한 여행 자동화를 만드세요",
+        "description": "트립 도구·통합·AI 에이전트를 위한 명확한 소유자 범위 API입니다. 읽기 권한으로 시작하고 사용자가 계획을 승인한 뒤 쓰기 권한을 추가하세요.",
+        "openapi": "OpenAPI 보기",
+        "getStarted": "시작하기",
+        "authenticationTitle": "인증",
+        "authentication": "개인용 액세스 토큰은 한 번만 표시하며 Authorization 헤더로만 보냅니다. URL에 토큰을 넣지 마세요.",
+        "scopesTitle": "작은 권한",
+        "scopes": "작업에 필요한 최소 권한만 사용하세요. 모든 리소스는 토큰 소유자의 트립으로 제한됩니다.",
+        "agentTitle": "에이전트에 맞는 계약",
+        "agent": "결정적인 JSON, 안정적인 오류 코드, 페이지네이션, 멱등 쓰기, OpenAPI 문서로 계획과 확인 단계를 예측 가능하게 만듭니다.",
+        "quickstartTitle": "2분 만에 시작하기",
+        "quickstart": "설정에서 토큰을 만들고 서버 전용 secret store에 저장한 뒤 첫 트립 요청 전에 introspection 엔드포인트를 호출하세요.",
+        "safetyTitle": "안전한 기본값",
+        "safety": "먼저 읽으세요. 삭제나 전체 교체는 변경 내용을 요약하고 확인을 받으세요. 새 변경에는 새 멱등 키를, 재시도에는 같은 키를 사용하세요.",
+        "limitsTitle": "예측 가능한 한도",
+        "limits": "기본 토큰별 한도는 분당 읽기 60회·쓰기 20회입니다. rate-limit 헤더를 따르고 429 응답에서는 백오프하세요."
     }
 }
