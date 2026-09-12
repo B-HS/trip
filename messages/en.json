@@ -729,7 +729,13 @@
         "invalidApiTokenExpiry": "The API token expiry must be in the future.",
         "invalidJson": "The request body must be valid JSON.",
         "idempotencyKeyRequired": "A valid Idempotency-Key header is required.",
-        "idempotencyKeyConflict": "That Idempotency-Key was already used for a different request."
+        "idempotencyKeyConflict": "That Idempotency-Key was already used for a different request.",
+        "idempotencyInProgress": "That Idempotency-Key is already being processed. Retry shortly.",
+        "invalidPagination": "Page and page_size must be positive integers within the documented limits.",
+        "requestTooLarge": "The request body is too large.",
+        "confirmationRequired": "This destructive request requires an explicit confirmation header.",
+        "ifMatchRequired": "This request requires the If-Match value returned by a current GET.",
+        "staleResource": "The resource changed since it was read. Fetch it again before retrying."
     },
     "toasts": {
         "tripCreated": "Trip created.",

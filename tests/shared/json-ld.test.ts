@@ -13,7 +13,7 @@ const trip = {
     destinations: [{ id: 'destination-1', countryCode: 'JP', city: 'Kyoto' }],
     flights: [],
     lodgings: [],
-} as never
+} as Record<string, unknown>
 
 describe('JSON-LD builders', () => {
     test('escapes HTML-sensitive characters before script injection', () => {
@@ -24,11 +24,29 @@ describe('JSON-LD builders', () => {
     })
 
     test('builds a tourist itinerary with structured destinations and days', () => {
-        const result = buildTouristTripJsonLd(trip, 'https://trip.gumyo.net/s/kyoto')
+        const result = buildTouristTripJsonLd(trip as never, 'https://trip.gumyo.net/s/kyoto')
 
         expect(result['@type']).toBe('TouristTrip')
         expect((result.itinerary as { itemListElement: unknown[] }).itemListElement).toHaveLength(1)
         expect(result.touristDestination).toBeDefined()
+        expect(result).not.toHaveProperty('accommodation')
+        expect(result).not.toHaveProperty('subjectOf')
+    })
+
+    test('uses TouristTrip departure and arrival time properties from flights', () => {
+        const result = buildTouristTripJsonLd(
+            {
+                ...trip,
+                flights: [
+                    { direction: 'outbound', departTime: '09:30', arriveTime: '11:00', departCode: 'ICN', arriveCode: 'KIX' },
+                    { direction: 'inbound', departTime: '14:00', arriveTime: '16:00', departCode: 'KIX', arriveCode: 'ICN' },
+                ],
+            } as never,
+            'https://trip.gumyo.net/s/kyoto',
+        )
+
+        expect(result.departureTime).toBe('2026-04-01T09:30:00')
+        expect(result.arrivalTime).toBe('2026-04-05T16:00:00')
     })
 
     test('uses Article for posts and QAPage only for questions', () => {

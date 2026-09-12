@@ -1,27 +1,50 @@
+import { and, eq } from 'drizzle-orm'
 import { API_RATE_LIMIT_READ_LIMIT, API_RATE_LIMIT_WINDOW_SECONDS, API_RATE_LIMIT_WRITE_LIMIT } from '@/shared/constant/developer-api'
+import { getDb } from '@/shared/db/client'
+import { developerApiRateLimit } from '@/shared/db/schema/developer-api'
 import { ApiError } from '@/shared/lib/api-response'
 
-type Bucket = { timestamps: number[] }
-const buckets = new Map<string, Bucket>()
+export type DeveloperApiRate = { limit: number; remaining: number; reset: number }
 
-export const checkDeveloperApiRateLimit = (tokenId: string, method: string) => {
-    const now = Date.now()
-    const windowStart = now - API_RATE_LIMIT_WINDOW_SECONDS * 1000
-    const key = `${tokenId}:${method === 'GET' || method === 'HEAD' ? 'read' : 'write'}`
-    const bucket = buckets.get(key) ?? { timestamps: [] }
-    bucket.timestamps = bucket.timestamps.filter((timestamp) => timestamp > windowStart)
-    const limit = method === 'GET' || method === 'HEAD' ? API_RATE_LIMIT_READ_LIMIT : API_RATE_LIMIT_WRITE_LIMIT
-    if (bucket.timestamps.length >= limit) {
-        const retryAfter = Math.max(1, Math.ceil((bucket.timestamps[0] + API_RATE_LIMIT_WINDOW_SECONDS * 1000 - now) / 1000))
-        throw new ApiError('RATE_LIMITED', 'error.rateLimited', { retryAfter, limit, reset: Math.ceil((now + retryAfter * 1000) / 1000) })
-    }
-    bucket.timestamps.push(now)
-    buckets.set(key, bucket)
-    return {
-        limit,
-        remaining: Math.max(0, limit - bucket.timestamps.length),
-        reset: Math.ceil((now + API_RATE_LIMIT_WINDOW_SECONDS * 1000) / 1000),
-    }
+export const rateLimitBucket = (method: string) => (method === 'GET' || method === 'HEAD' ? 'read' : 'write') as 'read' | 'write'
+export const rateLimitValue = (bucket: 'read' | 'write') => (bucket === 'read' ? API_RATE_LIMIT_READ_LIMIT : API_RATE_LIMIT_WRITE_LIMIT)
+
+/** The row is locked for the increment, so limits are shared across application instances. */
+export const checkDeveloperApiRateLimit = async (tokenId: string, method: string): Promise<DeveloperApiRate> => {
+    const bucket = rateLimitBucket(method)
+    const limit = rateLimitValue(bucket)
+    const now = new Date()
+    const windowMs = API_RATE_LIMIT_WINDOW_SECONDS * 1000
+    return getDb().transaction(async (tx) => {
+        const [row] = await tx
+            .select()
+            .from(developerApiRateLimit)
+            .where(and(eq(developerApiRateLimit.tokenId, tokenId), eq(developerApiRateLimit.bucket, bucket)))
+            .limit(1)
+            .for('update')
+        if (!row || now.getTime() - row.windowStartedAt.getTime() >= windowMs) {
+            await tx
+                .insert(developerApiRateLimit)
+                .values({ tokenId, bucket, windowStartedAt: now, requestCount: 1 })
+                .onDuplicateKeyUpdate({ set: { windowStartedAt: now, requestCount: 1, updatedAt: now } })
+            return { limit, remaining: limit - 1, reset: Math.ceil((now.getTime() + windowMs) / 1000) }
+        }
+        if (row.requestCount >= limit) {
+            const retryAfter = Math.max(1, Math.ceil((row.windowStartedAt.getTime() + windowMs - now.getTime()) / 1000))
+            throw new ApiError('RATE_LIMITED', 'error.rateLimited', {
+                retryAfter,
+                limit,
+                reset: Math.ceil((row.windowStartedAt.getTime() + windowMs) / 1000),
+            })
+        }
+        await tx
+            .update(developerApiRateLimit)
+            .set({ requestCount: row.requestCount + 1, updatedAt: now })
+            .where(and(eq(developerApiRateLimit.tokenId, tokenId), eq(developerApiRateLimit.bucket, bucket)))
+        return {
+            limit,
+            remaining: Math.max(0, limit - row.requestCount - 1),
+            reset: Math.ceil((row.windowStartedAt.getTime() + windowMs) / 1000),
+        }
+    })
 }
-
-export const clearDeveloperApiRateLimit = () => buckets.clear()

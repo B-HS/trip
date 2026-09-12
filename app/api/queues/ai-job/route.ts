@@ -3,6 +3,9 @@ import { processAiJob } from '@/entities/ai/ai.repository'
 
 export const maxDuration = 300
 
+// Vercel's handleCallback validates the queue callback envelope/authentication
+// boundary. VERCEL_QUEUE_TOKEN is only used by the REST publisher fallback and
+// must never be treated as a callback bearer secret.
 const handleQueueCallback = handleCallback<{ jobId: string }>(
     async (message) => {
         if (!message.jobId) throw new Error('invalid queue message')

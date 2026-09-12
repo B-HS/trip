@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "2872c5b8-70d3-47ac-8f66-853ba100d114",
+  "id": "6867ed55-a65a-49c2-b8a7-5229c36326ad",
   "prevId": "abb61ecc-0265-402d-85b5-dbb9ca62dc62",
   "tables": {
     "trip_ai_conversation": {
@@ -185,6 +185,27 @@
         "proposal": {
           "name": "proposal",
           "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lease_id": {
+          "name": "lease_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lease_expires_at": {
+          "name": "lease_expires_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "timestamp(3)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -418,6 +439,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "job_id": {
+          "name": "job_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp(3)",
@@ -434,6 +462,13 @@
             "conversation_id"
           ],
           "isUnique": false
+        },
+        "ai_message_job_idx": {
+          "name": "ai_message_job_idx",
+          "columns": [
+            "job_id"
+          ],
+          "isUnique": true
         }
       },
       "foreignKeys": {
@@ -488,7 +523,7 @@
         },
         "status": {
           "name": "status",
-          "type": "enum('pending','approved','rejected','applied')",
+          "type": "enum('pending','approved','applying','rejected','applied')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
@@ -651,6 +686,13 @@
             "created_at"
           ],
           "isUnique": false
+        },
+        "ai_usage_job_idx": {
+          "name": "ai_usage_job_idx",
+          "columns": [
+            "job_id"
+          ],
+          "isUnique": true
         }
       },
       "foreignKeys": {
@@ -2094,6 +2136,181 @@
           "columns": [
             "blocker_id",
             "blocked_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "trip_developer_api_idempotency": {
+      "name": "trip_developer_api_idempotency",
+      "columns": {
+        "token_id": {
+          "name": "token_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idempotency_key": {
+          "name": "idempotency_key",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "request_hash": {
+          "name": "request_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('processing','completed')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'processing'"
+        },
+        "response": {
+          "name": "response",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "response_status": {
+          "name": "response_status",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "claimed_at": {
+          "name": "claimed_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "developer_api_idempotency_claimed_idx": {
+          "name": "developer_api_idempotency_claimed_idx",
+          "columns": [
+            "claimed_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "trip_developer_api_idempotency_token_id_trip_developer_api_token_id_fk": {
+          "name": "trip_developer_api_idempotency_token_id_trip_developer_api_token_id_fk",
+          "tableFrom": "trip_developer_api_idempotency",
+          "tableTo": "trip_developer_api_token",
+          "columnsFrom": [
+            "token_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "trip_developer_api_idempotency_token_id_idempotency_key_pk": {
+          "name": "trip_developer_api_idempotency_token_id_idempotency_key_pk",
+          "columns": [
+            "token_id",
+            "idempotency_key"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "trip_developer_api_rate_limit": {
+      "name": "trip_developer_api_rate_limit",
+      "columns": {
+        "token_id": {
+          "name": "token_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "bucket": {
+          "name": "bucket",
+          "type": "enum('read','write')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "window_started_at": {
+          "name": "window_started_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "request_count": {
+          "name": "request_count",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "developer_api_rate_limit_window_idx": {
+          "name": "developer_api_rate_limit_window_idx",
+          "columns": [
+            "window_started_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "trip_developer_api_rate_limit_token_id_trip_developer_api_token_id_fk": {
+          "name": "trip_developer_api_rate_limit_token_id_trip_developer_api_token_id_fk",
+          "tableFrom": "trip_developer_api_rate_limit",
+          "tableTo": "trip_developer_api_token",
+          "columnsFrom": [
+            "token_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "trip_developer_api_rate_limit_token_id_bucket_pk": {
+          "name": "trip_developer_api_rate_limit_token_id_bucket_pk",
+          "columns": [
+            "token_id",
+            "bucket"
           ]
         }
       },

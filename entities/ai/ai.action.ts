@@ -14,6 +14,7 @@ import { aiJobInputSchema, aiKeyInputSchema, aiProposalDecisionSchema, aiProvide
 import { runAction } from '@/shared/lib/action-result'
 import { requireUser } from '@/shared/lib/session'
 import { enqueueAiJob } from '@/shared/lib/ai-queue'
+import { ANALYTICS_EVENT, trackEvent } from '@/shared/lib/analytics'
 
 export const saveAiKeyAction = async (input: unknown) => {
     const user = await requireUser()
@@ -41,6 +42,7 @@ export const createAiJobAction = async (input: unknown) => {
         const values = aiJobInputSchema.parse(input)
         const job = await createAiJob(user.id, values)
         await enqueueAiJob(job.jobId)
+        trackEvent(ANALYTICS_EVENT.aiJobRequested, { kind: values.kind })
         return job
     })
 }

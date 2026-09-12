@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm'
-import { index, json, timestamp, uniqueIndex, varchar } from 'drizzle-orm/mysql-core'
+import { index, int, json, mysqlEnum, primaryKey, timestamp, uniqueIndex, varchar } from 'drizzle-orm/mysql-core'
 import { user } from '@/shared/db/schema/auth'
 import { API_TOKEN_SCOPES, type ApiTokenScope } from '@/shared/constant/developer-api'
 import { tripTable } from '@/shared/db/table'
@@ -33,5 +33,41 @@ export const developerApiToken = tripTable(
 export const developerApiTokenRelations = relations(developerApiToken, ({ one }) => ({
     user: one(user, { fields: [developerApiToken.userId], references: [user.id] }),
 }))
+
+export const developerApiIdempotency = tripTable(
+    'developer_api_idempotency',
+    {
+        tokenId: varchar('token_id', { length: 36 })
+            .notNull()
+            .references(() => developerApiToken.id, { onDelete: 'cascade' }),
+        idempotencyKey: varchar('idempotency_key', { length: 255 }).notNull(),
+        requestHash: varchar('request_hash', { length: 64 }).notNull(),
+        status: mysqlEnum('status', ['processing', 'completed'] as const)
+            .notNull()
+            .default('processing'),
+        response: json('response'),
+        responseStatus: int('response_status'),
+        claimedAt: timestamp('claimed_at', { fsp: 3 }).defaultNow().notNull(),
+        completedAt: timestamp('completed_at', { fsp: 3 }),
+    },
+    (table) => [primaryKey({ columns: [table.tokenId, table.idempotencyKey] }), index('developer_api_idempotency_claimed_idx').on(table.claimedAt)],
+)
+
+export const developerApiRateLimit = tripTable(
+    'developer_api_rate_limit',
+    {
+        tokenId: varchar('token_id', { length: 36 })
+            .notNull()
+            .references(() => developerApiToken.id, { onDelete: 'cascade' }),
+        bucket: mysqlEnum('bucket', ['read', 'write'] as const).notNull(),
+        windowStartedAt: timestamp('window_started_at', { fsp: 3 }).notNull(),
+        requestCount: int('request_count').notNull().default(0),
+        updatedAt: timestamp('updated_at', { fsp: 3 })
+            .defaultNow()
+            .$onUpdate(() => new Date())
+            .notNull(),
+    },
+    (table) => [primaryKey({ columns: [table.tokenId, table.bucket] }), index('developer_api_rate_limit_window_idx').on(table.windowStartedAt)],
+)
 
 export const API_TOKEN_SCOPE_VALUES = API_TOKEN_SCOPES

@@ -16,11 +16,13 @@ type BoardPageProps = {
 export const generateMetadata = async ({ params }: BoardPageProps): Promise<Metadata> => {
     const { locale, key } = await params
     const t = await getTranslations({ locale, namespace: 'metadata.boardNotFound' })
+    const boardMetadata = await getTranslations({ locale, namespace: 'metadata.boards' })
     const board = await getBoardByKey(key)
     return createPageMetadata({
         locale,
         path: `/boards/${encodeURIComponent(key)}`,
         title: board === null ? t('title') : board.name,
+        description: boardMetadata('description'),
         indexable: board !== null,
     })
 }

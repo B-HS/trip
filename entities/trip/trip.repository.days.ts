@@ -193,13 +193,14 @@ const upsertDay = async (tx: TripTransaction, tripId: string, input: DayValues) 
     return id
 }
 
-export const saveDay = async (tripId: string, input: DayValues) =>
-    getDb().transaction(async (tx) => {
-        const dayId = await upsertDay(tx, tripId, input)
-        const children = await saveDayChildren(tx, tripId, dayId, input)
-        await touchTrip(tx, tripId)
-        return { id: dayId, ...children } satisfies SavedDay
-    })
+export const saveDayInTransaction = async (tx: TripTransaction, tripId: string, input: DayValues) => {
+    const dayId = await upsertDay(tx, tripId, input)
+    const children = await saveDayChildren(tx, tripId, dayId, input)
+    await touchTrip(tx, tripId)
+    return { id: dayId, ...children } satisfies SavedDay
+}
+
+export const saveDay = async (tripId: string, input: DayValues) => getDb().transaction((tx) => saveDayInTransaction(tx, tripId, input))
 
 export const deleteDay = async (tripId: string, dayId: string) => {
     await getDb().transaction(async (tx) => {

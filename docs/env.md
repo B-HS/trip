@@ -65,7 +65,7 @@ R2_PUBLIC_BASE_URL=
 # 7단계(AI) 전까지는 쓰이지 않는다
 APP_ENCRYPTION_KEY=
 
-# 선택 — Vercel Queues REST fallback / callback bearer guard
+# 선택 — Vercel Queues REST fallback credentials. Queue callbacks are authenticated by the Vercel Queues SDK handler/OIDC boundary, not this publish token.
 VERCEL_QUEUE_REGION=
 VERCEL_QUEUE_TOKEN=
 VERCEL_QUEUE_URL=

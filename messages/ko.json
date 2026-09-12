@@ -726,7 +726,13 @@
         "invalidApiTokenExpiry": "API 토큰 만료일은 미래여야 합니다.",
         "invalidJson": "요청 본문은 올바른 JSON이어야 합니다.",
         "idempotencyKeyRequired": "올바른 Idempotency-Key 헤더가 필요합니다.",
-        "idempotencyKeyConflict": "Idempotency-Key가 다른 요청에 이미 사용되었습니다."
+        "idempotencyKeyConflict": "Idempotency-Key가 다른 요청에 이미 사용되었습니다.",
+        "idempotencyInProgress": "해당 Idempotency-Key 요청을 처리 중입니다. 잠시 후 다시 시도해 주세요.",
+        "invalidPagination": "page와 page_size는 문서에 정의된 범위의 양의 정수여야 합니다.",
+        "requestTooLarge": "요청 본문이 너무 큽니다.",
+        "confirmationRequired": "삭제나 전체 교체 요청에는 명시적인 확인 헤더가 필요합니다.",
+        "ifMatchRequired": "현재 GET 응답에서 받은 If-Match 값이 필요합니다.",
+        "staleResource": "리소스가 읽은 뒤 변경되었습니다. 다시 조회한 후 시도해 주세요."
     },
     "toasts": {
         "tripCreated": "여행을 만들었습니다.",

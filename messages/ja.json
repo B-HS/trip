@@ -726,7 +726,13 @@
         "invalidApiTokenExpiry": "API トークンの有効期限は未来にしてください。",
         "invalidJson": "リクエスト本文は有効な JSON である必要があります。",
         "idempotencyKeyRequired": "有効な Idempotency-Key ヘッダーが必要です。",
-        "idempotencyKeyConflict": "その Idempotency-Key は別のリクエストで使用済みです。"
+        "idempotencyKeyConflict": "その Idempotency-Key は別のリクエストで使用済みです。",
+        "idempotencyInProgress": "その Idempotency-Key は処理中です。少し待って再試行してください。",
+        "invalidPagination": "page と page_size は文書化された範囲の正の整数で指定してください。",
+        "requestTooLarge": "リクエスト本文が大きすぎます。",
+        "confirmationRequired": "破壊的なリクエストには明示的な確認ヘッダーが必要です。",
+        "ifMatchRequired": "現在の GET で返された If-Match 値が必要です。",
+        "staleResource": "読み取り後にリソースが変更されました。再取得してから再試行してください。"
     },
     "toasts": {
         "tripCreated": "旅行を作成しました。",

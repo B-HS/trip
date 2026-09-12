@@ -51,7 +51,7 @@ const PERIOD_ISSUE = { message: 'validation.endDateBeforeStart', path: ['endDate
 export const tripBasicsSchema = tripBasicsFieldsSchema.refine(hasOrderedPeriod, PERIOD_ISSUE).refine(hasPairedTripLength, TRIP_LENGTH_ISSUE)
 
 export const destinationInputSchema = tripTemplateDestinationSchema.extend({ id: optionalId })
-export const destinationListSchema = z.array(destinationInputSchema)
+export const destinationListSchema = z.array(destinationInputSchema).max(20)
 
 export const tripBasicsFormSchema = tripBasicsFieldsSchema
     .extend({ destinations: destinationListSchema })
@@ -64,13 +64,13 @@ export const tripCreateSchema = tripBasicsFieldsSchema
     .refine(hasPairedTripLength, TRIP_LENGTH_ISSUE)
 
 export const flightInputSchema = tripTemplateFlightSchema.extend({ id: optionalId })
-export const flightListSchema = z.array(flightInputSchema)
+export const flightListSchema = z.array(flightInputSchema).max(20)
 
 export const lodgingInputSchema = tripTemplateLodgingSchema.extend({ id: optionalId })
-export const lodgingListSchema = z.array(lodgingInputSchema)
+export const lodgingListSchema = z.array(lodgingInputSchema).max(20)
 
 export const sidebarLinkInputSchema = tripTemplateSidebarLinkSchema.extend({ id: optionalId })
-export const sidebarLinkListSchema = z.array(sidebarLinkInputSchema)
+export const sidebarLinkListSchema = z.array(sidebarLinkInputSchema).max(30)
 
 export const sidebarSchema = tripTemplateFieldsSchema.pick({ sidebarNote: true }).extend({ links: sidebarLinkListSchema })
 
@@ -83,11 +83,11 @@ export const bookingInputSchema = tripTemplateBookingSchema.extend({
     id: optionalId,
     attachments: z.array(bookingAttachmentInputSchema).default([]),
 })
-export const bookingListSchema = z.array(bookingInputSchema)
+export const bookingListSchema = z.array(bookingInputSchema).max(100)
 
 export const infoBlockInputSchema = tripTemplateInfoBlockSchema.extend({ id: optionalId })
 export const infoSectionInputSchema = tripTemplateInfoSectionSchema.extend({ id: optionalId, blocks: z.array(infoBlockInputSchema).default([]) })
-export const infoSectionListSchema = z.array(infoSectionInputSchema)
+export const infoSectionListSchema = z.array(infoSectionInputSchema).max(50)
 
 export const scheduleKindInputSchema = tripTemplateScheduleKindSchema.extend({ id: optionalId })
 export const scheduleKindListSchema = z
@@ -108,10 +108,10 @@ export const dayNoteInputSchema = tripTemplateDayNoteSchema.extend({ id: optiona
 
 export const dayInputSchema = tripTemplateDaySchema.extend({
     id: optionalId,
-    facts: z.array(dayFactInputSchema).default([]),
-    routes: z.array(routeInputSchema).default([]),
-    scheduleItems: z.array(scheduleItemInputSchema).default([]),
-    notes: z.array(dayNoteInputSchema).default([]),
+    facts: z.array(dayFactInputSchema).max(50).default([]),
+    routes: z.array(routeInputSchema).max(100).default([]),
+    scheduleItems: z.array(scheduleItemInputSchema).max(200).default([]),
+    notes: z.array(dayNoteInputSchema).max(50).default([]),
 })
 
 export const dayIdListSchema = z.array(z.uuid()).min(1)

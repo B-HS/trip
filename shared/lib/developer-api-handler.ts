@@ -4,15 +4,33 @@ import { errorResponseStatus, toErrorResponse } from '@/shared/lib/action-result
 import { checkDeveloperApiRateLimit } from '@/shared/lib/api-rate-limit'
 import { requireDeveloperApiRequest, type AuthenticatedDeveloperToken } from '@/shared/lib/developer-api-token'
 import { ApiError } from '@/shared/lib/api-response'
+import { createHash } from 'node:crypto'
 
-export type DeveloperApiContext = { auth: AuthenticatedDeveloperToken; rate: ReturnType<typeof checkDeveloperApiRateLimit> }
+const API_REQUEST_BODY_MAX_BYTES = 1_000_000
+const API_PAGE_MAX = 1_000_000
+
+const responseMeta = Symbol('developer-api-response')
+type DeveloperApiResult<T> = { [responseMeta]: true; data: T; status: number; headers?: Record<string, string> }
+
+export const developerApiResponse = <T>(data: T, options: { status?: number; headers?: Record<string, string> } = {}): DeveloperApiResult<T> => ({
+    [responseMeta]: true,
+    data,
+    status: options.status ?? 200,
+    headers: options.headers,
+})
+
+export type DeveloperApiContext = { auth: AuthenticatedDeveloperToken; rate: Awaited<ReturnType<typeof checkDeveloperApiRateLimit>> }
 
 export const withDeveloperApi = async <T>(request: Request, handler: (context: DeveloperApiContext) => Promise<T>) => {
     try {
         const auth = await requireDeveloperApiRequest(request)
-        const rate = checkDeveloperApiRateLimit(auth.tokenId, request.method)
+        const rate = await checkDeveloperApiRateLimit(auth.tokenId, request.method)
         const result = await handler({ auth, rate })
-        return NextResponse.json({ success: true, data: result }, { headers: rateHeaders(rate) })
+        const meta = result && typeof result === 'object' && responseMeta in result ? (result as unknown as DeveloperApiResult<unknown>) : null
+        return NextResponse.json(
+            { success: true, data: meta ? meta.data : result },
+            { status: meta?.status ?? 200, headers: { ...rateHeaders(rate), ...(meta?.headers ?? {}) } },
+        )
     } catch (error) {
         unstable_rethrow(error)
         const body = toErrorResponse(error)
@@ -35,8 +53,17 @@ export const rateHeaders = (rate: { limit: number; remaining: number; reset: num
 })
 
 export const parseJson = async (request: Request) => {
+    const contentLength = request.headers.get('content-length')
+    if (contentLength !== null && Number(contentLength) > API_REQUEST_BODY_MAX_BYTES) throw new ApiError('PAYLOAD_TOO_LARGE', 'error.requestTooLarge')
+    let raw: string
     try {
-        return await request.json()
+        raw = await request.text()
+    } catch {
+        throw new ApiError('VALIDATION_ERROR', 'error.invalidJson')
+    }
+    if (new TextEncoder().encode(raw).byteLength > API_REQUEST_BODY_MAX_BYTES) throw new ApiError('PAYLOAD_TOO_LARGE', 'error.requestTooLarge')
+    try {
+        return JSON.parse(raw) as unknown
     } catch {
         throw new ApiError('VALIDATION_ERROR', 'error.invalidJson')
     }
@@ -44,8 +71,16 @@ export const parseJson = async (request: Request) => {
 
 export const parsePage = (request: Request) => {
     const url = new URL(request.url)
-    const page = Math.max(1, Number.parseInt(url.searchParams.get('page') ?? '1', 10) || 1)
-    const pageSize = Math.min(100, Math.max(1, Number.parseInt(url.searchParams.get('page_size') ?? '20', 10) || 20))
+    const parse = (name: string, fallback: number, max: number) => {
+        const value = url.searchParams.get(name)
+        if (value === null) return fallback
+        if (!/^[1-9]\d*$/.test(value)) throw new ApiError('VALIDATION_ERROR', 'error.invalidPagination')
+        const parsed = Number(value)
+        if (!Number.isSafeInteger(parsed) || parsed > max) throw new ApiError('VALIDATION_ERROR', 'error.invalidPagination')
+        return parsed
+    }
+    const page = parse('page', 1, API_PAGE_MAX)
+    const pageSize = parse('page_size', 20, 100)
     return { page, pageSize }
 }
 
@@ -55,4 +90,19 @@ export const requireIdempotencyKey = (request: Request) => {
         throw new ApiError('VALIDATION_ERROR', 'error.idempotencyKeyRequired')
     }
     return key
+}
+
+export const requireConfirmation = (request: Request, expected: 'replace' | 'delete') => {
+    if (request.headers.get('x-trip-confirm')?.trim().toLowerCase() !== expected) throw new ApiError('VALIDATION_ERROR', 'error.confirmationRequired')
+}
+
+export const etagForUpdatedAt = (updatedAt: Date | string) => {
+    const value = updatedAt instanceof Date ? updatedAt.toISOString() : updatedAt
+    return `"${createHash('sha256').update(value).digest('base64url')}"`
+}
+
+export const requireIfMatch = (request: Request, updatedAt: Date | string) => {
+    const value = request.headers.get('if-match')
+    if (!value) throw new ApiError('PRECONDITION_REQUIRED', 'error.ifMatchRequired')
+    if (value !== etagForUpdatedAt(updatedAt)) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
 }

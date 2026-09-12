@@ -67,9 +67,13 @@ export const tripAiMessage = tripTable(
         model: varchar('model', { length: 160 }),
         inputTokens: int('input_tokens'),
         outputTokens: int('output_tokens'),
+        // Deliberately no FK: this nullable output marker is inserted with the
+        // job's assistant message and is protected by a unique index. Keeping
+        // the dependency one-way avoids a circular Drizzle relation initializer.
+        jobId: varchar('job_id', { length: 36 }),
         createdAt: createdAt(),
     },
-    (table) => [index('ai_message_conversation_id_idx').on(table.conversationId)],
+    (table) => [index('ai_message_conversation_id_idx').on(table.conversationId), uniqueIndex('ai_message_job_idx').on(table.jobId)],
 )
 
 export const tripAiJob = tripTable(
@@ -87,6 +91,9 @@ export const tripAiJob = tripTable(
         attempts: int('attempts').notNull().default(0),
         error: varchar('error', { length: 500 }),
         proposal: json('proposal'),
+        leaseId: varchar('lease_id', { length: 36 }),
+        leaseExpiresAt: timestamp('lease_expires_at', { fsp: 3 }),
+        completedAt: timestamp('completed_at', { fsp: 3 }),
         createdAt: createdAt(),
         updatedAt: timestamp('updated_at', { fsp: 3 })
             .defaultNow()
@@ -111,7 +118,7 @@ export const tripAiUsage = tripTable(
         outputTokens: int('output_tokens').notNull().default(0),
         createdAt: createdAt(),
     },
-    (table) => [index('ai_usage_user_created_at_idx').on(table.userId, table.createdAt)],
+    (table) => [index('ai_usage_user_created_at_idx').on(table.userId, table.createdAt), uniqueIndex('ai_usage_job_idx').on(table.jobId)],
 )
 
 export const tripAiProposal = tripTable(

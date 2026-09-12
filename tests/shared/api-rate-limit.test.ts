@@ -1,11 +1,11 @@
-import { beforeEach, describe, expect, test } from 'bun:test'
-import { clearDeveloperApiRateLimit, checkDeveloperApiRateLimit } from '@/shared/lib/api-rate-limit'
+import { describe, expect, test } from 'bun:test'
+import { rateLimitBucket, rateLimitValue } from '@/shared/lib/api-rate-limit'
 
 describe('developer API rate limits', () => {
-    beforeEach(() => clearDeveloperApiRateLimit())
-
     test('tracks separate read and write buckets', () => {
-        expect(checkDeveloperApiRateLimit('token', 'GET').remaining).toBe(59)
-        expect(checkDeveloperApiRateLimit('token', 'POST').remaining).toBe(19)
+        expect(rateLimitBucket('GET')).toBe('read')
+        expect(rateLimitBucket('POST')).toBe('write')
+        expect(rateLimitValue('read')).toBe(60)
+        expect(rateLimitValue('write')).toBe(20)
     })
 })

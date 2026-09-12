@@ -20,7 +20,7 @@
 | 10 SEO·GEO·JSON-LD·Analytics·Speed Insights | 코드 구현(배포 후 지표 확인 대기)         | ADR-0030, 2026-09-12 Phase 8 구현 기록                                                                                                                                           |
 | 11 i18n ko·ja·en                            | 2차 구현 완료(배포 전)                    | ADR-0033 §4, ADR-0038, 5단계. 전체 UI·trip 도메인·locale 포맷·로그인 셸 전환                                                                                                     |
 | 12 출발 공항·지구본 상호작용                | 완료(4-4e)                                | ADR-0035, 마이그레이션 0007. 트립별 출발 공항(편집기 콤보박스·템플릿 JSON), `/trips` 지구본 드래그 회전·hover 툴팁·선 클릭 `?route=` 필터                                        |
-| 13 공개 개발자 API·개인용 액세스 토큰       | 완료(Phase 9)                             | ADR-0041, `/api/v1`, OpenAPI 3.1, `/settings/api`, rate limit·idempotency, migration 0012 provision. 0010 동의 → 0011 AI → 0012 API 순서와 공유 캐시 승격 검토                   |
+| 13 공개 개발자 API·개인용 액세스 토큰       | 완료(Phase 9)                             | ADR-0041, `/api/v1`, OpenAPI 3.1, `/settings/api`, durable DB rate limit·idempotency, migration 0012 provision. 0010 동의 → 0011 AI → 0012 API 선형 순서                         |
 
 ## 1. 콘텐츠 사이드바 — 추가 링크와 설명 커스터마이징
 

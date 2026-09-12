@@ -10,7 +10,7 @@ export type AiMessageRole = (typeof AI_MESSAGE_ROLES)[number]
 export const AI_JOB_KINDS = ['question', 'proposal'] as const
 export type AiJobKind = (typeof AI_JOB_KINDS)[number]
 
-export const AI_PROPOSAL_STATUSES = ['pending', 'approved', 'rejected', 'applied'] as const
+export const AI_PROPOSAL_STATUSES = ['pending', 'approved', 'applying', 'rejected', 'applied'] as const
 export type AiProposalStatus = (typeof AI_PROPOSAL_STATUSES)[number]
 
 export const AI_REASONING_EFFORTS = ['low', 'medium', 'high'] as const

@@ -1,27 +1,71 @@
 import { createHash } from 'node:crypto'
+import { and, eq, lt } from 'drizzle-orm'
+import { getDb } from '@/shared/db/client'
+import { developerApiIdempotency } from '@/shared/db/schema/developer-api'
 import { ApiError } from '@/shared/lib/api-response'
 
-type CachedResponse = { requestHash: string; response: unknown; status: number; expiresAt: number }
-const records = new Map<string, CachedResponse>()
-const TTL_MS = 24 * 60 * 60 * 1000
+const PROCESSING_TTL_MS = 10 * 60 * 1000
+export type IdempotencyReplay = { response: unknown; status: number }
 
 export const requestFingerprint = async (request: Request, body: unknown) => {
     const raw = JSON.stringify({ method: request.method, path: new URL(request.url).pathname, body })
     return createHash('sha256').update(raw).digest('hex')
 }
 
-export const readIdempotentResponse = (tokenId: string, key: string, requestHash: string) => {
-    const record = records.get(`${tokenId}:${key}`)
-    if (!record || record.expiresAt <= Date.now()) {
-        if (record) records.delete(`${tokenId}:${key}`)
-        return null
+export const claimIdempotency = async (tokenId: string, key: string, requestHash: string): Promise<IdempotencyReplay | null> => {
+    const db = getDb()
+    const staleBefore = new Date(Date.now() - PROCESSING_TTL_MS)
+    try {
+        await db.insert(developerApiIdempotency).values({ tokenId, idempotencyKey: key, requestHash, status: 'processing' })
+    } catch {
+        const row = await db
+            .select()
+            .from(developerApiIdempotency)
+            .where(and(eq(developerApiIdempotency.tokenId, tokenId), eq(developerApiIdempotency.idempotencyKey, key)))
+            .limit(1)
+        if (!row[0]) throw new ApiError('INTERNAL_ERROR')
+        if (row[0].requestHash !== requestHash) throw new ApiError('VALIDATION_ERROR', 'error.idempotencyKeyConflict')
+        if (row[0].status === 'completed') return { response: row[0].response, status: row[0].responseStatus ?? 200 }
+        const recovered = await db
+            .update(developerApiIdempotency)
+            .set({ claimedAt: new Date() })
+            .where(
+                and(
+                    eq(developerApiIdempotency.tokenId, tokenId),
+                    eq(developerApiIdempotency.idempotencyKey, key),
+                    eq(developerApiIdempotency.status, 'processing'),
+                    lt(developerApiIdempotency.claimedAt, staleBefore),
+                ),
+            )
+        if (recovered[0].affectedRows === 0) throw new ApiError('VALIDATION_ERROR', 'error.idempotencyInProgress')
     }
-    if (record.requestHash !== requestHash) throw new ApiError('VALIDATION_ERROR', 'error.idempotencyKeyConflict')
-    return record
+    return null
 }
 
-export const writeIdempotentResponse = (tokenId: string, key: string, requestHash: string, response: unknown, status = 200) => {
-    records.set(`${tokenId}:${key}`, { requestHash, response, status, expiresAt: Date.now() + TTL_MS })
+export const completeIdempotency = async (tokenId: string, key: string, requestHash: string, response: unknown, status = 200) => {
+    const result = await getDb()
+        .update(developerApiIdempotency)
+        .set({ status: 'completed', response, responseStatus: status, completedAt: new Date() })
+        .where(
+            and(
+                eq(developerApiIdempotency.tokenId, tokenId),
+                eq(developerApiIdempotency.idempotencyKey, key),
+                eq(developerApiIdempotency.requestHash, requestHash),
+                eq(developerApiIdempotency.status, 'processing'),
+            ),
+        )
+    if (result[0].affectedRows === 0) throw new ApiError('INTERNAL_ERROR')
 }
 
-export const clearApiIdempotency = () => records.clear()
+export const releaseIdempotency = async (tokenId: string, key: string, requestHash: string) => {
+    await getDb()
+        .delete(developerApiIdempotency)
+        .where(
+            and(
+                eq(developerApiIdempotency.tokenId, tokenId),
+                eq(developerApiIdempotency.idempotencyKey, key),
+                eq(developerApiIdempotency.requestHash, requestHash),
+                eq(developerApiIdempotency.status, 'processing'),
+            ),
+        )
+}

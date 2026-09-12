@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
+import { createPageMetadata } from '@/shared/lib/metadata'
 
 type Props = { params: Promise<{ locale: string }> }
 
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
     const { locale } = await params
     const t = await getTranslations({ locale, namespace: 'developerPortal' })
-    return { title: t('title'), description: t('description') }
+    return createPageMetadata({ locale, path: '/developers', title: t('title'), description: t('description') })
 }
 
 export default async function DevelopersPage() {

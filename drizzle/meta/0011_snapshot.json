@@ -189,6 +189,27 @@
           "notNull": false,
           "autoincrement": false
         },
+        "lease_id": {
+          "name": "lease_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lease_expires_at": {
+          "name": "lease_expires_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp(3)",
@@ -418,6 +439,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "job_id": {
+          "name": "job_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp(3)",
@@ -434,6 +462,13 @@
             "conversation_id"
           ],
           "isUnique": false
+        },
+        "ai_message_job_idx": {
+          "name": "ai_message_job_idx",
+          "columns": [
+            "job_id"
+          ],
+          "isUnique": true
         }
       },
       "foreignKeys": {
@@ -488,7 +523,7 @@
         },
         "status": {
           "name": "status",
-          "type": "enum('pending','approved','rejected','applied')",
+          "type": "enum('pending','approved','applying','rejected','applied')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
@@ -651,6 +686,13 @@
             "created_at"
           ],
           "isUnique": false
+        },
+        "ai_usage_job_idx": {
+          "name": "ai_usage_job_idx",
+          "columns": [
+            "job_id"
+          ],
+          "isUnique": true
         }
       },
       "foreignKeys": {

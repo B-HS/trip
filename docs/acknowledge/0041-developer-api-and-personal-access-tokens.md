@@ -10,8 +10,8 @@
 - API는 `trip_pat_` 접두어를 가진 256-bit 난수 bearer 토큰을 사용한다. 원문은 발급 응답에서 한 번만 반환하고 DB에는 SHA-256 digest와 prefix/last4 메타데이터만 저장한다. Authorization 헤더 외 위치(쿼리·경로·로그)는 허용하지 않는다.
 - 토큰은 사용자 소유이며 `trips:read`, `trips:write`, `token:inspect` 범위를 가진다. 모든 트립 API는 토큰 주체의 **소유 트립만** 반환·변경하며 멤버 권한을 우회하지 않는다. 모든 쓰기는 기존 `tripTemplateSchema`, `createTrip*`, `replaceTripFromTemplate`, `deleteTrip` 도메인 서비스를 사용한다.
 - 목록은 `page`/`page_size`(최대 100) 오프셋 페이지네이션과 `items`, `page`, `pageSize`, `total`, `pageCount`를 사용한다. 오류는 기존 `success:false` 계약과 안정적인 코드로 반환한다.
-- 생성·교체·삭제에는 `Idempotency-Key`가 필요하다. 현재 배포가 외부 상태 저장소를 전제하지 않도록 24시간 프로세스 로컬 캐시를 제공하고, 멀티 인스턴스 환경에서 정확한 한 번 처리가 필요해지는 시점에 공유 저장소로 승격한다.
-- 토큰별 슬라이딩 윈도우 rate limit(읽기 60회/분, 쓰기 20회/분)을 적용하고 `X-RateLimit-*` 헤더와 429를 반환한다. 이는 기본 애플리케이션 경계이며 운영 edge/WAF 한도를 대체하지 않는다.
+- 생성·교체·삭제에는 `Idempotency-Key`가 필요하다. 토큰·키 복합 primary key와 request hash/status/응답을 0012에 저장해 멀티 인스턴스에서도 원자적으로 claim하고 성공 응답을 안전하게 재생한다.
+- 토큰별 고정 윈도우 rate limit(읽기 60회/분, 쓰기 20회/분)을 0012 DB 행 잠금/트랜잭션으로 원자적으로 적용하고 `X-RateLimit-*` 헤더와 429를 반환한다. 이는 기본 애플리케이션 경계이며 운영 edge/WAF 한도를 대체하지 않는다.
 - `/settings/api`에서 토큰을 생성·목록·폐기한다. 기본 만료는 관리 UI가 선택하도록 두고, 운영 권장값은 365일 이내다.
 
 ## 이유와 보안 근거
@@ -25,8 +25,8 @@ Next.js 16은 Route Handler의 `params`를 비동기 API로만 제공하므로 �
 - 세션 쿠키를 API 인증으로 재사용: 브라우저 CSRF·수명·회수 모델이 외부 자동화에 부적합하다.
 - JWT: 즉시 폐기와 토큰 목록 UI가 필요하고 서명 키·claim 검증 복잡도가 늘어난다. opaque hash token으로 시작한다.
 - 쿼리 파라미터 토큰: 프록시·브라우저 기록·Referer로 유출될 수 있으므로 금지한다.
-- 외부 Redis rate limit: 첫 버전에서 유료 서비스와 운영 키를 강제하지 않고, 경계가 명확한 프로세스 로컬 한도를 먼저 제공한다.
+- 외부 Redis rate limit: 별도 운영 의존성을 추가하는 대신 0012의 동일 MySQL 트랜잭션 경계를 사용한다.
 
 ## 통합 메모
 
-`0010_trip-consent.sql`과 Phase 7 AI migration `0011_ai.sql` 다음으로 이 마이그레이션은 `0012`로 provision한다. 통합자는 스냅샷·journal 순서를 확인한 뒤 한 번만 생성·적용하고, 멀티 인스턴스 배포 전 idempotency/rate-limit 캐시를 공유 저장소로 교체해야 한다.
+`0010_trip-consent.sql`과 Phase 7 AI migration `0011_ai.sql` 다음으로 이 마이그레이션은 `0012`로 provision한다. 통합자는 스냅샷·journal 순서를 확인한 뒤 한 번만 생성·적용한다. idempotency/rate-limit은 0012의 durable DB 행과 트랜잭션을 사용하므로 별도 프로세스 캐시 승격이 필요하지 않다.

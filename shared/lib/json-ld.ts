@@ -8,7 +8,7 @@ export type JsonLdObject = { [key: string]: JsonLdValue }
 
 const context = 'https://schema.org'
 
-const asDateTime = (date: string) => (date.includes('T') ? date : `${date}T00:00:00Z`)
+const asDateTime = (date: string) => (date.includes('T') ? date : `${date}T00:00:00`)
 
 export const buildWebSiteJsonLd = (locale = 'ko'): JsonLdObject => ({
     '@context': context,
@@ -31,51 +31,48 @@ const buildPlace = (name: string, address?: string | null): JsonLdObject => ({
     ...(address ? { address: { '@type': 'PostalAddress', 'streetAddress': address } } : {}),
 })
 
-const buildFlight = (flight: PublicTrip['flights'][number]): JsonLdObject => ({
-    '@type': 'Flight',
-    ...(flight.flightNumber ? { flightNumber: flight.flightNumber } : {}),
-    'departureAirport': { '@type': 'Airport', 'iataCode': flight.departCode },
-    'arrivalAirport': { '@type': 'Airport', 'iataCode': flight.arriveCode },
-})
+const asTripDateTime = (date: string, time: string | null | undefined) => {
+    if (!time) return null
+    const normalized = /^\d{1,2}:\d{2}(?::\d{2})?$/.test(time) ? (time.length === 5 ? `${time}:00` : time) : null
+    return normalized === null ? null : `${date}T${normalized}`
+}
 
-export const buildTouristTripJsonLd = (trip: PublicTrip, url: string, description?: string | null): JsonLdObject => ({
-    '@context': context,
-    '@type': 'TouristTrip',
-    'name': trip.title,
-    url,
-    'description': description ?? `${trip.destination} travel itinerary`,
-    'startDate': asDateTime(trip.startDate),
-    'endDate': asDateTime(trip.endDate),
-    'touristType': 'Travel itinerary',
-    'itinerary': {
-        '@type': 'ItemList',
-        'numberOfItems': trip.days.length,
-        'itemListElement': trip.days.map((day, index) => ({
-            '@type': 'ListItem',
-            'position': index + 1,
-            'item': {
-                '@type': 'TouristAttraction',
-                'name': day.title,
-                ...(day.overview ? { description: day.overview } : {}),
-                ...(day.date ? { additionalProperty: { '@type': 'PropertyValue', 'name': 'date', 'value': day.date } } : {}),
-            },
-        })),
-    },
-    ...(trip.destinations.length > 0
-        ? { touristDestination: trip.destinations.map((destination) => buildPlace(destination.city ?? destination.countryCode)) }
-        : {}),
-    ...(trip.lodgings.length > 0
-        ? {
-              accommodation: trip.lodgings.map((lodging) => ({
-                  '@type': 'LodgingBusiness',
-                  'name': lodging.name,
-                  ...(lodging.address ? { address: lodging.address } : {}),
-                  ...(lodging.url ? { url: lodging.url } : {}),
-              })),
-          }
-        : {}),
-    ...(trip.flights.length > 0 ? { subjectOf: trip.flights.map(buildFlight) } : {}),
-})
+export const buildTouristTripJsonLd = (trip: PublicTrip, url: string, description?: string | null): JsonLdObject => {
+    const outbound = trip.flights.find((flight) => flight.direction === 'outbound') ?? trip.flights[0]
+    const inbound = [...trip.flights].reverse().find((flight) => flight.direction === 'inbound') ?? trip.flights.at(-1)
+    const departureTime = outbound ? asTripDateTime(trip.startDate, outbound.departTime) : null
+    const arrivalTime = inbound ? asTripDateTime(trip.endDate, inbound.arriveTime) : null
+
+    return {
+        '@context': context,
+        '@type': 'TouristTrip',
+        'name': trip.title,
+        url,
+        'description': description ?? `${trip.destination} travel itinerary`,
+        'startDate': asDateTime(trip.startDate),
+        'endDate': asDateTime(trip.endDate),
+        ...(departureTime ? { departureTime } : {}),
+        ...(arrivalTime ? { arrivalTime } : {}),
+        'touristType': 'Travel itinerary',
+        'itinerary': {
+            '@type': 'ItemList',
+            'numberOfItems': trip.days.length,
+            'itemListElement': trip.days.map((day, index) => ({
+                '@type': 'ListItem',
+                'position': index + 1,
+                'item': {
+                    '@type': 'TouristAttraction',
+                    'name': day.title,
+                    ...(day.overview ? { description: day.overview } : {}),
+                    ...(day.date ? { additionalProperty: { '@type': 'PropertyValue', 'name': 'date', 'value': day.date } } : {}),
+                },
+            })),
+        },
+        ...(trip.destinations.length > 0
+            ? { touristDestination: trip.destinations.map((destination) => buildPlace(destination.city ?? destination.countryCode)) }
+            : {}),
+    }
+}
 
 export const buildArticleJsonLd = (post: PostDetail, url: string): JsonLdObject => ({
     '@context': context,

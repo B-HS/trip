@@ -4,13 +4,20 @@ import { listAiKeys } from '@/entities/ai/ai.repository'
 import { AiSettingsWidget } from '@/widgets/ai/ai-settings-widget'
 import { isEncryptionConfigured } from '@/shared/lib/crypto'
 import { requireUser } from '@/shared/lib/session'
+import { createPageMetadata } from '@/shared/lib/metadata'
 
 type AiSettingsPageProps = { params: Promise<{ locale: string }> }
 
 export const generateMetadata = async ({ params }: AiSettingsPageProps): Promise<Metadata> => {
     const { locale } = await params
     const t = await getTranslations({ locale, namespace: 'ai' })
-    return { title: t('settingsTitle'), description: t('settingsDescription') }
+    return createPageMetadata({
+        locale,
+        path: '/settings/ai',
+        title: t('settingsTitle'),
+        description: t('settingsDescription'),
+        indexable: false,
+    })
 }
 
 const AiSettingsPage = async () => {

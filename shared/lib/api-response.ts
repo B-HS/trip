@@ -7,6 +7,9 @@ export const API_ERROR_CODE = {
     AI_NOT_CONFIGURED: 'AI_NOT_CONFIGURED',
     INTERNAL_ERROR: 'INTERNAL_ERROR',
     RATE_LIMITED: 'RATE_LIMITED',
+    PRECONDITION_REQUIRED: 'PRECONDITION_REQUIRED',
+    PRECONDITION_FAILED: 'PRECONDITION_FAILED',
+    PAYLOAD_TOO_LARGE: 'PAYLOAD_TOO_LARGE',
 } as const
 
 export type ApiErrorCode = (typeof API_ERROR_CODE)[keyof typeof API_ERROR_CODE]
@@ -20,6 +23,9 @@ export const API_ERROR_STATUS = {
     AI_NOT_CONFIGURED: 503,
     INTERNAL_ERROR: 500,
     RATE_LIMITED: 429,
+    PRECONDITION_REQUIRED: 428,
+    PRECONDITION_FAILED: 412,
+    PAYLOAD_TOO_LARGE: 413,
 } as const satisfies Record<ApiErrorCode, number>
 
 export const API_ERROR_MESSAGE = {
@@ -31,6 +37,9 @@ export const API_ERROR_MESSAGE = {
     AI_NOT_CONFIGURED: 'error.aiNotConfigured',
     INTERNAL_ERROR: 'error.internal',
     RATE_LIMITED: 'error.rateLimited',
+    PRECONDITION_REQUIRED: 'error.ifMatchRequired',
+    PRECONDITION_FAILED: 'error.staleResource',
+    PAYLOAD_TOO_LARGE: 'error.requestTooLarge',
 } as const satisfies Record<ApiErrorCode, string>
 
 export type ApiSuccessResponse<T> = { success: true; data: T }

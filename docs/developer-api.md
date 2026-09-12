@@ -29,11 +29,11 @@ curl https://trip.gumyo.net/api/v1/token \
 - `GET /api/v1/token` — token introspection/capabilities.
 - `GET /api/v1/trips?page=1&page_size=20` — 소유 트립 목록.
 - `GET /api/v1/trips/{tripId}` — 소유 트립 상세.
-- `POST /api/v1/trips` — 검증된 템플릿으로 생성.
+- `POST /api/v1/trips` — 기본 정보(`title`, `destination`, 날짜, 목적지 1개 이상) 또는 검증된 템플릿으로 생성.
 - `PUT /api/v1/trips/{tripId}` — 검증된 템플릿으로 전체 교체.
 - `DELETE /api/v1/trips/{tripId}` — 소유 트립 삭제.
 
-쓰기는 매번 고유하고 재시도에 안전한 `Idempotency-Key`를 보낸다.
+쓰기는 매번 고유하고 재시도에 안전한 `Idempotency-Key`를 보낸다. 키 상태와 응답은 DB에 저장되므로 여러 앱 인스턴스에서도 같은 요청을 안전하게 재생한다. 진행 중인 키를 동시에 사용하면 `VALIDATION_ERROR`가 반환된다.
 
 ```bash
 curl -X POST https://trip.gumyo.net/api/v1/trips \
@@ -47,7 +47,9 @@ curl -X POST https://trip.gumyo.net/api/v1/trips \
 
 성공은 `{ "success": true, "data": ... }`, 오류는 `{ "success": false, "error": { "code", "message" } }`다. 주요 코드: `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION_ERROR`, `RATE_LIMITED`.
 
-목록 응답은 `items`, `page`, `pageSize`, `total`, `pageCount`를 항상 포함한다. `page_size`는 1~100이다. 429 응답에는 `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` 헤더가 있다. 현재 기본 한도는 토큰당 읽기 60회/분, 쓰기 20회/분이다.
+목록 응답은 `items`, `page`, `pageSize`, `total`, `pageCount`를 항상 포함한다. `page`는 1~~1,000,000, `page_size`는 1~~100의 십진 양의 정수만 허용한다. JSON 본문은 UTF-8 기준 1 MiB 이하이며, 템플릿의 목적지 20개·일정 100일·일정 항목 200개 같은 중첩 상한은 OpenAPI에 표시한다. 429 응답에는 `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, 필요 시 `Retry-After` 헤더가 있다. 한도 카운터는 DB의 토큰별 읽기·쓰기 윈도에 원자적으로 기록되며 기본 한도는 읽기 60회/분, 쓰기 20회/분이다.
+
+전체 교체와 삭제는 파괴적이므로 현재 리소스를 먼저 `GET`해 받은 ETag를 `If-Match`로 보내고, `X-Trip-Confirm: replace` 또는 `X-Trip-Confirm: delete`를 함께 보내야 한다. 오래된 ETag는 거부된다. 같은 Idempotency-Key의 성공 응답은 확인 헤더나 리소스 존재 여부를 다시 검사하지 않고 안전하게 재생된다.
 
 ## AI 에이전트 가이드
 

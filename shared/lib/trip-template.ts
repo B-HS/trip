@@ -136,10 +136,10 @@ export const tripTemplateDaySchema = z.object({
     morningSummary: optionalText(120),
     afternoonSummary: optionalText(120),
     eveningSummary: optionalText(120),
-    facts: z.array(tripTemplateDayFactSchema).default([]),
-    routes: z.array(tripTemplateRouteSchema).default([]),
-    scheduleItems: z.array(tripTemplateScheduleItemSchema).default([]),
-    notes: z.array(tripTemplateDayNoteSchema).default([]),
+    facts: z.array(tripTemplateDayFactSchema).max(50).default([]),
+    routes: z.array(tripTemplateRouteSchema).max(100).default([]),
+    scheduleItems: z.array(tripTemplateScheduleItemSchema).max(200).default([]),
+    notes: z.array(tripTemplateDayNoteSchema).max(50).default([]),
 })
 
 export const tripTemplateBookingAttachmentSchema = z.object({
@@ -159,7 +159,7 @@ export const tripTemplateBookingSchema = z.object({
     linkUrl: optionalUrl,
     actionNote: optionalText(200),
     planStatus: optionalText(80),
-    attachments: z.array(tripTemplateBookingAttachmentSchema).default([]),
+    attachments: z.array(tripTemplateBookingAttachmentSchema).max(20).default([]),
 })
 
 export const tripTemplateInfoBlockSchema = z.object({
@@ -173,7 +173,7 @@ export const tripTemplateInfoBlockSchema = z.object({
 export const tripTemplateInfoSectionSchema = z.object({
     title: z.string().trim().min(1).max(120),
     isDefaultOpen: z.boolean().default(false),
-    blocks: z.array(tripTemplateInfoBlockSchema).default([]),
+    blocks: z.array(tripTemplateInfoBlockSchema).max(100).default([]),
 })
 
 export const tripTemplateFieldsSchema = z.object({
@@ -192,14 +192,14 @@ export const tripTemplateFieldsSchema = z.object({
     bookingNote: optionalText(2000),
     footerNote: optionalText(2000),
     sidebarNote: optionalText(500),
-    destinations: z.array(tripTemplateDestinationSchema).default([]),
-    flights: z.array(tripTemplateFlightSchema).default([]),
-    lodgings: z.array(tripTemplateLodgingSchema).default([]),
-    sidebarLinks: z.array(tripTemplateSidebarLinkSchema).default([]),
-    scheduleKinds: z.array(tripTemplateScheduleKindSchema).min(SCHEDULE_KIND_MIN_COUNT).default(DEFAULT_SCHEDULE_KINDS),
-    days: z.array(tripTemplateDaySchema).default([]),
-    bookings: z.array(tripTemplateBookingSchema).default([]),
-    infoSections: z.array(tripTemplateInfoSectionSchema).default([]),
+    destinations: z.array(tripTemplateDestinationSchema).max(20).default([]),
+    flights: z.array(tripTemplateFlightSchema).max(20).default([]),
+    lodgings: z.array(tripTemplateLodgingSchema).max(20).default([]),
+    sidebarLinks: z.array(tripTemplateSidebarLinkSchema).max(30).default([]),
+    scheduleKinds: z.array(tripTemplateScheduleKindSchema).min(SCHEDULE_KIND_MIN_COUNT).max(30).default(DEFAULT_SCHEDULE_KINDS),
+    days: z.array(tripTemplateDaySchema).max(100).default([]),
+    bookings: z.array(tripTemplateBookingSchema).max(100).default([]),
+    infoSections: z.array(tripTemplateInfoSectionSchema).max(50).default([]),
 })
 
 const hasKnownScheduleKinds = (value: { scheduleKinds: Array<{ key: string }>; days: Array<{ scheduleItems: Array<{ kind: string }> }> }) => {

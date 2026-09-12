@@ -48,6 +48,10 @@ CREATE TABLE `trip_ai_message` (
 --> statement-breakpoint
 CREATE INDEX `ai_message_conversation_id_idx` ON `trip_ai_message` (`conversation_id`);
 --> statement-breakpoint
+ALTER TABLE `trip_ai_message` ADD `job_id` varchar(36);
+--> statement-breakpoint
+ALTER TABLE `trip_ai_message` ADD CONSTRAINT `ai_message_job_idx` UNIQUE(`job_id`);
+--> statement-breakpoint
 CREATE TABLE `trip_ai_job` (
 	`id` varchar(36) NOT NULL,
 	`conversation_id` varchar(36) NOT NULL,
@@ -57,6 +61,9 @@ CREATE TABLE `trip_ai_job` (
 	`attempts` int NOT NULL DEFAULT 0,
 	`error` varchar(500),
 	`proposal` json,
+	`lease_id` varchar(36),
+	`lease_expires_at` timestamp(3),
+	`completed_at` timestamp(3),
 	`created_at` timestamp(3) NOT NULL DEFAULT (now()),
 	`updated_at` timestamp(3) NOT NULL DEFAULT (now()),
 	CONSTRAINT `trip_ai_job_id` PRIMARY KEY(`id`),
@@ -86,11 +93,13 @@ CREATE TABLE `trip_ai_usage` (
 --> statement-breakpoint
 CREATE INDEX `ai_usage_user_created_at_idx` ON `trip_ai_usage` (`user_id`,`created_at`);
 --> statement-breakpoint
+ALTER TABLE `trip_ai_usage` ADD CONSTRAINT `ai_usage_job_idx` UNIQUE(`job_id`);
+--> statement-breakpoint
 CREATE TABLE `trip_ai_proposal` (
 	`id` varchar(36) NOT NULL,
 	`job_id` varchar(36) NOT NULL,
 	`trip_id` varchar(36) NOT NULL,
-	`status` enum('pending','approved','rejected','applied') NOT NULL DEFAULT 'pending',
+	`status` enum('pending','approved','applying','rejected','applied') NOT NULL DEFAULT 'pending',
 	`changes` json NOT NULL,
 	`created_at` timestamp(3) NOT NULL DEFAULT (now()),
 	`updated_at` timestamp(3) NOT NULL DEFAULT (now()),
