@@ -2,8 +2,6 @@ import dayjs from 'dayjs'
 
 const DAY_UNIT = 'day'
 const NIGHTS_TO_DAYS_OFFSET = 1
-const NIGHT_SUFFIX = '박'
-const DAY_SUFFIX = '일'
 
 export type TripLengthSource = {
     startDate: string
@@ -18,7 +16,9 @@ export const resolveTripLength = ({ startDate, endDate, nights, days }: TripLeng
     return { nights: autoNights, days: autoNights + NIGHTS_TO_DAYS_OFFSET }
 }
 
-export const formatTripLength = (source: TripLengthSource) => {
+export const formatTripLength = (source: TripLengthSource, locale = 'ko') => {
     const { nights, days } = resolveTripLength(source)
-    return `${nights}${NIGHT_SUFFIX} ${days}${DAY_SUFFIX}`
+    if (locale === 'en') return `${nights} nights ${days} days`
+    if (locale === 'ja') return `${nights}泊 ${days}日`
+    return `${nights}박 ${days}일`
 }

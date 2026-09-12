@@ -34,4 +34,10 @@ describe('formatTripLength', () => {
     test('커스텀 값이 없으면 날짜로 계산한 라벨을 만든다', () => {
         expect(formatTripLength({ ...period, nights: null, days: null })).toBe('6박 7일')
     })
+
+    test('영어와 일본어 단위를 현재 locale에 맞춘다', () => {
+        const source = { ...period, nights: null, days: null }
+        expect(formatTripLength(source, 'en')).toBe('6 nights 7 days')
+        expect(formatTripLength(source, 'ja')).toBe('6泊 7日')
+    })
 })

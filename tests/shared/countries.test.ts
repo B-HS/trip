@@ -73,4 +73,9 @@ describe('isCountryCode / countryName', () => {
         expect(countryName('JP')).toBe('일본')
         expect(countryName('ZZ')).toBe('ZZ')
     })
+
+    test('현재 locale에 맞는 국가명을 돌려준다', () => {
+        expect(countryName('JP', 'en')).toBe('Japan')
+        expect(countryName('JP', 'ja')).toBe('日本')
+    })
 })

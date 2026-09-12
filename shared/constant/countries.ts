@@ -136,6 +136,10 @@ export const COUNTRY_CODES = Object.keys(COUNTRIES) as CountryCode[]
 
 export const isCountryCode = (code: string): code is CountryCode => Object.hasOwn(COUNTRIES, code)
 
-export const countryName = (code: string) => (isCountryCode(code) ? COUNTRIES[code].name : code)
+export const countryName = (code: string, locale = 'ko') => {
+    if (!isCountryCode(code)) return code
+    if (locale === 'ko') return COUNTRIES[code].name
+    return new Intl.DisplayNames([locale], { type: 'region' }).of(code) ?? COUNTRIES[code].nameEn
+}
 
 export const DEFAULT_COUNTRY_CODE = 'JP' satisfies CountryCode
