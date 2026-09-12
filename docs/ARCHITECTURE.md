@@ -4,7 +4,7 @@
 
 `/api/v1` is a versioned, bearer-token-only public API. Its resource boundary is the authenticated token owner's trips; it never treats a member role or a public share link as API ownership. OpenAPI 3.1 is served at `/api/v1/openapi.json`, while token lifecycle UI is `/settings/api` and the human/AI guide is `/developers`. See ADR-0041 and `docs/developer-api.md` for scopes, pagination, idempotency, and migration 0012.
 
-> 최종 갱신: 2026-09-12 · 대응 범위: 인증 확장 ADR-0039 — 조건부 OAuth·Email Worker 이메일 인증·가입 동의·법적 페이지·마이그레이션 0010 생성(**DB 미적용**)
+> 최종 갱신: 2026-09-12 · 대응 범위: 인증 확장 ADR-0039 및 AI/API 운영 반영 — 조건부 OAuth·Email Worker 이메일 인증·가입 동의·법적 페이지·마이그레이션 0010~0012 적용 완료(이력 12행)
 > 구현 정본. 코드와 어긋나면 코드를 고치거나 이 문서를 갱신한다. 결정의 배경·기각 대안은 `docs/acknowledge/README.md`.
 > 빌드 메모(2026-09-12): `next build`의 Turbopack 경로가 최적화 단계에서 정지하는 현상이 반복 재현되어 검증·배포용 `bun run build`는 `next build --webpack`으로 고정한다. React Compiler는 빌드 엔진과 별개로 `reactCompiler: true`를 유지한다.
 
@@ -46,7 +46,7 @@ shared/
   ui/       shadcn 55개(+ button `cell`·`cellPrimary`·`cellDestructive` 변형, `cell`·`cellIcon` 크기) + theme-provider · theme-toggle · motion-provider · motion/(7 프리미티브) · three/(지구본 — globe-math·globe-geography·globe-variant·globe-interaction·css-color·use-globe-theme·trip-globe(+scene·lazy))
 tests/    bun test 미러 구조(entities · features · shared · widgets) + setup.ts(happy-dom 전역 등록, `server-only` 를 빈 모듈로 mock, 자식 프레임 네비게이션 비활성)
 scripts/  migrate.ts · seed.ts · set-admin.ts(`bun run admin:set <email>`)
-drizzle/  0000(초기 20 테이블) · 0001(destination·favorite) · 0002(nights·days) · 0003(sidebar_link·sidebar_note) · 0004(schedule_kind + 데이터 이관, kind 컬럼 삭제) · 0005(upload·booking_attachment) · 0006(board·post·comment·post_like·like·point_ledger + user role/ban/bio/banner, session impersonated_by, trip like_count, 게시판 3행 시드) · 0007(trip departure_airport_code, ALTER 1개) · 0008(report·user_block 테이블 + post/comment deleted_at + point_ledger reason + revoked, 추가 전용) · 0010(user_consent) → 0011(ai key/conversation/message/job/usage/proposal + lease/output uniqueness) → 0012(developer API token + durable idempotency/rate-limit), 모두 **미적용** + meta snapshots/journal
+drizzle/  0000(초기 20 테이블) · 0001(destination·favorite) · 0002(nights·days) · 0003(sidebar_link·sidebar_note) · 0004(schedule_kind + 데이터 이관, kind 컬럼 삭제) · 0005(upload·booking_attachment) · 0006(board·post·comment·post_like·like·point_ledger + user role/ban/bio/banner, session impersonated_by, trip like_count, 게시판 3행 시드) · 0007(trip departure_airport_code, ALTER 1개) · 0008(report·user_block 테이블 + post/comment deleted_at + point_ledger reason + revoked, 추가 전용) · 0010(user_consent) → 0011(ai key/conversation/message/job/usage/proposal + lease/output uniqueness) → 0012(developer API token + durable idempotency/rate-limit), 모두 **운영 DB 적용 완료(이력 12행)** + meta snapshots/journal
 docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · env(환경변수 키·발급 안내) · acknowledge/ · memory/ · history/ · feedback/ · quality-assurance/ · DESIGN.md · osaka-trip-interactive.html
 ```
 

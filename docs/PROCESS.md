@@ -73,7 +73,7 @@
 ### 진행 메모
 
 - Vercel: 브랜치 `prod`(Pro 플랜), 환경변수는 `docs/env.md` 정본을 따른다. 락파일 v1(ADR-0013, 의존성 추가 시 `npx bun@1.3.14 install`).
-- DB: 공용 MySQL(로컬·prod 동일). 마이그레이션 **0000~0008** 적용됨(이력 9행), 인증 동의·AI·Developer API용 `0010_trip-consent.sql` → `0011_ai.sql` → `0012_developer-api-tokens.sql`은 생성했으나 아직 운영 DB에 적용하지 않았다. 운영 배포 전 `bun run db:migrate`로 순서대로 적용하고 이력 12행 및 각 테이블을 확인한다.
+- DB: 공용 MySQL(로컬·prod 동일). 마이그레이션 **0000~0008 및 0010→0011→0012** 적용됨(이력 12행, 2026-09-12 메타데이터·hash 검증 완료). 0012는 MySQL FK 식별자 길이 제한을 수정한 뒤 누락 구간을 보완해 적용했다. 운영에서는 `drizzle-kit push`를 금지하고 `bun run db:generate`/`db:migrate`만 사용한다.
 - 공개 페이지 캐시: `PublicTrip` 형태(컬럼·관계)가 바뀌면 `entities/trip/trip.cache.ts` 의 `PUBLIC_TRIP_CACHE_VERSION` 을 올린다(현재 `'5'`, trip revision을 포함한 public DTO 변경으로 올렸다). 로컬 `updateTag` 는 prod 데이터 캐시를 비우지 못하고, Vercel 데이터 캐시는 배포를 넘어 유지된다.
 - 검증 계정: tester@example.com / 사용자명 tester(오사카 예시 트립, 공개 slug `osaka-qa`), throwaway `qa_session2_204103@example.com`(세션 4 채택 실측으로 포인트 12).
 - dev 서버(세션 4 결정): trip 은 **:7777**(`bun run dev -p 7777`). :3000 은 다른 프로젝트(gumba)가 쓴다. `.env` 의 `BETTER_AUTH_URL`·`NEXT_PUBLIC_APP_URL` 도 7777 로 맞춰야 로그인·로그아웃·공개 헤더 `useSession` 이 동작한다(사용자 작업, AI 는 `.env` 접근 불가).

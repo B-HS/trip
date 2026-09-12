@@ -6,7 +6,7 @@
 
 `/api/v1` owner-scoped trip API와 `/api/v1/openapi.json`, `/developers`, `/settings/api` 토큰 lifecycle UI가 구현되었다(ADR-0041). Personal access token 원문은 한 번만 반환하고 SHA-256 hash만 저장하며, `trips:read`·`trips:write`·`token:inspect` scope와 bearer-only parsing, token별 read/write durable fixed-window limit, mutation idempotency key를 적용한다. 검증된 도메인 서비스와 `tripTemplateSchema`를 재사용하므로 멤버 트립·공개 링크로 권한이 확장되지 않는다.
 
-통합 시 `0010_trip-consent.sql` → `0011_ai.sql` → `0012_developer-api-tokens.sql` 순서로 journal과 snapshot이 일치하는지 확인한다. **0011/0012는 아직 운영 DB에 적용하지 않은 release precondition**이며, 0012에는 AI dispatch outbox·trip revision·idempotency retention index도 포함된다. 운영 배포 전 `/api/v1/openapi.json`, 401/403/404/412/428/429 계약, 토큰 원문 로그 미노출, owner-only 결과를 smoke test한다.
+`0010_trip-consent.sql` → `0011_ai.sql` → `0012_developer-api-tokens.sql` 순서와 journal/snapshot을 확인한 뒤 2026-09-12 운영 DB에 적용했다(이력 12행). 최초 0012 실행에서 MySQL 식별자 길이 제한으로 중단되어 짧은 FK 이름으로 안전하게 누락 부분을 보완하고 migration hash를 검증한 뒤 `bun run db:migrate` 재실행을 완료했다. 0012에는 AI dispatch outbox·trip revision·idempotency retention index가 포함된다. 운영 배포 후 `/api/v1/openapi.json`, 401/403/404/412/428/429 계약, 토큰 원문 로그 미노출, owner-only 결과를 smoke test한다.
 
 ## 1. 프로젝트 한 줄 정의
 
@@ -46,7 +46,7 @@
 
 ### 운영 후속
 
-1. 운영 환경변수 주입(`CRON_SECRET` 포함), 마이그레이션 0010→0011→0012 적용, Cloudflare Email Service 실제 발송 및 OAuth 콜백 스모크.
+1. 운영 환경변수 주입(`CRON_SECRET` 포함), Cloudflare Email Service 실제 발송 및 OAuth 콜백 스모크.
 2. Vercel queue/provider, SEO robots/sitemap/JSON-LD, developer API 401/403/404/429와 owner-only 결과 smoke.
 
 ## 4. 의사결정 요약 (상세·기각 대안은 `docs/acknowledge/`)
@@ -68,20 +68,20 @@
 ## 6. 미해결 질문 / 사용자 확인 필요 항목
 
 - 6단계 OAuth: 어떤 프로바이더를 먼저 붙일지(키 발급은 사용자 작업).
-- 0011 AI/0012 API migration은 운영자가 순서대로 적용해야 한다. idempotency/rate-limit은 이미 0012 DB 트랜잭션 경계에 있으므로 별도 캐시 승격 작업은 없다.
+- 0011 AI/0012 API migration은 0010 다음 순서로 운영 DB에 적용 완료했다. idempotency/rate-limit은 0012 DB 트랜잭션 경계에 있으므로 별도 캐시 승격 작업은 없다.
 - trip 도메인 ja·en 제품 문구는 구현·혼입 검사를 마쳤으며, 원어민 수준의 톤 리뷰는 제품 QA에서 선택적으로 수행한다.
 
 ## 7. 환경 & 전제
 
 - Bun 1.4.2, Next 16.3.4(dev는 Turbopack, 프로덕션 빌드는 Webpack), next-intl 4.14.4, zod 4.5.4, drizzle mysql(`trip_` prefix), dev 서버 `:7777`.
 - task 위임: 카테고리는 `oh-my-opencode.jsonc` 고정으로 복원 전까지 `subagent_type=general` 사용 권장(카테고리 모델 매핑은 재시작 후 jsonc 반영).
-- 마이그레이션 상태: 0000~0008 적용(이력 9행), 인증 동의·AI·Developer API용 0010 → 0011 → 0012 SQL은 생성했으나 아직 운영 DB에 적용하지 않았다. 이는 이 릴리스의 precondition이다. `drizzle-kit push` 금지, `bun run db:generate`/`db:migrate`만.
+- 마이그레이션 상태: 0000~0008 및 0010 → 0011 → 0012 적용(이력 12행, 2026-09-12 메타데이터 검증 완료). 0012는 MySQL FK 식별자 길이 제한을 수정한 SQL hash로 기록되었다. `drizzle-kit push` 금지, `bun run db:generate`/`db:migrate`만.
 
 ## 8. 다음 세션 TODO (우선순위 순)
 
 1. 인증 확장 작업 트리를 커밋하고 dev→prod로 머지·push한다.
 2. 운영자가 `docs/env.md`의 OAuth·Email Worker 키를 주입하고 0010을 적용한 뒤 콜백·실제 수신 메일을 스모크한다.
-3. 0011/0012가 아직 적용되지 않았다는 precondition을 확인하고 운영 migration 0010→0011→0012 및 각 public/API/AI smoke를 진행한다.
+3. 각 public/API/AI smoke와 OAuth·Email·provider credential 검증을 진행한다.
 
 ## 9. 문서 지도
 

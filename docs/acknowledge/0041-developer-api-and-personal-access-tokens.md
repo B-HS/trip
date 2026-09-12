@@ -31,6 +31,6 @@ Next.js 16은 Route Handler의 `params`를 비동기 API로만 제공하므로 �
 
 ## 통합 메모
 
-0011/0012는 현재 운영 DB에 아직 적용하지 않은 release precondition이다. 운영자는 스냅샷·journal 순서를 확인한 뒤 0010 → 0011 → 0012 순서로 한 번만 적용한다.
+0010 → 0011 → 0012는 스냅샷·journal 순서를 확인한 뒤 2026-09-12 운영 DB에 한 번 적용했다(이력 12행). 0012의 FK 이름은 MySQL 식별자 길이 제한에 맞춘 명시적 이름이며, migration hash와 필수 schema 객체를 메타데이터로 검증했다.
 
 `0010_trip-consent.sql`과 Phase 7 AI migration `0011_ai.sql` 다음으로 이 마이그레이션은 `0012`로 provision한다. 통합자는 스냅샷·journal 순서를 확인한 뒤 한 번만 생성·적용한다. idempotency/rate-limit은 0012의 durable DB 행과 트랜잭션을 사용하므로 별도 프로세스 캐시 승격이 필요하지 않다.

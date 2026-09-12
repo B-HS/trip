@@ -24,7 +24,7 @@ ADR-0029 remains the product decision: users supply their own provider key, keys
 ## Operational smoke steps
 
 1. Set `APP_ENCRYPTION_KEY` with `openssl rand -base64 32` and one user-owned provider key.
-2. Apply migrations 0011 then 0012 in order, open `/settings/ai`, and confirm only the provider hint is visible after saving.
+2. Migrations 0010, 0011, and 0012 are applied in order (history 12 rows); open `/settings/ai`, and confirm only the provider hint is visible after saving.
 3. Open a member trip, load models, ask a question, and verify polling reaches `done` after the browser is refreshed.
 4. Submit a change proposal, verify the preview, reject it once, then submit another proposal and approve/apply it. Confirm the trip editor/viewer domain rules still validate the resulting schedule.
 5. On Vercel, configure the `ai-job` trigger and queue region/token; verify a failed provider request increments `attempts` and reaches `failed` without exposing prompt content.
