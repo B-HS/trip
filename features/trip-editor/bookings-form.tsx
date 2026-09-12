@@ -3,6 +3,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, type FC } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import { type BookingInput, type BookingValues } from '@/entities/trip/trip.validate'
@@ -15,7 +16,7 @@ import { bookingsFormSchema, type BookingsFormInput, type BookingsFormValues } f
 import { EditorToolbar } from '@/features/trip-editor/editor-toolbar'
 import { SortableRow } from '@/features/trip-editor/sortable-row'
 import { SortableRows } from '@/features/trip-editor/sortable-rows'
-import { BOOKING_PRIORITIES, BOOKING_PRIORITY_LABEL } from '@/shared/constant/trip'
+import { BOOKING_PRIORITIES } from '@/shared/constant/trip'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { NativeSelect, NativeSelectOption } from '@/shared/ui/native-select'
@@ -41,6 +42,7 @@ type BookingsFormProps = {
 }
 
 export const BookingsForm: FC<BookingsFormProps> = ({ defaultValues, onSubmit, isPending, isUploadEnabled, isUploading, onUploadImage }) => {
+    const t = useTranslations('tripEditor.bookings')
     const didResetRef = useRef(false)
     const form = useForm<BookingsFormInput, unknown, BookingsFormValues>({
         resolver: zodResolver(bookingsFormSchema),
@@ -65,18 +67,18 @@ export const BookingsForm: FC<BookingsFormProps> = ({ defaultValues, onSubmit, i
         <FormProvider {...form}>
             <EditorFormShell isDirty={isDirty} isPending={isPending} onSubmit={handleSubmit} onReset={() => form.reset()}>
                 <EditorToolbar
-                    title='예매 체크리스트'
-                    description='우선순위 순서대로 정렬해 두면 뷰어에서 그대로 표시됩니다.'
+                    title={t('title')}
+                    description={t('description')}
                     count={rows.fields.length}
                     action={
                         <Button type='button' variant='cell' size='cell' onClick={() => rows.append(EMPTY_BOOKING)}>
                             <PlusIcon />
-                            예매 추가
+                            {t('add')}
                         </Button>
                     }
                 />
                 {rows.fields.length === 0 ? (
-                    <p className='bg-card p-3 text-xs text-muted-foreground'>등록된 예매 항목이 없습니다.</p>
+                    <p className='bg-card p-3 text-xs text-muted-foreground'>{t('empty')}</p>
                 ) : (
                     <SortableRows ids={rows.fields.map((row) => row.fieldKey)} onReorder={rows.move}>
                         {rows.fields.map((row, index) => (
@@ -84,12 +86,12 @@ export const BookingsForm: FC<BookingsFormProps> = ({ defaultValues, onSubmit, i
                                 key={row.fieldKey}
                                 id={row.fieldKey}
                                 index={index}
-                                removeLabel='예매 항목 삭제'
+                                removeLabel={t('remove')}
                                 onRemove={() => rows.remove(index)}>
                                 <div className='flex flex-col gap-3'>
                                     <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
                                         <EditorField
-                                            label='항목'
+                                            label={t('item')}
                                             htmlFor={`booking-${index}-title`}
                                             error={itemErrors?.[index]?.title?.message}
                                             className='lg:col-span-2'>
@@ -100,17 +102,20 @@ export const BookingsForm: FC<BookingsFormProps> = ({ defaultValues, onSubmit, i
                                                 {...form.register(`items.${index}.title`)}
                                             />
                                         </EditorField>
-                                        <EditorField label='시점' htmlFor={`booking-${index}-when`} error={itemErrors?.[index]?.whenLabel?.message}>
+                                        <EditorField
+                                            label={t('when')}
+                                            htmlFor={`booking-${index}-when`}
+                                            error={itemErrors?.[index]?.whenLabel?.message}>
                                             <Input
                                                 id={`booking-${index}-when`}
                                                 className={EDITOR_INPUT_CLASS}
-                                                placeholder='출발 2주 전'
+                                                placeholder={t('whenPlaceholder')}
                                                 aria-invalid={!!itemErrors?.[index]?.whenLabel}
                                                 {...form.register(`items.${index}.whenLabel`, EMPTY_TO_NULL)}
                                             />
                                         </EditorField>
                                         <EditorField
-                                            label='우선순위'
+                                            label={t('priority')}
                                             htmlFor={`booking-${index}-priority`}
                                             error={itemErrors?.[index]?.priority?.message}>
                                             <NativeSelect
@@ -121,25 +126,25 @@ export const BookingsForm: FC<BookingsFormProps> = ({ defaultValues, onSubmit, i
                                                 {...form.register(`items.${index}.priority`)}>
                                                 {BOOKING_PRIORITIES.map((priority) => (
                                                     <NativeSelectOption key={priority} value={priority}>
-                                                        {BOOKING_PRIORITY_LABEL[priority]}
+                                                        {t(`priorities.${priority}`)}
                                                     </NativeSelectOption>
                                                 ))}
                                             </NativeSelect>
                                         </EditorField>
                                         <EditorField
-                                            label='링크 이름'
+                                            label={t('linkLabel')}
                                             htmlFor={`booking-${index}-link-label`}
                                             error={itemErrors?.[index]?.linkLabel?.message}>
                                             <Input
                                                 id={`booking-${index}-link-label`}
                                                 className={EDITOR_INPUT_CLASS}
-                                                placeholder='공식 예매처'
+                                                placeholder={t('linkLabelPlaceholder')}
                                                 aria-invalid={!!itemErrors?.[index]?.linkLabel}
                                                 {...form.register(`items.${index}.linkLabel`, EMPTY_TO_NULL)}
                                             />
                                         </EditorField>
                                         <EditorField
-                                            label='링크 주소'
+                                            label={t('linkUrl')}
                                             htmlFor={`booking-${index}-link-url`}
                                             error={itemErrors?.[index]?.linkUrl?.message}
                                             className='lg:col-span-3'>
@@ -153,27 +158,27 @@ export const BookingsForm: FC<BookingsFormProps> = ({ defaultValues, onSubmit, i
                                             />
                                         </EditorField>
                                         <EditorField
-                                            label='할 일'
+                                            label={t('action')}
                                             htmlFor={`booking-${index}-action-note`}
                                             error={itemErrors?.[index]?.actionNote?.message}
                                             className='lg:col-span-2'>
                                             <Input
                                                 id={`booking-${index}-action-note`}
                                                 className={EDITOR_INPUT_CLASS}
-                                                placeholder='오픈 시간에 맞춰 결제'
+                                                placeholder={t('actionPlaceholder')}
                                                 aria-invalid={!!itemErrors?.[index]?.actionNote}
                                                 {...form.register(`items.${index}.actionNote`, EMPTY_TO_NULL)}
                                             />
                                         </EditorField>
                                         <EditorField
-                                            label='진행 상태'
+                                            label={t('status')}
                                             htmlFor={`booking-${index}-plan-status`}
                                             error={itemErrors?.[index]?.planStatus?.message}
                                             className='lg:col-span-2'>
                                             <Input
                                                 id={`booking-${index}-plan-status`}
                                                 className={EDITOR_INPUT_CLASS}
-                                                placeholder='예매 완료'
+                                                placeholder={t('statusPlaceholder')}
                                                 aria-invalid={!!itemErrors?.[index]?.planStatus}
                                                 {...form.register(`items.${index}.planStatus`, EMPTY_TO_NULL)}
                                             />

@@ -3,6 +3,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, type FC } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { type LodgingInput, type LodgingValues } from '@/entities/trip/trip.validate'
@@ -34,6 +35,7 @@ type LodgingsFormProps = {
 }
 
 export const LodgingsForm: FC<LodgingsFormProps> = ({ defaultValues, onSubmit, isPending }) => {
+    const t = useTranslations('tripEditor.lodgings')
     const didResetRef = useRef(false)
     const form = useForm<LodgingsFormInput, unknown, LodgingsFormValues>({
         resolver: zodResolver(lodgingsFormSchema),
@@ -57,24 +59,24 @@ export const LodgingsForm: FC<LodgingsFormProps> = ({ defaultValues, onSubmit, i
     return (
         <EditorFormShell isDirty={isDirty} isPending={isPending} onSubmit={handleSubmit} onReset={() => form.reset()}>
             <EditorToolbar
-                title='숙소'
-                description='모든 날의 출발점이 되는 숙소 정보입니다.'
+                title={t('title')}
+                description={t('description')}
                 count={rows.fields.length}
                 action={
                     <Button type='button' variant='cell' size='cell' onClick={() => rows.append(EMPTY_LODGING)}>
                         <PlusIcon />
-                        숙소 추가
+                        {t('add')}
                     </Button>
                 }
             />
             {rows.fields.length === 0 ? (
-                <p className='bg-card p-3 text-xs text-muted-foreground'>등록된 숙소가 없습니다.</p>
+                <p className='bg-card p-3 text-xs text-muted-foreground'>{t('empty')}</p>
             ) : (
                 <SortableRows ids={rows.fields.map((row) => row.fieldKey)} onReorder={rows.move}>
                     {rows.fields.map((row, index) => (
-                        <SortableRow key={row.fieldKey} id={row.fieldKey} index={index} removeLabel='숙소 삭제' onRemove={() => rows.remove(index)}>
+                        <SortableRow key={row.fieldKey} id={row.fieldKey} index={index} removeLabel={t('remove')} onRemove={() => rows.remove(index)}>
                             <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
-                                <EditorField label='이름' htmlFor={`lodging-${index}-name`} error={itemErrors?.[index]?.name?.message}>
+                                <EditorField label={t('name')} htmlFor={`lodging-${index}-name`} error={itemErrors?.[index]?.name?.message}>
                                     <Input
                                         id={`lodging-${index}-name`}
                                         className={EDITOR_INPUT_CLASS}
@@ -83,7 +85,7 @@ export const LodgingsForm: FC<LodgingsFormProps> = ({ defaultValues, onSubmit, i
                                     />
                                 </EditorField>
                                 <EditorField
-                                    label='현지 표기'
+                                    label={t('localName')}
                                     htmlFor={`lodging-${index}-name-local`}
                                     error={itemErrors?.[index]?.nameLocal?.message}>
                                     <Input
@@ -93,7 +95,7 @@ export const LodgingsForm: FC<LodgingsFormProps> = ({ defaultValues, onSubmit, i
                                         {...form.register(`items.${index}.nameLocal`, EMPTY_TO_NULL)}
                                     />
                                 </EditorField>
-                                <EditorField label='체크인' htmlFor={`lodging-${index}-check-in`} error={itemErrors?.[index]?.checkIn?.message}>
+                                <EditorField label={t('checkIn')} htmlFor={`lodging-${index}-check-in`} error={itemErrors?.[index]?.checkIn?.message}>
                                     <Input
                                         id={`lodging-${index}-check-in`}
                                         className={`${EDITOR_INPUT_CLASS} font-mono`}
@@ -102,7 +104,10 @@ export const LodgingsForm: FC<LodgingsFormProps> = ({ defaultValues, onSubmit, i
                                         {...form.register(`items.${index}.checkIn`, EMPTY_TO_NULL)}
                                     />
                                 </EditorField>
-                                <EditorField label='체크아웃' htmlFor={`lodging-${index}-check-out`} error={itemErrors?.[index]?.checkOut?.message}>
+                                <EditorField
+                                    label={t('checkOut')}
+                                    htmlFor={`lodging-${index}-check-out`}
+                                    error={itemErrors?.[index]?.checkOut?.message}>
                                     <Input
                                         id={`lodging-${index}-check-out`}
                                         className={`${EDITOR_INPUT_CLASS} font-mono`}
@@ -112,7 +117,7 @@ export const LodgingsForm: FC<LodgingsFormProps> = ({ defaultValues, onSubmit, i
                                     />
                                 </EditorField>
                                 <EditorField
-                                    label='주소'
+                                    label={t('address')}
                                     htmlFor={`lodging-${index}-address`}
                                     error={itemErrors?.[index]?.address?.message}
                                     className='sm:col-span-2'>
@@ -124,7 +129,7 @@ export const LodgingsForm: FC<LodgingsFormProps> = ({ defaultValues, onSubmit, i
                                     />
                                 </EditorField>
                                 <EditorField
-                                    label='링크'
+                                    label={t('link')}
                                     htmlFor={`lodging-${index}-url`}
                                     error={itemErrors?.[index]?.url?.message}
                                     className='sm:col-span-2'>
@@ -138,20 +143,20 @@ export const LodgingsForm: FC<LodgingsFormProps> = ({ defaultValues, onSubmit, i
                                     />
                                 </EditorField>
                                 <EditorField
-                                    label='이동 안내'
+                                    label={t('access')}
                                     htmlFor={`lodging-${index}-access-note`}
                                     error={itemErrors?.[index]?.accessNote?.message}
                                     className='sm:col-span-2'>
                                     <Input
                                         id={`lodging-${index}-access-note`}
                                         className={EDITOR_INPUT_CLASS}
-                                        placeholder='난바역 도보 5분'
+                                        placeholder={t('accessPlaceholder')}
                                         aria-invalid={!!itemErrors?.[index]?.accessNote}
                                         {...form.register(`items.${index}.accessNote`, EMPTY_TO_NULL)}
                                     />
                                 </EditorField>
                                 <EditorField
-                                    label='메모'
+                                    label={t('note')}
                                     htmlFor={`lodging-${index}-note`}
                                     error={itemErrors?.[index]?.note?.message}
                                     className='sm:col-span-2'>

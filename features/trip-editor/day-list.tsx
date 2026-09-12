@@ -1,6 +1,7 @@
 'use client'
 
 import { PlusIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useState, type FC } from 'react'
 import type { TripDay } from '@/entities/trip/trip.type'
 import { EditorToolbar } from '@/features/trip-editor/editor-toolbar'
@@ -34,6 +35,7 @@ type DayListProps = {
 }
 
 export const DayList: FC<DayListProps> = ({ days, selectedDayId, onSelect, onCreate, onDelete, onReorder, isPending }) => {
+    const t = useTranslations('tripEditor.dayList')
     const [deletingDayId, setDeletingDayId] = useState<string | null>(null)
 
     const deletingDay = days.find((day) => day.id === deletingDayId)
@@ -53,17 +55,17 @@ export const DayList: FC<DayListProps> = ({ days, selectedDayId, onSelect, onCre
     return (
         <div className='flex flex-col gap-px bg-background'>
             <EditorToolbar
-                title='날짜'
+                title={t('title')}
                 count={days.length}
                 action={
                     <Button type='button' variant='cell' size='cell' disabled={isPending} onClick={onCreate}>
                         <PlusIcon />
-                        날짜 추가
+                        {t('add')}
                     </Button>
                 }
             />
             {days.length === 0 ? (
-                <p className='bg-card p-3 text-xs text-muted-foreground'>등록된 날짜가 없습니다.</p>
+                <p className='bg-card p-3 text-xs text-muted-foreground'>{t('empty')}</p>
             ) : (
                 <SortableRows ids={days.map((day) => day.id)} onReorder={handleReorder}>
                     {days.map((day, index) => (
@@ -71,7 +73,7 @@ export const DayList: FC<DayListProps> = ({ days, selectedDayId, onSelect, onCre
                             key={day.id}
                             id={day.id}
                             index={index}
-                            removeLabel='날짜 삭제'
+                            removeLabel={t('remove')}
                             isActive={day.id === selectedDayId}
                             onRemove={() => setDeletingDayId(day.id)}>
                             <button
@@ -94,19 +96,19 @@ export const DayList: FC<DayListProps> = ({ days, selectedDayId, onSelect, onCre
             <AlertDialog open={deletingDayId !== null} onOpenChange={(isOpen) => !isOpen && setDeletingDayId(null)}>
                 <AlertDialogContent size='sm'>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>날짜를 삭제할까요?</AlertDialogTitle>
+                        <AlertDialogTitle>{t('deleteTitle')}</AlertDialogTitle>
                         <AlertDialogDescription>
                             {deletingDay === undefined
-                                ? '이 날짜의 일정과 경로가 함께 삭제됩니다.'
-                                : `${deletingDay.shortLabel} ${deletingDay.title} 의 일정과 경로가 함께 삭제됩니다.`}
+                                ? t('deleteDefault')
+                                : t('deleteDescription', { day: `${deletingDay.shortLabel} ${deletingDay.title}` })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className='gap-px bg-background'>
                         <AlertDialogCancel variant='cell' size='cell'>
-                            취소
+                            {t('cancel')}
                         </AlertDialogCancel>
                         <Button type='button' variant='cellDestructive' size='cell' disabled={isPending} onClick={handleDelete}>
-                            삭제
+                            {t('delete')}
                         </Button>
                     </AlertDialogFooter>
                 </AlertDialogContent>

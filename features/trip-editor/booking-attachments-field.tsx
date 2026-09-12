@@ -2,13 +2,14 @@
 'use no memo'
 
 import { ImagePlusIcon, LinkIcon, Trash2Icon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useRef, type ChangeEvent, type FC } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import type { UploadedImage } from '@/entities/upload/upload.type'
 import { EditorField } from '@/features/trip-editor/editor-field'
 import { EDITOR_INPUT_CLASS, EMPTY_TO_NULL } from '@/features/trip-editor/editor-form'
 import type { BookingsFormInput, BookingsFormValues } from '@/features/trip-editor/editor-schema'
-import { UPLOAD_DISABLED_HINT, UPLOAD_IMAGE_ACCEPT } from '@/shared/constant/upload'
+import { UPLOAD_IMAGE_ACCEPT } from '@/shared/constant/upload'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 
@@ -22,6 +23,7 @@ type BookingAttachmentsFieldProps = {
 }
 
 export const BookingAttachmentsField: FC<BookingAttachmentsFieldProps> = ({ bookingIndex, isUploadEnabled, isUploading, onUploadImage }) => {
+    const t = useTranslations('tripEditor.attachments')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const { control, register, formState } = useFormContext<BookingsFormInput, unknown, BookingsFormValues>()
     const attachments = useFieldArray({ control, name: `items.${bookingIndex}.attachments`, keyName: 'fieldKey' })
@@ -40,11 +42,11 @@ export const BookingAttachmentsField: FC<BookingAttachmentsFieldProps> = ({ book
     return (
         <div className='flex flex-col gap-2'>
             <div className='flex flex-wrap items-center justify-between gap-2'>
-                <span className='text-xs font-medium text-muted-foreground'>첨부 {attachments.fields.length}</span>
+                <span className='text-xs font-medium text-muted-foreground'>{t('count', { count: attachments.fields.length })}</span>
                 <div className='flex gap-px bg-background'>
                     <Button type='button' variant='cell' size='cell' onClick={() => attachments.append({ ...EMPTY_LINK_ATTACHMENT })}>
                         <LinkIcon />
-                        링크 추가
+                        {t('addLink')}
                     </Button>
                     <Button
                         type='button'
@@ -53,29 +55,29 @@ export const BookingAttachmentsField: FC<BookingAttachmentsFieldProps> = ({ book
                         disabled={!isUploadEnabled || isUploading}
                         onClick={() => fileInputRef.current?.click()}>
                         <ImagePlusIcon />
-                        이미지 업로드
+                        {t('uploadImage')}
                     </Button>
                 </div>
             </div>
-            {!isUploadEnabled && <p className='text-xs text-muted-foreground'>{UPLOAD_DISABLED_HINT}</p>}
+            {!isUploadEnabled && <p className='text-xs text-muted-foreground'>{t('uploadDisabled')}</p>}
             {attachments.fields.map((attachment, attachmentIndex) => (
                 <div key={attachment.fieldKey} className='flex items-end gap-2'>
                     <EditorField
-                        label='첨부 라벨'
+                        label={t('label')}
                         htmlFor={`booking-${bookingIndex}-attachment-${attachmentIndex}-label`}
                         error={errors?.[attachmentIndex]?.label?.message}
                         className='min-w-32 flex-1'>
                         <Input
                             id={`booking-${bookingIndex}-attachment-${attachmentIndex}-label`}
                             className={EDITOR_INPUT_CLASS}
-                            placeholder='예매 확인 메일'
+                            placeholder={t('labelPlaceholder')}
                             aria-invalid={!!errors?.[attachmentIndex]?.label}
                             {...register(`items.${bookingIndex}.attachments.${attachmentIndex}.label`, EMPTY_TO_NULL)}
                         />
                     </EditorField>
                     {attachment.kind === 'image' ? (
                         <EditorField
-                            label='이미지 주소'
+                            label={t('imageUrl')}
                             htmlFor={`booking-${bookingIndex}-attachment-${attachmentIndex}-url`}
                             error={errors?.[attachmentIndex]?.url?.message}
                             className='min-w-48 flex-2'>
@@ -88,7 +90,7 @@ export const BookingAttachmentsField: FC<BookingAttachmentsFieldProps> = ({ book
                         </EditorField>
                     ) : (
                         <EditorField
-                            label='첨부 주소'
+                            label={t('url')}
                             htmlFor={`booking-${bookingIndex}-attachment-${attachmentIndex}-url`}
                             error={errors?.[attachmentIndex]?.url?.message}
                             className='min-w-48 flex-2'>
@@ -107,7 +109,7 @@ export const BookingAttachmentsField: FC<BookingAttachmentsFieldProps> = ({ book
                         type='button'
                         variant='ghost'
                         size='icon-xs'
-                        aria-label='첨부 삭제'
+                        aria-label={t('remove')}
                         onClick={() => attachments.remove(attachmentIndex)}>
                         <Trash2Icon />
                     </Button>
@@ -117,7 +119,7 @@ export const BookingAttachmentsField: FC<BookingAttachmentsFieldProps> = ({ book
                 ref={fileInputRef}
                 className='hidden'
                 type='file'
-                aria-label='첨부 이미지 파일 선택'
+                aria-label={t('fileInput')}
                 accept={UPLOAD_IMAGE_ACCEPT}
                 onChange={handleFileChange}
             />

@@ -3,6 +3,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, type FC } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import type { SavedDay, TripScheduleKind } from '@/entities/trip/trip.type'
@@ -36,6 +37,7 @@ type DayFormProps = {
 }
 
 export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValues, onSubmit, isPending }) => {
+    const t = useTranslations('tripEditor.day')
     const didResetRef = useRef(false)
     const form = useForm<DayInput, unknown, DayValues>({ resolver: zodResolver(dayInputSchema), defaultValues })
     const facts = useFieldArray({ control: form.control, name: 'facts', keyName: 'fieldKey' })
@@ -58,17 +60,12 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
 
     return (
         <FormProvider {...form}>
-            <EditorFormShell
-                isDirty={isDirty}
-                isPending={isPending}
-                onSubmit={handleSubmit}
-                onReset={() => form.reset()}
-                hint='이 날짜만 저장합니다.'>
-                <EditorPanel title={heading} description='날짜 탭과 헤딩에 사용하는 값입니다.' contentClassName={EDITOR_GRID_CLASS}>
-                    <EditorField label='날짜' htmlFor='day-date' error={errors.date?.message}>
+            <EditorFormShell isDirty={isDirty} isPending={isPending} onSubmit={handleSubmit} onReset={() => form.reset()} hint={t('saveHint')}>
+                <EditorPanel title={heading} description={t('headerDescription')} contentClassName={EDITOR_GRID_CLASS}>
+                    <EditorField label={t('date')} htmlFor='day-date' error={errors.date?.message}>
                         <Input id='day-date' className={EDITOR_INPUT_CLASS} type='date' aria-invalid={!!errors.date} {...form.register('date')} />
                     </EditorField>
-                    <EditorField label='탭 라벨' htmlFor='day-short-label' error={errors.shortLabel?.message}>
+                    <EditorField label={t('tabLabel')} htmlFor='day-short-label' error={errors.shortLabel?.message}>
                         <Input
                             id='day-short-label'
                             className={`${EDITOR_INPUT_CLASS} font-mono`}
@@ -77,10 +74,10 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                             {...form.register('shortLabel')}
                         />
                     </EditorField>
-                    <EditorField label='제목' htmlFor='day-title' error={errors.title?.message}>
+                    <EditorField label={t('title')} htmlFor='day-title' error={errors.title?.message}>
                         <Input id='day-title' className={EDITOR_INPUT_CLASS} aria-invalid={!!errors.title} {...form.register('title')} />
                     </EditorField>
-                    <EditorField label='부제' htmlFor='day-subtitle' error={errors.subtitle?.message}>
+                    <EditorField label={t('subtitle')} htmlFor='day-subtitle' error={errors.subtitle?.message}>
                         <Input
                             id='day-subtitle'
                             className={EDITOR_INPUT_CLASS}
@@ -89,8 +86,8 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                         />
                     </EditorField>
                 </EditorPanel>
-                <EditorPanel title='본문' description='개요, 이동 계획, 마무리 문단입니다.'>
-                    <EditorField label='개요' htmlFor='day-overview' error={errors.overview?.message}>
+                <EditorPanel title={t('bodyTitle')} description={t('bodyDescription')}>
+                    <EditorField label={t('overview')} htmlFor='day-overview' error={errors.overview?.message}>
                         <Textarea
                             id='day-overview'
                             className={EDITOR_TEXTAREA_CLASS}
@@ -99,7 +96,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                         />
                     </EditorField>
                     <div className={EDITOR_GRID_CLASS}>
-                        <EditorField label='이동 계획 제목' htmlFor='day-plan-headline' error={errors.planHeadline?.message}>
+                        <EditorField label={t('planHeadline')} htmlFor='day-plan-headline' error={errors.planHeadline?.message}>
                             <Input
                                 id='day-plan-headline'
                                 className={EDITOR_INPUT_CLASS}
@@ -107,7 +104,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                                 {...form.register('planHeadline', EMPTY_TO_NULL)}
                             />
                         </EditorField>
-                        <EditorField label='마무리 제목' htmlFor='day-closing-headline' error={errors.closingHeadline?.message}>
+                        <EditorField label={t('closingHeadline')} htmlFor='day-closing-headline' error={errors.closingHeadline?.message}>
                             <Input
                                 id='day-closing-headline'
                                 className={EDITOR_INPUT_CLASS}
@@ -115,7 +112,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                                 {...form.register('closingHeadline', EMPTY_TO_NULL)}
                             />
                         </EditorField>
-                        <EditorField label='이동 계획 본문' htmlFor='day-plan-note' error={errors.planNote?.message}>
+                        <EditorField label={t('planNote')} htmlFor='day-plan-note' error={errors.planNote?.message}>
                             <Textarea
                                 id='day-plan-note'
                                 className={EDITOR_TEXTAREA_CLASS}
@@ -123,7 +120,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                                 {...form.register('planNote', EMPTY_TO_NULL)}
                             />
                         </EditorField>
-                        <EditorField label='마무리 본문' htmlFor='day-closing-note' error={errors.closingNote?.message}>
+                        <EditorField label={t('closingNote')} htmlFor='day-closing-note' error={errors.closingNote?.message}>
                             <Textarea
                                 id='day-closing-note'
                                 className={EDITOR_TEXTAREA_CLASS}
@@ -133,8 +130,8 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                         </EditorField>
                     </div>
                 </EditorPanel>
-                <EditorPanel title='전체 일정 표' description='여행 정보의 전체 일정 표에 들어가는 요약입니다.' contentClassName={EDITOR_GRID_CLASS}>
-                    <EditorField label='오전' htmlFor='day-morning' error={errors.morningSummary?.message}>
+                <EditorPanel title={t('summaryTitle')} description={t('summaryDescription')} contentClassName={EDITOR_GRID_CLASS}>
+                    <EditorField label={t('morning')} htmlFor='day-morning' error={errors.morningSummary?.message}>
                         <Input
                             id='day-morning'
                             className={EDITOR_INPUT_CLASS}
@@ -142,7 +139,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                             {...form.register('morningSummary', EMPTY_TO_NULL)}
                         />
                     </EditorField>
-                    <EditorField label='오후' htmlFor='day-afternoon' error={errors.afternoonSummary?.message}>
+                    <EditorField label={t('afternoon')} htmlFor='day-afternoon' error={errors.afternoonSummary?.message}>
                         <Input
                             id='day-afternoon'
                             className={EDITOR_INPUT_CLASS}
@@ -150,7 +147,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                             {...form.register('afternoonSummary', EMPTY_TO_NULL)}
                         />
                     </EditorField>
-                    <EditorField label='저녁' htmlFor='day-evening' error={errors.eveningSummary?.message}>
+                    <EditorField label={t('evening')} htmlFor='day-evening' error={errors.eveningSummary?.message}>
                         <Input
                             id='day-evening'
                             className={EDITOR_INPUT_CLASS}
@@ -160,12 +157,12 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                     </EditorField>
                 </EditorPanel>
                 <EditorToolbar
-                    title='확인된 내용'
+                    title={t('factsTitle')}
                     count={facts.fields.length}
                     action={
                         <Button type='button' variant='cell' size='cell' onClick={() => facts.append(EMPTY_FACT)}>
                             <PlusIcon />
-                            항목 추가
+                            {t('addFact')}
                         </Button>
                     }
                 />
@@ -176,10 +173,10 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                                 key={row.fieldKey}
                                 id={row.fieldKey}
                                 index={index}
-                                removeLabel='항목 삭제'
+                                removeLabel={t('removeFact')}
                                 onRemove={() => facts.remove(index)}>
                                 <div className={EDITOR_GRID_CLASS}>
-                                    <EditorField label='항목' htmlFor={`fact-${index}-label`} error={errors.facts?.[index]?.label?.message}>
+                                    <EditorField label={t('factLabel')} htmlFor={`fact-${index}-label`} error={errors.facts?.[index]?.label?.message}>
                                         <Input
                                             id={`fact-${index}-label`}
                                             className={EDITOR_INPUT_CLASS}
@@ -187,7 +184,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                                             {...form.register(`facts.${index}.label`)}
                                         />
                                     </EditorField>
-                                    <EditorField label='내용' htmlFor={`fact-${index}-value`} error={errors.facts?.[index]?.value?.message}>
+                                    <EditorField label={t('factValue')} htmlFor={`fact-${index}-value`} error={errors.facts?.[index]?.value?.message}>
                                         <Input
                                             id={`fact-${index}-value`}
                                             className={EDITOR_INPUT_CLASS}
@@ -201,12 +198,12 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                     </SortableRows>
                 )}
                 <EditorToolbar
-                    title='이동 경로'
+                    title={t('routesTitle')}
                     count={routes.fields.length}
                     action={
                         <Button type='button' variant='cell' size='cell' onClick={() => routes.append(EMPTY_ROUTE)}>
                             <PlusIcon />
-                            경로 추가
+                            {t('addRoute')}
                         </Button>
                     }
                 />
@@ -217,10 +214,13 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                                 key={row.fieldKey}
                                 id={row.fieldKey}
                                 index={index}
-                                removeLabel='경로 삭제'
+                                removeLabel={t('removeRoute')}
                                 onRemove={() => routes.remove(index)}>
                                 <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
-                                    <EditorField label='출발' htmlFor={`route-${index}-origin`} error={errors.routes?.[index]?.origin?.message}>
+                                    <EditorField
+                                        label={t('origin')}
+                                        htmlFor={`route-${index}-origin`}
+                                        error={errors.routes?.[index]?.origin?.message}>
                                         <Input
                                             id={`route-${index}-origin`}
                                             className={EDITOR_INPUT_CLASS}
@@ -229,7 +229,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                                         />
                                     </EditorField>
                                     <EditorField
-                                        label='도착'
+                                        label={t('arrival')}
                                         htmlFor={`route-${index}-destination`}
                                         error={errors.routes?.[index]?.destination?.message}>
                                         <Input
@@ -239,7 +239,10 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                                             {...form.register(`routes.${index}.destination`)}
                                         />
                                     </EditorField>
-                                    <EditorField label='소요(분)' htmlFor={`route-${index}-minutes`} error={errors.routes?.[index]?.minutes?.message}>
+                                    <EditorField
+                                        label={t('minutes')}
+                                        htmlFor={`route-${index}-minutes`}
+                                        error={errors.routes?.[index]?.minutes?.message}>
                                         <Input
                                             id={`route-${index}-minutes`}
                                             className={`${EDITOR_INPUT_CLASS} font-mono tabular-nums`}
@@ -249,24 +252,27 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                                             {...form.register(`routes.${index}.minutes`, { valueAsNumber: true })}
                                         />
                                     </EditorField>
-                                    <EditorField label='계산식' htmlFor={`route-${index}-formula`} error={errors.routes?.[index]?.formula?.message}>
+                                    <EditorField
+                                        label={t('formula')}
+                                        htmlFor={`route-${index}-formula`}
+                                        error={errors.routes?.[index]?.formula?.message}>
                                         <Input
                                             id={`route-${index}-formula`}
                                             className={EDITOR_INPUT_CLASS}
-                                            placeholder='도보 8 + 지하철 12'
+                                            placeholder={t('formulaPlaceholder')}
                                             aria-invalid={!!errors.routes?.[index]?.formula}
                                             {...form.register(`routes.${index}.formula`, EMPTY_TO_NULL)}
                                         />
                                     </EditorField>
                                     <EditorField
-                                        label='경로 설명'
+                                        label={t('routeDescription')}
                                         htmlFor={`route-${index}-path-text`}
                                         error={errors.routes?.[index]?.pathText?.message}
                                         className='sm:col-span-2 lg:col-span-4'>
                                         <Input
                                             id={`route-${index}-path-text`}
                                             className={EDITOR_INPUT_CLASS}
-                                            placeholder='난바역 → 미도스지선 → 우메다역'
+                                            placeholder={t('routePlaceholder')}
                                             aria-invalid={!!errors.routes?.[index]?.pathText}
                                             {...form.register(`routes.${index}.pathText`, EMPTY_TO_NULL)}
                                         />
@@ -277,12 +283,12 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                     </SortableRows>
                 )}
                 <EditorToolbar
-                    title='타임라인'
+                    title={t('timelineTitle')}
                     count={scheduleItems.fields.length}
                     action={
                         <Button type='button' variant='cell' size='cell' onClick={() => scheduleItems.append(toEmptySchedule(firstKindId))}>
                             <PlusIcon />
-                            일정 추가
+                            {t('addSchedule')}
                         </Button>
                     }
                 />
@@ -293,7 +299,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                                 key={row.fieldKey}
                                 id={row.fieldKey}
                                 index={index}
-                                removeLabel='일정 삭제'
+                                removeLabel={t('removeSchedule')}
                                 onRemove={() => scheduleItems.remove(index)}>
                                 <DayScheduleRow index={index} kinds={scheduleKinds} />
                             </SortableRow>
@@ -301,12 +307,12 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                     </SortableRows>
                 )}
                 <EditorToolbar
-                    title='참고'
+                    title={t('notesTitle')}
                     count={notes.fields.length}
                     action={
                         <Button type='button' variant='cell' size='cell' onClick={() => notes.append(EMPTY_NOTE)}>
                             <PlusIcon />
-                            참고 추가
+                            {t('addNote')}
                         </Button>
                     }
                 />
@@ -317,11 +323,11 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                                 key={row.fieldKey}
                                 id={row.fieldKey}
                                 index={index}
-                                removeLabel='참고 삭제'
+                                removeLabel={t('removeNote')}
                                 onRemove={() => notes.remove(index)}>
                                 <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
                                     <EditorField
-                                        label='앞 문장'
+                                        label={t('leading')}
                                         htmlFor={`note-${index}-leading`}
                                         error={errors.notes?.[index]?.leading?.message}
                                         className='sm:col-span-2'>
@@ -333,7 +339,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                                         />
                                     </EditorField>
                                     <EditorField
-                                        label='링크 이름'
+                                        label={t('linkLabel')}
                                         htmlFor={`note-${index}-link-label`}
                                         error={errors.notes?.[index]?.linkLabel?.message}>
                                         <Input
@@ -343,7 +349,10 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                                             {...form.register(`notes.${index}.linkLabel`, EMPTY_TO_NULL)}
                                         />
                                     </EditorField>
-                                    <EditorField label='링크 주소' htmlFor={`note-${index}-link-url`} error={errors.notes?.[index]?.linkUrl?.message}>
+                                    <EditorField
+                                        label={t('linkUrl')}
+                                        htmlFor={`note-${index}-link-url`}
+                                        error={errors.notes?.[index]?.linkUrl?.message}>
                                         <Input
                                             id={`note-${index}-link-url`}
                                             className={EDITOR_INPUT_CLASS}
@@ -354,7 +363,7 @@ export const DayForm: FC<DayFormProps> = ({ heading, scheduleKinds, defaultValue
                                         />
                                     </EditorField>
                                     <EditorField
-                                        label='뒤 문장'
+                                        label={t('trailing')}
                                         htmlFor={`note-${index}-trailing`}
                                         error={errors.notes?.[index]?.trailing?.message}
                                         className='sm:col-span-2 lg:col-span-4'>

@@ -3,6 +3,7 @@
 import dayjs from 'dayjs'
 import { ExternalLinkIcon, TriangleAlertIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from '@/i18n/navigation'
@@ -20,14 +21,7 @@ import { KindsTab } from '@/widgets/trip-editor/kinds-tab'
 import { ShareTab } from '@/widgets/trip-editor/share-tab'
 import { SidebarTab } from '@/widgets/trip-editor/sidebar-tab'
 import { TravelTab } from '@/widgets/trip-editor/travel-tab'
-import {
-    EDITOR_EXPORT_TAB_LABEL,
-    EDITOR_TAB_LABEL,
-    EDITOR_TAB_PARAM,
-    EDITOR_TABS,
-    resolveEditorTab,
-    type EditorTab,
-} from '@/widgets/trip-editor/trip-editor.constant'
+import { EDITOR_TAB_PARAM, EDITOR_TABS, resolveEditorTab, type EditorTab } from '@/widgets/trip-editor/trip-editor.constant'
 import type { TripEditorTabProps } from '@/widgets/trip-editor/trip-editor.type'
 
 const SAVED_TIME_FORMAT = 'HH:mm:ss'
@@ -49,6 +43,7 @@ type TripEditorWidgetProps = {
 }
 
 export const TripEditorWidget: FC<TripEditorWidgetProps> = ({ tripId, isUploadEnabled }) => {
+    const t = useTranslations('tripEditor')
     const [savedAt, setSavedAt] = useState<string | null>(null)
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -63,8 +58,8 @@ export const TripEditorWidget: FC<TripEditorWidgetProps> = ({ tripId, isUploadEn
                 <div className='flex flex-col items-center justify-center gap-6 bg-card p-3 text-center'>
                     <TriangleAlertIcon className='size-6 text-destructive' aria-hidden />
                     <div className='flex flex-col gap-1'>
-                        <p className='text-sm font-medium'>여행을 불러오지 못했습니다.</p>
-                        <p className='text-xs text-muted-foreground'>요청이 실패했습니다. 잠시 후 다시 시도하세요.</p>
+                        <p className='text-sm font-medium'>{t('loadFailed')}</p>
+                        <p className='text-xs text-muted-foreground'>{t('requestFailed')}</p>
                     </div>
                 </div>
             )
@@ -91,12 +86,12 @@ export const TripEditorWidget: FC<TripEditorWidgetProps> = ({ tripId, isUploadEn
             <div className='flex flex-wrap items-stretch justify-between gap-px bg-background'>
                 <div className='flex min-w-0 flex-1 flex-col justify-center gap-0.5 bg-card p-3'>
                     <h1 className='truncate text-sm font-semibold tracking-tight'>{detail.title}</h1>
-                    <p className='text-xs text-muted-foreground'>{savedAt === null ? '탭마다 따로 저장합니다.' : `최근 저장 ${savedAt}`}</p>
+                    <p className='text-xs text-muted-foreground'>{savedAt === null ? t('savePerTab') : t('recentSaved', { time: savedAt })}</p>
                 </div>
                 <Button variant='cell' size='cell' asChild>
                     <Link href={`/trips/${tripId}`}>
                         <ExternalLinkIcon />
-                        보기
+                        {t('view')}
                     </Link>
                 </Button>
             </div>
@@ -106,7 +101,7 @@ export const TripEditorWidget: FC<TripEditorWidgetProps> = ({ tripId, isUploadEn
                         key={tab}
                         className='h-full flex-none rounded-none border-0 px-4 py-0 text-sm shadow-none after:hidden data-active:bg-card data-active:shadow-none dark:data-active:border-0 dark:data-active:bg-card'
                         value={tab}>
-                        {tab === 'share' && !isOwner ? EDITOR_EXPORT_TAB_LABEL : EDITOR_TAB_LABEL[tab]}
+                        {tab === 'share' && !isOwner ? t('tabs.export') : t(`tabs.${tab}`)}
                         {tabCount[tab] !== undefined && <span className='font-mono text-muted-foreground tabular-nums'>{tabCount[tab]}</span>}
                     </TabsTrigger>
                 ))}

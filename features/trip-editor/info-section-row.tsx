@@ -2,6 +2,7 @@
 'use no memo'
 
 import { PlusIcon, Trash2Icon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { type FC } from 'react'
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form'
 import { EditorField } from '@/features/trip-editor/editor-field'
@@ -18,12 +19,6 @@ import { Switch } from '@/shared/ui/switch'
 
 const EMPTY_BLOCK = { kind: 'paragraph', emphasis: null, text: null, linkLabel: null, linkUrl: null } satisfies InfoBlockInput
 
-const SECTION_TITLE_LABEL = '섹션 제목'
-const DEFAULT_OPEN_LABEL = '기본 펼침'
-const BLOCK_ADD_LABEL = '블록 추가'
-const BLOCK_REMOVE_LABEL = '블록 삭제'
-const SECTION_REMOVE_LABEL = '섹션 삭제'
-const EMPTY_BLOCKS_TEXT = '블록이 없습니다.'
 const CELL_CLASS = 'flex min-h-10 items-center gap-2 bg-card px-4'
 
 type InfoSectionRowProps = {
@@ -32,6 +27,7 @@ type InfoSectionRowProps = {
 }
 
 export const InfoSectionRow: FC<InfoSectionRowProps> = ({ sectionIndex, onRemove }) => {
+    const t = useTranslations('tripEditor.infoSection')
     const { control, register, formState } = useFormContext<InfoSectionsFormInput, unknown, InfoSectionsFormValues>()
     const blocks = useFieldArray({ control, name: `items.${sectionIndex}.blocks`, keyName: 'fieldKey' })
 
@@ -40,7 +36,7 @@ export const InfoSectionRow: FC<InfoSectionRowProps> = ({ sectionIndex, onRemove
 
     return (
         <div className='flex flex-col gap-3'>
-            <EditorField label={SECTION_TITLE_LABEL} htmlFor={`${fieldId}-title`} error={errors?.title?.message}>
+            <EditorField label={t('title')} htmlFor={`${fieldId}-title`} error={errors?.title?.message}>
                 <Input
                     id={`${fieldId}-title`}
                     className={EDITOR_INPUT_CLASS}
@@ -58,20 +54,20 @@ export const InfoSectionRow: FC<InfoSectionRowProps> = ({ sectionIndex, onRemove
                         )}
                     />
                     <Label className={cn(EDITOR_LABEL_LINE_CLASS, 'text-xs font-medium text-muted-foreground')} htmlFor={`${fieldId}-default-open`}>
-                        {DEFAULT_OPEN_LABEL}
+                        {t('defaultOpen')}
                     </Label>
                 </div>
                 <Button type='button' variant='cell' size='cell' onClick={() => blocks.append(EMPTY_BLOCK)}>
                     <PlusIcon />
-                    {BLOCK_ADD_LABEL}
+                    {t('addBlock')}
                 </Button>
                 <Button type='button' variant='cellDestructive' size='cell' onClick={onRemove}>
                     <Trash2Icon />
-                    {SECTION_REMOVE_LABEL}
+                    {t('removeSection')}
                 </Button>
             </div>
             {blocks.fields.length === 0 ? (
-                <p className='text-xs text-muted-foreground'>{EMPTY_BLOCKS_TEXT}</p>
+                <p className='text-xs text-muted-foreground'>{t('empty')}</p>
             ) : (
                 <SortableRows ids={blocks.fields.map((block) => block.fieldKey)} onReorder={blocks.move}>
                     {blocks.fields.map((block, blockIndex) => (
@@ -79,7 +75,7 @@ export const InfoSectionRow: FC<InfoSectionRowProps> = ({ sectionIndex, onRemove
                             key={block.fieldKey}
                             id={block.fieldKey}
                             index={blockIndex}
-                            removeLabel={BLOCK_REMOVE_LABEL}
+                            removeLabel={t('removeBlock')}
                             onRemove={() => blocks.remove(blockIndex)}>
                             <InfoBlockRow sectionIndex={sectionIndex} blockIndex={blockIndex} />
                         </SortableRow>

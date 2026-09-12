@@ -3,6 +3,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, type FC } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { tripBasicsFormSchema, type TripBasicsFormInput, type TripBasicsFormValues } from '@/entities/trip/trip.validate'
@@ -28,8 +29,6 @@ import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Textarea } from '@/shared/ui/textarea'
 
-const DEPARTURE_AIRPORT_HINT = '고르지 않으면 기본 ICN 으로 계산합니다.'
-
 type BasicsFormProps = {
     defaultValues: TripBasicsFormInput
     onSubmit: EditorSubmit<TripBasicsFormValues>
@@ -37,6 +36,7 @@ type BasicsFormProps = {
 }
 
 export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPending }) => {
+    const t = useTranslations('tripEditor.basics')
     const didResetRef = useRef(false)
     const form = useForm<TripBasicsFormInput, unknown, TripBasicsFormValues>({ resolver: zodResolver(tripBasicsFormSchema), defaultValues })
     const rows = useFieldArray({ control: form.control, name: 'destinations', keyName: 'fieldKey' })
@@ -55,20 +55,20 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
 
     return (
         <EditorFormShell isDirty={isDirty} isPending={isPending} onSubmit={handleSubmit} onReset={() => form.reset()}>
-            <EditorPanel title='여행 개요' description='목록과 뷰어 상단에 표시되는 정보입니다.' contentClassName={EDITOR_GRID_CLASS}>
-                <EditorField label='제목' htmlFor='basics-title' error={errors.title?.message}>
+            <EditorPanel title={t('overviewTitle')} description={t('overviewDescription')} contentClassName={EDITOR_GRID_CLASS}>
+                <EditorField label={t('title')} htmlFor='basics-title' error={errors.title?.message}>
                     <Input id='basics-title' className={EDITOR_INPUT_CLASS} aria-invalid={!!errors.title} {...form.register('title')} />
                 </EditorField>
-                <EditorField label='윗줄 문구' htmlFor='basics-eyebrow' error={errors.eyebrow?.message}>
+                <EditorField label={t('eyebrow')} htmlFor='basics-eyebrow' error={errors.eyebrow?.message}>
                     <Input
                         id='basics-eyebrow'
                         className={EDITOR_INPUT_CLASS}
-                        placeholder='2박 3일 일정'
+                        placeholder={t('eyebrowPlaceholder')}
                         aria-invalid={!!errors.eyebrow}
                         {...form.register('eyebrow', EMPTY_TO_NULL)}
                     />
                 </EditorField>
-                <EditorField label='목적지' htmlFor='basics-destination' error={errors.destination?.message}>
+                <EditorField label={t('destination')} htmlFor='basics-destination' error={errors.destination?.message}>
                     <Input
                         id='basics-destination'
                         className={EDITOR_INPUT_CLASS}
@@ -77,10 +77,10 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                     />
                 </EditorField>
                 <EditorField
-                    label='출발 공항'
+                    label={t('departureAirport')}
                     htmlFor='basics-departure-airport'
                     error={errors.departureAirportCode?.message}
-                    hint={DEPARTURE_AIRPORT_HINT}>
+                    hint={t('departureAirportHint')}>
                     <Controller
                         control={form.control}
                         name='departureAirportCode'
@@ -95,16 +95,16 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                         )}
                     />
                 </EditorField>
-                <EditorField label='기간 문구' htmlFor='basics-period-note' error={errors.periodNote?.message}>
+                <EditorField label={t('periodNote')} htmlFor='basics-period-note' error={errors.periodNote?.message}>
                     <Input
                         id='basics-period-note'
                         className={EDITOR_INPUT_CLASS}
-                        placeholder='10.01 목 - 10.07 화'
+                        placeholder={t('periodNotePlaceholder')}
                         aria-invalid={!!errors.periodNote}
                         {...form.register('periodNote', EMPTY_TO_NULL)}
                     />
                 </EditorField>
-                <EditorField label='시작일' htmlFor='basics-start-date' error={errors.startDate?.message}>
+                <EditorField label={t('startDate')} htmlFor='basics-start-date' error={errors.startDate?.message}>
                     <Input
                         id='basics-start-date'
                         className={EDITOR_INPUT_CLASS}
@@ -113,7 +113,7 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                         {...form.register('startDate')}
                     />
                 </EditorField>
-                <EditorField label='종료일' htmlFor='basics-end-date' error={errors.endDate?.message}>
+                <EditorField label={t('endDate')} htmlFor='basics-end-date' error={errors.endDate?.message}>
                     <Input
                         id='basics-end-date'
                         className={EDITOR_INPUT_CLASS}
@@ -122,7 +122,7 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                         {...form.register('endDate')}
                     />
                 </EditorField>
-                <EditorField label='박' htmlFor='basics-nights' error={errors.customNights?.message}>
+                <EditorField label={t('nights')} htmlFor='basics-nights' error={errors.customNights?.message}>
                     <Input
                         id='basics-nights'
                         className={EDITOR_INPUT_CLASS}
@@ -134,7 +134,7 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                         {...form.register('customNights', EMPTY_TO_NULL_NUMBER)}
                     />
                 </EditorField>
-                <EditorField label='일' htmlFor='basics-days' error={errors.customDays?.message} hint='비우면 날짜로 계산합니다'>
+                <EditorField label={t('days')} htmlFor='basics-days' error={errors.customDays?.message} hint={t('autoLengthHint')}>
                     <Input
                         id='basics-days'
                         className={EDITOR_INPUT_CLASS}
@@ -146,11 +146,7 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                         {...form.register('customDays', EMPTY_TO_NULL_NUMBER)}
                     />
                 </EditorField>
-                <EditorField
-                    label='확인 기준일'
-                    htmlFor='basics-verified-on'
-                    error={errors.verifiedOn?.message}
-                    hint='정보를 마지막으로 확인한 날짜입니다.'>
+                <EditorField label={t('verifiedOn')} htmlFor='basics-verified-on' error={errors.verifiedOn?.message} hint={t('verifiedOnHint')}>
                     <Input
                         id='basics-verified-on'
                         className={EDITOR_INPUT_CLASS}
@@ -159,36 +155,41 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                         {...form.register('verifiedOn', EMPTY_TO_NULL)}
                     />
                 </EditorField>
-                <EditorField label='주의 문구' htmlFor='basics-disclaimer' error={errors.disclaimer?.message}>
+                <EditorField label={t('disclaimer')} htmlFor='basics-disclaimer' error={errors.disclaimer?.message}>
                     <Input
                         id='basics-disclaimer'
                         className={EDITOR_INPUT_CLASS}
-                        placeholder='운행 정보는 변동될 수 있습니다.'
+                        placeholder={t('disclaimerPlaceholder')}
                         aria-invalid={!!errors.disclaimer}
                         {...form.register('disclaimer', EMPTY_TO_NULL)}
                     />
                 </EditorField>
             </EditorPanel>
             <EditorToolbar
-                title='목적지'
-                description='여행하는 순서대로 나라를 추가하세요. 항공편이 없으면 지구본 경로에 사용됩니다.'
+                title={t('destinationsTitle')}
+                description={t('destinationsDescription')}
                 count={rows.fields.length}
                 action={
                     <Button type='button' variant='cell' size='cell' onClick={() => rows.append({ countryCode: DEFAULT_COUNTRY_CODE, city: null })}>
                         <PlusIcon />
-                        나라 추가
+                        {t('addCountry')}
                     </Button>
                 }
             />
             {rows.fields.length === 0 ? (
-                <p className='bg-card p-3 text-xs text-muted-foreground'>등록된 목적지가 없습니다.</p>
+                <p className='bg-card p-3 text-xs text-muted-foreground'>{t('destinationsEmpty')}</p>
             ) : (
                 <SortableRows ids={rows.fields.map((row) => row.fieldKey)} onReorder={rows.move}>
                     {rows.fields.map((row, index) => (
-                        <SortableRow key={row.fieldKey} id={row.fieldKey} index={index} removeLabel='목적지 삭제' onRemove={() => rows.remove(index)}>
+                        <SortableRow
+                            key={row.fieldKey}
+                            id={row.fieldKey}
+                            index={index}
+                            removeLabel={t('removeDestination')}
+                            onRemove={() => rows.remove(index)}>
                             <div className={EDITOR_GRID_CLASS}>
                                 <EditorField
-                                    label='나라'
+                                    label={t('country')}
                                     htmlFor={`destination-${index}-country`}
                                     error={errors.destinations?.[index]?.countryCode?.message}>
                                     <Controller
@@ -204,11 +205,14 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                                         )}
                                     />
                                 </EditorField>
-                                <EditorField label='도시' htmlFor={`destination-${index}-city`} error={errors.destinations?.[index]?.city?.message}>
+                                <EditorField
+                                    label={t('city')}
+                                    htmlFor={`destination-${index}-city`}
+                                    error={errors.destinations?.[index]?.city?.message}>
                                     <Input
                                         id={`destination-${index}-city`}
                                         className={EDITOR_INPUT_CLASS}
-                                        placeholder='오사카'
+                                        placeholder={t('cityPlaceholder')}
                                         aria-invalid={!!errors.destinations?.[index]?.city}
                                         {...form.register(`destinations.${index}.city`, EMPTY_TO_NULL)}
                                     />
@@ -218,8 +222,8 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                     ))}
                 </SortableRows>
             )}
-            <EditorPanel title='안내 문구' description='뷰어의 범례·예매 소개·푸터에 그대로 표시됩니다.'>
-                <EditorField label='여유 시간 안내' htmlFor='basics-buffer-policy' error={errors.bufferPolicy?.message}>
+            <EditorPanel title={t('noticesTitle')} description={t('noticesDescription')}>
+                <EditorField label={t('bufferPolicy')} htmlFor='basics-buffer-policy' error={errors.bufferPolicy?.message}>
                     <Textarea
                         id='basics-buffer-policy'
                         className={EDITOR_TEXTAREA_CLASS}
@@ -227,7 +231,7 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                         {...form.register('bufferPolicy', EMPTY_TO_NULL)}
                     />
                 </EditorField>
-                <EditorField label='예매 안내' htmlFor='basics-booking-note' error={errors.bookingNote?.message}>
+                <EditorField label={t('bookingNote')} htmlFor='basics-booking-note' error={errors.bookingNote?.message}>
                     <Textarea
                         id='basics-booking-note'
                         className={EDITOR_TEXTAREA_CLASS}
@@ -235,7 +239,7 @@ export const BasicsForm: FC<BasicsFormProps> = ({ defaultValues, onSubmit, isPen
                         {...form.register('bookingNote', EMPTY_TO_NULL)}
                     />
                 </EditorField>
-                <EditorField label='푸터 문구' htmlFor='basics-footer-note' error={errors.footerNote?.message}>
+                <EditorField label={t('footerNote')} htmlFor='basics-footer-note' error={errors.footerNote?.message}>
                     <Textarea
                         id='basics-footer-note'
                         className={EDITOR_TEXTAREA_CLASS}

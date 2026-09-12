@@ -3,6 +3,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CopyIcon, DownloadIcon, ExternalLinkIcon, UploadIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState, type ChangeEvent, type FC, type MouseEvent } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -54,6 +55,7 @@ export const SharePanel: FC<SharePanelProps> = ({
     isExporting,
     isImporting,
 }) => {
+    const t = useTranslations('tripEditor.share')
     const didResetRef = useRef(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [pendingTemplate, setPendingTemplate] = useState<TripTemplate | null>(null)
@@ -71,9 +73,9 @@ export const SharePanel: FC<SharePanelProps> = ({
         if (savedUrl === null) return
         try {
             await navigator.clipboard.writeText(savedUrl)
-            toast.success('공유 링크를 복사했습니다.')
+            toast.success(t('copySuccess'))
         } catch {
-            toast.error('링크를 복사하지 못했습니다.')
+            toast.error(t('copyFailed'))
         }
     }
     const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -82,7 +84,7 @@ export const SharePanel: FC<SharePanelProps> = ({
         if (file === undefined) return
         const template = parseTripTemplateJson(await file.text())
         if (template === null) {
-            toast.error('올바른 트립 JSON 이 아닙니다.')
+            toast.error(t('invalidJson'))
             return
         }
         setPendingTemplate(template)
@@ -103,13 +105,8 @@ export const SharePanel: FC<SharePanelProps> = ({
     return (
         <div className='flex flex-col gap-px bg-background'>
             {canManage && (
-                <EditorFormShell
-                    isDirty={isDirty}
-                    isPending={isPending}
-                    onSubmit={handleSubmit}
-                    onReset={() => form.reset()}
-                    hint='공유 설정을 저장합니다.'>
-                    <EditorPanel title='공개 링크' description='공개하면 로그인 없이도 읽기 전용으로 볼 수 있습니다.'>
+                <EditorFormShell isDirty={isDirty} isPending={isPending} onSubmit={handleSubmit} onReset={() => form.reset()} hint={t('saveHint')}>
+                    <EditorPanel title={t('publicLink')} description={t('publicLinkDescription')}>
                         <div className='flex items-center gap-2'>
                             <Switch
                                 id='share-is-public'
@@ -117,14 +114,10 @@ export const SharePanel: FC<SharePanelProps> = ({
                                 onCheckedChange={(checked) => form.setValue('isPublic', checked, { shouldDirty: true })}
                             />
                             <Label className='text-xs font-medium text-muted-foreground' htmlFor='share-is-public'>
-                                공개 링크 사용
+                                {t('enablePublicLink')}
                             </Label>
                         </div>
-                        <EditorField
-                            label='공유 주소'
-                            htmlFor='share-slug'
-                            error={errors.slug?.message}
-                            hint='영문 소문자, 숫자, 하이픈만 사용할 수 있습니다. 비워 두면 자동으로 만듭니다.'>
+                        <EditorField label={t('shareAddress')} htmlFor='share-slug' error={errors.slug?.message} hint={t('slugHint')}>
                             <Input
                                 id='share-slug'
                                 className={`${EDITOR_INPUT_CLASS} font-mono`}
@@ -134,23 +127,23 @@ export const SharePanel: FC<SharePanelProps> = ({
                             />
                         </EditorField>
                         <p className='font-mono text-xs break-all text-muted-foreground'>
-                            {previewSlug === null || previewSlug === ''
-                                ? '저장하면 공유 주소가 만들어집니다.'
-                                : `${APP_URL}${SHARE_PATH}${previewSlug}`}
+                            {previewSlug === null || previewSlug === '' ? t('slugAfterSave') : `${APP_URL}${SHARE_PATH}${previewSlug}`}
                         </p>
                         <div className='flex w-fit flex-wrap items-stretch gap-px bg-background'>
                             <Button type='button' variant='cell' size='cell' disabled={savedUrl === null} onClick={handleCopy}>
                                 <CopyIcon />
-                                링크 복사
+                                {t('copyLink')}
                             </Button>
                             {savedUrl === null ? (
                                 <Button type='button' variant='cell' size='cell' disabled>
-                                    <ExternalLinkIcon />새 탭에서 열기
+                                    <ExternalLinkIcon />
+                                    {t('openNewTab')}
                                 </Button>
                             ) : (
                                 <Button variant='cell' size='cell' asChild>
                                     <a href={savedUrl} target='_blank' rel='noopener noreferrer'>
-                                        <ExternalLinkIcon />새 탭에서 열기
+                                        <ExternalLinkIcon />
+                                        {t('openNewTab')}
                                     </a>
                                 </Button>
                             )}
@@ -158,15 +151,15 @@ export const SharePanel: FC<SharePanelProps> = ({
                     </EditorPanel>
                 </EditorFormShell>
             )}
-            <EditorPanel title='내보내기·가져오기' description='구조화된 JSON 으로 내려받거나, 내보낸 JSON 을 가져와 현재 내용을 교체할 수 있습니다.'>
+            <EditorPanel title={t('transferTitle')} description={t('transferDescription')}>
                 <div className='flex w-fit flex-wrap items-stretch gap-px bg-background'>
                     <Button type='button' variant='cell' size='cell' disabled={isExporting} onClick={onExport}>
                         <DownloadIcon />
-                        {isExporting ? '내보내는 중…' : 'JSON 내보내기'}
+                        {isExporting ? t('exporting') : t('export')}
                     </Button>
                     <Button type='button' variant='cell' size='cell' disabled={isImporting} onClick={() => fileInputRef.current?.click()}>
                         <UploadIcon />
-                        {isImporting ? '가져오는 중…' : 'JSON 가져오기'}
+                        {isImporting ? t('importing') : t('import')}
                     </Button>
                     <input ref={fileInputRef} className='hidden' type='file' accept={IMPORT_ACCEPT} onChange={handleFileChange} />
                 </div>
@@ -174,20 +167,24 @@ export const SharePanel: FC<SharePanelProps> = ({
             <AlertDialog open={pendingTemplate !== null} onOpenChange={() => setPendingTemplate(null)}>
                 <AlertDialogContent className='rounded-none'>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>이 JSON 으로 교체할까요?</AlertDialogTitle>
+                        <AlertDialogTitle>{t('confirmTitle')}</AlertDialogTitle>
                         <AlertDialogDescription>
                             {pendingTemplate === null
                                 ? ''
-                                : `${pendingTemplate.title} · 날짜 ${pendingTemplate.days.length}개 · 예매 ${pendingTemplate.bookings.length}개`}
-                            <span className='mt-1 block'>현재 내용이 모두 교체됩니다. 체크·메모도 초기화됩니다.</span>
+                                : t('importSummary', {
+                                      title: pendingTemplate.title,
+                                      days: pendingTemplate.days.length,
+                                      bookings: pendingTemplate.bookings.length,
+                                  })}
+                            <span className='mt-1 block'>{t('replaceWarning')}</span>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className='gap-px bg-background sm:ml-auto sm:w-fit'>
                         <AlertDialogCancel variant='cell' size='cell' disabled={isImporting}>
-                            취소
+                            {t('cancel')}
                         </AlertDialogCancel>
                         <AlertDialogAction variant='cellPrimary' size='cell' disabled={isImporting} onClick={handleImport}>
-                            {isImporting ? '가져오는 중…' : '가져오기'}
+                            {isImporting ? t('importing') : t('confirmImport')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

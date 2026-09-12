@@ -1,6 +1,7 @@
 'use client'
 
 import type { FC } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import {
     useExportTrip,
@@ -24,6 +25,7 @@ const JSON_INDENT = 4
 const EXPORT_MIME_TYPE = 'application/json'
 
 export const ShareTab: FC<TripEditorTabProps> = ({ tripId, detail, onSaved }) => {
+    const t = useTranslations('tripEditor')
     const isOwner = detail.viewerRole === 'owner'
     const members = useTripMembers(isOwner ? tripId : '')
     const updateShareSettings = useUpdateShareSettings(tripId)
@@ -61,7 +63,7 @@ export const ShareTab: FC<TripEditorTabProps> = ({ tripId, detail, onSaved }) =>
         link.download = `trip-${detail.shareSlug ?? detail.id}.json`
         link.click()
         URL.revokeObjectURL(url)
-        toast.success('JSON 파일을 내보냈습니다.')
+        toast.success(t('exportSuccess'))
     }
     const handleImport = async (template: TripTemplate) => {
         try {

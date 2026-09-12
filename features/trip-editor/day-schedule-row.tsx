@@ -2,6 +2,7 @@
 'use no memo'
 
 import { ExternalLinkIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { type FC } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import type { TripScheduleKind } from '@/entities/trip/trip.type'
@@ -19,6 +20,7 @@ type DayScheduleRowProps = {
 }
 
 export const DayScheduleRow: FC<DayScheduleRowProps> = ({ index, kinds }) => {
+    const t = useTranslations('tripEditor.schedule')
     const { control, register, formState } = useFormContext<DayInput, unknown, DayValues>()
     const [kindId, mapQuery] = useWatch({ control, name: [`scheduleItems.${index}.kindId`, `scheduleItems.${index}.mapQuery`] })
 
@@ -29,7 +31,7 @@ export const DayScheduleRow: FC<DayScheduleRowProps> = ({ index, kinds }) => {
 
     return (
         <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
-            <EditorField label='시각' htmlFor={`${fieldId}-time`} error={errors?.timeLabel?.message}>
+            <EditorField label={t('time')} htmlFor={`${fieldId}-time`} error={errors?.timeLabel?.message}>
                 <Input
                     id={`${fieldId}-time`}
                     className={`${EDITOR_INPUT_CLASS} font-mono`}
@@ -38,7 +40,7 @@ export const DayScheduleRow: FC<DayScheduleRowProps> = ({ index, kinds }) => {
                     {...register(`scheduleItems.${index}.timeLabel`)}
                 />
             </EditorField>
-            <EditorField label='내용' htmlFor={`${fieldId}-title`} error={errors?.title?.message} className='lg:col-span-2'>
+            <EditorField label={t('content')} htmlFor={`${fieldId}-title`} error={errors?.title?.message} className='lg:col-span-2'>
                 <Input
                     id={`${fieldId}-title`}
                     className={EDITOR_INPUT_CLASS}
@@ -46,7 +48,7 @@ export const DayScheduleRow: FC<DayScheduleRowProps> = ({ index, kinds }) => {
                     {...register(`scheduleItems.${index}.title`)}
                 />
             </EditorField>
-            <EditorField label='구분' htmlFor={`${fieldId}-kind`} error={errors?.kindId?.message}>
+            <EditorField label={t('kind')} htmlFor={`${fieldId}-kind`} error={errors?.kindId?.message}>
                 <NativeSelect
                     id={`${fieldId}-kind`}
                     className='w-full'
@@ -60,7 +62,7 @@ export const DayScheduleRow: FC<DayScheduleRowProps> = ({ index, kinds }) => {
                     ))}
                 </NativeSelect>
             </EditorField>
-            <EditorField label='메모' htmlFor={`${fieldId}-note`} error={errors?.note?.message} className='sm:col-span-2'>
+            <EditorField label={t('note')} htmlFor={`${fieldId}-note`} error={errors?.note?.message} className='sm:col-span-2'>
                 <Input
                     id={`${fieldId}-note`}
                     className={EDITOR_INPUT_CLASS}
@@ -68,7 +70,7 @@ export const DayScheduleRow: FC<DayScheduleRowProps> = ({ index, kinds }) => {
                     {...register(`scheduleItems.${index}.note`, EMPTY_TO_NULL)}
                 />
             </EditorField>
-            <EditorField label='여유 문구' htmlFor={`${fieldId}-buffer`} error={errors?.bufferNote?.message}>
+            <EditorField label={t('buffer')} htmlFor={`${fieldId}-buffer`} error={errors?.bufferNote?.message}>
                 <Input
                     id={`${fieldId}-buffer`}
                     className={EDITOR_INPUT_CLASS}
@@ -77,18 +79,18 @@ export const DayScheduleRow: FC<DayScheduleRowProps> = ({ index, kinds }) => {
                     {...register(`scheduleItems.${index}.bufferNote`, EMPTY_TO_NULL)}
                 />
             </EditorField>
-            <EditorField label='지도 검색어' htmlFor={`${fieldId}-map-query`} error={errors?.mapQuery?.message}>
+            <EditorField label={t('mapQuery')} htmlFor={`${fieldId}-map-query`} error={errors?.mapQuery?.message}>
                 <div className='flex items-center gap-1'>
                     <Input
                         id={`${fieldId}-map-query`}
                         className={EDITOR_INPUT_CLASS}
-                        placeholder='난바역'
+                        placeholder={t('mapPlaceholder')}
                         aria-invalid={!!errors?.mapQuery}
                         {...register(`scheduleItems.${index}.mapQuery`, EMPTY_TO_NULL)}
                     />
                     {mapUrl !== null && (
                         <Button className='shrink-0' variant='ghost' size='icon-sm' asChild>
-                            <a href={mapUrl} target='_blank' rel='noopener noreferrer' aria-label='지도 미리보기' title='지도 미리보기'>
+                            <a href={mapUrl} target='_blank' rel='noopener noreferrer' aria-label={t('mapPreview')} title={t('mapPreview')}>
                                 <ExternalLinkIcon />
                             </a>
                         </Button>

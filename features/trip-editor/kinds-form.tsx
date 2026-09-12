@@ -3,6 +3,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState, type FC } from 'react'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import type { ScheduleKindInput, ScheduleKindsSaveValues } from '@/entities/trip/trip.validate'
@@ -14,7 +15,8 @@ import { EditorToolbar } from '@/features/trip-editor/editor-toolbar'
 import { SortableRow } from '@/features/trip-editor/sortable-row'
 import { SortableRows } from '@/features/trip-editor/sortable-rows'
 import { SCHEDULE_KIND_SWATCH_CLASS } from '@/features/trip-viewer/trip-viewer-kind'
-import { SCHEDULE_KIND_COLOR_TOKEN_LABEL, SCHEDULE_KIND_COLOR_TOKENS, SCHEDULE_KIND_MIN_COUNT } from '@/shared/constant/trip'
+import { SCHEDULE_KIND_COLOR_TOKENS, SCHEDULE_KIND_MIN_COUNT } from '@/shared/constant/trip'
+import { translateMessage } from '@/shared/lib/message-key'
 import { cn } from '@/shared/lib/utils'
 import {
     AlertDialog,
@@ -43,6 +45,8 @@ type KindsFormProps = {
 }
 
 export const KindsForm: FC<KindsFormProps> = ({ defaultValues, usageByKindId, onSubmit, isPending }) => {
+    const t = useTranslations('tripEditor.kinds')
+    const tMessage = useTranslations()
     const didResetRef = useRef(false)
     const [replacements, setReplacements] = useState<Record<string, string>>({})
     const [removeIndex, setRemoveIndex] = useState<number | null>(null)
@@ -92,45 +96,47 @@ export const KindsForm: FC<KindsFormProps> = ({ defaultValues, usageByKindId, on
     return (
         <EditorFormShell isDirty={isDirty} isPending={isPending} onSubmit={handleSubmit} onReset={handleReset}>
             <EditorToolbar
-                title='일정 종류'
-                description='타임라인 배지와 범례에 쓰는 종류입니다. 순서는 범례에 그대로 반영합니다.'
+                title={t('title')}
+                description={t('description')}
                 count={rows.fields.length}
                 action={
                     <Button type='button' variant='cell' size='cell' onClick={() => rows.append(toEmptyKind())}>
                         <PlusIcon />
-                        종류 추가
+                        {t('add')}
                     </Button>
                 }
             />
-            {itemErrors?.root !== undefined && <p className='bg-card p-3 text-xs text-destructive'>{itemErrors.root.message}</p>}
+            {itemErrors?.root?.message !== undefined && (
+                <p className='bg-card p-3 text-xs text-destructive'>{translateMessage(tMessage, itemErrors.root.message)}</p>
+            )}
             <SortableRows ids={rows.fields.map((row) => row.fieldKey)} onReorder={rows.move}>
                 {rows.fields.map((row, index) => (
                     <SortableRow
                         key={row.fieldKey}
                         id={row.fieldKey}
                         index={index}
-                        removeLabel='종류 삭제'
+                        removeLabel={t('remove')}
                         onRemove={isRemovable ? () => handleRequestRemove(index) : undefined}>
                         <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
-                            <EditorField label='이름' htmlFor={`kind-${index}-label`} error={itemErrors?.[index]?.label?.message}>
+                            <EditorField label={t('name')} htmlFor={`kind-${index}-label`} error={itemErrors?.[index]?.label?.message}>
                                 <Input
                                     id={`kind-${index}-label`}
                                     className={EDITOR_INPUT_CLASS}
-                                    placeholder='계획'
+                                    placeholder={t('namePlaceholder')}
                                     aria-invalid={!!itemErrors?.[index]?.label}
                                     {...form.register(`items.${index}.label`)}
                                 />
                             </EditorField>
-                            <EditorField label='범례 라벨' htmlFor={`kind-${index}-legend`} error={itemErrors?.[index]?.legendLabel?.message}>
+                            <EditorField label={t('legend')} htmlFor={`kind-${index}-legend`} error={itemErrors?.[index]?.legendLabel?.message}>
                                 <Input
                                     id={`kind-${index}-legend`}
                                     className={EDITOR_INPUT_CLASS}
-                                    placeholder='계획 일정'
+                                    placeholder={t('legendPlaceholder')}
                                     aria-invalid={!!itemErrors?.[index]?.legendLabel}
                                     {...form.register(`items.${index}.legendLabel`)}
                                 />
                             </EditorField>
-                            <EditorField label='색' htmlFor={`kind-${index}-color`} error={itemErrors?.[index]?.colorToken?.message}>
+                            <EditorField label={t('color')} htmlFor={`kind-${index}-color`} error={itemErrors?.[index]?.colorToken?.message}>
                                 <Controller
                                     control={form.control}
                                     name={`items.${index}.colorToken`}
@@ -143,7 +149,7 @@ export const KindsForm: FC<KindsFormProps> = ({ defaultValues, usageByKindId, on
                                                 {SCHEDULE_KIND_COLOR_TOKENS.map((token) => (
                                                     <SelectItem key={token} value={token}>
                                                         <span aria-hidden className={cn('size-2 shrink-0', SCHEDULE_KIND_SWATCH_CLASS[token])} />
-                                                        {SCHEDULE_KIND_COLOR_TOKEN_LABEL[token]}
+                                                        {t(`colors.${token}`)}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -151,11 +157,11 @@ export const KindsForm: FC<KindsFormProps> = ({ defaultValues, usageByKindId, on
                                     )}
                                 />
                             </EditorField>
-                            <EditorField label='여유 문구' htmlFor={`kind-${index}-buffer`} error={itemErrors?.[index]?.bufferLabel?.message}>
+                            <EditorField label={t('buffer')} htmlFor={`kind-${index}-buffer`} error={itemErrors?.[index]?.bufferLabel?.message}>
                                 <Input
                                     id={`kind-${index}-buffer`}
                                     className={EDITOR_INPUT_CLASS}
-                                    placeholder='마지막 10분 여유'
+                                    placeholder={t('bufferPlaceholder')}
                                     aria-invalid={!!itemErrors?.[index]?.bufferLabel}
                                     {...form.register(`items.${index}.bufferLabel`, EMPTY_TO_NULL)}
                                 />
@@ -167,17 +173,15 @@ export const KindsForm: FC<KindsFormProps> = ({ defaultValues, usageByKindId, on
             <AlertDialog open={removeIndex !== null} onOpenChange={(open) => !open && setRemoveIndex(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>{`'${removeLabel}' 종류를 삭제할까요?`}</AlertDialogTitle>
+                        <AlertDialogTitle>{t('deleteTitle', { name: removeLabel })}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            {removeUsage > NO_USAGE_COUNT
-                                ? `이 종류를 쓰는 일정이 ${removeUsage}건 있습니다. 대신할 종류를 고르면 저장할 때 함께 바꿉니다.`
-                                : '이 종류를 쓰는 일정이 없습니다. 저장할 때 목록에서 제거합니다.'}
+                            {removeUsage > NO_USAGE_COUNT ? t('deleteUsed', { count: removeUsage }) : t('deleteUnused')}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     {removeUsage > NO_USAGE_COUNT && (
                         <Select value={replacementId ?? undefined} onValueChange={setReplacementId}>
-                            <SelectTrigger className='w-full' aria-label='대체 종류'>
-                                <SelectValue placeholder='대체 종류 선택' />
+                            <SelectTrigger className='w-full' aria-label={t('replacement')}>
+                                <SelectValue placeholder={t('replacementPlaceholder')} />
                             </SelectTrigger>
                             <SelectContent>
                                 {rows.fields.map((row, index) =>
@@ -192,14 +196,14 @@ export const KindsForm: FC<KindsFormProps> = ({ defaultValues, usageByKindId, on
                     )}
                     <AlertDialogFooter className='gap-px bg-background sm:ml-auto sm:w-fit'>
                         <AlertDialogCancel variant='cell' size='cell'>
-                            취소
+                            {t('cancel')}
                         </AlertDialogCancel>
                         <AlertDialogAction
                             variant='cellDestructive'
                             size='cell'
                             disabled={removeUsage > NO_USAGE_COUNT && replacementId === null}
                             onClick={handleConfirmRemove}>
-                            삭제
+                            {t('delete')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

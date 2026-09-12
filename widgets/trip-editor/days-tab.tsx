@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type FC } from 'react'
+import { useTranslations } from 'next-intl'
 import { useDeleteDay, useReorderDays, useSaveDay } from '@/entities/trip/trip.query'
 import type { DayValues } from '@/entities/trip/trip.validate'
 import { DayForm } from '@/features/trip-editor/day-form'
@@ -9,11 +10,11 @@ import { toDayDefaults, toDayDraft, toDayHeading } from '@/widgets/trip-editor/t
 import type { TripEditorTabProps } from '@/widgets/trip-editor/trip-editor.type'
 
 const DRAFT_KEY = 'new'
-const DRAFT_HEADING = '새 날짜'
 const NOT_FOUND_INDEX = -1
 const DRAFT_SEQ_STEP = 1
 
 export const DaysTab: FC<TripEditorTabProps> = ({ tripId, detail, onSaved }) => {
+    const t = useTranslations('tripEditor')
     const [editingDayId, setEditingDayId] = useState<string | null>(detail.days[0]?.id ?? null)
     const [draftSeq, setDraftSeq] = useState(0)
     const saveDay = useSaveDay(tripId)
@@ -22,7 +23,7 @@ export const DaysTab: FC<TripEditorTabProps> = ({ tripId, detail, onSaved }) => 
 
     const selectedIndex = detail.days.findIndex((day) => day.id === editingDayId)
     const selectedDay = selectedIndex === NOT_FOUND_INDEX ? undefined : detail.days[selectedIndex]
-    const heading = selectedDay === undefined ? DRAFT_HEADING : toDayHeading(selectedDay, selectedIndex)
+    const heading = selectedDay === undefined ? t('newDay') : toDayHeading(selectedDay, selectedIndex)
     const defaultValues = selectedDay === undefined ? toDayDraft(detail) : toDayDefaults(selectedDay)
     const formKey = selectedDay?.id ?? `${DRAFT_KEY}-${draftSeq}`
 

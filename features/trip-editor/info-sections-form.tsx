@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, type FC } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import type { InfoSectionInput, InfoSectionValues } from '@/entities/trip/trip.validate'
@@ -23,6 +24,7 @@ type InfoSectionsFormProps = {
 }
 
 export const InfoSectionsForm: FC<InfoSectionsFormProps> = ({ defaultValues, onSubmit, isPending }) => {
+    const t = useTranslations('tripEditor.infoSections')
     const didResetRef = useRef(false)
     const form = useForm<InfoSectionsFormInput, unknown, InfoSectionsFormValues>({
         resolver: zodResolver(infoSectionsFormSchema),
@@ -46,18 +48,18 @@ export const InfoSectionsForm: FC<InfoSectionsFormProps> = ({ defaultValues, onS
         <FormProvider {...form}>
             <EditorFormShell isDirty={isDirty} isPending={isPending} onSubmit={handleSubmit} onReset={() => form.reset()}>
                 <EditorToolbar
-                    title='여행 정보'
-                    description='뷰어의 아코디언 섹션입니다. 섹션과 블록 모두 순서를 바꿀 수 있습니다.'
+                    title={t('title')}
+                    description={t('description')}
                     count={rows.fields.length}
                     action={
                         <Button type='button' variant='cell' size='cell' onClick={() => rows.append(EMPTY_SECTION)}>
                             <PlusIcon />
-                            섹션 추가
+                            {t('add')}
                         </Button>
                     }
                 />
                 {rows.fields.length === 0 ? (
-                    <p className='bg-card p-3 text-xs text-muted-foreground'>등록된 정보 섹션이 없습니다.</p>
+                    <p className='bg-card p-3 text-xs text-muted-foreground'>{t('empty')}</p>
                 ) : (
                     <SortableRows ids={rows.fields.map((row) => row.fieldKey)} onReorder={rows.move}>
                         {rows.fields.map((row, index) => (

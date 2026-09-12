@@ -4,6 +4,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVerticalIcon, Trash2Icon } from 'lucide-react'
 import { motion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import type { FC, PropsWithChildren } from 'react'
 import { MOTION_EASE_STANDARD, MOTION_FADE_DURATION } from '@/shared/lib/motion'
 import { cn } from '@/shared/lib/utils'
@@ -12,7 +13,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 
 const ROW_NUMBER_PAD = 2
 const ROW_NUMBER_OFFSET = 1
-const DRAG_HANDLE_LABEL = '순서 변경'
 
 type SortableRowProps = PropsWithChildren<{
     id: string
@@ -24,6 +24,7 @@ type SortableRowProps = PropsWithChildren<{
 }>
 
 export const SortableRow: FC<SortableRowProps> = ({ id, index, removeLabel, onRemove, isActive = false, className, children }) => {
+    const t = useTranslations('tripEditor')
     const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id })
 
     return (
@@ -42,7 +43,7 @@ export const SortableRow: FC<SortableRowProps> = ({ id, index, removeLabel, onRe
                         type='button'
                         variant='ghost'
                         size='icon-xs'
-                        aria-label={DRAG_HANDLE_LABEL}
+                        aria-label={t('drag')}
                         {...attributes}
                         {...listeners}>
                         <GripVerticalIcon />

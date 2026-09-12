@@ -3,6 +3,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, type FC } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { sidebarSchema, type SidebarInput, type SidebarLinkInput, type SidebarValues } from '@/entities/trip/trip.validate'
@@ -26,6 +27,7 @@ type SidebarFormProps = {
 }
 
 export const SidebarForm: FC<SidebarFormProps> = ({ defaultValues, onSubmit, isPending }) => {
+    const t = useTranslations('tripEditor.sidebar')
     const didResetRef = useRef(false)
     const form = useForm<SidebarInput, unknown, SidebarValues>({ resolver: zodResolver(sidebarSchema), defaultValues })
     const rows = useFieldArray({ control: form.control, name: 'links', keyName: 'fieldKey' })
@@ -45,8 +47,8 @@ export const SidebarForm: FC<SidebarFormProps> = ({ defaultValues, onSubmit, isP
 
     return (
         <EditorFormShell isDirty={isDirty} isPending={isPending} onSubmit={handleSubmit} onReset={() => form.reset()}>
-            <EditorPanel title='소개 문구' description='뷰어 사이드바의 기간 줄 아래에 보여 줍니다.'>
-                <EditorField label='소개 문구' htmlFor='sidebar-note' error={errors.sidebarNote?.message}>
+            <EditorPanel title={t('introTitle')} description={t('introDescription')}>
+                <EditorField label={t('introLabel')} htmlFor='sidebar-note' error={errors.sidebarNote?.message}>
                     <Textarea
                         id='sidebar-note'
                         className={EDITOR_TEXTAREA_CLASS}
@@ -56,24 +58,24 @@ export const SidebarForm: FC<SidebarFormProps> = ({ defaultValues, onSubmit, isP
                 </EditorField>
             </EditorPanel>
             <EditorToolbar
-                title='링크'
-                description='사이드바 숙소 아래에 보여 주는 링크 목록입니다.'
+                title={t('linksTitle')}
+                description={t('linksDescription')}
                 count={rows.fields.length}
                 action={
                     <Button type='button' variant='cell' size='cell' onClick={() => rows.append(EMPTY_LINK)}>
                         <PlusIcon />
-                        링크 추가
+                        {t('add')}
                     </Button>
                 }
             />
             {rows.fields.length === 0 ? (
-                <p className='bg-card p-3 text-xs text-muted-foreground'>등록된 링크가 없습니다.</p>
+                <p className='bg-card p-3 text-xs text-muted-foreground'>{t('empty')}</p>
             ) : (
                 <SortableRows ids={rows.fields.map((row) => row.fieldKey)} onReorder={rows.move}>
                     {rows.fields.map((row, index) => (
-                        <SortableRow key={row.fieldKey} id={row.fieldKey} index={index} removeLabel='링크 삭제' onRemove={() => rows.remove(index)}>
+                        <SortableRow key={row.fieldKey} id={row.fieldKey} index={index} removeLabel={t('remove')} onRemove={() => rows.remove(index)}>
                             <div className='grid gap-3 sm:grid-cols-2'>
-                                <EditorField label='라벨' htmlFor={`sidebar-link-${index}-label`} error={linkErrors?.[index]?.label?.message}>
+                                <EditorField label={t('label')} htmlFor={`sidebar-link-${index}-label`} error={linkErrors?.[index]?.label?.message}>
                                     <Input
                                         id={`sidebar-link-${index}-label`}
                                         className={EDITOR_INPUT_CLASS}
@@ -81,7 +83,7 @@ export const SidebarForm: FC<SidebarFormProps> = ({ defaultValues, onSubmit, isP
                                         {...form.register(`links.${index}.label`)}
                                     />
                                 </EditorField>
-                                <EditorField label='주소' htmlFor={`sidebar-link-${index}-url`} error={linkErrors?.[index]?.url?.message}>
+                                <EditorField label={t('url')} htmlFor={`sidebar-link-${index}-url`} error={linkErrors?.[index]?.url?.message}>
                                     <Input
                                         id={`sidebar-link-${index}-url`}
                                         className={EDITOR_INPUT_CLASS}
@@ -92,7 +94,7 @@ export const SidebarForm: FC<SidebarFormProps> = ({ defaultValues, onSubmit, isP
                                     />
                                 </EditorField>
                                 <EditorField
-                                    label='설명'
+                                    label={t('description')}
                                     htmlFor={`sidebar-link-${index}-description`}
                                     error={linkErrors?.[index]?.description?.message}
                                     className='sm:col-span-2'>

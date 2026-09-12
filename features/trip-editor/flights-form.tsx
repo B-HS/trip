@@ -3,6 +3,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useRef, type FC } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { type FlightInput, type FlightValues } from '@/entities/trip/trip.validate'
@@ -14,7 +15,7 @@ import { EditorToolbar } from '@/features/trip-editor/editor-toolbar'
 import { SortableRow } from '@/features/trip-editor/sortable-row'
 import { SortableRows } from '@/features/trip-editor/sortable-rows'
 import { AIRPORTS } from '@/shared/constant/airports'
-import { FLIGHT_DIRECTION_LABEL, FLIGHT_DIRECTIONS } from '@/shared/constant/trip'
+import { FLIGHT_DIRECTIONS } from '@/shared/constant/trip'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { NativeSelect, NativeSelectOption } from '@/shared/ui/native-select'
@@ -41,6 +42,8 @@ type FlightsFormProps = {
 }
 
 export const FlightsForm: FC<FlightsFormProps> = ({ defaultValues, onSubmit, isPending }) => {
+    const t = useTranslations('tripEditor.flights')
+    const locale = useLocale()
     const didResetRef = useRef(false)
     const form = useForm<FlightsFormInput, unknown, FlightsFormValues>({
         resolver: zodResolver(flightsFormSchema),
@@ -64,24 +67,27 @@ export const FlightsForm: FC<FlightsFormProps> = ({ defaultValues, onSubmit, isP
     return (
         <EditorFormShell isDirty={isDirty} isPending={isPending} onSubmit={handleSubmit} onReset={() => form.reset()}>
             <EditorToolbar
-                title='항공편'
-                description='드래그해서 순서를 바꿀 수 있습니다.'
+                title={t('title')}
+                description={t('description')}
                 count={rows.fields.length}
                 action={
                     <Button type='button' variant='cell' size='cell' onClick={() => rows.append(EMPTY_FLIGHT)}>
                         <PlusIcon />
-                        항공편 추가
+                        {t('add')}
                     </Button>
                 }
             />
             {rows.fields.length === 0 ? (
-                <p className='bg-card p-3 text-xs text-muted-foreground'>등록된 항공편이 없습니다.</p>
+                <p className='bg-card p-3 text-xs text-muted-foreground'>{t('empty')}</p>
             ) : (
                 <SortableRows ids={rows.fields.map((row) => row.fieldKey)} onReorder={rows.move}>
                     {rows.fields.map((row, index) => (
-                        <SortableRow key={row.fieldKey} id={row.fieldKey} index={index} removeLabel='항공편 삭제' onRemove={() => rows.remove(index)}>
+                        <SortableRow key={row.fieldKey} id={row.fieldKey} index={index} removeLabel={t('remove')} onRemove={() => rows.remove(index)}>
                             <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
-                                <EditorField label='구분' htmlFor={`flight-${index}-direction`} error={itemErrors?.[index]?.direction?.message}>
+                                <EditorField
+                                    label={t('direction')}
+                                    htmlFor={`flight-${index}-direction`}
+                                    error={itemErrors?.[index]?.direction?.message}>
                                     <NativeSelect
                                         id={`flight-${index}-direction`}
                                         className='w-full'
@@ -90,26 +96,26 @@ export const FlightsForm: FC<FlightsFormProps> = ({ defaultValues, onSubmit, isP
                                         {...form.register(`items.${index}.direction`)}>
                                         {FLIGHT_DIRECTIONS.map((direction) => (
                                             <NativeSelectOption key={direction} value={direction}>
-                                                {FLIGHT_DIRECTION_LABEL[direction]}
+                                                {t(`directions.${direction}`)}
                                             </NativeSelectOption>
                                         ))}
                                     </NativeSelect>
                                 </EditorField>
                                 <EditorField
-                                    label='라벨'
+                                    label={t('label')}
                                     htmlFor={`flight-${index}-label`}
                                     error={itemErrors?.[index]?.label?.message}
                                     className='lg:col-span-3'>
                                     <Input
                                         id={`flight-${index}-label`}
                                         className={EDITOR_INPUT_CLASS}
-                                        placeholder='10.01 목 · 출국'
+                                        placeholder={t('labelPlaceholder')}
                                         aria-invalid={!!itemErrors?.[index]?.label}
                                         {...form.register(`items.${index}.label`)}
                                     />
                                 </EditorField>
                                 <EditorField
-                                    label='출발 공항'
+                                    label={t('departAirport')}
                                     htmlFor={`flight-${index}-depart-code`}
                                     error={itemErrors?.[index]?.departCode?.message}>
                                     <Input
@@ -122,7 +128,7 @@ export const FlightsForm: FC<FlightsFormProps> = ({ defaultValues, onSubmit, isP
                                     />
                                 </EditorField>
                                 <EditorField
-                                    label='출발 시각'
+                                    label={t('departTime')}
                                     htmlFor={`flight-${index}-depart-time`}
                                     error={itemErrors?.[index]?.departTime?.message}>
                                     <Input
@@ -134,18 +140,21 @@ export const FlightsForm: FC<FlightsFormProps> = ({ defaultValues, onSubmit, isP
                                     />
                                 </EditorField>
                                 <EditorField
-                                    label='출발 터미널'
+                                    label={t('departTerminal')}
                                     htmlFor={`flight-${index}-depart-terminal`}
                                     error={itemErrors?.[index]?.departTerminal?.message}>
                                     <Input
                                         id={`flight-${index}-depart-terminal`}
                                         className={EDITOR_INPUT_CLASS}
-                                        placeholder='제1여객터미널'
+                                        placeholder={t('departTerminalPlaceholder')}
                                         aria-invalid={!!itemErrors?.[index]?.departTerminal}
                                         {...form.register(`items.${index}.departTerminal`, EMPTY_TO_NULL)}
                                     />
                                 </EditorField>
-                                <EditorField label='편명' htmlFor={`flight-${index}-number`} error={itemErrors?.[index]?.flightNumber?.message}>
+                                <EditorField
+                                    label={t('flightNumber')}
+                                    htmlFor={`flight-${index}-number`}
+                                    error={itemErrors?.[index]?.flightNumber?.message}>
                                     <Input
                                         id={`flight-${index}-number`}
                                         className={`${EDITOR_INPUT_CLASS} font-mono`}
@@ -155,7 +164,7 @@ export const FlightsForm: FC<FlightsFormProps> = ({ defaultValues, onSubmit, isP
                                     />
                                 </EditorField>
                                 <EditorField
-                                    label='도착 공항'
+                                    label={t('arriveAirport')}
                                     htmlFor={`flight-${index}-arrive-code`}
                                     error={itemErrors?.[index]?.arriveCode?.message}>
                                     <Input
@@ -168,7 +177,7 @@ export const FlightsForm: FC<FlightsFormProps> = ({ defaultValues, onSubmit, isP
                                     />
                                 </EditorField>
                                 <EditorField
-                                    label='도착 시각'
+                                    label={t('arriveTime')}
                                     htmlFor={`flight-${index}-arrive-time`}
                                     error={itemErrors?.[index]?.arriveTime?.message}>
                                     <Input
@@ -180,26 +189,26 @@ export const FlightsForm: FC<FlightsFormProps> = ({ defaultValues, onSubmit, isP
                                     />
                                 </EditorField>
                                 <EditorField
-                                    label='도착 터미널'
+                                    label={t('arriveTerminal')}
                                     htmlFor={`flight-${index}-arrive-terminal`}
                                     error={itemErrors?.[index]?.arriveTerminal?.message}>
                                     <Input
                                         id={`flight-${index}-arrive-terminal`}
                                         className={EDITOR_INPUT_CLASS}
-                                        placeholder='제1터미널'
+                                        placeholder={t('arriveTerminalPlaceholder')}
                                         aria-invalid={!!itemErrors?.[index]?.arriveTerminal}
                                         {...form.register(`items.${index}.arriveTerminal`, EMPTY_TO_NULL)}
                                     />
                                 </EditorField>
                                 <EditorField
-                                    label='메모'
+                                    label={t('note')}
                                     htmlFor={`flight-${index}-note`}
                                     error={itemErrors?.[index]?.note?.message}
                                     className='sm:col-span-2 lg:col-span-4'>
                                     <Input
                                         id={`flight-${index}-note`}
                                         className={EDITOR_INPUT_CLASS}
-                                        placeholder='탑승 수속 마감 시각 등'
+                                        placeholder={t('notePlaceholder')}
                                         aria-invalid={!!itemErrors?.[index]?.note}
                                         {...form.register(`items.${index}.note`, EMPTY_TO_NULL)}
                                     />
@@ -212,7 +221,7 @@ export const FlightsForm: FC<FlightsFormProps> = ({ defaultValues, onSubmit, isP
             <datalist id={AIRPORT_DATALIST_ID}>
                 {Object.entries(AIRPORTS).map(([code, airport]) => (
                     <option key={code} value={code}>
-                        {`${airport.city} ${airport.name}`}
+                        {locale === 'ko' ? `${airport.city} ${airport.name}` : code}
                     </option>
                 ))}
             </datalist>
