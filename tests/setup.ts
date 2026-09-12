@@ -10,10 +10,10 @@ type MessageValues = Record<string, string | number | Date>
 const catalog = messages as unknown as Record<string, unknown>
 
 const lookup = (path: string) => {
-    const value = path
+    const resolved = path
         .split('.')
         .reduce<unknown>((acc, segment) => (acc && typeof acc === 'object' ? (acc as Record<string, unknown>)[segment] : undefined), catalog)
-    return typeof value === 'string' ? value : path
+    return typeof resolved === 'string' ? resolved : path
 }
 
 const interpolate = (text: string, values?: MessageValues) =>
