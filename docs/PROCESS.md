@@ -60,7 +60,7 @@
     - [x] 5-2. 도메인 카탈로그화(커밋 `2d2dc97`·`92ac2df`·`17a53b2`·`6de4134`): common·metadata·app 페이지, community 전역(게시판·글·댓글·신고·차단·admin), profile, auth 폼·위젯. entities·폼 문자열 → `validation.*`·`error.*`·`auth.errors.*`·`community.toast.*`·`profile.toast.*` 키 + `translateMessage` 표시 번역. `ja` 카탈로그 한국어 혼입 교정. memo 훅 제거(`bc78656`)
     - [x] 5-3. trip 도메인 2차(2026-09-12): intro/marketing·trips·trip-editor·trip-viewer·rich-editor·toast 카탈로그화, locale별 날짜·요일·기간·국가명, 새 여행 기본 일정 종류 locale 저장, 렌더 중 state 갱신 제거. 강제 유지 규칙은 `docs/CONVENTIONS.md`.
 - [x] 6단계. 인증 확장(ADR-0033 §2, ADR-0039): 조건부 Naver·GitHub OAuth, Cloudflare Email Worker 이메일 인증, 가입 필수 약관·개인정보 동의 및 다국어 법적 페이지. 운영 환경변수 주입·마이그레이션 0010 적용·실제 메일 발송 검증은 배포 작업으로 남음.
-- [ ] 7단계. 로드맵 4 AI(ADR-0029: Vercel Queues, 자기 키만, AES-GCM, `APP_ENCRYPTION_KEY` 없이 구현 후 키 등록 시 테스트)
+- [x] 7단계. 로드맵 4 AI(ADR-0029·0040): 자기 키 AES-GCM, 공식 provider 모델 조회·캐시·멤버십 검증, 영속 대화/작업/usage, Vercel Queues callback + 로컬 결정적 fallback, polling UI, 승인형 일정 diff. 운영 `APP_ENCRYPTION_KEY`·Queues 설정과 provider smoke는 사용자 작업.
 - [ ] 8단계. 로드맵 10 SEO·GEO·JSON-LD·Analytics·Speed Insights(ADR-0030, hreflang·locale 별 sitemap 포함)
 
 ## 미착수

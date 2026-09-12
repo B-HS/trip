@@ -1,12 +1,12 @@
 'use client'
 
-import { LanguagesIcon, LogOutIcon, SettingsIcon, UserIcon } from 'lucide-react'
+import { BotIcon, LanguagesIcon, LogOutIcon, SettingsIcon, UserIcon } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { Link, usePathname, useRouter } from '@/i18n/navigation'
 import { routing, type AppLocale } from '@/i18n/routing'
 import type { FC } from 'react'
 import { setMotionPreference, useMotionPreference } from '@/shared/hooks/use-motion-preference'
-import { PROFILE_SETTINGS_PATH } from '@/shared/constant/route'
+import { AI_SETTINGS_PATH, PROFILE_SETTINGS_PATH } from '@/shared/constant/route'
 import { cn } from '@/shared/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import {
@@ -116,6 +116,12 @@ export const UserMenu: FC<UserMenuProps> = ({ name, email, username, image, isCo
                         <Link href={PROFILE_SETTINGS_PATH}>
                             <SettingsIcon />
                             {t('profileSettings')}
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href={AI_SETTINGS_PATH}>
+                            <BotIcon />
+                            {t('aiSettings')}
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem onSelect={onSignOut}>

@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { type FC, useEffect, useRef, useState } from 'react'
 import { useTripDetail } from '@/entities/trip/trip.query'
+import { AiTripAssistant } from '@/widgets/ai/ai-trip-assistant'
 import type { PublicTrip, TripDayDetail } from '@/entities/trip/trip.type'
 import {
     useResetDayChecks,
@@ -281,6 +282,7 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
                 <InfoPanel sections={trip.infoSections} days={days} isPrintLayout />
                 <TripFooter footerNote={trip.footerNote} />
             </div>
+            {isMember && tripId && <AiTripAssistant tripId={tripId} />}
             <AlertDialog open={resetTargetDay !== null} onOpenChange={(open) => !open && setResetTargetDayId(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>

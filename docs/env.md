@@ -18,6 +18,10 @@
 | `R2_BUCKET`                                 | 선택(5개 묶음) | 업로드 대상 버킷 이름                                                              | Cloudflare → R2 → 버킷 생성 시 정한 이름                                       | O           | O                 | X         |
 | `R2_PUBLIC_BASE_URL`                        | 선택(5개 묶음) | 업로드 결과를 읽는 공개 URL. `next/image` 원격 패턴이 여기서 만들어진다            | 버킷에 **커스텀 도메인**을 연결해 그 주소를 쓴다(`r2.dev` 는 개발용, ADR-0026) | O           | O                 | **O**     |
 | `APP_ENCRYPTION_KEY`                        | 선택(7단계)    | AI 프로바이더 키를 AES-256-GCM 으로 암호화·복호화                                  | `openssl rand -base64 32`(base64 32바이트)                                     | O           | O                 | X         |
+| `VERCEL_QUEUE_REGION`                       | 선택(7단계)    | Vercel Queues SDK/REST 지역                                                        | Vercel Queues 프로젝트 지역(예: `iad1`)                                        | O           | O                 | X         |
+| `VERCEL_QUEUE_TOKEN`                        | 선택(7단계)    | SDK가 없는 로컬·REST queue publish bearer 토큰                                     | Vercel OIDC/Queues 설정에서 발급한 토큰                                        | O           | O                 | X         |
+| `VERCEL_QUEUE_URL`                          | 선택(7단계)    | `@vercel/queue` SDK가 없는 로컬·REST fallback endpoint                             | region-specific `https://<region>.vercel-queue.com`                            | O           | O                 | X         |
+| `AI_PROVIDER_MOCK`                          | 테스트 전용    | provider 네트워크 호출을 하지 않는 결정적 fake 응답                                | 테스트 실행 시에만 `1`; 운영에는 설정하지 않음                                 | O           | X                 | X         |
 | `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | 선택(6단계)    | GitHub 소셜 로그인. 두 값을 모두 넣을 때만 로그인 화면에 표시                      | GitHub Settings → Developer settings → OAuth Apps                              | O           | O                 | X         |
 | `NAVER_CLIENT_ID` / `NAVER_CLIENT_SECRET`   | 선택(6단계)    | 네이버 소셜 로그인. 두 값을 모두 넣을 때만 로그인 화면에 표시                      | 네이버 개발자센터 → 애플리케이션 등록                                          | O           | O                 | X         |
 | `EMAIL_WORKER_URL`                          | 선택(6단계)    | 인증 메일을 전달할 Cloudflare Worker HTTPS URL                                     | `cloudflare/mail-worker` 배포 URL                                              | O           | O                 | X         |
@@ -60,6 +64,12 @@ R2_PUBLIC_BASE_URL=
 # 선택 — AI 키 암호화용 base64 32바이트. `openssl rand -base64 32`
 # 7단계(AI) 전까지는 쓰이지 않는다
 APP_ENCRYPTION_KEY=
+
+# 선택 — Vercel Queues REST fallback / callback bearer guard
+VERCEL_QUEUE_REGION=
+VERCEL_QUEUE_TOKEN=
+VERCEL_QUEUE_URL=
+AI_PROVIDER_MOCK=
 
 # 선택 — OAuth. ID와 secret을 모두 채운 provider만 로그인 화면에 표시된다
 GITHUB_CLIENT_ID=

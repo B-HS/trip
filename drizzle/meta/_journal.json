@@ -71,6 +71,13 @@
       "when": 1789203168422,
       "tag": "0010_trip-consent",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1789206649431,
+      "tag": "0011_ai",
+      "breakpoints": true
     }
   ]
 }

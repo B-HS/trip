@@ -1,0 +1,7 @@
+{
+    "functions": {
+        "app/api/queues/ai-job/route.ts": {
+            "experimentalTriggers": [{ "type": "queue/v2beta", "topic": "ai-job" }]
+        }
+    }
+}

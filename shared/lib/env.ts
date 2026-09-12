@@ -25,6 +25,11 @@ const envSchema = z.object({
     EMAIL_WORKER_URL: optionalUrl,
     EMAIL_WORKER_TOKEN: optionalText,
     EMAIL_FROM: optionalText,
+    APP_ENCRYPTION_KEY: optionalText,
+    VERCEL_QUEUE_REGION: optionalText,
+    VERCEL_QUEUE_TOKEN: optionalText,
+    VERCEL_QUEUE_URL: optionalUrl,
+    VERCEL_ENV: optionalText,
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 })
 

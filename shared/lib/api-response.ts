@@ -4,6 +4,7 @@ export const API_ERROR_CODE = {
     NOT_FOUND: 'NOT_FOUND',
     VALIDATION_ERROR: 'VALIDATION_ERROR',
     UPLOAD_NOT_CONFIGURED: 'UPLOAD_NOT_CONFIGURED',
+    AI_NOT_CONFIGURED: 'AI_NOT_CONFIGURED',
     INTERNAL_ERROR: 'INTERNAL_ERROR',
 } as const
 
@@ -15,6 +16,7 @@ export const API_ERROR_STATUS = {
     NOT_FOUND: 404,
     VALIDATION_ERROR: 400,
     UPLOAD_NOT_CONFIGURED: 503,
+    AI_NOT_CONFIGURED: 503,
     INTERNAL_ERROR: 500,
 } as const satisfies Record<ApiErrorCode, number>
 
@@ -24,6 +26,7 @@ export const API_ERROR_MESSAGE = {
     NOT_FOUND: 'error.notFound',
     VALIDATION_ERROR: 'error.invalidInput',
     UPLOAD_NOT_CONFIGURED: 'error.uploadNotConfigured',
+    AI_NOT_CONFIGURED: 'error.aiNotConfigured',
     INTERNAL_ERROR: 'error.internal',
 } as const satisfies Record<ApiErrorCode, string>
 

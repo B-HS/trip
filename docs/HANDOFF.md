@@ -8,7 +8,7 @@
 
 ## 2. 현재 목표
 
-5단계 i18n 2차와 6단계 인증 확장 구현까지 완료했다. 다음은 운영 환경 설정·마이그레이션 적용·배포 검증 후 7단계 AI, 8단계 SEO다.
+5단계 i18n 2차와 6단계 인증 확장 구현까지 완료했다. 7단계 AI 코드 구현까지 완료했으며, 다음은 운영 환경 설정·마이그레이션 적용·배포 검증 후 8단계 SEO다.
 
 ## 3. 완료 / 진행 중 / 미착수
 
@@ -49,6 +49,7 @@
 - ADR-0038: next-intl as-needed ko 기본, proxy 합성 순서(i18n 307 통과 → 로케일 제거 pathname 으로 인증 → `next=` 프리픽스 보존), 메시지 키 체계(`validation.`/`error.`/`auth.errors.`/`*.toast.` + `translateMessage`), typed routes 해제, trip 도메인 2차 완료.
 - ADR-0039: 설정이 있는 OAuth만 활성화하고, Email Worker가 있을 때만 이메일 인증을 요구하며, 가입 시 현재 법적 문서 버전을 동의 테이블에 기록한다.
 - 사용자 결정(2026-09-11): i18n path prefix+proxy 합성 / dayjs 서버측 per-request / zod errorMap+키 / Email Service 수용(trip.gumyo.net) / OAuth 키 없음→비활성+안내.
+- ADR-0040: Phase 7 구현은 Vercel Queues `send`/push callback, OpenAI·Anthropic·Ollama Cloud 공식 모델 API, AES-256-GCM 사용자 키, 10분 서버 캐시, 영속 AI 작업·usage, 승인형 `saveDay` diff 적용으로 고정했다. 운영에서는 `APP_ENCRYPTION_KEY`와 Queue 토큰을 주입해야 한다.
 
 ## 5. 사용자 방향성 & 작업 규칙
 
