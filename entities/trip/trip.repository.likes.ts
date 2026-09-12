@@ -6,7 +6,7 @@ import { tripLike } from '@/shared/db/schema/community'
 import { trip } from '@/shared/db/schema/trip'
 import { ApiError } from '@/shared/lib/api-response'
 
-const TRIP_NOT_FOUND = '여행을 찾을 수 없습니다.'
+const TRIP_NOT_FOUND = 'error.tripNotFound'
 
 export const findTripIsPublic = async (tripId: string) => {
     const [row] = await getDb().select({ isPublic: trip.isPublic }).from(trip).where(eq(trip.id, tripId)).limit(1)

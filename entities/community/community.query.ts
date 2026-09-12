@@ -82,12 +82,14 @@ export const useAcceptComment = (postId: string) => {
 }
 
 export const useTogglePostLike = (postId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation(
         likeToggleMutationOptions({
             queryClient,
             queryKey: QUERY_KEY.COMMUNITY.POST_LIKE(postId),
             mutationFn: async (liked) => unwrapActionResult(await togglePostLikeAction(postId, liked)),
+            formatError: (error) => translateMessage(t, error.message),
         }),
     )
 }
@@ -158,6 +160,7 @@ export const useDismissReport = (page: number) => {
 }
 
 export const useBanReportedUser = (page: number) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (reportId: string) => unwrapActionResult(await banReportedUserAction(reportId)),
@@ -167,7 +170,6 @@ export const useBanReportedUser = (page: number) => {
         },
         onError: (error) => toast.error(translateMessage(t, error.message)),
     })
-    const t = useTranslations()
 }
 
 export const useUnbanUser = (page: number) => {

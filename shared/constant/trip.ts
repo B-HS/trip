@@ -34,65 +34,51 @@ export const DEFAULT_SCHEDULE_KINDS: ScheduleKindDefinition[] = [
     { key: 'target', label: '예매 목표', legendLabel: '예매 목표·미확정', colorToken: 'warning', bufferLabel: '마지막 10분 여유' },
 ]
 
-export const DEFAULT_SCHEDULE_KIND_KEY = 'planned'
+const DEFAULT_SCHEDULE_KINDS_BY_LOCALE = {
+    en: [
+        { key: 'planned', label: 'Planned', legendLabel: 'Planned schedule', colorToken: 'muted', bufferLabel: '10-minute buffer at the end' },
+        {
+            key: 'confirmed',
+            label: 'Confirmed time',
+            legendLabel: 'Flights and official shuttles',
+            colorToken: 'success',
+            bufferLabel: '10-minute buffer before and after',
+        },
+        {
+            key: 'target',
+            label: 'Booking target',
+            legendLabel: 'Booking target · unconfirmed',
+            colorToken: 'warning',
+            bufferLabel: '10-minute buffer at the end',
+        },
+    ],
+    ja: [
+        { key: 'planned', label: '予定', legendLabel: '予定行程', colorToken: 'muted', bufferLabel: '最後に10分の余裕' },
+        { key: 'confirmed', label: '確定時刻', legendLabel: '航空便・公式シャトル', colorToken: 'success', bufferLabel: '前後に10分の余裕' },
+        { key: 'target', label: '予約目標', legendLabel: '予約目標・未確定', colorToken: 'warning', bufferLabel: '最後に10分の余裕' },
+    ],
+    ko: DEFAULT_SCHEDULE_KINDS,
+} as const satisfies Record<'en' | 'ja' | 'ko', readonly ScheduleKindDefinition[]>
 
-export const SCHEDULE_KIND_COLOR_TOKEN_LABEL = {
-    'muted': '기본 회색',
-    'success': '초록',
-    'warning': '노랑',
-    'destructive': '빨강',
-    'chart-1': '강조 1',
-    'chart-2': '강조 2',
-    'chart-3': '강조 3',
-    'chart-4': '강조 4',
-    'chart-5': '강조 5',
-} as const satisfies Record<ScheduleKindColorToken, string>
+export const getDefaultScheduleKinds = (locale: string): ScheduleKindDefinition[] =>
+    DEFAULT_SCHEDULE_KINDS_BY_LOCALE[locale === 'en' || locale === 'ja' ? locale : 'ko'].map((kind) => ({ ...kind }))
+
+export const DEFAULT_SCHEDULE_KIND_KEY = 'planned'
 
 export const BOOKING_PRIORITIES = ['p1', 'p2', 'p3', 'onsite'] as const
 export type BookingPriority = (typeof BOOKING_PRIORITIES)[number]
 
-export const BOOKING_PRIORITY_LABEL = {
-    p1: '우선순위 1',
-    p2: '우선순위 2',
-    p3: '우선순위 3',
-    onsite: '우선순위 현장',
-} as const satisfies Record<BookingPriority, string>
-
 export const INFO_BLOCK_KINDS = ['paragraph', 'bullet', 'heading', 'day_table'] as const
 export type InfoBlockKind = (typeof INFO_BLOCK_KINDS)[number]
-
-export const INFO_BLOCK_KIND_LABEL = {
-    paragraph: '문단',
-    bullet: '목록 항목',
-    heading: '소제목',
-    day_table: '전체 일정 표',
-} as const satisfies Record<InfoBlockKind, string>
 
 export const MEMBER_ROLES = ['owner', 'editor', 'viewer'] as const
 export type MemberRole = (typeof MEMBER_ROLES)[number]
 
-export const MEMBER_ROLE_LABEL = {
-    owner: '소유자',
-    editor: '편집자',
-    viewer: '열람자',
-} as const satisfies Record<MemberRole, string>
-
 export const FLIGHT_DIRECTIONS = ['outbound', 'inbound'] as const
 export type FlightDirection = (typeof FLIGHT_DIRECTIONS)[number]
 
-export const FLIGHT_DIRECTION_LABEL = {
-    outbound: '출국',
-    inbound: '귀국',
-} as const satisfies Record<FlightDirection, string>
-
 export const TRIP_VIEWS = ['itinerary', 'bookings', 'info'] as const
 export type TripView = (typeof TRIP_VIEWS)[number]
-
-export const TRIP_VIEW_LABEL = {
-    itinerary: '날짜별 일정',
-    bookings: '예매 체크',
-    info: '여행 정보',
-} as const satisfies Record<TripView, string>
 
 export const GOOGLE_MAPS_SEARCH_URL = 'https://www.google.com/maps/search/?api=1&query='
 

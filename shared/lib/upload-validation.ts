@@ -2,7 +2,6 @@ import {
     UPLOAD_IMAGE_EXTENSION,
     UPLOAD_IMAGE_MIME_TYPES,
     UPLOAD_MAX_BYTES,
-    UPLOAD_MAX_SIZE_LABEL,
     type UploadImageMimeType,
     type UploadKind,
 } from '@/shared/constant/upload'
@@ -21,10 +20,10 @@ const IMAGE_SIGNATURE = {
 } as const satisfies Record<UploadImageMimeType, readonly ByteSignature[]>
 
 export const UPLOAD_ISSUE = {
-    EMPTY: '업로드할 이미지를 선택해 주세요.',
-    TOO_LARGE: `이미지는 ${UPLOAD_MAX_SIZE_LABEL} 이하만 올릴 수 있습니다.`,
-    UNSUPPORTED_TYPE: '지원하지 않는 이미지 형식입니다.',
-    CONTENT_MISMATCH: '이미지 파일이 아닙니다.',
+    EMPTY: 'validation.uploadEmpty',
+    TOO_LARGE: 'validation.uploadTooLarge',
+    UNSUPPORTED_TYPE: 'validation.uploadUnsupportedType',
+    CONTENT_MISMATCH: 'validation.uploadContentMismatch',
 } as const
 
 export type UploadIssue = (typeof UPLOAD_ISSUE)[keyof typeof UPLOAD_ISSUE]

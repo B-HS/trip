@@ -19,7 +19,7 @@ export const getTripRole = async (tripId: string, userId: string): Promise<Membe
 
 export const assertTripAccess = async (tripId: string, userId: string, level: TripAccessLevel) => {
     const { exists, role } = await readTripRole(tripId, userId)
-    if (!exists || role === null) throw new ApiError('NOT_FOUND', '여행을 찾을 수 없습니다.')
+    if (!exists || role === null) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
     if (!canAccess(role, level)) throw new ApiError('FORBIDDEN')
     return role
 }

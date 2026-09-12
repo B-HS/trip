@@ -1,12 +1,6 @@
 export const BOARD_KINDS = ['free', 'qna', 'review'] as const
 export type BoardKind = (typeof BOARD_KINDS)[number]
 
-export const BOARD_KIND_LABEL = {
-    free: '자유',
-    qna: '질문',
-    review: '후기',
-} as const satisfies Record<BoardKind, string>
-
 export const QNA_BOARD_KIND: BoardKind = 'qna'
 
 export const BOARD_KEY_MAX_LENGTH = 40
@@ -96,7 +90,3 @@ export const SEARCH_QUERY_PARAM = 'q'
 export const PAGE_PARAM = 'page'
 export const SORT_PARAM = 'sort'
 export const PROFILE_TAB_PARAM = 'tab'
-
-export const EMPTY_POST_LABEL = '아직 등록된 글이 없습니다.'
-export const EMPTY_TRIP_LABEL = '아직 공개된 트립이 없습니다.'
-export const EMPTY_LIKED_TRIP_LABEL = '아직 좋아요한 트립이 없습니다.'

@@ -46,7 +46,7 @@ const tripBasicsFieldsSchema = tripTemplateFieldsSchema.omit({
 
 const hasOrderedPeriod = (value: { startDate: string; endDate: string }) => value.endDate >= value.startDate
 
-const PERIOD_ISSUE = { message: '종료일은 시작일과 같거나 이후여야 합니다.', path: ['endDate'] }
+const PERIOD_ISSUE = { message: 'validation.endDateBeforeStart', path: ['endDate'] }
 
 export const tripBasicsSchema = tripBasicsFieldsSchema.refine(hasOrderedPeriod, PERIOD_ISSUE).refine(hasPairedTripLength, TRIP_LENGTH_ISSUE)
 
@@ -59,7 +59,7 @@ export const tripBasicsFormSchema = tripBasicsFieldsSchema
     .refine(hasPairedTripLength, TRIP_LENGTH_ISSUE)
 
 export const tripCreateSchema = tripBasicsFieldsSchema
-    .extend({ destinations: destinationListSchema.min(TRIP_DESTINATION_MIN_COUNT, '목적지를 한 곳 이상 추가해 주세요.') })
+    .extend({ destinations: destinationListSchema.min(TRIP_DESTINATION_MIN_COUNT, 'validation.tripDestinationsMin') })
     .refine(hasOrderedPeriod, PERIOD_ISSUE)
     .refine(hasPairedTripLength, TRIP_LENGTH_ISSUE)
 
@@ -92,8 +92,8 @@ export const infoSectionListSchema = z.array(infoSectionInputSchema)
 export const scheduleKindInputSchema = tripTemplateScheduleKindSchema.extend({ id: optionalId })
 export const scheduleKindListSchema = z
     .array(scheduleKindInputSchema)
-    .min(SCHEDULE_KIND_MIN_COUNT, '일정 종류를 한 가지 이상 남겨 주세요.')
-    .max(SCHEDULE_KIND_MAX_COUNT, `일정 종류는 최대 ${SCHEDULE_KIND_MAX_COUNT}가지까지 만들 수 있습니다.`)
+    .min(SCHEDULE_KIND_MIN_COUNT, 'validation.kindsMin')
+    .max(SCHEDULE_KIND_MAX_COUNT, 'validation.kindsMax')
     .refine(hasUniqueScheduleKindKeys, SCHEDULE_KIND_DUPLICATE_ISSUE)
 
 export const scheduleKindsSaveSchema = z.object({

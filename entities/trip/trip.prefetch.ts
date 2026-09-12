@@ -18,7 +18,7 @@ export const prefetchTripDetail = async (queryClient: QueryClient, tripId: strin
         queryKey: QUERY_KEY.TRIP.DETAIL(tripId),
         queryFn: async () => {
             const [detail, viewerRole] = await Promise.all([getTripDetail(tripId), getTripRole(tripId, userId)])
-            if (detail === null) throw new ApiError('NOT_FOUND', '여행을 찾을 수 없습니다.')
+            if (detail === null) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
             return { ...detail, viewerRole }
         },
     })

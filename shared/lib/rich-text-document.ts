@@ -5,7 +5,7 @@ import { RICH_TEXT_DOC_TYPE, RICH_TEXT_MAX_JSON_LENGTH, RICH_TEXT_MEDIA_NODE_TYP
 import { createRichTextSchema } from '@/shared/lib/rich-text-extensions'
 
 const WHITESPACE_PATTERN = /\s+/g
-const RICH_TEXT_DOCUMENT_ISSUE = '본문 형식이 올바르지 않습니다.'
+const RICH_TEXT_DOCUMENT_ISSUE = 'validation.richTextInvalid'
 
 export type RichTextDocument = JSONContent
 

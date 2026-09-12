@@ -19,7 +19,7 @@ import type {
 } from '@/entities/trip/trip.validate'
 import { asAirportCode } from '@/shared/constant/airports'
 import { isCountryCode } from '@/shared/constant/countries'
-import { DEFAULT_SCHEDULE_KIND_KEY, DEFAULT_SCHEDULE_KINDS } from '@/shared/constant/trip'
+import { DEFAULT_SCHEDULE_KIND_KEY, getDefaultScheduleKinds } from '@/shared/constant/trip'
 import { getDb } from '@/shared/db/client'
 import {
     trip,
@@ -287,8 +287,7 @@ const insertScheduleKinds = async (tx: TripTransaction, tripId: string, kinds: T
 const replaceScheduleKindUsage = async (tx: TripTransaction, removableId: string, replacementId: string | undefined, keptIds: Set<string>) => {
     const [used] = await tx.select({ id: tripScheduleItem.id }).from(tripScheduleItem).where(eq(tripScheduleItem.kindId, removableId)).limit(1)
     if (used === undefined) return
-    if (replacementId === undefined || !keptIds.has(replacementId))
-        throw new ApiError('VALIDATION_ERROR', '삭제하는 일정 종류를 대신할 종류를 골라 주세요.')
+    if (replacementId === undefined || !keptIds.has(replacementId)) throw new ApiError('VALIDATION_ERROR', 'error.replacementKindRequired')
     await tx.update(tripScheduleItem).set({ kindId: replacementId }).where(eq(tripScheduleItem.kindId, removableId))
 }
 
@@ -410,12 +409,12 @@ export const findPublicTripBySlug = async (slug: string) => {
     return findTripDetail(tripId)
 }
 
-export const createTrip = async (ownerId: string, basics: TripBasicsValues, destinations: DestinationValues[]) => {
+export const createTrip = async (ownerId: string, basics: TripBasicsValues, destinations: DestinationValues[], locale = 'ko') => {
     const id = crypto.randomUUID()
     await getDb().transaction(async (tx) => {
         await tx.insert(trip).values({ ...toTripValues(basics), id, ownerId })
         await tx.insert(tripMember).values({ tripId: id, userId: ownerId, role: 'owner' })
-        await insertScheduleKinds(tx, id, DEFAULT_SCHEDULE_KINDS)
+        await insertScheduleKinds(tx, id, getDefaultScheduleKinds(locale))
         await reconcileDestinations(tx, id, destinations)
     })
     return { id } satisfies CreatedTrip
@@ -525,7 +524,7 @@ const isSlugTaken = async (slug: string, tripId: string) => {
 
 const resolveShareSlug = async (tripId: string, current: { shareSlug: string | null; destination: string }, requested: string | undefined) => {
     if (requested !== undefined) {
-        if (await isSlugTaken(requested, tripId)) throw new ApiError('VALIDATION_ERROR', '이미 사용 중인 공유 주소입니다.')
+        if (await isSlugTaken(requested, tripId)) throw new ApiError('VALIDATION_ERROR', 'error.slugTaken')
         return requested
     }
     if (current.shareSlug !== null) return current.shareSlug
@@ -534,13 +533,13 @@ const resolveShareSlug = async (tripId: string, current: { shareSlug: string | n
         const candidate = `${base}-${randomSlugSuffix()}`
         if (!(await isSlugTaken(candidate, tripId))) return candidate
     }
-    throw new ApiError('INTERNAL_ERROR', '공유 주소를 생성하지 못했습니다.')
+    throw new ApiError('INTERNAL_ERROR', 'error.slugGenerateFailed')
 }
 
 export const updateShareSettings = async (tripId: string, input: ShareSettingsValues) => {
     const db = getDb()
     const [current] = await db.select({ shareSlug: trip.shareSlug, destination: trip.destination }).from(trip).where(eq(trip.id, tripId))
-    if (!current) throw new ApiError('NOT_FOUND', '여행을 찾을 수 없습니다.')
+    if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
     const slug = await resolveShareSlug(tripId, current, input.slug)
     await db.update(trip).set({ shareSlug: slug, isPublic: input.isPublic }).where(eq(trip.id, tripId))
     return { slug, isPublic: input.isPublic } satisfies ShareSettings
@@ -548,7 +547,7 @@ export const updateShareSettings = async (tripId: string, input: ShareSettingsVa
 
 export const exportTripTemplate = async (tripId: string) => {
     const detail = await findTripDetail(tripId)
-    if (!detail) throw new ApiError('NOT_FOUND', '여행을 찾을 수 없습니다.')
+    if (!detail) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
     const kindKeyById = new Map(detail.scheduleKinds.map((kind) => [kind.id, kind.key]))
     return {
         title: detail.title,

@@ -1,12 +1,14 @@
 'use client'
 
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { resetDayChecksAction, saveDayMemoAction, toggleBookingCheckAction, toggleScheduleCheckAction } from '@/entities/user-state/user-state.action'
 import { fetchTripUserState } from '@/entities/user-state/user-state.api'
 import type { TripUserState } from '@/entities/user-state/user-state.type'
 import { QUERY_KEY } from '@/shared/constant/query-key'
 import { unwrapActionResult } from '@/shared/lib/action-result'
+import { translateMessage } from '@/shared/lib/message-key'
 
 const toggleId = (ids: string[], id: string, checked: boolean) => (checked ? Array.from(new Set([...ids, id])) : ids.filter((value) => value !== id))
 
@@ -16,6 +18,7 @@ export const userStateQueryOptions = (tripId: string) =>
 export const useTripUserState = (tripId: string) => useQuery({ ...userStateQueryOptions(tripId), enabled: tripId.length > 0 })
 
 export const useToggleScheduleCheck = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     const queryKey = QUERY_KEY.USER_STATE.TRIP(tripId)
     return useMutation({
@@ -33,13 +36,14 @@ export const useToggleScheduleCheck = (tripId: string) => {
         },
         onError: (error, variables, context) => {
             if (context?.previous) queryClient.setQueryData(queryKey, context.previous)
-            toast.error(error.message)
+            toast.error(translateMessage(t, error.message))
         },
         onSettled: () => queryClient.invalidateQueries({ queryKey }),
     })
 }
 
 export const useToggleBookingCheck = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     const queryKey = QUERY_KEY.USER_STATE.TRIP(tripId)
     return useMutation({
@@ -57,13 +61,14 @@ export const useToggleBookingCheck = (tripId: string) => {
         },
         onError: (error, variables, context) => {
             if (context?.previous) queryClient.setQueryData(queryKey, context.previous)
-            toast.error(error.message)
+            toast.error(translateMessage(t, error.message))
         },
         onSettled: () => queryClient.invalidateQueries({ queryKey }),
     })
 }
 
 export const useResetDayChecks = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     const queryKey = QUERY_KEY.USER_STATE.TRIP(tripId)
     return useMutation({
@@ -83,14 +88,15 @@ export const useResetDayChecks = (tripId: string) => {
         },
         onError: (error, variables, context) => {
             if (context?.previous) queryClient.setQueryData(queryKey, context.previous)
-            toast.error(error.message)
+            toast.error(translateMessage(t, error.message))
         },
-        onSuccess: () => toast.success('이 날의 체크를 모두 해제했습니다.'),
+        onSuccess: () => toast.success(t('toasts.dayChecksReset')),
         onSettled: () => queryClient.invalidateQueries({ queryKey }),
     })
 }
 
 export const useSaveDayMemo = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     const queryKey = QUERY_KEY.USER_STATE.TRIP(tripId)
     return useMutation({
@@ -105,7 +111,7 @@ export const useSaveDayMemo = (tripId: string) => {
         },
         onError: (error, variables, context) => {
             if (context?.previous) queryClient.setQueryData(queryKey, context.previous)
-            toast.error(error.message)
+            toast.error(translateMessage(t, error.message))
         },
         onSettled: () => queryClient.invalidateQueries({ queryKey }),
     })

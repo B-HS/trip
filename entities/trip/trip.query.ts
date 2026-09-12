@@ -1,6 +1,7 @@
 'use client'
 
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import {
     createTripAction,
@@ -46,9 +47,8 @@ import type {
 import { QUERY_KEY } from '@/shared/constant/query-key'
 import { unwrapActionResult } from '@/shared/lib/action-result'
 import { likeToggleMutationOptions } from '@/shared/lib/like-mutation'
+import { translateMessage } from '@/shared/lib/message-key'
 import type { TripTemplateInput } from '@/shared/lib/trip-template'
-
-const SAVED_MESSAGE = '저장했습니다.'
 
 export const tripListQueryOptions = () => queryOptions({ queryKey: QUERY_KEY.TRIP.LIST, queryFn: fetchTripList })
 
@@ -73,30 +73,33 @@ export const useTripMembers = (tripId: string) => useQuery({ ...tripMembersQuery
 export const useTripLike = (tripId: string) => useQuery({ ...tripLikeQueryOptions(tripId), enabled: tripId.length > 0 })
 
 export const useCreateTrip = () => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (input: TripCreateInput) => unwrapActionResult(await createTripAction(input)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
-            toast.success('여행을 만들었습니다.')
+            toast.success(t('toasts.tripCreated'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useCreateTripFromTemplate = () => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (template: TripTemplateInput) => unwrapActionResult(await createTripFromTemplateAction(template)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
-            toast.success('예시 여행을 만들었습니다.')
+            toast.success(t('toasts.sampleTripCreated'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useSaveTripBasics = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (input: TripBasicsFormInput) => unwrapActionResult(await saveTripBasicsAction(tripId, input)),
@@ -104,13 +107,14 @@ export const useSaveTripBasics = (tripId: string) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.FAVORITES })
-            toast.success('기본 정보를 저장했습니다.')
+            toast.success(t('toasts.basicsSaved'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useToggleFavorite = () => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (variables: { tripId: string; isFavorite: boolean }) =>
@@ -133,7 +137,7 @@ export const useToggleFavorite = () => {
         onError: (error, _variables, context) => {
             if (context?.previousList !== undefined) queryClient.setQueryData(QUERY_KEY.TRIP.LIST, context.previousList)
             if (context?.previousFavorites !== undefined) queryClient.setQueryData(QUERY_KEY.TRIP.FAVORITES, context.previousFavorites)
-            toast.error(error.message)
+            toast.error(translateMessage(t, error.message))
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
@@ -143,81 +147,88 @@ export const useToggleFavorite = () => {
 }
 
 export const useSaveFlights = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (list: FlightListInput) => unwrapActionResult(await saveFlightsAction(tripId, list)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
-            toast.success('항공편을 저장했습니다.')
+            toast.success(t('toasts.flightsSaved'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useSaveLodgings = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (list: LodgingListInput) => unwrapActionResult(await saveLodgingsAction(tripId, list)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
-            toast.success('숙소를 저장했습니다.')
+            toast.success(t('toasts.lodgingsSaved'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useSaveSidebar = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (input: SidebarInput) => unwrapActionResult(await saveSidebarAction(tripId, input)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
-            toast.success('사이드바를 저장했습니다.')
+            toast.success(t('toasts.sidebarSaved'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useSaveScheduleKinds = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (input: ScheduleKindsSaveInput) => unwrapActionResult(await saveScheduleKindsAction(tripId, input)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
-            toast.success('일정 종류를 저장했습니다.')
+            toast.success(t('toasts.scheduleKindsSaved'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useSaveDay = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (day: DayInput) => unwrapActionResult(await saveDayAction(tripId, day)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
-            toast.success('일정을 저장했습니다.')
+            toast.success(t('toasts.daySaved'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useDeleteDay = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (dayId: string) => unwrapActionResult(await deleteDayAction(tripId, dayId)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
-            toast.success('날짜를 삭제했습니다.')
+            toast.success(t('toasts.dayDeleted'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useReorderDays = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (dayIds: string[]) => unwrapActionResult(await reorderDaysAction(tripId, dayIds)),
@@ -228,41 +239,44 @@ export const useReorderDays = (tripId: string) => {
                 queryClient.setQueryData(QUERY_KEY.TRIP.DETAIL(tripId), { ...previousDetail, days: orderDaysByIds(previousDetail.days, dayIds) })
             return { previousDetail }
         },
-        onSuccess: () => toast.success('날짜 순서를 저장했습니다.'),
+        onSuccess: () => toast.success(t('toasts.dayOrderSaved')),
         onError: (error, _dayIds, context) => {
             if (context?.previousDetail !== undefined) queryClient.setQueryData(QUERY_KEY.TRIP.DETAIL(tripId), context.previousDetail)
-            toast.error(error.message)
+            toast.error(translateMessage(t, error.message))
         },
         onSettled: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) }),
     })
 }
 
 export const useSaveBookings = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (list: BookingListInput) => unwrapActionResult(await saveBookingsAction(tripId, list)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
-            toast.success('예매 목록을 저장했습니다.')
+            toast.success(t('toasts.bookingsSaved'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useSaveInfoSections = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (list: InfoSectionListInput) => unwrapActionResult(await saveInfoSectionsAction(tripId, list)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
-            toast.success('여행 정보를 저장했습니다.')
+            toast.success(t('toasts.infoSaved'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useDeleteTrip = () => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (tripId: string) => unwrapActionResult(await deleteTripAction(tripId)),
@@ -270,74 +284,80 @@ export const useDeleteTrip = () => {
             queryClient.removeQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(data.id) })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.FAVORITES })
-            toast.success('여행을 삭제했습니다.')
+            toast.success(t('toasts.tripDeleted'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useInviteMember = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (input: MemberInviteInput) => unwrapActionResult(await inviteMemberAction(tripId, input)),
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.MEMBERS(tripId) })
-            toast.success(data.kind === 'member' ? '멤버를 추가했습니다.' : '초대를 보냈습니다. 가입하면 자동으로 참여합니다.')
+            toast.success(data.kind === 'member' ? t('toasts.memberAdded') : t('toasts.inviteSent'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useUpdateMemberRole = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (variables: { userId: string; role: MemberRoleInput }) =>
             unwrapActionResult(await updateMemberRoleAction(tripId, variables.userId, variables.role)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.MEMBERS(tripId) })
-            toast.success('권한을 변경했습니다.')
+            toast.success(t('toasts.roleUpdated'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useRemoveMember = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (userId: string) => unwrapActionResult(await removeMemberAction(tripId, userId)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.MEMBERS(tripId) })
-            toast.success('멤버를 삭제했습니다.')
+            toast.success(t('toasts.memberRemoved'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useRemoveInvite = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (inviteId: string) => unwrapActionResult(await removeInviteAction(tripId, inviteId)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.MEMBERS(tripId) })
-            toast.success('초대를 취소했습니다.')
+            toast.success(t('toasts.inviteCanceled'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useUpdateShareSettings = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (input: ShareSettingsInput) => unwrapActionResult(await updateShareSettingsAction(tripId, input)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
-            toast.success(SAVED_MESSAGE)
+            toast.success(t('toasts.saved'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
 export const useImportTrip = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (template: TripTemplateInput) => unwrapActionResult(await importTripAction(tripId, template)),
@@ -345,25 +365,29 @@ export const useImportTrip = (tripId: string) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.DETAIL(tripId) })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.USER_STATE.TRIP(tripId) })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
-            toast.success('JSON 을 가져와 내용을 교체했습니다.')
+            toast.success(t('toasts.tripImported'))
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }
 
-export const useExportTrip = (tripId: string) =>
-    useMutation({
+export const useExportTrip = (tripId: string) => {
+    const t = useTranslations()
+    return useMutation({
         mutationFn: async () => unwrapActionResult(await exportTripAction(tripId)),
-        onError: (error) => toast.error(error.message),
+        onError: (error) => toast.error(translateMessage(t, error.message)),
     })
+}
 
 export const useToggleTripLike = (tripId: string) => {
+    const t = useTranslations()
     const queryClient = useQueryClient()
     return useMutation(
         likeToggleMutationOptions({
             queryClient,
             queryKey: QUERY_KEY.TRIP.LIKE(tripId),
             mutationFn: async (liked) => unwrapActionResult(await toggleTripLikeAction(tripId, liked)),
+            formatError: (error) => translateMessage(t, error.message),
         }),
     )
 }

@@ -12,9 +12,10 @@ type LikeToggleOptions = {
     queryClient: QueryClient
     queryKey: QueryKey
     mutationFn: (liked: boolean) => Promise<LikeState>
+    formatError?: (error: Error) => string
 }
 
-export const likeToggleMutationOptions = ({ queryClient, queryKey, mutationFn }: LikeToggleOptions) => ({
+export const likeToggleMutationOptions = ({ queryClient, queryKey, mutationFn, formatError }: LikeToggleOptions) => ({
     mutationFn,
     onMutate: async (liked: boolean) => {
         await queryClient.cancelQueries({ queryKey })
@@ -28,7 +29,7 @@ export const likeToggleMutationOptions = ({ queryClient, queryKey, mutationFn }:
     },
     onError: (error: Error, _liked: boolean, context: LikeToggleContext | undefined) => {
         if (context?.previous) queryClient.setQueryData(queryKey, context.previous)
-        toast.error(error.message)
+        toast.error(formatError?.(error) ?? error.message)
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey }),
 })

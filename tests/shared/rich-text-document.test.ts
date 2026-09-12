@@ -79,10 +79,10 @@ describe('richTextDocumentSchema', () => {
         expect(richTextDocumentSchema.parse(paragraph('안녕'))).toEqual(paragraph('안녕'))
     })
 
-    test('유효하지 않은 문서는 한국어 메시지로 실패한다', () => {
+    test('유효하지 않은 문서는 번역 키로 실패한다', () => {
         const result = richTextDocumentSchema.safeParse({ type: 'doc', content: [{ type: 'script' }] })
         expect(result.success).toBe(false)
-        expect(result.error?.issues[0]?.message).toBe('본문 형식이 올바르지 않습니다.')
+        expect(result.error?.issues[0]?.message).toBe('validation.richTextInvalid')
     })
 })
 

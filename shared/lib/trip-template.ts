@@ -22,16 +22,16 @@ import { UPLOAD_ATTACHMENT_KINDS } from '@/shared/constant/upload'
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 const HTTP_URL_PATTERN = /^https?:\/\//
-const SIDEBAR_LINK_URL_ISSUE = '링크는 http 또는 https 주소여야 합니다.'
-const SCHEDULE_KIND_KEY_ISSUE = '종류 키는 영문 소문자·숫자·하이픈만 쓸 수 있습니다.'
+const SIDEBAR_LINK_URL_ISSUE = 'validation.sidebarLinkUrlInvalid'
+const SCHEDULE_KIND_KEY_ISSUE = 'validation.scheduleKindKeyPattern'
 
-export const SCHEDULE_KIND_DUPLICATE_ISSUE = { message: '일정 종류 키가 중복됩니다.', path: ['scheduleKinds'] }
+export const SCHEDULE_KIND_DUPLICATE_ISSUE = { message: 'validation.scheduleKindDuplicate', path: ['scheduleKinds'] }
 
-export const SCHEDULE_KIND_REFERENCE_ISSUE = { message: '일정 항목이 목록에 없는 종류를 가리킵니다.', path: ['days'] }
+export const SCHEDULE_KIND_REFERENCE_ISSUE = { message: 'validation.scheduleKindReference', path: ['days'] }
 
 export const hasUniqueScheduleKindKeys = (kinds: Array<{ key: string }>) => new Set(kinds.map((kind) => kind.key)).size === kinds.length
 
-const ATTACHMENT_URL_ISSUE = '첨부 주소는 http 또는 https 주소여야 합니다.'
+const ATTACHMENT_URL_ISSUE = 'validation.attachmentUrlInvalid'
 
 const optionalText = (max: number) => z.string().trim().max(max).nullable().default(null)
 const optionalUrl = z.url().max(500).nullable().default(null)
@@ -46,7 +46,7 @@ const optionalAirportCode = z
 export const hasPairedTripLength = (value: { customNights: number | null; customDays: number | null }) =>
     (value.customNights === null) === (value.customDays === null)
 
-export const TRIP_LENGTH_ISSUE = { message: '박과 일은 함께 입력해 주세요.', path: ['customDays'] }
+export const TRIP_LENGTH_ISSUE = { message: 'validation.tripLengthPair', path: ['customDays'] }
 
 export const tripTemplateDestinationSchema = z.object({
     countryCode: z.enum(COUNTRY_CODES),

@@ -13,7 +13,7 @@ export const GET = async (request: Request, context: { params: Promise<{ tripId:
         const { tripId } = await context.params
         const viewerRole = await assertTripAccess(tripId, session.user.id, 'view')
         const detail = await getTripDetail(tripId)
-        if (detail === null) throw new ApiError('NOT_FOUND', '여행을 찾을 수 없습니다.')
+        if (detail === null) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
         return NextResponse.json(successResponse({ ...detail, viewerRole }))
     } catch (error) {
         unstable_rethrow(error)

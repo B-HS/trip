@@ -16,7 +16,7 @@ import { ApiError } from '@/shared/lib/api-response'
 import { requireUser } from '@/shared/lib/session'
 
 const assertBelongsToTrip = (tripId: string, ownerTripId: string | null) => {
-    if (ownerTripId !== tripId) throw new ApiError('NOT_FOUND', '항목을 찾을 수 없습니다.')
+    if (ownerTripId !== tripId) throw new ApiError('NOT_FOUND', 'error.itemNotFound')
 }
 
 export const toggleScheduleCheckAction = async (tripId: string, itemId: string, checked: boolean) => {

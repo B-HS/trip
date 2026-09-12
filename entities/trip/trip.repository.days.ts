@@ -91,7 +91,7 @@ const assertTripScheduleKinds = async (tx: TripTransaction, tripId: string, item
     if (items.length === 0) return
     const kinds = await tx.select({ id: tripScheduleKind.id }).from(tripScheduleKind).where(eq(tripScheduleKind.tripId, tripId))
     const kindIds = new Set(kinds.map((kind) => kind.id))
-    if (items.some((item) => !kindIds.has(item.kindId))) throw new ApiError('VALIDATION_ERROR', '이 여행에 없는 일정 종류입니다.')
+    if (items.some((item) => !kindIds.has(item.kindId))) throw new ApiError('VALIDATION_ERROR', 'error.kindNotInTrip')
 }
 
 const saveScheduleItems = async (tx: TripTransaction, tripId: string, dayId: string, items: ScheduleItemValues[]) => {
@@ -154,7 +154,7 @@ export const saveDayChildren = async (tx: TripTransaction, tripId: string, dayId
 
 const resolveKindId = (kindIdByKey: Map<string, string>, key: string) => {
     const kindId = kindIdByKey.get(key)
-    if (kindId === undefined) throw new ApiError('VALIDATION_ERROR', '일정 종류를 찾을 수 없습니다.')
+    if (kindId === undefined) throw new ApiError('VALIDATION_ERROR', 'error.kindNotFound')
     return kindId
 }
 
@@ -213,7 +213,7 @@ export const reorderDays = async (tripId: string, dayIds: string[]) => {
         const rows = await tx.select({ id: tripDay.id }).from(tripDay).where(eq(tripDay.tripId, tripId))
         const known = new Set(rows.map((row) => row.id))
         const ordered = dayIds.filter((dayId) => known.has(dayId))
-        if (ordered.length !== rows.length) throw new ApiError('VALIDATION_ERROR', '일자 순서 정보가 올바르지 않습니다.')
+        if (ordered.length !== rows.length) throw new ApiError('VALIDATION_ERROR', 'error.dayOrderInvalid')
         for (const [index, dayId] of ordered.entries()) {
             await tx
                 .update(tripDay)

@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath, updateTag } from 'next/cache'
+import { getLocale } from 'next-intl/server'
 import { assertTripAccess } from '@/entities/trip/trip.access'
 import {
     createTrip,
@@ -71,7 +72,7 @@ export const createTripAction = async (input: TripCreateInput) => {
     const user = await requireUser()
     return runAction(async () => {
         const { destinations, ...basics } = tripCreateSchema.parse(input)
-        return createTrip(user.id, basics, destinations)
+        return createTrip(user.id, basics, destinations, await getLocale())
     })
 }
 

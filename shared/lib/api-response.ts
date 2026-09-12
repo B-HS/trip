@@ -19,12 +19,12 @@ export const API_ERROR_STATUS = {
 } as const satisfies Record<ApiErrorCode, number>
 
 export const API_ERROR_MESSAGE = {
-    UNAUTHORIZED: '로그인이 필요합니다.',
-    FORBIDDEN: '접근 권한이 없습니다.',
-    NOT_FOUND: '찾을 수 없습니다.',
-    VALIDATION_ERROR: '입력값이 올바르지 않습니다.',
-    UPLOAD_NOT_CONFIGURED: '이미지 저장소가 설정되지 않았습니다.',
-    INTERNAL_ERROR: '처리 중 오류가 발생했습니다.',
+    UNAUTHORIZED: 'error.unauthorized',
+    FORBIDDEN: 'error.forbidden',
+    NOT_FOUND: 'error.notFound',
+    VALIDATION_ERROR: 'error.invalidInput',
+    UPLOAD_NOT_CONFIGURED: 'error.uploadNotConfigured',
+    INTERNAL_ERROR: 'error.internal',
 } as const satisfies Record<ApiErrorCode, string>
 
 export type ApiSuccessResponse<T> = { success: true; data: T }

@@ -12,7 +12,7 @@ const ROLE_RANK = { owner: 0, editor: 1, viewer: 2 } as const satisfies Record<M
 
 const findOwnerId = async (tripId: string) => {
     const [row] = await getDb().select({ ownerId: trip.ownerId }).from(trip).where(eq(trip.id, tripId))
-    if (!row) throw new ApiError('NOT_FOUND', '여행을 찾을 수 없습니다.')
+    if (!row) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
     return row.ownerId
 }
 
@@ -55,7 +55,7 @@ export const inviteMember = async (tripId: string, email: string, role: Assignab
     const ownerId = await findOwnerId(tripId)
     const [existingUser] = await db.select({ id: user.id }).from(user).where(eq(user.email, normalized))
     if (existingUser) {
-        if (existingUser.id === ownerId) throw new ApiError('VALIDATION_ERROR', '이미 이 여행의 소유자입니다.')
+        if (existingUser.id === ownerId) throw new ApiError('VALIDATION_ERROR', 'error.ownerAlreadyMember')
         return addMember(tripId, existingUser.id, role)
     }
     const [existingInvite] = await db
@@ -73,7 +73,7 @@ export const inviteMember = async (tripId: string, email: string, role: Assignab
 
 export const updateMemberRole = async (tripId: string, userId: string, role: AssignableRole) => {
     const ownerId = await findOwnerId(tripId)
-    if (ownerId === userId) throw new ApiError('VALIDATION_ERROR', '소유자의 권한은 변경할 수 없습니다.')
+    if (ownerId === userId) throw new ApiError('VALIDATION_ERROR', 'error.ownerRoleImmutable')
     await getDb()
         .update(tripMember)
         .set({ role })
@@ -82,7 +82,7 @@ export const updateMemberRole = async (tripId: string, userId: string, role: Ass
 
 export const removeMember = async (tripId: string, userId: string) => {
     const ownerId = await findOwnerId(tripId)
-    if (ownerId === userId) throw new ApiError('VALIDATION_ERROR', '소유자는 삭제할 수 없습니다.')
+    if (ownerId === userId) throw new ApiError('VALIDATION_ERROR', 'error.ownerCannotRemove')
     await getDb()
         .delete(tripMember)
         .where(and(eq(tripMember.tripId, tripId), eq(tripMember.userId, userId)))

@@ -9,7 +9,7 @@ export const GET = withRouteErrorHandling(async (request: Request, context: { pa
     const { tripId } = await context.params
     const session = await getServerSession()
     if ((await findTripIsPublic(tripId)) !== true) {
-        if (!session) throw new ApiError('NOT_FOUND', '여행을 찾을 수 없습니다.')
+        if (!session) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
         await assertTripAccess(tripId, session.user.id, 'view')
     }
     return NextResponse.json(successResponse(await findTripLikeState(tripId, session?.user.id ?? null)))
