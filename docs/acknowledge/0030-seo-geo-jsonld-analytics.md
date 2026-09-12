@@ -30,6 +30,6 @@
 - `app/sitemap.ts`는 정적 공개 경로와 공개 트립·삭제되지 않은 게시글·username이 있는 비차단 프로필을 1시간 캐시로 내보내며, 각 URL에 ko·en·ja·x-default alternates를 포함한다. `app/robots.ts`는 locale 프리픽스를 포함한 비공개 경로와 API를 차단한다.
 - 공개 트립은 `app/[locale]/(shell)/s/[slug]/opengraph-image.tsx`에서 제목·목적지·기간을 포함한 1200×630 이미지를 생성하고, `llms.txt`는 실제 공개 트립 URL을 포함한 기계 판독용 개요를 제공한다. 공개 트립 요약은 서버 컴포넌트로 초기 HTML에 포함한다.
 - `shared/lib/json-ld.ts`의 빌더는 사용자 작성 값이 포함될 수 있는 JSON-LD를 `features/seo/json-ld-script.tsx`에서 `<`, `>`, `&`를 이스케이프해 주입한다. `QAPage`는 질문 게시판에만 사용하고, 댓글 본문을 추측해 `acceptedAnswer`를 만들지 않는다.
-- Analytics 이벤트에는 집계 가능한 source/boolean 값만 넣고 제목·본문·이메일·식별자·URL을 전달하지 않는다. `ai_job_requested`는 AI 작업 생성이 성공한 클라이언트 mutation callback에서만 전송한다. Speed Insights는 루트 레이아웃의 `@vercel/speed-insights` 마운트와 Vercel 대시보드의 Core Web Vitals 확인을 운영 절차로 둔다. 패키지 버전은 현재 공식 2.x 라인(현재 lockfile `2.0.0`)을 사용한다.
+- Analytics 이벤트에는 집계 가능한 source/boolean 값만 넣고 제목·본문·이메일·식별자·URL을 전달하지 않는다. `ai_job_requested`는 AI 작업 생성이 성공한 클라이언트 mutation callback에서만 전송한다. Speed Insights는 루트 레이아웃의 `@vercel/speed-insights` 마운트와 Vercel 대시보드의 Core Web Vitals 확인을 운영 절차로 둔다. 현재 사용하는 Next 통합 export를 제공하는 Vercel 공식 1.3.1 패키지를 lockfile에 고정한다. Bun 1.3.14의 전체 그래프 설치에서 2.0.0 tarball만 무결성 추출 오류를 재현하며, 1.3.1은 같은 조건에서 통과한다.
 
 검증에 참고한 1차 문서: [Next.js Metadata API](https://nextjs.org/docs/app/api-reference/functions/generate-metadata), [Next.js sitemap](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap), [Vercel Web Analytics](https://vercel.com/docs/analytics), [Vercel Speed Insights package](https://vercel.com/docs/speed-insights/package).
