@@ -34,12 +34,13 @@ ADR-0033 이 i18n 을 ko 기본·ja·en 3언어로 못박았고, 리서치 메�
 
 ### 5. 언어 전환기
 
-`widgets/app-shell/locale-switcher.tsx` — public header 에 ko·english·日本語 드롭다운(기존 게시판 메뉴 패턴 재사용). next-intl 공식 패턴대로 `router.replace(pathname, { locale })` 가 `NEXT_LOCALE` 쿠키를 설정·유지한다.
+`widgets/app-shell/locale-switcher.tsx`의 공개 헤더 드롭다운과 `features/app-shell/user-menu.tsx`의 로그인 사용자 메뉴에 ko·English·日本語 전환을 모두 둔다. next-intl 공식 패턴대로 `router.replace(pathname, { locale })`가 현재 논리 경로를 유지하고 `NEXT_LOCALE` 쿠키를 설정·유지한다.
 
-### 6. 완료 범위와 GAP (2차 과제)
+### 6. 완료 범위와 2차 결과
 
 - **완료**: app 페이지 metadata·copy, app-shell 내비·푸터·전환기, community 전역(게시판·글·댓글·신고·차단·admin), profile(헤더·탭·설정·닉네임·이미지), auth 폼·위젯, entities 메시지 키화, `ja` 카탈로그 한국어 혼입 교정, 테스트 목(`tests/setup.ts` next-intl/i18n 모킹) 정비.
-- **GAP(2차)**: trip 도메인(trip-editor·trip-viewer·trips·editor 상수)과 `marketing.ts`·`shared/constant/trip.ts`·`community.ts` 의 EMPTY_* 라벨은 아직 한국어 하드코딩 — `trip.toast.*` 등 키 접두부는 레지스트리에 예약돼 있다. dayjs per-request 로케일(서버측 포맷) 미작: 현재 `import 'dayjs/locale/ko'` 하드코딩 3곳(`trip-viewer-format`·`day-picker`·`trip-date-range`). `osaka.ts`·`countries.ts`·`airports.ts` 는 콘텐츠 데이터로 한국어 유지(번역 대상 아님).
+- **2차 완료(2026-09-12)**: intro/marketing·trips·trip-editor·trip-viewer·rich-editor의 화면 문구, 접근성 이름, dialog, empty/error 상태와 trip/user-state toast를 ko/en/ja 카탈로그에 연결했다. 날짜·요일·기간·국가명은 현재 요청 locale을 명시적으로 받아 포맷하며, 새 여행의 기본 일정 종류도 생성 locale로 저장한다.
+- `osaka.ts`는 한국어 예시 여행 콘텐츠이고 기존 사용자 작성 데이터도 번역하지 않는다. 원본 콘텐츠와 UI chrome의 경계 및 이후 변경의 강제 규칙은 `docs/CONVENTIONS.md`를 따른다.
 
 ## 각된 대안
 

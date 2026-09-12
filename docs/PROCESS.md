@@ -1,6 +1,6 @@
 # PROCESS — trip
 
-> 최종 갱신: 2026-09-12 · 대응 커밋: `6de4134`~~`e6baaac`(i18n 1차 — ADR-0038. 4-5 완료·배포에 이어 next-intl as-needed(ko 기본)·proxy 합성·`app/[locale]/`·전환기·common/app/community/profile 도메인 카탈로그화·메시지 키 체계·혼입 제거·memo 훅 제거. prod 배포 반영, `/en`·`/ja` 200. trip 도메인·dayjs locale 은 2차 GAP(ADR-0038 §6)). 검증 green: typecheck·lint·prettier·`bun test` **573 pass / 0 fail**, `next build` 통과
+> 최종 갱신: 2026-09-12 · i18n 2차 작업 트리: intro/marketing·trips·trip-editor·trip-viewer·rich-editor·toast 카탈로그화, locale별 포맷, 로그인 셸 언어 전환, React Compiler 규칙 강제. 검증 결과는 `docs/HANDOFF.md` 기준.
 > 기준 문서: `~/.claude/convention/*.md`, `~/personal-llm/*.md`, `docs/HANDOFF.md`(세션 진입점), `docs/ARCHITECTURE.md`, `docs/acknowledge/README.md`, `docs/DESIGN.md`
 
 ## 완료 — 초기 구축 (2026-09-09, Phase 1~3)
@@ -55,10 +55,10 @@
         - [x] 4-5a. 데이터 계층(커밋 `d62de70` ADR → `1a3a5a2` 스키마·마이그레이션 0008 → `c807a7a` entities·액션 → `181ab9c` 테스트): 소프트 삭제(`trip_post`·`trip_comment` `deleted_at`, 목록·상세·카운터 SQL 제외, 답글 있는 삭제 댓글은 `projectComments` 로 `isDeleted` 자리 표시), 신고 `trip_report`(UNIQUE(reporter,kind,target), 중복은 VALIDATION_ERROR, admin hide/dismiss/ban(better-auth `banUser`)/unban), 차단 `trip_user_block`(단방향, 목록 SQL `notInArray` + 댓글 JS 필터, `findBlockedIdsForUser` React cache), 채택 변경·회수(`reason` enum +`revoked`, 재채택 -10/+10, 채택 댓글 삭제 -10+null — 4-4 KNOWN ISSUE 해소), 사용자명 변경(`changeUsernameAction`, `^[a-z0-9_.]+$` 3~30), 트립 첨부 소유자·공개만(`canAttachTrip`). 마이그레이션 0008 **DB 적용 완료**(사용자가 `.env` 발급 후 `bun run db:migrate` → `migrations applied`, 이력 9행·`trip_report`·`trip_user_block`·`trip_post`/`trip_comment`.`deleted_at`·`trip_point_ledger.reason` enum `revoked` 실DB 재확인)
         - [x] 4-5b. UI(커밋 `a297162` viewerId 스레딩 → `a6d0714` 소프트 삭제 문구·"삭제된 댓글" placeholder·채택 이동·신고/차단 셀 → `204176e` 프로필 차단/차단해제·차단 목록·사용자명 변경 폼·대문 `max-h-64` 상한 → `0a828f4` `/admin/reports` admin 전용 큐·hide/dismiss/ban/unban/복구·좁은 invalidation → `e3d9bba` dayjs 타임스탬프 포맷): `QUERY_KEY.REPORT.LIST(page)` 등록, admin 페이지 `isAdminRole`+`notFound` 게이팅·prefetch/HydrationBoundary
         - [x] 4-5c. 검증·DB: `bun run db:migrate` 적용 후 `trip___drizzle_migrations` 9행·`trip_report`·`trip_user_block` 실DB 확인 완료. 검증 사다리 green(`bun test` 573 pass / 0 fail)
-- [~] 5단계. i18n ko·ja·en(ADR-0033 §4, ADR-0038) — 1차 완료·배포 / 2차 잔여:
+- [x] 5단계. i18n ko·ja·en(ADR-0033 §4, ADR-0038) — 1차 골격과 2차 trip 도메인 완료:
     - [x] 5-1. 골격(커밋 `13cc729`·`f8697db`·`8357c52`·`7084333`): next-intl 4.14.4, `defineRouting` as-needed(ko 기본), proxy 합성(i18n 307 통과 → 로케일 제거 pathname 인증 → `next=` 프리픽스 보존), `app/[locale]/` 재구조화, i18n navigation 스윕(usePathname non-prefixed), 헤더 언어 전환기(NEXT_LOCALE 쿠키), typed routes 해제(`d664734`)
     - [x] 5-2. 도메인 카탈로그화(커밋 `2d2dc97`·`92ac2df`·`17a53b2`·`6de4134`): common·metadata·app 페이지, community 전역(게시판·글·댓글·신고·차단·admin), profile, auth 폼·위젯. entities·폼 문자열 → `validation.*`·`error.*`·`auth.errors.*`·`community.toast.*`·`profile.toast.*` 키 + `translateMessage` 표시 번역. `ja` 카탈로그 한국어 혼입 교정. memo 훅 제거(`bc78656`)
-    - [ ] 5-3. 2차 GAP(ADR-0038 §6): trip-editor·trip-viewer·trips·`rich-editor.constant`·`marketing.ts`·`shared/constant/trip.ts`·`community.ts` EMPTY_* `t()`화, dayjs per-request 로케일(`dayjs/locale/ko` 하드코딩 3곳: `trip-viewer-format`·`day-picker`·`trip-date-range`), `trip.toast.*` 연결. `osaka.ts`·`countries.ts`·`airports.ts` 는 콘텐츠 데이터로 한국어 유지(의도)
+    - [x] 5-3. trip 도메인 2차(2026-09-12): intro/marketing·trips·trip-editor·trip-viewer·rich-editor·toast 카탈로그화, locale별 날짜·요일·기간·국가명, 새 여행 기본 일정 종류 locale 저장, 렌더 중 state 갱신 제거. 강제 유지 규칙은 `docs/CONVENTIONS.md`.
 - [ ] 6단계. 인증 확장(ADR-0033 §2): Naver·GitHub OAuth, 이메일 인증(Cloudflare mail worker, 리서치 후), 약관·동의(`docs/legal/` ko→ja·en, korean-law-mcp)
 - [ ] 7단계. 로드맵 4 AI(ADR-0029: Vercel Queues, 자기 키만, AES-GCM, `APP_ENCRYPTION_KEY` 없이 구현 후 키 등록 시 테스트)
 - [ ] 8단계. 로드맵 10 SEO·GEO·JSON-LD·Analytics·Speed Insights(ADR-0030, hreflang·locale 별 sitemap 포함)

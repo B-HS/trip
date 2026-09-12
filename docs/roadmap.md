@@ -18,7 +18,7 @@
 | 8 셀형 액션 UI                              | 완료                                      | ADR-0023                                                                                                                                                                         |
 | 9 몇박 며칠                                 | 완료                                      | ADR-0020, 마이그레이션 0002                                                                                                                                                      |
 | 10 SEO·GEO·JSON-LD·Analytics·Speed Insights | 미착수(설계 완료)                         | ADR-0030                                                                                                                                                                         |
-| 11 i18n ko·ja·en                            | 1차 완료·배포(2차 trip 도메인·dayjs 잔여) | ADR-0033 §4, ADR-0038, 5단계                                                                                                                                                     |
+| 11 i18n ko·ja·en                            | 2차 구현 완료(배포 전)                    | ADR-0033 §4, ADR-0038, 5단계. 전체 UI·trip 도메인·locale 포맷·로그인 셸 전환                                                                                                     |
 | 12 출발 공항·지구본 상호작용                | 완료(4-4e)                                | ADR-0035, 마이그레이션 0007. 트립별 출발 공항(편집기 콤보박스·템플릿 JSON), `/trips` 지구본 드래그 회전·hover 툴팁·선 클릭 `?route=` 필터                                        |
 
 ## 1. 콘텐츠 사이드바 — 추가 링크와 설명 커스터마이징
@@ -104,7 +104,7 @@
 - next-intl, URL 프리픽스 `as-needed`(기본 ko 프리픽스 없음, `/ja/…`·`/en/…`), 쿠키로 선택 기억, 셸 사용자 메뉴·게스트 헤더의 언어 전환 셀.
 - 범위: UI 문구·검증 메시지·toast·메일 템플릿·메타데이터·약관. 날짜·숫자는 locale 포맷. 사용자 콘텐츠·오사카 템플릿 데이터는 원문 유지.
 - 문구는 메시지 카탈로그(`messages/{ko,ja,en}.json`)로 관리하고 컴포넌트에 하드코딩하지 않는다. hreflang·locale 별 sitemap 은 로드맵 10 에서.
-- 2026-09-12 1차 완료·배포(ADR-0038): 골격(as-needed ko 기본·proxy 합성·전환기) + common·metadata·app·community·profile·auth 도메인 + 메시지 키 체계(`validation.`·`error.`·`auth.errors.`·`*.toast.` + `translateMessage`). 2차: trip 도메인·marketing·dayjs per-request 로케일(ADR-0038 §6).
+- 2026-09-12 1차 완료·배포 후 2차 구현 완료(ADR-0038): intro/marketing·trips·trip-editor·trip-viewer·rich-editor·toast 카탈로그화, locale별 날짜·요일·기간·국가명, 생성 locale별 기본 일정 종류, 로그인 사용자 메뉴 전환. 강제 유지 규칙은 `docs/CONVENTIONS.md`.
 
 ## 12. 출발 공항·지구본 상호작용 (ADR-0035, 4-4e 완료)
 

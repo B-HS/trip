@@ -2,6 +2,7 @@
 
 > 최종 갱신: 2026-09-11 · 대응 커밋: `181ab9c`(4-5 커뮤니티 확장 데이터 계층 ADR-0037 — 마이그레이션 0008 생성·추가 전용 SQL 검증, **DB 미적용**(`DATABASE_URL` 부재) · UI 는 후속)
 > 구현 정본. 코드와 어긋나면 코드를 고치거나 이 문서를 갱신한다. 결정의 배경·기각 대안은 `docs/acknowledge/README.md`.
+> 빌드 메모(2026-09-12): `next build`의 Turbopack 경로가 최적화 단계에서 정지하는 현상이 반복 재현되어 검증·배포용 `bun run build`는 `next build --webpack`으로 고정한다. React Compiler는 빌드 엔진과 별개로 `reactCompiler: true`를 유지한다.
 
 ## 1. 스택
 
@@ -161,5 +162,6 @@ docs/     ARCHITECTURE · HANDOFF · PROCESS · roadmap · env(환경변수 키�
 - `proxy.ts` 합성 순서: `handleI18nRouting` 선행 → 리다이렉트 응답은 그대로 통과 → 프리픽스 제거 pathname 으로 PROTECTED/GUEST_ONLY 판정 → 로그인 리다이렉트 `next` 에 프리픽스 보존. matcher 는 next-intl 표준(api·_next·_vercel·정적 제외).
 - 내부 내비게이션은 `@/i18n/navigation`(Link·useRouter·usePathname) 일원화 — usePathname 은 non-prefixed 논리 경로 반환. typedRoutes 는 프리픽스 충돌로 `Route` 결합을 plain string 으로 해제.
 - 카탈로그 `messages/{ko,en,ja}.json`, 도메인 네임스페이스. 데이터 계층은 번역 텍스트 대신 안정 키를 emitting 한다(`validation.*`·`error.*`·`auth.errors.<CODE>`·`community.toast.*`·`profile.toast.*`). 표시 지점(`shared/ui/field.tsx` FieldError·토스트)에서 `shared/lib/message-key.ts` 의 `translateMessage` 가 접두부를 감지해 번역, 아니면 원문 통과. 숫자 보정 문구는 카탈로그에 값을 박는다.
-- 언어 전환기 `widgets/app-shell/locale-switcher.tsx`: `router.replace(pathname, { locale })` 가 NEXT_LOCALE 쿠키 설정.
-- 2차 GAP(ADR-0038 §6): trip 도메인·marketing·EMPTY_* untranslated, dayjs per-request 로케일 미작(`dayjs/locale/ko` 하드코딩 3곳), `osaka.ts`·`countries.ts`·`airports.ts` 콘텐츠 데이터는 한국어 유지(의도).
+- 언어 전환기는 공개 헤더의 `widgets/app-shell/locale-switcher.tsx`와 로그인 셸의 `features/app-shell/user-menu.tsx`에 모두 있다. `router.replace(pathname, { locale })`로 현재 논리 경로를 유지하고 NEXT_LOCALE 쿠키를 설정한다.
+- 2차에서 intro/marketing·trips·trip-editor·trip-viewer·rich-editor와 toast를 ko/en/ja 카탈로그에 연결했고 날짜·요일·기간·국가명 포맷을 요청 locale 기반으로 전환했다. 새 여행의 기본 일정 종류도 생성 locale로 저장한다. `osaka.ts`는 한국어 예시 콘텐츠, `countries.ts`·`airports.ts`의 한국어 필드는 원본 콘텐츠 데이터로 유지하되 UI chrome에는 직접 노출하지 않는다.
+- 강제 구현 규칙과 리팩터링 완료 조건은 `docs/CONVENTIONS.md`를 정본으로 삼는다. 특히 React Compiler 사용 중 수동 memo hook 금지, 사용자 노출 문자열 카탈로그화, 세 locale 키 동등성은 예외 없는 품질 게이트다.
