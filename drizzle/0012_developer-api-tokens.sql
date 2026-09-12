@@ -24,9 +24,11 @@ CREATE TABLE `trip_developer_api_idempotency` (
 	`token_id` varchar(36) NOT NULL,
 	`idempotency_key` varchar(255) NOT NULL,
 	`request_hash` varchar(64) NOT NULL,
+	`claim_nonce` varchar(36) NOT NULL,
 	`status` enum('processing','completed') NOT NULL DEFAULT 'processing',
 	`response` json,
 	`response_status` int,
+	`response_headers` json,
 	`claimed_at` timestamp(3) NOT NULL DEFAULT (now()),
 	`completed_at` timestamp(3),
 	CONSTRAINT `trip_developer_api_idempotency_token_id_idempotency_key_pk` PRIMARY KEY(`token_id`,`idempotency_key`)

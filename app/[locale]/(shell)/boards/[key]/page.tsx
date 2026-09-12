@@ -22,7 +22,7 @@ export const generateMetadata = async ({ params }: BoardPageProps): Promise<Meta
         locale,
         path: `/boards/${encodeURIComponent(key)}`,
         title: board === null ? t('title') : board.name,
-        description: boardMetadata('description'),
+        description: board?.description ?? boardMetadata('description'),
         indexable: board !== null,
     })
 }

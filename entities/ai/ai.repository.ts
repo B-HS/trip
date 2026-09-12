@@ -1,5 +1,5 @@
 import 'server-only'
-import { and, asc, desc, eq, gte, inArray, lt, or, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, gt, gte, inArray, lt, or, sql } from 'drizzle-orm'
 import { assertTripAccess } from '@/entities/trip/trip.access'
 import { findTripDetail } from '@/entities/trip/trip.repository'
 import { saveDayInTransaction } from '@/entities/trip/trip.repository.days'
@@ -9,10 +9,12 @@ import type { AiKeyStatus, AiModel, AiProposalChange } from '@/entities/ai/ai.ty
 import { AI_MAX_ERROR_LENGTH, AI_MODEL_CACHE_TTL_MS, type AiJobKind, type AiProvider, type AiReasoningEffort } from '@/shared/constant/ai'
 import { getDb } from '@/shared/db/client'
 import { tripAiConversation, tripAiJob, tripAiKey, tripAiMessage, tripAiProposal, tripAiUsage } from '@/shared/db/schema/ai'
+import { trip as tripTable } from '@/shared/db/schema/trip'
 import { decryptSecret, encryptSecret } from '@/shared/lib/crypto'
 import { ApiError } from '@/shared/lib/api-response'
 
 const AI_JOB_LEASE_MS = 10 * 60 * 1000
+const AI_PROPOSAL_LEASE_MS = 10 * 60 * 1000
 
 type ModelCacheEntry = { expiresAt: number; models: AiModel[] }
 const modelCache = new Map<string, ModelCacheEntry>()
@@ -254,7 +256,20 @@ export const processAiJob = async (jobId: string) => {
             conversation.reasoningEffort,
         )
         const assistantId = crypto.randomUUID()
-        await db.transaction(async (tx) => {
+        const outputCommitted = await db.transaction(async (tx) => {
+            const [activeJob] = await tx
+                .select({ id: tripAiJob.id })
+                .from(tripAiJob)
+                .where(
+                    and(
+                        eq(tripAiJob.id, jobId),
+                        eq(tripAiJob.status, 'running'),
+                        eq(tripAiJob.leaseId, leaseId),
+                        gt(tripAiJob.leaseExpiresAt, new Date()),
+                    ),
+                )
+                .for('update')
+            if (!activeJob) return false
             await tx.insert(tripAiMessage).values({
                 id: assistantId,
                 conversationId: conversation.id,
@@ -279,7 +294,20 @@ export const processAiJob = async (jobId: string) => {
             if (job.kind === 'proposal') {
                 const changes = proposalChanges(extractJson(result.text))
                 const proposalId = crypto.randomUUID()
-                await tx.insert(tripAiProposal).values({ id: proposalId, jobId, tripId: conversation.tripId, status: 'pending', changes })
+                const [proposalTrip] = await tx
+                    .select({ updatedAt: tripTable.updatedAt })
+                    .from(tripTable)
+                    .where(eq(tripTable.id, conversation.tripId))
+                    .limit(1)
+                    .for('update')
+                await tx.insert(tripAiProposal).values({
+                    id: proposalId,
+                    jobId,
+                    tripId: conversation.tripId,
+                    status: 'pending',
+                    changes,
+                    baseTripUpdatedAt: proposalTrip?.updatedAt ?? null,
+                })
                 await tx
                     .update(tripAiJob)
                     .set({ status: 'done', proposal: changes, leaseId: null, leaseExpiresAt: null, completedAt: new Date() })
@@ -289,7 +317,9 @@ export const processAiJob = async (jobId: string) => {
                     .update(tripAiJob)
                     .set({ status: 'done', leaseId: null, leaseExpiresAt: null, completedAt: new Date() })
                     .where(and(eq(tripAiJob.id, jobId), eq(tripAiJob.leaseId, leaseId)))
+            return true
         })
+        if (!outputCommitted) return
     } catch (error) {
         const message = error instanceof Error ? error.message.slice(0, AI_MAX_ERROR_LENGTH) : 'AI job failed'
         await db
@@ -338,12 +368,23 @@ export const applyAiProposal = async (userId: string, proposalId: string) => {
         .limit(1)
     if (!rows[0]) throw new ApiError('NOT_FOUND', 'error.aiProposalNotFound')
     if (rows[0].proposal.status === 'applied') return { status: 'applied' as const }
-    if (rows[0].proposal.status !== 'approved') throw new ApiError('VALIDATION_ERROR', 'error.aiProposalApprovalRequired')
+    const applyingLeaseActive =
+        rows[0].proposal.status === 'applying' && rows[0].proposal.leaseExpiresAt !== null && rows[0].proposal.leaseExpiresAt.getTime() > Date.now()
+    if (applyingLeaseActive) throw new ApiError('VALIDATION_ERROR', 'error.aiProposalAlreadyDecided')
+    if (rows[0].proposal.status !== 'approved' && rows[0].proposal.status !== 'applying')
+        throw new ApiError('VALIDATION_ERROR', 'error.aiProposalApprovalRequired')
     await assertTripAccess(rows[0].proposal.tripId, userId, 'edit')
+    const proposalLeaseId = crypto.randomUUID()
+    const now = new Date()
     const claim = await getDb()
         .update(tripAiProposal)
-        .set({ status: 'applying' })
-        .where(and(eq(tripAiProposal.id, proposalId), eq(tripAiProposal.status, 'approved')))
+        .set({ status: 'applying', leaseId: proposalLeaseId, leaseExpiresAt: new Date(now.getTime() + AI_PROPOSAL_LEASE_MS) })
+        .where(
+            and(
+                eq(tripAiProposal.id, proposalId),
+                or(eq(tripAiProposal.status, 'approved'), and(eq(tripAiProposal.status, 'applying'), lt(tripAiProposal.leaseExpiresAt, now))),
+            ),
+        )
     if (claim[0].affectedRows === 0) throw new ApiError('VALIDATION_ERROR', 'error.aiProposalAlreadyDecided')
     let trip
     try {
@@ -351,15 +392,15 @@ export const applyAiProposal = async (userId: string, proposalId: string) => {
     } catch (error) {
         await getDb()
             .update(tripAiProposal)
-            .set({ status: 'approved' })
-            .where(and(eq(tripAiProposal.id, proposalId), eq(tripAiProposal.status, 'applying')))
+            .set({ status: 'approved', leaseId: null, leaseExpiresAt: null })
+            .where(and(eq(tripAiProposal.id, proposalId), eq(tripAiProposal.status, 'applying'), eq(tripAiProposal.leaseId, proposalLeaseId)))
         throw error
     }
     if (!trip) {
         await getDb()
             .update(tripAiProposal)
-            .set({ status: 'approved' })
-            .where(and(eq(tripAiProposal.id, proposalId), eq(tripAiProposal.status, 'applying')))
+            .set({ status: 'approved', leaseId: null, leaseExpiresAt: null })
+            .where(and(eq(tripAiProposal.id, proposalId), eq(tripAiProposal.status, 'applying'), eq(tripAiProposal.leaseId, proposalLeaseId)))
         throw new ApiError('NOT_FOUND', 'error.tripNotFound')
     }
     const changes = rows[0].proposal.changes as AiProposalChange[]
@@ -406,18 +447,36 @@ export const applyAiProposal = async (userId: string, proposalId: string) => {
             }
             validatedDays.push(dayInputSchema.parse({ ...day, scheduleItems: items }))
         }
-        await getDb().transaction(async (tx) => {
+        const applied = await getDb().transaction(async (tx) => {
+            const [lockedProposal] = await tx
+                .select({ status: tripAiProposal.status, leaseExpiresAt: tripAiProposal.leaseExpiresAt })
+                .from(tripAiProposal)
+                .where(and(eq(tripAiProposal.id, proposalId), eq(tripAiProposal.status, 'applying'), eq(tripAiProposal.leaseId, proposalLeaseId)))
+                .limit(1)
+                .for('update')
+            if (!lockedProposal || !lockedProposal.leaseExpiresAt || lockedProposal.leaseExpiresAt.getTime() <= Date.now()) return false
+            const [currentTrip] = await tx
+                .select({ updatedAt: tripTable.updatedAt })
+                .from(tripTable)
+                .where(eq(tripTable.id, trip.id))
+                .limit(1)
+                .for('update')
+            if (!currentTrip) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+            if (rows[0].proposal.baseTripUpdatedAt && currentTrip.updatedAt.getTime() !== rows[0].proposal.baseTripUpdatedAt.getTime())
+                throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
             for (const day of validatedDays) await saveDayInTransaction(tx, trip.id, day)
             await tx
                 .update(tripAiProposal)
-                .set({ status: 'applied' })
-                .where(and(eq(tripAiProposal.id, proposalId), eq(tripAiProposal.status, 'applying')))
+                .set({ status: 'applied', leaseId: null, leaseExpiresAt: null })
+                .where(and(eq(tripAiProposal.id, proposalId), eq(tripAiProposal.status, 'applying'), eq(tripAiProposal.leaseId, proposalLeaseId)))
+            return true
         })
+        if (!applied) throw new ApiError('VALIDATION_ERROR', 'error.aiProposalAlreadyDecided')
     } catch (error) {
         await getDb()
             .update(tripAiProposal)
-            .set({ status: 'approved' })
-            .where(and(eq(tripAiProposal.id, proposalId), eq(tripAiProposal.status, 'applying')))
+            .set({ status: 'approved', leaseId: null, leaseExpiresAt: null })
+            .where(and(eq(tripAiProposal.id, proposalId), eq(tripAiProposal.status, 'applying'), eq(tripAiProposal.leaseId, proposalLeaseId)))
         throw error
     }
     return { status: 'applied' as const }

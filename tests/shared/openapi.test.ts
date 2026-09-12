@@ -12,4 +12,13 @@ test('developer API OpenAPI document describes the implemented versioned routes'
     expect(openApiDocument.paths['/trips/{tripId}'].delete.parameters).toHaveLength(3)
     expect(openApiDocument.components.parameters.PageSize.schema.maximum).toBe(100)
     expect(openApiDocument.components.schemas.TripTemplate.properties.destinations.minItems).toBe(1)
+    expect(openApiDocument.components.schemas.ScheduleKind.required).toContain('legendLabel')
+    expect(openApiDocument.paths['/trips'].get.security).toEqual([{ bearerAuth: [] }])
+    expect(openApiDocument.paths['/trips'].get['x-required-scopes']).toEqual(['trips:read'])
+    expect(openApiDocument.paths['/trips/{tripId}'].put.responses['428']).toBeDefined()
+    expect(openApiDocument.paths['/trips/{tripId}'].put.responses['500']).toBeDefined()
+    expect(openApiDocument.paths['/trips'].get.responses['200'].$ref).toBe('#/components/responses/TripListSuccess')
+    expect(openApiDocument.paths['/trips/{tripId}'].get.responses['200'].content['application/json'].schema.$ref).toBe(
+        '#/components/schemas/TripDetailSuccess',
+    )
 })

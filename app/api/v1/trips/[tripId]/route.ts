@@ -1,6 +1,6 @@
 import { tripTemplateSchema } from '@/shared/lib/trip-template'
 import { assertTripAccess } from '@/entities/trip/trip.access'
-import { findTripDetail, replaceTripFromTemplate, deleteTrip } from '@/entities/trip/trip.repository'
+import { findTripDetail, replaceTripFromTemplateIfUnchanged, deleteTripIfUnchanged } from '@/entities/trip/trip.repository'
 import { assertDeveloperApiScope } from '@/shared/lib/developer-api-token'
 import {
     developerApiResponse,
@@ -35,8 +35,9 @@ export const PUT = async (request: Request, context: Context) =>
         const key = requireIdempotencyKey(request)
         const body = await parseJson(request)
         const hash = await requestFingerprint(request, body)
-        const replay = await claimIdempotency(auth.tokenId, key, hash)
-        if (replay) return developerApiResponse(replay.response, { status: replay.status })
+        const claim = await claimIdempotency(auth.tokenId, key, hash)
+        if (claim.replay) return developerApiResponse(claim.replay.response, { status: claim.replay.status, headers: claim.replay.headers })
+        let mutationCommitted = false
         try {
             requireConfirmation(request, 'replace')
             await assertTripAccess(tripId, auth.userId, 'own')
@@ -51,12 +52,14 @@ export const PUT = async (request: Request, context: Context) =>
             )
                 throw new ApiError('VALIDATION_ERROR', 'error.invalidInput')
             const template = tripTemplateSchema.parse(body)
-            const saved = await replaceTripFromTemplate(tripId, template)
+            const saved = await replaceTripFromTemplateIfUnchanged(tripId, template, current.updatedAt)
+            mutationCommitted = true
             const updated = await findTripDetail(tripId)
-            await completeIdempotency(auth.tokenId, key, hash, saved)
-            return developerApiResponse(saved, { headers: updated ? { ETag: etagForUpdatedAt(updated.updatedAt) } : undefined })
+            const responseHeaders: Record<string, string> = updated ? { ETag: etagForUpdatedAt(updated.updatedAt) } : {}
+            await completeIdempotency(auth.tokenId, key, hash, claim.claimNonce, saved, 200, responseHeaders)
+            return developerApiResponse(saved, { headers: responseHeaders })
         } catch (error) {
-            await releaseIdempotency(auth.tokenId, key, hash)
+            if (!mutationCommitted) await releaseIdempotency(auth.tokenId, key, hash, claim.claimNonce)
             throw error
         }
     })
@@ -67,20 +70,22 @@ export const DELETE = async (request: Request, context: Context) =>
         const tripId = await idFor(context)
         const key = requireIdempotencyKey(request)
         const hash = await requestFingerprint(request, null)
-        const replay = await claimIdempotency(auth.tokenId, key, hash)
-        if (replay) return developerApiResponse(replay.response, { status: replay.status })
+        const claim = await claimIdempotency(auth.tokenId, key, hash)
+        if (claim.replay) return developerApiResponse(claim.replay.response, { status: claim.replay.status, headers: claim.replay.headers })
+        let mutationCommitted = false
         try {
             requireConfirmation(request, 'delete')
             await assertTripAccess(tripId, auth.userId, 'own')
             const current = await findTripDetail(tripId)
             if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
             requireIfMatch(request, current.updatedAt)
-            await deleteTrip(tripId)
+            await deleteTripIfUnchanged(tripId, current.updatedAt)
+            mutationCommitted = true
             const response = { id: tripId, deleted: true }
-            await completeIdempotency(auth.tokenId, key, hash, response)
+            await completeIdempotency(auth.tokenId, key, hash, claim.claimNonce, response)
             return response
         } catch (error) {
-            await releaseIdempotency(auth.tokenId, key, hash)
+            if (!mutationCommitted) await releaseIdempotency(auth.tokenId, key, hash, claim.claimNonce)
             throw error
         }
     })

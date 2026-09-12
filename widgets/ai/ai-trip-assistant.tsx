@@ -10,6 +10,7 @@ import { translateMessage } from '@/shared/lib/message-key'
 import { Button } from '@/shared/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
 import { Textarea } from '@/shared/ui/textarea'
+import { ANALYTICS_EVENT, trackEvent } from '@/shared/lib/analytics'
 
 type AiTripAssistantProps = { tripId: string }
 type ApiEnvelope<T> = { success: true; data: T } | { success: false; error: { message: string } }
@@ -72,6 +73,7 @@ export const AiTripAssistant: FC<AiTripAssistantProps> = ({ tripId }) => {
             )
             setPrompt('')
             setJob({ id: created.jobId, kind, status: 'queued', attempts: 0, error: null, proposalId: null, createdAt: new Date() })
+            trackEvent(ANALYTICS_EVENT.aiJobRequested, { kind })
         } catch (reason: unknown) {
             setError(reason instanceof Error ? translateMessage(tMessage, reason.message) : '')
         }

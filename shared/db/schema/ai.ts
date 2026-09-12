@@ -133,6 +133,9 @@ export const tripAiProposal = tripTable(
             .references(() => trip.id, { onDelete: 'cascade' }),
         status: mysqlEnum('status', AI_PROPOSAL_STATUSES).notNull().default('pending'),
         changes: json('changes').notNull(),
+        baseTripUpdatedAt: timestamp('base_trip_updated_at', { fsp: 3 }),
+        leaseId: varchar('lease_id', { length: 36 }),
+        leaseExpiresAt: timestamp('lease_expires_at', { fsp: 3 }),
         createdAt: createdAt(),
         updatedAt: timestamp('updated_at', { fsp: 3 })
             .defaultNow()

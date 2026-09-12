@@ -4,7 +4,7 @@
 
 ## Phase 9 developer API handoff
 
-`/api/v1` owner-scoped trip API와 `/api/v1/openapi.json`, `/developers`, `/settings/api` 토큰 lifecycle UI가 구현되었다(ADR-0041). Personal access token 원문은 한 번만 반환하고 SHA-256 hash만 저장하며, `trips:read`·`trips:write`·`token:inspect` scope와 bearer-only parsing, token별 read/write sliding-window limit, mutation idempotency key를 적용한다. 검증된 도메인 서비스와 `tripTemplateSchema`를 재사용하므로 멤버 트립·공개 링크로 권한이 확장되지 않는다.
+`/api/v1` owner-scoped trip API와 `/api/v1/openapi.json`, `/developers`, `/settings/api` 토큰 lifecycle UI가 구현되었다(ADR-0041). Personal access token 원문은 한 번만 반환하고 SHA-256 hash만 저장하며, `trips:read`·`trips:write`·`token:inspect` scope와 bearer-only parsing, token별 read/write durable fixed-window limit, mutation idempotency key를 적용한다. 검증된 도메인 서비스와 `tripTemplateSchema`를 재사용하므로 멤버 트립·공개 링크로 권한이 확장되지 않는다.
 
 통합 시 `0010_trip-consent.sql` → `0011_ai.sql` → `0012_developer-api-tokens.sql` 순서로 journal과 snapshot이 일치하는지 확인한다. 운영 배포 전 `/api/v1/openapi.json`, 401/403/404/412/428/429 계약, 토큰 원문 로그 미노출, owner-only 결과를 smoke test한다.
 

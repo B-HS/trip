@@ -23,12 +23,17 @@ describe('JSON-LD builders', () => {
         expect(serialized).toContain('\\u003c/script\\u003e')
     })
 
-    test('builds a tourist itinerary with structured destinations and days', () => {
+    test('builds a schema.org-safe tourist itinerary with places and days', () => {
         const result = buildTouristTripJsonLd(trip as never, 'https://trip.gumyo.net/s/kyoto')
 
         expect(result['@type']).toBe('TouristTrip')
-        expect((result.itinerary as { itemListElement: unknown[] }).itemListElement).toHaveLength(1)
-        expect(result.touristDestination).toBeDefined()
+        const itinerary = result.itinerary as { itemListElement: Array<{ item: { '@type': string; 'name': string } }>; numberOfItems: number }
+        expect(itinerary.itemListElement).toHaveLength(2)
+        expect(itinerary.numberOfItems).toBe(2)
+        expect(itinerary.itemListElement[0]?.item).toMatchObject({ '@type': 'Place', 'name': 'Kyoto' })
+        expect(result).not.toHaveProperty('startDate')
+        expect(result).not.toHaveProperty('endDate')
+        expect(result).not.toHaveProperty('touristDestination')
         expect(result).not.toHaveProperty('accommodation')
         expect(result).not.toHaveProperty('subjectOf')
     })

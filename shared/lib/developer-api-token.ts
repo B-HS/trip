@@ -1,6 +1,6 @@
 import 'server-only'
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
-import { and, eq, isNull } from 'drizzle-orm'
+import { and, count, eq, isNull } from 'drizzle-orm'
 import {
     API_TOKEN_LABEL_MAX_LENGTH,
     API_TOKEN_MAX_COUNT,
@@ -12,6 +12,7 @@ import {
 } from '@/shared/constant/developer-api'
 import { getDb } from '@/shared/db/client'
 import { developerApiToken } from '@/shared/db/schema/developer-api'
+import { user } from '@/shared/db/schema/auth'
 import { ApiError } from '@/shared/lib/api-response'
 
 export type DeveloperApiToken = typeof developerApiToken.$inferSelect
@@ -78,17 +79,18 @@ export const issueDeveloperApiToken = async (
     if (input.expiresAt !== undefined && input.expiresAt !== null && input.expiresAt.getTime() <= Date.now()) {
         throw new ApiError('VALIDATION_ERROR', 'error.invalidApiTokenExpiry')
     }
-    const existing = await getDb()
-        .select({ id: developerApiToken.id })
-        .from(developerApiToken)
-        .where(and(eq(developerApiToken.userId, userId), isNull(developerApiToken.revokedAt)))
-    if (existing.length >= API_TOKEN_MAX_COUNT) throw new ApiError('VALIDATION_ERROR', 'error.apiTokenLimit')
     const token = createApiTokenValue()
     const metadata = tokenMetadata(token)
     const id = crypto.randomUUID()
-    await getDb()
-        .insert(developerApiToken)
-        .values({
+    const row = await getDb().transaction(async (tx) => {
+        const [owner] = await tx.select({ id: user.id }).from(user).where(eq(user.id, userId)).for('update')
+        if (!owner) throw new ApiError('NOT_FOUND', 'error.apiTokenNotFound')
+        const [{ activeCount }] = await tx
+            .select({ activeCount: count(developerApiToken.id) })
+            .from(developerApiToken)
+            .where(and(eq(developerApiToken.userId, userId), isNull(developerApiToken.revokedAt)))
+        if (activeCount >= API_TOKEN_MAX_COUNT) throw new ApiError('VALIDATION_ERROR', 'error.apiTokenLimit')
+        await tx.insert(developerApiToken).values({
             id,
             userId,
             tokenHash: hashApiToken(token),
@@ -97,7 +99,9 @@ export const issueDeveloperApiToken = async (
             scopes,
             expiresAt: input.expiresAt ?? null,
         })
-    const [row] = await getDb().select().from(developerApiToken).where(eq(developerApiToken.id, id)).limit(1)
+        const [inserted] = await tx.select().from(developerApiToken).where(eq(developerApiToken.id, id)).limit(1)
+        return inserted
+    })
     if (!row) throw new ApiError('INTERNAL_ERROR')
     return { ...toPublic(row), token }
 }

@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 import { API_RATE_LIMIT_READ_LIMIT, API_RATE_LIMIT_WINDOW_SECONDS, API_RATE_LIMIT_WRITE_LIMIT } from '@/shared/constant/developer-api'
 import { getDb } from '@/shared/db/client'
 import { developerApiRateLimit } from '@/shared/db/schema/developer-api'
@@ -16,6 +16,12 @@ export const checkDeveloperApiRateLimit = async (tokenId: string, method: string
     const now = new Date()
     const windowMs = API_RATE_LIMIT_WINDOW_SECONDS * 1000
     return getDb().transaction(async (tx) => {
+        // Establish the row atomically before taking the lock. A no-op duplicate
+        // update prevents concurrent first requests from resetting an active window.
+        await tx
+            .insert(developerApiRateLimit)
+            .values({ tokenId, bucket, windowStartedAt: now, requestCount: 0 })
+            .onDuplicateKeyUpdate({ set: { windowStartedAt: sql`${developerApiRateLimit.windowStartedAt}` } })
         const [row] = await tx
             .select()
             .from(developerApiRateLimit)

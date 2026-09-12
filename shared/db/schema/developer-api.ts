@@ -45,8 +45,10 @@ export const developerApiIdempotency = tripTable(
         status: mysqlEnum('status', ['processing', 'completed'] as const)
             .notNull()
             .default('processing'),
+        claimNonce: varchar('claim_nonce', { length: 36 }).notNull(),
         response: json('response'),
         responseStatus: int('response_status'),
+        responseHeaders: json('response_headers').$type<Record<string, string>>(),
         claimedAt: timestamp('claimed_at', { fsp: 3 }).defaultNow().notNull(),
         completedAt: timestamp('completed_at', { fsp: 3 }),
     },

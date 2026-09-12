@@ -45,7 +45,7 @@ curl -X POST https://trip.gumyo.net/api/v1/trips \
 
 ## 계약과 오류
 
-성공은 `{ "success": true, "data": ... }`, 오류는 `{ "success": false, "error": { "code", "message" } }`다. 주요 코드: `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION_ERROR`, `RATE_LIMITED`.
+성공은 `{ "success": true, "data": ... }`, 오류는 `{ "success": false, "error": { "code", "message" } }`다. 주요 코드: `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION_ERROR`, `PRECONDITION_REQUIRED`(428), `PRECONDITION_FAILED`(412), `PAYLOAD_TOO_LARGE`(413), `RATE_LIMITED`(429), `INTERNAL_ERROR`(500).
 
 목록 응답은 `items`, `page`, `pageSize`, `total`, `pageCount`를 항상 포함한다. `page`는 1~~1,000,000, `page_size`는 1~~100의 십진 양의 정수만 허용한다. JSON 본문은 UTF-8 기준 1 MiB 이하이며, 템플릿의 목적지 20개·일정 100일·일정 항목 200개 같은 중첩 상한은 OpenAPI에 표시한다. 429 응답에는 `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, 필요 시 `Retry-After` 헤더가 있다. 한도 카운터는 DB의 토큰별 읽기·쓰기 윈도에 원자적으로 기록되며 기본 한도는 읽기 60회/분, 쓰기 20회/분이다.
 

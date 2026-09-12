@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "6867ed55-a65a-49c2-b8a7-5229c36326ad",
+  "id": "3c159f58-0b4c-4a02-8320-b0055d83a469",
   "prevId": "abb61ecc-0265-402d-85b5-dbb9ca62dc62",
   "tables": {
     "trip_ai_conversation": {
@@ -534,6 +534,27 @@
           "type": "json",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "base_trip_updated_at": {
+          "name": "base_trip_updated_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lease_id": {
+          "name": "lease_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lease_expires_at": {
+          "name": "lease_expires_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "created_at": {
@@ -2174,6 +2195,13 @@
           "autoincrement": false,
           "default": "'processing'"
         },
+        "claim_nonce": {
+          "name": "claim_nonce",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "response": {
           "name": "response",
           "type": "json",
@@ -2184,6 +2212,13 @@
         "response_status": {
           "name": "response_status",
           "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "response_headers": {
+          "name": "response_headers",
+          "type": "json",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

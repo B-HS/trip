@@ -536,6 +536,27 @@
           "notNull": true,
           "autoincrement": false
         },
+        "base_trip_updated_at": {
+          "name": "base_trip_updated_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lease_id": {
+          "name": "lease_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lease_expires_at": {
+          "name": "lease_expires_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp(3)",

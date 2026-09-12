@@ -1,5 +1,5 @@
 import 'server-only'
-import { eq, inArray, type SQL } from 'drizzle-orm'
+import { count, eq, inArray, type SQL } from 'drizzle-orm'
 import { getTripRole } from '@/entities/trip/trip.access'
 import { insertTemplateDays, removableIds, touchTrip } from '@/entities/trip/trip.repository.days'
 import { resolveTripRole } from '@/entities/trip/trip.role'
@@ -315,13 +315,14 @@ export const saveScheduleKinds = async (tripId: string, list: ScheduleKindValues
     })
 }
 
-export const findTripSummariesForUser = async (userId: string, ownedOnly = false) => {
+export const findTripSummariesForUser = async (userId: string, ownedOnly = false, page?: { page: number; pageSize: number }) => {
     const db = getDb()
     const memberTripIds = db.select({ tripId: tripMember.tripId }).from(tripMember).where(eq(tripMember.userId, userId))
     const rows = await db.query.trip.findMany({
         where: (fields, { eq: equals, or, inArray: within }) =>
             ownedOnly ? equals(fields.ownerId, userId) : or(equals(fields.ownerId, userId), within(fields.id, memberTripIds)),
         orderBy: (fields, { desc }) => [desc(fields.startDate), desc(fields.createdAt)],
+        ...(page ? { limit: page.pageSize, offset: (page.page - 1) * page.pageSize } : {}),
         with: {
             members: { where: (fields, { eq: equals }) => equals(fields.userId, userId), columns: { role: true } },
             favorites: { where: (fields, { eq: equals }) => equals(fields.userId, userId), columns: { sortOrder: true } },
@@ -354,6 +355,14 @@ export const findTripSummariesForUser = async (userId: string, ownedOnly = false
                 flights: row.flights,
             }) satisfies TripSummary,
     )
+}
+
+export const countOwnedTripsForUser = async (userId: string) => {
+    const [row] = await getDb()
+        .select({ total: count(trip.id) })
+        .from(trip)
+        .where(eq(trip.ownerId, userId))
+    return Number(row?.total ?? 0)
 }
 
 export const findTripDetail = async (tripId: string) => {
@@ -437,22 +446,35 @@ export const createTripFromTemplate = async (ownerId: string, template: TripTemp
     return { id } satisfies CreatedTrip
 }
 
+const replaceTripFromTemplateInTransaction = async (tx: TripTransaction, tripId: string, template: TripTemplate) => {
+    await tx
+        .update(trip)
+        .set({ ...toTripValues(template), sidebarNote: template.sidebarNote })
+        .where(eq(trip.id, tripId))
+    await reconcileDestinations(tx, tripId, template.destinations)
+    await reconcileFlights(tx, tripId, template.flights)
+    await reconcileLodgings(tx, tripId, template.lodgings)
+    await reconcileSidebarLinks(tx, tripId, template.sidebarLinks)
+    await tx.delete(tripDay).where(eq(tripDay.tripId, tripId))
+    await tx.delete(tripScheduleKind).where(eq(tripScheduleKind.tripId, tripId))
+    await insertTemplateDays(tx, tripId, template.days, await insertScheduleKinds(tx, tripId, template.scheduleKinds))
+    const keys = await reconcileBookings(tx, tripId, template.bookings)
+    await reconcileInfoSections(tx, tripId, template.infoSections)
+    return keys
+}
+
 export const replaceTripFromTemplate = async (tripId: string, template: TripTemplate) => {
+    const removedKeys = await getDb().transaction((tx) => replaceTripFromTemplateInTransaction(tx, tripId, template))
+    await removeUploadedObjects(removedKeys)
+    return { id: tripId } satisfies CreatedTrip
+}
+
+export const replaceTripFromTemplateIfUnchanged = async (tripId: string, template: TripTemplate, expectedUpdatedAt: string) => {
     const removedKeys = await getDb().transaction(async (tx) => {
-        await tx
-            .update(trip)
-            .set({ ...toTripValues(template), sidebarNote: template.sidebarNote })
-            .where(eq(trip.id, tripId))
-        await reconcileDestinations(tx, tripId, template.destinations)
-        await reconcileFlights(tx, tripId, template.flights)
-        await reconcileLodgings(tx, tripId, template.lodgings)
-        await reconcileSidebarLinks(tx, tripId, template.sidebarLinks)
-        await tx.delete(tripDay).where(eq(tripDay.tripId, tripId))
-        await tx.delete(tripScheduleKind).where(eq(tripScheduleKind.tripId, tripId))
-        await insertTemplateDays(tx, tripId, template.days, await insertScheduleKinds(tx, tripId, template.scheduleKinds))
-        const keys = await reconcileBookings(tx, tripId, template.bookings)
-        await reconcileInfoSections(tx, tripId, template.infoSections)
-        return keys
+        const [current] = await tx.select({ updatedAt: trip.updatedAt }).from(trip).where(eq(trip.id, tripId)).for('update')
+        if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+        if (current.updatedAt.toISOString() !== expectedUpdatedAt) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
+        return replaceTripFromTemplateInTransaction(tx, tripId, template)
     })
     await removeUploadedObjects(removedKeys)
     return { id: tripId } satisfies CreatedTrip
@@ -467,6 +489,15 @@ export const saveTripBasics = async (tripId: string, basics: TripBasicsValues, d
 
 export const deleteTrip = async (tripId: string) => {
     await getDb().delete(trip).where(eq(trip.id, tripId))
+}
+
+export const deleteTripIfUnchanged = async (tripId: string, expectedUpdatedAt: string) => {
+    await getDb().transaction(async (tx) => {
+        const [current] = await tx.select({ updatedAt: trip.updatedAt }).from(trip).where(eq(trip.id, tripId)).for('update')
+        if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+        if (current.updatedAt.toISOString() !== expectedUpdatedAt) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
+        await tx.delete(trip).where(eq(trip.id, tripId))
+    })
 }
 
 export const saveFlights = async (tripId: string, list: FlightValues[]) => {

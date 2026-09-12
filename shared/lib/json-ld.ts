@@ -43,34 +43,38 @@ export const buildTouristTripJsonLd = (trip: PublicTrip, url: string, descriptio
     const departureTime = outbound ? asTripDateTime(trip.startDate, outbound.departTime) : null
     const arrivalTime = inbound ? asTripDateTime(trip.endDate, inbound.arriveTime) : null
 
+    const itineraryItems = [
+        ...trip.destinations.map((destination, index) => ({
+            '@type': 'ListItem',
+            'position': index + 1,
+            'item': buildPlace(destination.city ?? destination.countryCode),
+        })),
+        ...trip.days.map((day, index) => ({
+            '@type': 'ListItem',
+            'position': trip.destinations.length + index + 1,
+            'item': {
+                '@type': 'TouristAttraction',
+                'name': day.title,
+                ...(day.overview ? { description: day.overview } : {}),
+                ...(day.date ? { additionalProperty: { '@type': 'PropertyValue', 'name': 'date', 'value': day.date } } : {}),
+            },
+        })),
+    ]
+
     return {
         '@context': context,
         '@type': 'TouristTrip',
         'name': trip.title,
         url,
         'description': description ?? `${trip.destination} travel itinerary`,
-        'startDate': asDateTime(trip.startDate),
-        'endDate': asDateTime(trip.endDate),
         ...(departureTime ? { departureTime } : {}),
         ...(arrivalTime ? { arrivalTime } : {}),
         'touristType': 'Travel itinerary',
         'itinerary': {
             '@type': 'ItemList',
-            'numberOfItems': trip.days.length,
-            'itemListElement': trip.days.map((day, index) => ({
-                '@type': 'ListItem',
-                'position': index + 1,
-                'item': {
-                    '@type': 'TouristAttraction',
-                    'name': day.title,
-                    ...(day.overview ? { description: day.overview } : {}),
-                    ...(day.date ? { additionalProperty: { '@type': 'PropertyValue', 'name': 'date', 'value': day.date } } : {}),
-                },
-            })),
+            'numberOfItems': itineraryItems.length,
+            'itemListElement': itineraryItems,
         },
-        ...(trip.destinations.length > 0
-            ? { touristDestination: trip.destinations.map((destination) => buildPlace(destination.city ?? destination.countryCode)) }
-            : {}),
     }
 }
 
