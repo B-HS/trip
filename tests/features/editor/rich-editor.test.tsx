@@ -2,14 +2,7 @@ import { afterEach, describe, expect, mock, test } from 'bun:test'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { UploadedImage } from '@/entities/upload/upload.type'
 import { RichEditor } from '@/features/editor/rich-editor'
-import {
-    RICH_EDITOR_DIALOG_CONFIRM,
-    RICH_EDITOR_FILE_INPUT_LABEL,
-    RICH_EDITOR_LABEL,
-    RICH_EDITOR_LINK_DIALOG,
-    RICH_EDITOR_YOUTUBE_DIALOG,
-} from '@/features/editor/rich-editor.constant'
-import { UPLOAD_DISABLED_HINT } from '@/shared/constant/upload'
+import messages from '@/messages/ko.json'
 import type { RichTextDocument } from '@/shared/lib/rich-text-document'
 import { TooltipProvider } from '@/shared/ui/tooltip'
 
@@ -18,6 +11,12 @@ const UPLOAD_ID = 'upload-1'
 const UPLOADED_URL = 'https://cdn.example.com/photo.jpg'
 const YOUTUBE_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
 const UPPERCASE_LINK_URL = 'HTTPS://example.com'
+const RICH_EDITOR_LABEL = messages.richEditor.toolbar
+const RICH_EDITOR_FILE_INPUT_LABEL = messages.richEditor.fileInput
+const RICH_EDITOR_DIALOG_CONFIRM = messages.richEditor.confirm
+const RICH_EDITOR_LINK_DIALOG = messages.richEditor.link
+const RICH_EDITOR_YOUTUBE_DIALOG = messages.richEditor.youtube
+const UPLOAD_DISABLED_HINT = messages.richEditor.uploadDisabled
 
 type RenderOptions = {
     content?: RichTextDocument | null

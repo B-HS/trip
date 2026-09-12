@@ -1,12 +1,12 @@
 'use client'
 
 import { EditorContent, useEditor } from '@tiptap/react'
+import { useTranslations } from 'next-intl'
 import { useRef, useState, type ChangeEvent, type FC } from 'react'
 import type { UploadedImage } from '@/entities/upload/upload.type'
 import { RichEditorLinkDialog } from '@/features/editor/rich-editor-link-dialog'
 import { RichEditorToolbar } from '@/features/editor/rich-editor-toolbar'
 import { RichEditorYoutubeDialog } from '@/features/editor/rich-editor-youtube-dialog'
-import { RICH_EDITOR_FILE_INPUT_LABEL } from '@/features/editor/rich-editor.constant'
 import { RICH_TEXT_CLASS, RICH_TEXT_YOUTUBE_HEIGHT, RICH_TEXT_YOUTUBE_WIDTH } from '@/shared/constant/rich-text'
 import { UPLOAD_IMAGE_ACCEPT } from '@/shared/constant/upload'
 import { EMPTY_RICH_TEXT_DOCUMENT, toPlainDocument, type RichTextDocument } from '@/shared/lib/rich-text-document'
@@ -40,6 +40,7 @@ export const RichEditor: FC<RichEditorProps> = ({
     onUploadImage,
     className,
 }) => {
+    const t = useTranslations('richEditor')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [linkUrl, setLinkUrl] = useState<string | null>(null)
     const [isYoutubeOpen, setIsYoutubeOpen] = useState(false)
@@ -103,7 +104,7 @@ export const RichEditor: FC<RichEditorProps> = ({
                 ref={fileInputRef}
                 className='hidden'
                 type='file'
-                aria-label={RICH_EDITOR_FILE_INPUT_LABEL}
+                aria-label={t('fileInput')}
                 accept={UPLOAD_IMAGE_ACCEPT}
                 onChange={handleFileChange}
             />

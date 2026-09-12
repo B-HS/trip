@@ -1,19 +1,14 @@
 'use client'
 
 import { useState, type FC, type FormEvent } from 'react'
-import {
-    RICH_EDITOR_DIALOG_CANCEL,
-    RICH_EDITOR_DIALOG_CONFIRM,
-    RICH_EDITOR_LINK_DIALOG,
-    RICH_EDITOR_YOUTUBE_DIALOG,
-} from '@/features/editor/rich-editor.constant'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/shared/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/shared/ui/dialog'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
 
 type RichEditorUrlDialogProps = {
-    copy: typeof RICH_EDITOR_LINK_DIALOG | typeof RICH_EDITOR_YOUTUBE_DIALOG
+    kind: 'link' | 'youtube'
     inputId: string
     initialUrl: string
     validate: (url: string) => boolean
@@ -21,7 +16,8 @@ type RichEditorUrlDialogProps = {
     onSubmit: (url: string) => void
 }
 
-export const RichEditorUrlDialog: FC<RichEditorUrlDialogProps> = ({ copy, inputId, initialUrl, validate, onClose, onSubmit }) => {
+export const RichEditorUrlDialog: FC<RichEditorUrlDialogProps> = ({ kind, inputId, initialUrl, validate, onClose, onSubmit }) => {
+    const t = useTranslations('richEditor')
     const [url, setUrl] = useState(initialUrl)
     const [isInvalid, setIsInvalid] = useState(false)
 
@@ -40,29 +36,29 @@ export const RichEditorUrlDialog: FC<RichEditorUrlDialogProps> = ({ copy, inputI
         <Dialog open onOpenChange={(isOpen) => !isOpen && onClose()}>
             <DialogContent className='rounded-none'>
                 <DialogHeader>
-                    <DialogTitle>{copy.title}</DialogTitle>
-                    <DialogDescription>{copy.description}</DialogDescription>
+                    <DialogTitle>{t(`${kind}.title`)}</DialogTitle>
+                    <DialogDescription>{t(`${kind}.description`)}</DialogDescription>
                 </DialogHeader>
                 <form className='flex flex-col gap-6' onSubmit={handleSubmit}>
                     <div className='flex flex-col gap-1.5'>
                         <Label className='text-xs font-medium text-muted-foreground' htmlFor={inputId}>
-                            {copy.label}
+                            {t(`${kind}.label`)}
                         </Label>
                         <Input
                             id={inputId}
                             value={url}
-                            placeholder={copy.placeholder}
+                            placeholder={t(`${kind}.placeholder`)}
                             aria-invalid={isInvalid}
                             onChange={(event) => setUrl(event.target.value)}
                         />
-                        {isInvalid && <p className='text-xs text-destructive'>{copy.invalid}</p>}
+                        {isInvalid && <p className='text-xs text-destructive'>{t(`${kind}.invalid`)}</p>}
                     </div>
                     <div className='flex gap-px bg-background'>
                         <Button type='button' variant='cell' size='cell' onClick={onClose}>
-                            {RICH_EDITOR_DIALOG_CANCEL}
+                            {t('cancel')}
                         </Button>
                         <Button type='submit' variant='cellPrimary' size='cell'>
-                            {RICH_EDITOR_DIALOG_CONFIRM}
+                            {t('confirm')}
                         </Button>
                     </div>
                 </form>

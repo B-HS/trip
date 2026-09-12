@@ -3,7 +3,6 @@
 import { isValidYoutubeUrl } from '@tiptap/extension-youtube'
 import type { FC } from 'react'
 import { RichEditorUrlDialog } from '@/features/editor/rich-editor-url-dialog'
-import { RICH_EDITOR_YOUTUBE_DIALOG } from '@/features/editor/rich-editor.constant'
 
 const YOUTUBE_URL_INPUT_ID = 'rich-editor-youtube-url'
 
@@ -14,7 +13,7 @@ type RichEditorYoutubeDialogProps = {
 
 export const RichEditorYoutubeDialog: FC<RichEditorYoutubeDialogProps> = ({ onClose, onSubmit }) => (
     <RichEditorUrlDialog
-        copy={RICH_EDITOR_YOUTUBE_DIALOG}
+        kind='youtube'
         inputId={YOUTUBE_URL_INPUT_ID}
         initialUrl=''
         validate={(url) => isValidYoutubeUrl(url) !== null}

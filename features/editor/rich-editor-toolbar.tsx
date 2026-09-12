@@ -17,10 +17,9 @@ import {
     StrikethroughIcon,
     UndoIcon,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import type { FC, ReactNode } from 'react'
-import { RICH_EDITOR_LABEL, RICH_EDITOR_UPLOADING_HINT } from '@/features/editor/rich-editor.constant'
 import { RICH_TEXT_HEADING_LEVELS } from '@/shared/constant/rich-text'
-import { UPLOAD_DISABLED_HINT } from '@/shared/constant/upload'
 import { Button } from '@/shared/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 
@@ -45,6 +44,7 @@ type RichEditorToolbarProps = {
 }
 
 export const RichEditorToolbar: FC<RichEditorToolbarProps> = ({ editor, isUploadEnabled, isUploading, onOpenLink, onOpenYoutube, onPickImage }) => {
+    const t = useTranslations('richEditor')
     const state = useEditorState({
         editor,
         selector: ({ editor: instance }) => ({
@@ -73,83 +73,83 @@ export const RichEditorToolbar: FC<RichEditorToolbarProps> = ({ editor, isUpload
     })
 
     const resolveImageHint = () => {
-        if (!isUploadEnabled) return UPLOAD_DISABLED_HINT
-        if (isUploading) return RICH_EDITOR_UPLOADING_HINT
-        return RICH_EDITOR_LABEL.image
+        if (!isUploadEnabled) return t('uploadDisabled')
+        if (isUploading) return t('uploading')
+        return t('toolbar.image')
     }
     const cells: RichEditorToolbarCell[] = [
         {
-            label: RICH_EDITOR_LABEL.heading2,
+            label: t('toolbar.heading2'),
             icon: <Heading2Icon />,
             isActive: state.isHeading2,
             isDisabled: !state.canHeading2,
             onSelect: () => editor.chain().focus().toggleHeading({ level: HEADING_2_LEVEL }).run(),
         },
         {
-            label: RICH_EDITOR_LABEL.heading3,
+            label: t('toolbar.heading3'),
             icon: <Heading3Icon />,
             isActive: state.isHeading3,
             isDisabled: !state.canHeading3,
             onSelect: () => editor.chain().focus().toggleHeading({ level: HEADING_3_LEVEL }).run(),
         },
         {
-            label: RICH_EDITOR_LABEL.bold,
+            label: t('toolbar.bold'),
             icon: <BoldIcon />,
             isActive: state.isBold,
             isDisabled: !state.canBold,
             onSelect: () => editor.chain().focus().toggleBold().run(),
         },
         {
-            label: RICH_EDITOR_LABEL.italic,
+            label: t('toolbar.italic'),
             icon: <ItalicIcon />,
             isActive: state.isItalic,
             isDisabled: !state.canItalic,
             onSelect: () => editor.chain().focus().toggleItalic().run(),
         },
         {
-            label: RICH_EDITOR_LABEL.strike,
+            label: t('toolbar.strike'),
             icon: <StrikethroughIcon />,
             isActive: state.isStrike,
             isDisabled: !state.canStrike,
             onSelect: () => editor.chain().focus().toggleStrike().run(),
         },
         {
-            label: RICH_EDITOR_LABEL.bulletList,
+            label: t('toolbar.bulletList'),
             icon: <ListIcon />,
             isActive: state.isBulletList,
             isDisabled: !state.canBulletList,
             onSelect: () => editor.chain().focus().toggleBulletList().run(),
         },
         {
-            label: RICH_EDITOR_LABEL.orderedList,
+            label: t('toolbar.orderedList'),
             icon: <ListOrderedIcon />,
             isActive: state.isOrderedList,
             isDisabled: !state.canOrderedList,
             onSelect: () => editor.chain().focus().toggleOrderedList().run(),
         },
         {
-            label: RICH_EDITOR_LABEL.blockquote,
+            label: t('toolbar.blockquote'),
             icon: <QuoteIcon />,
             isActive: state.isBlockquote,
             isDisabled: !state.canBlockquote,
             onSelect: () => editor.chain().focus().toggleBlockquote().run(),
         },
         {
-            label: RICH_EDITOR_LABEL.codeBlock,
+            label: t('toolbar.codeBlock'),
             icon: <SquareCodeIcon />,
             isActive: state.isCodeBlock,
             isDisabled: !state.canCodeBlock,
             onSelect: () => editor.chain().focus().toggleCodeBlock().run(),
         },
         {
-            label: RICH_EDITOR_LABEL.link,
+            label: t('toolbar.link'),
             icon: <LinkIcon />,
             isActive: state.isLink,
             isDisabled: false,
             onSelect: onOpenLink,
         },
         {
-            label: RICH_EDITOR_LABEL.image,
+            label: t('toolbar.image'),
             hint: resolveImageHint(),
             icon: <ImagePlusIcon />,
             isActive: undefined,
@@ -157,21 +157,21 @@ export const RichEditorToolbar: FC<RichEditorToolbarProps> = ({ editor, isUpload
             onSelect: onPickImage,
         },
         {
-            label: RICH_EDITOR_LABEL.youtube,
+            label: t('toolbar.youtube'),
             icon: <PlayCircleIcon />,
             isActive: undefined,
             isDisabled: false,
             onSelect: onOpenYoutube,
         },
         {
-            label: RICH_EDITOR_LABEL.undo,
+            label: t('toolbar.undo'),
             icon: <UndoIcon />,
             isActive: undefined,
             isDisabled: !state.canUndo,
             onSelect: () => editor.chain().focus().undo().run(),
         },
         {
-            label: RICH_EDITOR_LABEL.redo,
+            label: t('toolbar.redo'),
             icon: <RedoIcon />,
             isActive: undefined,
             isDisabled: !state.canRedo,
