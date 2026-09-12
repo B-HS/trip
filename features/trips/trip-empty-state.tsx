@@ -2,6 +2,7 @@
 
 import { PlusIcon, SparklesIcon } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
+import { useTranslations } from 'next-intl'
 import type { ComponentProps, FC } from 'react'
 import { Button } from '@/shared/ui/button'
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from '@/shared/ui/empty'
@@ -15,23 +16,27 @@ type TripEmptyStateProps = {
     onCreateSample: () => void
 }
 
-export const TripEmptyState: FC<TripEmptyStateProps> = ({ newTripHref, isSamplePending, onCreateSample }) => (
-    <Empty className='gap-6 rounded-none border-none bg-card p-3'>
-        <TripGlobeLazy className='max-w-md' routes={SAMPLE_ROUTES} variant='panel' interactive={false} />
-        <EmptyHeader className='gap-2'>
-            <EmptyTitle className='text-sm font-medium'>아직 트립이 없습니다</EmptyTitle>
-            <EmptyDescription className='text-xs'>새 트립을 만들거나 오사카 예시 트립으로 구조를 먼저 살펴보세요.</EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent className='w-fit flex-row flex-wrap items-stretch justify-center gap-px bg-background'>
-            <Button variant='cellPrimary' size='cell' asChild>
-                <Link href={newTripHref}>
-                    <PlusIcon aria-hidden />새 트립
-                </Link>
-            </Button>
-            <Button variant='cell' size='cell' disabled={isSamplePending} onClick={onCreateSample}>
-                <SparklesIcon aria-hidden />
-                {isSamplePending ? '만드는 중…' : '오사카 예시 트립 만들기'}
-            </Button>
-        </EmptyContent>
-    </Empty>
-)
+export const TripEmptyState: FC<TripEmptyStateProps> = ({ newTripHref, isSamplePending, onCreateSample }) => {
+    const t = useTranslations('trips.empty')
+    return (
+        <Empty className='gap-6 rounded-none border-none bg-card p-3'>
+            <TripGlobeLazy className='max-w-md' routes={SAMPLE_ROUTES} variant='panel' interactive={false} />
+            <EmptyHeader className='gap-2'>
+                <EmptyTitle className='text-sm font-medium'>{t('title')}</EmptyTitle>
+                <EmptyDescription className='text-xs'>{t('description')}</EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent className='w-fit flex-row flex-wrap items-stretch justify-center gap-px bg-background'>
+                <Button variant='cellPrimary' size='cell' asChild>
+                    <Link href={newTripHref}>
+                        <PlusIcon aria-hidden />
+                        {t('newTrip')}
+                    </Link>
+                </Button>
+                <Button variant='cell' size='cell' disabled={isSamplePending} onClick={onCreateSample}>
+                    <SparklesIcon aria-hidden />
+                    {isSamplePending ? t('creating') : t('template')}
+                </Button>
+            </EmptyContent>
+        </Empty>
+    )
+}

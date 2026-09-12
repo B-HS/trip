@@ -1,7 +1,9 @@
 'use client'
 
+import dayjs from 'dayjs'
 import { PlusIcon, SparklesIcon, XIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
+import { useLocale, useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { useRouter } from '@/i18n/navigation'
 import { useEffect, useState, type FC } from 'react'
@@ -12,7 +14,6 @@ import { TripEmptyState } from '@/features/trips/trip-empty-state'
 import { TripErrorState } from '@/features/trips/trip-error-state'
 import { TripStatTiles, type TripStatTile } from '@/features/trips/trip-stat-tiles'
 import { OSAKA_TRIP_TEMPLATE } from '@/shared/constant/template/osaka'
-import { MEMBER_ROLE_LABEL } from '@/shared/constant/trip'
 import { MOTION_EASE_STANDARD, MOTION_FADE_DURATION } from '@/shared/lib/motion'
 import { replaceSearchParam } from '@/shared/lib/search-param'
 import { formatTripDateRange } from '@/shared/lib/trip-date-range'
@@ -38,6 +39,8 @@ export type TripListWidgetProps = {
 }
 
 export const TripListWidget: FC<TripListWidgetProps> = ({ initialRoute = null }) => {
+    const locale = useLocale()
+    const t = useTranslations('trips')
     const [deleteTarget, setDeleteTarget] = useState<TripDeleteTarget | null>(null)
     const [selectedRouteKey, setSelectedRouteKey] = useState(initialRoute)
     const router = useRouter()
@@ -47,16 +50,16 @@ export const TripListWidget: FC<TripListWidgetProps> = ({ initialRoute = null })
     const toggleFavorite = useToggleFavorite()
 
     const trips = tripList.data ?? []
-    const globeRoutes = collectGlobeRoutes(trips)
+    const globeRoutes = collectGlobeRoutes(trips, locale)
     const selectedRoute = findGlobeRoute(globeRoutes, selectedRouteKey)
-    const hasStaleRoute = tripList.data !== undefined && selectedRouteKey !== null && selectedRoute === null
-    if (hasStaleRoute) setSelectedRouteKey(null)
-    const visibleTrips = filterTripsByRoute(trips, selectedRoute)
+    const activeRouteKey = tripList.data !== undefined && selectedRouteKey !== null && selectedRoute === null ? null : selectedRouteKey
+    const activeRoute = findGlobeRoute(globeRoutes, activeRouteKey)
+    const visibleTrips = filterTripsByRoute(trips, activeRoute)
     const tiles: TripStatTile[] = [
-        { label: '트립 수', value: trips.length },
-        { label: '일정 수', value: trips.reduce((total, trip) => total + trip.scheduleCount, 0) },
-        { label: '예매 항목', value: trips.reduce((total, trip) => total + trip.bookingCount, 0) },
-        { label: '진행 중', value: countOngoingTrips(trips, today) },
+        { label: t('list.stats.count'), value: trips.length },
+        { label: t('list.stats.schedules'), value: trips.reduce((total, trip) => total + trip.scheduleCount, 0) },
+        { label: t('list.stats.bookings'), value: trips.reduce((total, trip) => total + trip.bookingCount, 0) },
+        { label: t('list.stats.ongoing'), value: countOngoingTrips(trips, today) },
     ]
 
     const handleCreateSample = () => createFromTemplate.mutate(OSAKA_TRIP_TEMPLATE, { onSuccess: (created) => router.push(`/trips/${created.id}`) })
@@ -73,18 +76,32 @@ export const TripListWidget: FC<TripListWidgetProps> = ({ initialRoute = null })
                             title={trip.title}
                             eyebrow={trip.eyebrow}
                             destination={trip.destination}
-                            dateRangeLabel={formatTripDateRange(trip)}
+                            dateRangeLabel={formatTripDateRange(trip, locale)}
                             destinations={trip.destinations}
                             routeLabel={resolveTripRouteLabel(trip.flights)}
                             isFavorite={trip.isFavorite}
-                            status={deriveTripStatus(trip, today)}
-                            roleLabel={MEMBER_ROLE_LABEL[trip.role]}
-                            lengthLabel={formatTripLength({
-                                startDate: trip.startDate,
-                                endDate: trip.endDate,
-                                nights: trip.customNights,
-                                days: trip.customDays,
-                            })}
+                            status={(() => {
+                                const status = deriveTripStatus(trip, today)
+                                return status === null
+                                    ? null
+                                    : {
+                                          tone: status,
+                                          label:
+                                              status === 'upcoming'
+                                                  ? t('status.upcoming', { days: dayjs(trip.startDate).diff(dayjs(today), 'day') })
+                                                  : t(`status.${status}`),
+                                      }
+                            })()}
+                            roleLabel={t(`roles.${trip.role}`)}
+                            lengthLabel={formatTripLength(
+                                {
+                                    startDate: trip.startDate,
+                                    endDate: trip.endDate,
+                                    nights: trip.customNights,
+                                    days: trip.customDays,
+                                },
+                                locale,
+                            )}
                             scheduleCount={trip.scheduleCount}
                             bookingCount={trip.bookingCount}
                             canEdit={trip.role !== 'viewer'}
@@ -108,17 +125,18 @@ export const TripListWidget: FC<TripListWidgetProps> = ({ initialRoute = null })
                 <section className='flex flex-wrap items-stretch gap-px bg-background'>
                     <Button variant='cellPrimary' size='cell' asChild>
                         <Link href={NEW_TRIP_PATH}>
-                            <PlusIcon aria-hidden />새 트립
+                            <PlusIcon aria-hidden />
+                            {t('list.newTrip')}
                         </Link>
                     </Button>
                     <Button variant='cell' size='cell' disabled={createFromTemplate.isPending} onClick={handleCreateSample}>
                         <SparklesIcon aria-hidden />
-                        {createFromTemplate.isPending ? '만드는 중…' : '오사카 예시 트립 만들기'}
+                        {createFromTemplate.isPending ? t('list.creating') : t('list.template')}
                     </Button>
                     {selectedRoute !== null && (
                         <Button variant='cell' size='cell' onClick={() => handleSelectRoute(selectedRoute.key)}>
                             <XIcon aria-hidden />
-                            {`${selectedRoute.codeLabel} 필터 해제`}
+                            {t('list.removeRouteFilter', { code: selectedRoute.codeLabel })}
                         </Button>
                     )}
                     <div aria-hidden className='min-w-0 flex-1 bg-card' />
@@ -135,14 +153,14 @@ export const TripListWidget: FC<TripListWidgetProps> = ({ initialRoute = null })
     useEffect(() => {
         if (tripList.data === undefined) return
         replaceSearchParam(ROUTE_PARAM, selectedRouteKey)
-    }, [selectedRouteKey, tripList.data])
+    }, [activeRouteKey, selectedRouteKey, tripList.data])
 
     return (
         <div className='flex flex-1 flex-col gap-px'>
             <FadeIn as='section' className='flex flex-col gap-1 bg-muted p-3'>
                 <p className='font-mono text-2xs tracking-widest text-muted-foreground uppercase'>TRIPS</p>
-                <h1 className='text-2xl font-semibold tracking-tight'>내 트립</h1>
-                <p className='text-xs text-muted-foreground'>참여 중인 트립을 모아 봅니다. 카드를 열면 일정과 예매 체크리스트로 이동합니다.</p>
+                <h1 className='text-2xl font-semibold tracking-tight'>{t('list.title')}</h1>
+                <p className='text-xs text-muted-foreground'>{t('list.description')}</p>
             </FadeIn>
             <FadeIn as='section' className='bg-card p-3' delay={GLOBE_DELAY}>
                 {globeRoutes.length > 0 ? (
@@ -151,11 +169,11 @@ export const TripListWidget: FC<TripListWidgetProps> = ({ initialRoute = null })
                         variant='panel'
                         dragRotate
                         showTooltip
-                        selectedKey={selectedRoute?.key ?? null}
+                        selectedKey={activeRoute?.key ?? null}
                         onRouteSelect={handleSelectRoute}
                     />
                 ) : (
-                    <p className='py-6 text-center text-xs text-muted-foreground'>목적지나 항공편을 등록하면 전체 경로가 지구본에 표시됩니다.</p>
+                    <p className='py-6 text-center text-xs text-muted-foreground'>{t('list.globeHint')}</p>
                 )}
             </FadeIn>
             {renderTrips()}

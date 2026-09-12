@@ -1,6 +1,7 @@
 'use client'
 
 import type { FC, MouseEvent } from 'react'
+import { useTranslations } from 'next-intl'
 import { useDeleteTrip } from '@/entities/trip/trip.query'
 import {
     AlertDialog,
@@ -21,6 +22,7 @@ type TripDeleteDialogProps = {
 }
 
 export const TripDeleteDialog: FC<TripDeleteDialogProps> = ({ target, onOpenChange }) => {
+    const t = useTranslations('trips.deleteDialog')
     const deleteTrip = useDeleteTrip()
 
     const handleConfirm = (event: MouseEvent<HTMLButtonElement>) => {
@@ -33,17 +35,15 @@ export const TripDeleteDialog: FC<TripDeleteDialogProps> = ({ target, onOpenChan
         <AlertDialog open={target !== null} onOpenChange={onOpenChange}>
             <AlertDialogContent className='rounded-none'>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>트립을 삭제할까요?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        {target?.title ?? ''}의 날짜별 일정과 예매 목록, 멤버가 함께 삭제됩니다. 되돌릴 수 없습니다.
-                    </AlertDialogDescription>
+                    <AlertDialogTitle>{t('title')}</AlertDialogTitle>
+                    <AlertDialogDescription>{t('description', { title: target?.title ?? '' })}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter className='gap-px bg-background sm:ml-auto sm:w-fit'>
                     <AlertDialogCancel variant='cell' size='cell' disabled={deleteTrip.isPending}>
-                        취소
+                        {t('cancel')}
                     </AlertDialogCancel>
                     <AlertDialogAction variant='cellDestructive' size='cell' disabled={deleteTrip.isPending} onClick={handleConfirm}>
-                        {deleteTrip.isPending ? '삭제 중…' : '삭제'}
+                        {deleteTrip.isPending ? t('deleting') : t('delete')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

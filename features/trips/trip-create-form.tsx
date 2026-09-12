@@ -3,6 +3,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon, Trash2Icon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import type { FC } from 'react'
 import { Controller, useFieldArray, useForm, type FieldError } from 'react-hook-form'
 import { tripCreateSchema, type TripCreateInput, type TripCreateValues } from '@/entities/trip/trip.validate'
@@ -27,16 +28,6 @@ const DEFAULT_VALUES: TripCreateInput = {
     destinations: [{ countryCode: DEFAULT_COUNTRY_CODE, city: null }],
 }
 
-const MESSAGE = {
-    title: '제목을 120자 이내로 입력해 주세요.',
-    destination: '목적지를 120자 이내로 입력해 주세요.',
-    eyebrow: '한 줄 소개는 120자 이내로 입력해 주세요.',
-    startDate: '시작일을 선택해 주세요.',
-    endDate: '종료일을 선택해 주세요.',
-    periodNote: '기간 메모는 200자 이내로 입력해 주세요.',
-    destinations: '나라를 한 곳 이상 추가해 주세요.',
-} as const
-
 const resolveMessage = (error: FieldError | undefined, fallback: string) => {
     if (!error) return null
     if (error.type === CUSTOM_ISSUE_TYPE && error.message) return error.message
@@ -51,17 +42,21 @@ type TripCreateFormProps = {
 }
 
 export const TripCreateForm: FC<TripCreateFormProps> = ({ isPending, onSubmit }) => {
+    const t = useTranslations('trips.create')
+    const tValidation = useTranslations('validation')
     const form = useForm<TripCreateInput, unknown, TripCreateValues>({ resolver: zodResolver(tripCreateSchema), defaultValues: DEFAULT_VALUES })
     const rows = useFieldArray({ control: form.control, name: 'destinations', keyName: 'fieldKey' })
 
     const { errors } = form.formState
-    const titleError = resolveMessage(errors.title, MESSAGE.title)
-    const destinationError = resolveMessage(errors.destination, MESSAGE.destination)
-    const eyebrowError = resolveMessage(errors.eyebrow, MESSAGE.eyebrow)
-    const startDateError = resolveMessage(errors.startDate, MESSAGE.startDate)
-    const endDateError = resolveMessage(errors.endDate, MESSAGE.endDate)
-    const periodNoteError = resolveMessage(errors.periodNote, MESSAGE.periodNote)
-    const destinationsError = errors.destinations?.root?.message ?? errors.destinations?.message ?? null
+    const translateError = (message: string | null) =>
+        message?.startsWith('validation.') ? tValidation(message.slice('validation.'.length)) : message
+    const titleError = translateError(resolveMessage(errors.title, tValidation('tripTitleTooLong')))
+    const destinationError = translateError(resolveMessage(errors.destination, tValidation('tripDestinationTooLong')))
+    const eyebrowError = translateError(resolveMessage(errors.eyebrow, tValidation('tripEyebrowTooLong')))
+    const startDateError = translateError(resolveMessage(errors.startDate, tValidation('tripStartDateRequired')))
+    const endDateError = translateError(resolveMessage(errors.endDate, tValidation('tripEndDateRequired')))
+    const periodNoteError = translateError(resolveMessage(errors.periodNote, tValidation('tripPeriodNoteTooLong')))
+    const destinationsError = translateError(errors.destinations?.root?.message ?? errors.destinations?.message ?? null)
 
     const handleSubmit = form.handleSubmit((values) =>
         onSubmit({ ...values, eyebrow: emptyToNull(values.eyebrow), periodNote: emptyToNull(values.periodNote) }),
@@ -71,18 +66,23 @@ export const TripCreateForm: FC<TripCreateFormProps> = ({ isPending, onSubmit })
         <form className='flex flex-col gap-4' noValidate onSubmit={handleSubmit}>
             <FieldGroup className='gap-4'>
                 <Field data-invalid={titleError !== null}>
-                    <FieldLabel htmlFor='trip-title'>제목</FieldLabel>
-                    <Input id='trip-title' aria-invalid={titleError !== null} placeholder='오사카 여행 노트' {...form.register('title')} />
+                    <FieldLabel htmlFor='trip-title'>{t('labels.title')}</FieldLabel>
+                    <Input id='trip-title' aria-invalid={titleError !== null} placeholder={t('placeholders.title')} {...form.register('title')} />
                     <FieldErrorMessage>{titleError}</FieldErrorMessage>
                 </Field>
                 <Field data-invalid={destinationError !== null}>
-                    <FieldLabel htmlFor='trip-destination'>목적지</FieldLabel>
-                    <Input id='trip-destination' aria-invalid={destinationError !== null} placeholder='오사카' {...form.register('destination')} />
+                    <FieldLabel htmlFor='trip-destination'>{t('labels.destination')}</FieldLabel>
+                    <Input
+                        id='trip-destination'
+                        aria-invalid={destinationError !== null}
+                        placeholder={t('placeholders.destination')}
+                        {...form.register('destination')}
+                    />
                     <FieldErrorMessage>{destinationError}</FieldErrorMessage>
                 </Field>
                 <Field data-invalid={destinationsError !== null}>
-                    <FieldLabel htmlFor='trip-country-0'>나라</FieldLabel>
-                    <FieldDescription className='text-xs'>여행하는 순서대로 나라와 도시를 추가하세요. 지구본 경로에 사용됩니다.</FieldDescription>
+                    <FieldLabel htmlFor='trip-country-0'>{t('labels.country')}</FieldLabel>
+                    <FieldDescription className='text-xs'>{t('labels.countryHint')}</FieldDescription>
                     <div className='flex flex-col gap-2'>
                         {rows.fields.map((row, index) => (
                             <div key={row.fieldKey} className='flex items-center gap-2'>
@@ -103,9 +103,9 @@ export const TripCreateForm: FC<TripCreateFormProps> = ({ isPending, onSubmit })
                                     )}
                                 />
                                 <Input
-                                    aria-label={`${index + ROW_NUMBER_OFFSET}번째 도시`}
+                                    aria-label={t('labels.city', { index: index + ROW_NUMBER_OFFSET })}
                                     className='min-w-0 flex-1'
-                                    placeholder='도시 (선택)'
+                                    placeholder={t('labels.cityOptional')}
                                     maxLength={TRIP_DESTINATION_CITY_MAX_LENGTH}
                                     aria-invalid={errors.destinations?.[index]?.city !== undefined}
                                     {...form.register(`destinations.${index}.city`, { setValueAs: emptyToNull })}
@@ -115,7 +115,7 @@ export const TripCreateForm: FC<TripCreateFormProps> = ({ isPending, onSubmit })
                                     type='button'
                                     variant='ghost'
                                     size='icon-sm'
-                                    aria-label={`${index + ROW_NUMBER_OFFSET}번째 나라 삭제`}
+                                    aria-label={t('labels.removeCountry', { index: index + ROW_NUMBER_OFFSET })}
                                     disabled={rows.fields.length <= TRIP_DESTINATION_MIN_COUNT}
                                     onClick={() => rows.remove(index)}>
                                     <Trash2Icon aria-hidden />
@@ -129,36 +129,36 @@ export const TripCreateForm: FC<TripCreateFormProps> = ({ isPending, onSubmit })
                                 size='cell'
                                 onClick={() => rows.append({ countryCode: DEFAULT_COUNTRY_CODE, city: null })}>
                                 <PlusIcon aria-hidden />
-                                나라 추가
+                                {t('labels.addCountry')}
                             </Button>
                         </div>
                     </div>
                     <FieldErrorMessage>{destinationsError}</FieldErrorMessage>
                 </Field>
                 <Field data-invalid={eyebrowError !== null}>
-                    <FieldLabel htmlFor='trip-eyebrow'>한 줄 소개</FieldLabel>
+                    <FieldLabel htmlFor='trip-eyebrow'>{t('labels.eyebrow')}</FieldLabel>
                     <Input id='trip-eyebrow' aria-invalid={eyebrowError !== null} placeholder='KANSAI / OCTOBER 2026' {...form.register('eyebrow')} />
-                    <FieldDescription className='text-xs'>목록과 상세 화면의 제목 위에 표시됩니다. 비워 둬도 됩니다.</FieldDescription>
+                    <FieldDescription className='text-xs'>{t('labels.eyebrowHint')}</FieldDescription>
                     <FieldErrorMessage>{eyebrowError}</FieldErrorMessage>
                 </Field>
                 <div className='grid gap-4 sm:grid-cols-2'>
                     <Field data-invalid={startDateError !== null}>
-                        <FieldLabel htmlFor='trip-start-date'>시작일</FieldLabel>
+                        <FieldLabel htmlFor='trip-start-date'>{t('labels.startDate')}</FieldLabel>
                         <Input id='trip-start-date' type='date' aria-invalid={startDateError !== null} {...form.register('startDate')} />
                         <FieldErrorMessage>{startDateError}</FieldErrorMessage>
                     </Field>
                     <Field data-invalid={endDateError !== null}>
-                        <FieldLabel htmlFor='trip-end-date'>종료일</FieldLabel>
+                        <FieldLabel htmlFor='trip-end-date'>{t('labels.endDate')}</FieldLabel>
                         <Input id='trip-end-date' type='date' aria-invalid={endDateError !== null} {...form.register('endDate')} />
                         <FieldErrorMessage>{endDateError}</FieldErrorMessage>
                     </Field>
                 </div>
                 <Field data-invalid={periodNoteError !== null}>
-                    <FieldLabel htmlFor='trip-period-note'>기간 메모</FieldLabel>
+                    <FieldLabel htmlFor='trip-period-note'>{t('labels.periodNote')}</FieldLabel>
                     <Input
                         id='trip-period-note'
                         aria-invalid={periodNoteError !== null}
-                        placeholder='6박 7일 · 예비일 하루'
+                        placeholder={t('placeholders.periodNote')}
                         {...form.register('periodNote')}
                     />
                     <FieldErrorMessage>{periodNoteError}</FieldErrorMessage>
@@ -166,7 +166,7 @@ export const TripCreateForm: FC<TripCreateFormProps> = ({ isPending, onSubmit })
             </FieldGroup>
             <div className='flex w-fit gap-px self-end bg-background'>
                 <Button type='submit' variant='cellPrimary' size='cell' disabled={isPending}>
-                    {isPending ? '만드는 중…' : '트립 만들기'}
+                    {isPending ? t('labels.submitting') : t('labels.submit')}
                 </Button>
             </div>
         </form>
