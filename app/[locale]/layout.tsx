@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { setRequestLocale } from 'next-intl/server'
 import type { Metadata, Viewport } from 'next'
 import type { FC, PropsWithChildren } from 'react'
-import { routing } from '@/i18n/routing'
+import { openGraphLocale, routing } from '@/i18n/routing'
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/shared/constant/site'
 import { QueryProvider } from '@/shared/lib/query-provider'
 import { MotionProvider } from '@/shared/ui/motion-provider'
@@ -18,8 +18,6 @@ export const generateStaticParams = () => routing.locales.map((locale) => ({ loc
 interface LocaleLayoutProps extends PropsWithChildren {
     params: Promise<{ locale: string }>
 }
-
-const openGraphLocale = (locale: string) => (locale === 'ja' ? 'ja_JP' : locale === 'en' ? 'en_US' : 'ko_KR')
 
 export const generateMetadata = async ({ params }: LocaleLayoutProps): Promise<Metadata> => {
     const { locale } = await params
