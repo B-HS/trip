@@ -54,6 +54,41 @@ describe('JSON-LD builders', () => {
         expect(result.arrivalTime).toBe('2026-04-05T16:00:00')
     })
 
+    test('emits valid standalone Flight and LodgingBusiness graph nodes', () => {
+        const result = buildTouristTripJsonLd(
+            {
+                ...trip,
+                flights: [
+                    {
+                        id: 'flight-1',
+                        direction: 'outbound',
+                        label: 'Outbound',
+                        flightNumber: 'KE123',
+                        departTime: '09:30',
+                        arriveTime: '11:00',
+                        departCode: 'ICN',
+                        arriveCode: 'KIX',
+                    },
+                ],
+                lodgings: [{ id: 'lodging-1', name: 'Kyoto Hotel', address: '1 Kyoto St', url: 'https://example.com/hotel' }],
+            } as never,
+            'https://trip.gumyo.net/s/kyoto',
+        )
+
+        expect(result.mentions).toEqual([
+            { '@id': 'https://trip.gumyo.net/s/kyoto#flight-flight-1' },
+            { '@id': 'https://trip.gumyo.net/s/kyoto#lodging-lodging-1' },
+        ])
+        expect(result['@graph']).toEqual([
+            expect.objectContaining({
+                '@type': 'Flight',
+                'departureAirport': { '@type': 'Airport', 'identifier': 'ICN' },
+                'arrivalAirport': { '@type': 'Airport', 'identifier': 'KIX' },
+            }),
+            expect.objectContaining({ '@type': 'LodgingBusiness', 'address': { '@type': 'PostalAddress', 'streetAddress': '1 Kyoto St' } }),
+        ])
+    })
+
     test('uses Article for posts and QAPage only for questions', () => {
         const post = {
             title: 'Where should I stay?',

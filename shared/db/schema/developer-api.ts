@@ -52,7 +52,11 @@ export const developerApiIdempotency = tripTable(
         claimedAt: timestamp('claimed_at', { fsp: 3 }).defaultNow().notNull(),
         completedAt: timestamp('completed_at', { fsp: 3 }),
     },
-    (table) => [primaryKey({ columns: [table.tokenId, table.idempotencyKey] }), index('developer_api_idempotency_claimed_idx').on(table.claimedAt)],
+    (table) => [
+        primaryKey({ columns: [table.tokenId, table.idempotencyKey] }),
+        index('developer_api_idempotency_claimed_idx').on(table.claimedAt),
+        index('developer_api_idempotency_completed_idx').on(table.completedAt),
+    ],
 )
 
 export const developerApiRateLimit = tripTable(

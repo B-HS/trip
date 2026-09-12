@@ -1,7 +1,7 @@
 import 'server-only'
-import { count, eq, inArray, type SQL } from 'drizzle-orm'
+import { count, eq, inArray, sql, type SQL } from 'drizzle-orm'
 import { getTripRole } from '@/entities/trip/trip.access'
-import { insertTemplateDays, removableIds, touchTrip } from '@/entities/trip/trip.repository.days'
+import { insertTemplateDays, lockTrip, removableIds, touchTrip } from '@/entities/trip/trip.repository.days'
 import { resolveTripRole } from '@/entities/trip/trip.role'
 import type { CreatedTrip, PublicTrip, ShareSettings, TripDetail, TripSummary, TripTransaction } from '@/entities/trip/trip.type'
 import type {
@@ -293,6 +293,7 @@ const replaceScheduleKindUsage = async (tx: TripTransaction, removableId: string
 
 export const saveScheduleKinds = async (tripId: string, list: ScheduleKindValues[], replacements: Record<string, string>) => {
     await getDb().transaction(async (tx) => {
+        await lockTrip(tx, tripId)
         const existing = await tx.select({ id: tripScheduleKind.id }).from(tripScheduleKind).where(eq(tripScheduleKind.tripId, tripId))
         const existingIds = new Set(existing.map((row) => row.id))
         const removable = removableIds(existing, list)
@@ -421,32 +422,46 @@ export const findPublicTripBySlug = async (slug: string) => {
 
 export const createTrip = async (ownerId: string, basics: TripBasicsValues, destinations: DestinationValues[], locale = 'ko') => {
     const id = crypto.randomUUID()
-    await getDb().transaction(async (tx) => {
-        await tx.insert(trip).values({ ...toTripValues(basics), id, ownerId })
-        await tx.insert(tripMember).values({ tripId: id, userId: ownerId, role: 'owner' })
-        await insertScheduleKinds(tx, id, getDefaultScheduleKinds(locale))
-        await reconcileDestinations(tx, id, destinations)
-    })
+    await getDb().transaction((tx) => createTripInTransaction(tx, ownerId, basics, destinations, locale, id))
+    return { id } satisfies CreatedTrip
+}
+
+export const createTripInTransaction = async (
+    tx: TripTransaction,
+    ownerId: string,
+    basics: TripBasicsValues,
+    destinations: DestinationValues[],
+    locale = 'ko',
+    id = crypto.randomUUID(),
+) => {
+    await tx.insert(trip).values({ ...toTripValues(basics), id, ownerId })
+    await tx.insert(tripMember).values({ tripId: id, userId: ownerId, role: 'owner' })
+    await insertScheduleKinds(tx, id, getDefaultScheduleKinds(locale))
+    await reconcileDestinations(tx, id, destinations)
     return { id } satisfies CreatedTrip
 }
 
 export const createTripFromTemplate = async (ownerId: string, template: TripTemplate) => {
     const id = crypto.randomUUID()
-    await getDb().transaction(async (tx) => {
-        await tx.insert(trip).values({ ...toTripValues(template), sidebarNote: template.sidebarNote, id, ownerId })
-        await tx.insert(tripMember).values({ tripId: id, userId: ownerId, role: 'owner' })
-        await reconcileDestinations(tx, id, template.destinations)
-        await reconcileFlights(tx, id, template.flights)
-        await reconcileLodgings(tx, id, template.lodgings)
-        await reconcileSidebarLinks(tx, id, template.sidebarLinks)
-        await insertTemplateDays(tx, id, template.days, await insertScheduleKinds(tx, id, template.scheduleKinds))
-        await reconcileBookings(tx, id, template.bookings)
-        await reconcileInfoSections(tx, id, template.infoSections)
-    })
+    await getDb().transaction((tx) => createTripFromTemplateInTransaction(tx, ownerId, template, id))
+    return { id } satisfies CreatedTrip
+}
+
+export const createTripFromTemplateInTransaction = async (tx: TripTransaction, ownerId: string, template: TripTemplate, id = crypto.randomUUID()) => {
+    await tx.insert(trip).values({ ...toTripValues(template), sidebarNote: template.sidebarNote, id, ownerId })
+    await tx.insert(tripMember).values({ tripId: id, userId: ownerId, role: 'owner' })
+    await reconcileDestinations(tx, id, template.destinations)
+    await reconcileFlights(tx, id, template.flights)
+    await reconcileLodgings(tx, id, template.lodgings)
+    await reconcileSidebarLinks(tx, id, template.sidebarLinks)
+    await insertTemplateDays(tx, id, template.days, await insertScheduleKinds(tx, id, template.scheduleKinds))
+    await reconcileBookings(tx, id, template.bookings)
+    await reconcileInfoSections(tx, id, template.infoSections)
     return { id } satisfies CreatedTrip
 }
 
 const replaceTripFromTemplateInTransaction = async (tx: TripTransaction, tripId: string, template: TripTemplate) => {
+    await lockTrip(tx, tripId)
     await tx
         .update(trip)
         .set({ ...toTripValues(template), sidebarNote: template.sidebarNote })
@@ -460,6 +475,7 @@ const replaceTripFromTemplateInTransaction = async (tx: TripTransaction, tripId:
     await insertTemplateDays(tx, tripId, template.days, await insertScheduleKinds(tx, tripId, template.scheduleKinds))
     const keys = await reconcileBookings(tx, tripId, template.bookings)
     await reconcileInfoSections(tx, tripId, template.infoSections)
+    await touchTrip(tx, tripId)
     return keys
 }
 
@@ -480,10 +496,38 @@ export const replaceTripFromTemplateIfUnchanged = async (tripId: string, templat
     return { id: tripId } satisfies CreatedTrip
 }
 
+export const replaceTripFromTemplateIfUnchangedInTransaction = async (
+    tx: TripTransaction,
+    tripId: string,
+    template: TripTemplate,
+    expectedUpdatedAt: string,
+) => {
+    const [current] = await tx.select({ updatedAt: trip.updatedAt }).from(trip).where(eq(trip.id, tripId)).for('update')
+    if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+    if (current.updatedAt.toISOString() !== expectedUpdatedAt) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
+    await replaceTripFromTemplateInTransaction(tx, tripId, template)
+    return { id: tripId } satisfies CreatedTrip
+}
+
+export const replaceTripFromTemplateIfRevisionUnchangedInTransaction = async (
+    tx: TripTransaction,
+    tripId: string,
+    template: TripTemplate,
+    expectedRevision: number,
+) => {
+    const [current] = await tx.select({ revision: trip.revision }).from(trip).where(eq(trip.id, tripId)).for('update')
+    if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+    if (current.revision !== expectedRevision) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
+    await replaceTripFromTemplateInTransaction(tx, tripId, template)
+    return { id: tripId } satisfies CreatedTrip
+}
+
 export const saveTripBasics = async (tripId: string, basics: TripBasicsValues, destinations: DestinationValues[]) => {
     await getDb().transaction(async (tx) => {
+        await lockTrip(tx, tripId)
         await tx.update(trip).set(toTripValues(basics)).where(eq(trip.id, tripId))
         await reconcileDestinations(tx, tripId, destinations)
+        await touchTrip(tx, tripId)
     })
 }
 
@@ -492,16 +536,26 @@ export const deleteTrip = async (tripId: string) => {
 }
 
 export const deleteTripIfUnchanged = async (tripId: string, expectedUpdatedAt: string) => {
-    await getDb().transaction(async (tx) => {
-        const [current] = await tx.select({ updatedAt: trip.updatedAt }).from(trip).where(eq(trip.id, tripId)).for('update')
-        if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
-        if (current.updatedAt.toISOString() !== expectedUpdatedAt) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
-        await tx.delete(trip).where(eq(trip.id, tripId))
-    })
+    await getDb().transaction((tx) => deleteTripIfUnchangedInTransaction(tx, tripId, expectedUpdatedAt))
+}
+
+export const deleteTripIfUnchangedInTransaction = async (tx: TripTransaction, tripId: string, expectedUpdatedAt: string) => {
+    const [current] = await tx.select({ updatedAt: trip.updatedAt }).from(trip).where(eq(trip.id, tripId)).for('update')
+    if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+    if (current.updatedAt.toISOString() !== expectedUpdatedAt) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
+    await tx.delete(trip).where(eq(trip.id, tripId))
+}
+
+export const deleteTripIfRevisionUnchangedInTransaction = async (tx: TripTransaction, tripId: string, expectedRevision: number) => {
+    const [current] = await tx.select({ revision: trip.revision }).from(trip).where(eq(trip.id, tripId)).for('update')
+    if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+    if (current.revision !== expectedRevision) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
+    await tx.delete(trip).where(eq(trip.id, tripId))
 }
 
 export const saveFlights = async (tripId: string, list: FlightValues[]) => {
     await getDb().transaction(async (tx) => {
+        await lockTrip(tx, tripId)
         await reconcileFlights(tx, tripId, list)
         await touchTrip(tx, tripId)
     })
@@ -509,6 +563,7 @@ export const saveFlights = async (tripId: string, list: FlightValues[]) => {
 
 export const saveLodgings = async (tripId: string, list: LodgingValues[]) => {
     await getDb().transaction(async (tx) => {
+        await lockTrip(tx, tripId)
         await reconcileLodgings(tx, tripId, list)
         await touchTrip(tx, tripId)
     })
@@ -516,6 +571,7 @@ export const saveLodgings = async (tripId: string, list: LodgingValues[]) => {
 
 export const saveSidebar = async (tripId: string, input: SidebarValues) => {
     await getDb().transaction(async (tx) => {
+        await lockTrip(tx, tripId)
         await tx.update(trip).set({ sidebarNote: input.sidebarNote }).where(eq(trip.id, tripId))
         await reconcileSidebarLinks(tx, tripId, input.links)
         await touchTrip(tx, tripId)
@@ -524,6 +580,7 @@ export const saveSidebar = async (tripId: string, input: SidebarValues) => {
 
 export const saveBookings = async (tripId: string, list: BookingValues[]) => {
     const removedKeys = await getDb().transaction(async (tx) => {
+        await lockTrip(tx, tripId)
         const keys = await reconcileBookings(tx, tripId, list)
         await touchTrip(tx, tripId)
         return keys
@@ -533,6 +590,7 @@ export const saveBookings = async (tripId: string, list: BookingValues[]) => {
 
 export const saveInfoSections = async (tripId: string, list: InfoSectionValues[]) => {
     await getDb().transaction(async (tx) => {
+        await lockTrip(tx, tripId)
         await reconcileInfoSections(tx, tripId, list)
         await touchTrip(tx, tripId)
     })
@@ -570,11 +628,20 @@ const resolveShareSlug = async (tripId: string, current: { shareSlug: string | n
 
 export const updateShareSettings = async (tripId: string, input: ShareSettingsValues) => {
     const db = getDb()
-    const [current] = await db.select({ shareSlug: trip.shareSlug, destination: trip.destination }).from(trip).where(eq(trip.id, tripId))
-    if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
-    const slug = await resolveShareSlug(tripId, current, input.slug)
-    await db.update(trip).set({ shareSlug: slug, isPublic: input.isPublic }).where(eq(trip.id, tripId))
-    return { slug, isPublic: input.isPublic } satisfies ShareSettings
+    return db.transaction(async (tx) => {
+        const [current] = await tx
+            .select({ shareSlug: trip.shareSlug, destination: trip.destination })
+            .from(trip)
+            .where(eq(trip.id, tripId))
+            .for('update')
+        if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+        const slug = await resolveShareSlug(tripId, current, input.slug)
+        await tx
+            .update(trip)
+            .set({ shareSlug: slug, isPublic: input.isPublic, updatedAt: new Date(), revision: sql`${trip.revision} + 1` })
+            .where(eq(trip.id, tripId))
+        return { slug, isPublic: input.isPublic } satisfies ShareSettings
+    })
 }
 
 export const exportTripTemplate = async (tripId: string) => {

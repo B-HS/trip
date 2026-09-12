@@ -8,7 +8,7 @@ import { listProviderModels, generateProviderText } from '@/entities/ai/ai.provi
 import type { AiKeyStatus, AiModel, AiProposalChange } from '@/entities/ai/ai.types'
 import { AI_MAX_ERROR_LENGTH, AI_MODEL_CACHE_TTL_MS, type AiJobKind, type AiProvider, type AiReasoningEffort } from '@/shared/constant/ai'
 import { getDb } from '@/shared/db/client'
-import { tripAiConversation, tripAiJob, tripAiKey, tripAiMessage, tripAiProposal, tripAiUsage } from '@/shared/db/schema/ai'
+import { tripAiConversation, tripAiDispatch, tripAiJob, tripAiKey, tripAiMessage, tripAiProposal, tripAiUsage } from '@/shared/db/schema/ai'
 import { trip as tripTable } from '@/shared/db/schema/trip'
 import { decryptSecret, encryptSecret } from '@/shared/lib/crypto'
 import { ApiError } from '@/shared/lib/api-response'
@@ -107,6 +107,7 @@ export const createAiJob = async (userId: string, input: NewJob) => {
         }
         await tx.insert(tripAiMessage).values({ id: messageId, conversationId, role: 'user', content: input.prompt })
         await tx.insert(tripAiJob).values({ id: jobId, conversationId, userMessageId: messageId, kind: input.kind, status: 'queued', attempts: 0 })
+        await tx.insert(tripAiDispatch).values({ jobId, status: 'queued', attempts: 0 })
     })
     return { jobId, conversationId, messageId }
 }
@@ -295,7 +296,7 @@ export const processAiJob = async (jobId: string) => {
                 const changes = proposalChanges(extractJson(result.text))
                 const proposalId = crypto.randomUUID()
                 const [proposalTrip] = await tx
-                    .select({ updatedAt: tripTable.updatedAt })
+                    .select({ revision: tripTable.revision, updatedAt: tripTable.updatedAt })
                     .from(tripTable)
                     .where(eq(tripTable.id, conversation.tripId))
                     .limit(1)
@@ -306,6 +307,7 @@ export const processAiJob = async (jobId: string) => {
                     tripId: conversation.tripId,
                     status: 'pending',
                     changes,
+                    baseTripRevision: proposalTrip?.revision ?? null,
                     baseTripUpdatedAt: proposalTrip?.updatedAt ?? null,
                 })
                 await tx
@@ -456,13 +458,13 @@ export const applyAiProposal = async (userId: string, proposalId: string) => {
                 .for('update')
             if (!lockedProposal || !lockedProposal.leaseExpiresAt || lockedProposal.leaseExpiresAt.getTime() <= Date.now()) return false
             const [currentTrip] = await tx
-                .select({ updatedAt: tripTable.updatedAt })
+                .select({ revision: tripTable.revision, updatedAt: tripTable.updatedAt })
                 .from(tripTable)
                 .where(eq(tripTable.id, trip.id))
                 .limit(1)
                 .for('update')
             if (!currentTrip) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
-            if (rows[0].proposal.baseTripUpdatedAt && currentTrip.updatedAt.getTime() !== rows[0].proposal.baseTripUpdatedAt.getTime())
+            if (rows[0].proposal.baseTripRevision !== null && currentTrip.revision !== rows[0].proposal.baseTripRevision)
                 throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
             for (const day of validatedDays) await saveDayInTransaction(tx, trip.id, day)
             await tx

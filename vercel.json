@@ -3,5 +3,6 @@
         "app/api/queues/ai-job/route.ts": {
             "experimentalTriggers": [{ "type": "queue/v2beta", "topic": "ai-job" }]
         }
-    }
+    },
+    "crons": [{ "path": "/api/cron/ai-dispatch", "schedule": "*/5 * * * *" }]
 }

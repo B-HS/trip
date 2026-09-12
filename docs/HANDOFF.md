@@ -6,7 +6,7 @@
 
 `/api/v1` owner-scoped trip API와 `/api/v1/openapi.json`, `/developers`, `/settings/api` 토큰 lifecycle UI가 구현되었다(ADR-0041). Personal access token 원문은 한 번만 반환하고 SHA-256 hash만 저장하며, `trips:read`·`trips:write`·`token:inspect` scope와 bearer-only parsing, token별 read/write durable fixed-window limit, mutation idempotency key를 적용한다. 검증된 도메인 서비스와 `tripTemplateSchema`를 재사용하므로 멤버 트립·공개 링크로 권한이 확장되지 않는다.
 
-통합 시 `0010_trip-consent.sql` → `0011_ai.sql` → `0012_developer-api-tokens.sql` 순서로 journal과 snapshot이 일치하는지 확인한다. 운영 배포 전 `/api/v1/openapi.json`, 401/403/404/412/428/429 계약, 토큰 원문 로그 미노출, owner-only 결과를 smoke test한다.
+통합 시 `0010_trip-consent.sql` → `0011_ai.sql` → `0012_developer-api-tokens.sql` 순서로 journal과 snapshot이 일치하는지 확인한다. **0011/0012는 아직 운영 DB에 적용하지 않은 release precondition**이며, 0012에는 AI dispatch outbox·trip revision·idempotency retention index도 포함된다. 운영 배포 전 `/api/v1/openapi.json`, 401/403/404/412/428/429 계약, 토큰 원문 로그 미노출, owner-only 결과를 smoke test한다.
 
 ## 1. 프로젝트 한 줄 정의
 
@@ -46,7 +46,7 @@
 
 ### 운영 후속
 
-1. 운영 환경변수 주입, 마이그레이션 0010→0011→0012 적용, Cloudflare Email Service 실제 발송 및 OAuth 콜백 스모크.
+1. 운영 환경변수 주입(`CRON_SECRET` 포함), 마이그레이션 0010→0011→0012 적용, Cloudflare Email Service 실제 발송 및 OAuth 콜백 스모크.
 2. Vercel queue/provider, SEO robots/sitemap/JSON-LD, developer API 401/403/404/429와 owner-only 결과 smoke.
 
 ## 4. 의사결정 요약 (상세·기각 대안은 `docs/acknowledge/`)

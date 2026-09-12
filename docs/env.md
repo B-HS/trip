@@ -21,6 +21,7 @@
 | `VERCEL_QUEUE_REGION`                       | 선택(7단계)    | Vercel Queues SDK/REST 지역                                                        | Vercel Queues 프로젝트 지역(예: `iad1`)                                        | O           | O                 | X         |
 | `VERCEL_QUEUE_TOKEN`                        | 선택(7단계)    | SDK가 없는 로컬·REST queue publish bearer 토큰                                     | Vercel OIDC/Queues 설정에서 발급한 토큰                                        | O           | O                 | X         |
 | `VERCEL_QUEUE_URL`                          | 선택(7단계)    | `@vercel/queue` SDK가 없는 로컬·REST fallback endpoint                             | region-specific `https://<region>.vercel-queue.com`                            | O           | O                 | X         |
+| `CRON_SECRET`                               | 선택(7단계)    | AI outbox retry 및 idempotency cleanup cron 인증                                   | 운영용 난수 secret을 Vercel 환경변수에 설정                                    | O           | O                 | X         |
 | `AI_PROVIDER_MOCK`                          | 테스트 전용    | provider 네트워크 호출을 하지 않는 결정적 fake 응답                                | 테스트 실행 시에만 `1`; 운영에는 설정하지 않음                                 | O           | X                 | X         |
 | `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | 선택(6단계)    | GitHub 소셜 로그인. 두 값을 모두 넣을 때만 로그인 화면에 표시                      | GitHub Settings → Developer settings → OAuth Apps                              | O           | O                 | X         |
 | `NAVER_CLIENT_ID` / `NAVER_CLIENT_SECRET`   | 선택(6단계)    | 네이버 소셜 로그인. 두 값을 모두 넣을 때만 로그인 화면에 표시                      | 네이버 개발자센터 → 애플리케이션 등록                                          | O           | O                 | X         |
@@ -69,6 +70,7 @@ APP_ENCRYPTION_KEY=
 VERCEL_QUEUE_REGION=
 VERCEL_QUEUE_TOKEN=
 VERCEL_QUEUE_URL=
+CRON_SECRET=
 AI_PROVIDER_MOCK=
 
 # 선택 — OAuth. ID와 secret을 모두 채운 provider만 로그인 화면에 표시된다

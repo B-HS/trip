@@ -101,8 +101,11 @@ export const etagForUpdatedAt = (updatedAt: Date | string) => {
     return `"${createHash('sha256').update(value).digest('base64url')}"`
 }
 
-export const requireIfMatch = (request: Request, updatedAt: Date | string) => {
+export const etagForRevision = (revision: number) => `"${createHash('sha256').update(`revision:${revision}`).digest('base64url')}"`
+
+export const requireIfMatch = (request: Request, expected: Date | string | number) => {
     const value = request.headers.get('if-match')
     if (!value) throw new ApiError('PRECONDITION_REQUIRED', 'error.ifMatchRequired')
-    if (value !== etagForUpdatedAt(updatedAt)) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
+    const expectedTag = typeof expected === 'number' ? etagForRevision(expected) : etagForUpdatedAt(expected)
+    if (value !== expectedTag) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
 }

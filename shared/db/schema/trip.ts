@@ -54,6 +54,7 @@ export const trip = tripTable(
         shareSlug: varchar('share_slug', { length: 64 }),
         isPublic: boolean('is_public').default(false).notNull(),
         likeCount: int('like_count').notNull().default(0),
+        revision: int('revision').notNull().default(0),
         createdAt: createdAt(),
         updatedAt: updatedAt(),
     },

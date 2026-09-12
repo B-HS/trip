@@ -1,5 +1,5 @@
 import 'server-only'
-import { and, desc, eq, inArray } from 'drizzle-orm'
+import { and, desc, eq, inArray, sql } from 'drizzle-orm'
 import type { SavedDay, SavedRow, TripTransaction } from '@/entities/trip/trip.type'
 import type { DayFactValues, DayNoteValues, DayValues, RouteValues, ScheduleItemValues } from '@/entities/trip/trip.validate'
 import { getDb } from '@/shared/db/client'
@@ -13,7 +13,15 @@ type DayFields = Omit<DayValues, 'id' | 'facts' | 'routes' | 'scheduleItems' | '
 type DayChildren = Pick<DayValues, 'facts' | 'routes' | 'scheduleItems' | 'notes'>
 
 export const touchTrip = async (tx: TripTransaction, tripId: string) => {
-    await tx.update(trip).set({ updatedAt: new Date() }).where(eq(trip.id, tripId))
+    await tx
+        .update(trip)
+        .set({ updatedAt: new Date(), revision: sql`${trip.revision} + 1` })
+        .where(eq(trip.id, tripId))
+}
+
+export const lockTrip = async (tx: TripTransaction, tripId: string) => {
+    const [row] = await tx.select({ id: trip.id }).from(trip).where(eq(trip.id, tripId)).limit(1).for('update')
+    if (!row) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
 }
 
 export const removableIds = (existing: Array<{ id: string }>, items: Array<{ id?: string }>) => {
@@ -194,6 +202,7 @@ const upsertDay = async (tx: TripTransaction, tripId: string, input: DayValues) 
 }
 
 export const saveDayInTransaction = async (tx: TripTransaction, tripId: string, input: DayValues) => {
+    await lockTrip(tx, tripId)
     const dayId = await upsertDay(tx, tripId, input)
     const children = await saveDayChildren(tx, tripId, dayId, input)
     await touchTrip(tx, tripId)
@@ -204,6 +213,7 @@ export const saveDay = async (tripId: string, input: DayValues) => getDb().trans
 
 export const deleteDay = async (tripId: string, dayId: string) => {
     await getDb().transaction(async (tx) => {
+        await lockTrip(tx, tripId)
         await tx.delete(tripDay).where(and(eq(tripDay.id, dayId), eq(tripDay.tripId, tripId)))
         await touchTrip(tx, tripId)
     })
@@ -211,6 +221,7 @@ export const deleteDay = async (tripId: string, dayId: string) => {
 
 export const reorderDays = async (tripId: string, dayIds: string[]) => {
     await getDb().transaction(async (tx) => {
+        await lockTrip(tx, tripId)
         const rows = await tx.select({ id: tripDay.id }).from(tripDay).where(eq(tripDay.tripId, tripId))
         const known = new Set(rows.map((row) => row.id))
         const ordered = dayIds.filter((dayId) => known.has(dayId))

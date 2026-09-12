@@ -1,18 +1,25 @@
 import { tripTemplateSchema } from '@/shared/lib/trip-template'
 import { assertTripAccess } from '@/entities/trip/trip.access'
-import { findTripDetail, replaceTripFromTemplateIfUnchanged, deleteTripIfUnchanged } from '@/entities/trip/trip.repository'
+import {
+    deleteTripIfRevisionUnchangedInTransaction,
+    findTripDetail,
+    replaceTripFromTemplateIfRevisionUnchangedInTransaction,
+} from '@/entities/trip/trip.repository'
 import { assertDeveloperApiScope } from '@/shared/lib/developer-api-token'
 import {
     developerApiResponse,
-    etagForUpdatedAt,
+    etagForRevision,
     requireConfirmation,
     requireIfMatch,
     withDeveloperApi,
     parseJson,
     requireIdempotencyKey,
 } from '@/shared/lib/developer-api-handler'
-import { claimIdempotency, completeIdempotency, releaseIdempotency, requestFingerprint } from '@/shared/lib/api-idempotency'
+import { requestFingerprint, runIdempotentMutation } from '@/shared/lib/api-idempotency'
 import { ApiError } from '@/shared/lib/api-response'
+import { eq } from 'drizzle-orm'
+import { trip as tripTable } from '@/shared/db/schema/trip'
+import { toDeveloperTripDetail } from '@/shared/lib/developer-api-dto'
 
 type Context = { params: Promise<{ tripId: string }> }
 
@@ -25,7 +32,7 @@ export const GET = async (request: Request, context: Context) =>
         await assertTripAccess(tripId, auth.userId, 'own')
         const detail = await findTripDetail(tripId)
         if (detail === null) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
-        return developerApiResponse(detail, { headers: { ETag: etagForUpdatedAt(detail.updatedAt) } })
+        return developerApiResponse(toDeveloperTripDetail(detail), { headers: { ETag: etagForRevision(detail.revision) } })
     })
 
 export const PUT = async (request: Request, context: Context) =>
@@ -35,15 +42,12 @@ export const PUT = async (request: Request, context: Context) =>
         const key = requireIdempotencyKey(request)
         const body = await parseJson(request)
         const hash = await requestFingerprint(request, body)
-        const claim = await claimIdempotency(auth.tokenId, key, hash)
-        if (claim.replay) return developerApiResponse(claim.replay.response, { status: claim.replay.status, headers: claim.replay.headers })
-        let mutationCommitted = false
-        try {
+        const result = await runIdempotentMutation(auth.tokenId, key, hash, async (tx) => {
             requireConfirmation(request, 'replace')
             await assertTripAccess(tripId, auth.userId, 'own')
             const current = await findTripDetail(tripId)
             if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
-            requireIfMatch(request, current.updatedAt)
+            requireIfMatch(request, current.revision)
             if (
                 !body ||
                 typeof body !== 'object' ||
@@ -52,16 +56,12 @@ export const PUT = async (request: Request, context: Context) =>
             )
                 throw new ApiError('VALIDATION_ERROR', 'error.invalidInput')
             const template = tripTemplateSchema.parse(body)
-            const saved = await replaceTripFromTemplateIfUnchanged(tripId, template, current.updatedAt)
-            mutationCommitted = true
-            const updated = await findTripDetail(tripId)
-            const responseHeaders: Record<string, string> = updated ? { ETag: etagForUpdatedAt(updated.updatedAt) } : {}
-            await completeIdempotency(auth.tokenId, key, hash, claim.claimNonce, saved, 200, responseHeaders)
-            return developerApiResponse(saved, { headers: responseHeaders })
-        } catch (error) {
-            if (!mutationCommitted) await releaseIdempotency(auth.tokenId, key, hash, claim.claimNonce)
-            throw error
-        }
+            const saved = await replaceTripFromTemplateIfRevisionUnchangedInTransaction(tx, tripId, template, current.revision)
+            const [updated] = await tx.select({ revision: tripTable.revision }).from(tripTable).where(eq(tripTable.id, tripId)).limit(1)
+            const responseHeaders: Record<string, string> = updated ? { ETag: etagForRevision(updated.revision) } : {}
+            return { response: saved, headers: responseHeaders }
+        })
+        return developerApiResponse(result.response, { status: result.status, headers: result.headers })
     })
 
 export const DELETE = async (request: Request, context: Context) =>
@@ -70,22 +70,15 @@ export const DELETE = async (request: Request, context: Context) =>
         const tripId = await idFor(context)
         const key = requireIdempotencyKey(request)
         const hash = await requestFingerprint(request, null)
-        const claim = await claimIdempotency(auth.tokenId, key, hash)
-        if (claim.replay) return developerApiResponse(claim.replay.response, { status: claim.replay.status, headers: claim.replay.headers })
-        let mutationCommitted = false
-        try {
+        const result = await runIdempotentMutation(auth.tokenId, key, hash, async (tx) => {
             requireConfirmation(request, 'delete')
             await assertTripAccess(tripId, auth.userId, 'own')
             const current = await findTripDetail(tripId)
             if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
-            requireIfMatch(request, current.updatedAt)
-            await deleteTripIfUnchanged(tripId, current.updatedAt)
-            mutationCommitted = true
+            requireIfMatch(request, current.revision)
+            await deleteTripIfRevisionUnchangedInTransaction(tx, tripId, current.revision)
             const response = { id: tripId, deleted: true }
-            await completeIdempotency(auth.tokenId, key, hash, claim.claimNonce, response)
-            return response
-        } catch (error) {
-            if (!mutationCommitted) await releaseIdempotency(auth.tokenId, key, hash, claim.claimNonce)
-            throw error
-        }
+            return { response }
+        })
+        return developerApiResponse(result.response, { status: result.status, headers: result.headers })
     })

@@ -1,7 +1,8 @@
 import 'server-only'
 import { and, eq, isNull } from 'drizzle-orm'
 import { getDb } from '@/shared/db/client'
-import { tripInvite, tripMember } from '@/shared/db/schema/trip'
+import { trip, tripInvite, tripMember } from '@/shared/db/schema/trip'
+import { touchTrip } from '@/entities/trip/trip.repository.days'
 
 export const normalizeEmail = (email: string) => email.trim().toLowerCase()
 
@@ -16,11 +17,14 @@ export const acceptPendingInvitesForUser = async (invitedUser: { id: string; ema
     await db.transaction(async (tx) => {
         const acceptedAt = new Date()
         for (const invite of invites) {
+            const [lockedTrip] = await tx.select({ id: trip.id }).from(trip).where(eq(trip.id, invite.tripId)).for('update')
+            if (!lockedTrip) continue
             await tx
                 .insert(tripMember)
                 .values({ tripId: invite.tripId, userId: invitedUser.id, role: invite.role })
                 .onDuplicateKeyUpdate({ set: { role: invite.role } })
             await tx.update(tripInvite).set({ acceptedAt }).where(eq(tripInvite.id, invite.id))
+            await touchTrip(tx, invite.tripId)
         }
     })
     return { accepted: invites.length }

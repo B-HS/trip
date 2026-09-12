@@ -6,6 +6,7 @@ import { normalizeEmail } from '@/shared/db/accept-invites'
 import { getDb } from '@/shared/db/client'
 import { user } from '@/shared/db/schema/auth'
 import { trip, tripInvite, tripMember } from '@/shared/db/schema/trip'
+import { touchTrip } from '@/entities/trip/trip.repository.days'
 import { ApiError } from '@/shared/lib/api-response'
 
 const ROLE_RANK = { owner: 0, editor: 1, viewer: 2 } as const satisfies Record<MemberRole, number>
@@ -45,7 +46,12 @@ export const findTripInvites = async (tripId: string) => {
 }
 
 export const addMember = async (tripId: string, userId: string, role: AssignableRole) => {
-    await getDb().insert(tripMember).values({ tripId, userId, role }).onDuplicateKeyUpdate({ set: { role } })
+    await getDb().transaction(async (tx) => {
+        const [existingTrip] = await tx.select({ id: trip.id }).from(trip).where(eq(trip.id, tripId)).for('update')
+        if (!existingTrip) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+        await tx.insert(tripMember).values({ tripId, userId, role }).onDuplicateKeyUpdate({ set: { role } })
+        await touchTrip(tx, tripId)
+    })
     return { kind: 'member', userId } as const
 }
 
@@ -56,42 +62,67 @@ export const inviteMember = async (tripId: string, email: string, role: Assignab
     const [existingUser] = await db.select({ id: user.id }).from(user).where(eq(user.email, normalized))
     if (existingUser) {
         if (existingUser.id === ownerId) throw new ApiError('VALIDATION_ERROR', 'error.ownerAlreadyMember')
-        return addMember(tripId, existingUser.id, role)
+        await db.transaction(async (tx) => {
+            const [locked] = await tx.select({ id: trip.id }).from(trip).where(eq(trip.id, tripId)).for('update')
+            if (!locked) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+            await tx.insert(tripMember).values({ tripId, userId: existingUser.id, role }).onDuplicateKeyUpdate({ set: { role } })
+            await touchTrip(tx, tripId)
+        })
+        return { kind: 'member', userId: existingUser.id } as const
     }
     const [existingInvite] = await db
         .select({ id: tripInvite.id })
         .from(tripInvite)
         .where(and(eq(tripInvite.tripId, tripId), eq(tripInvite.email, normalized)))
     if (existingInvite) {
-        await db.update(tripInvite).set({ role, invitedBy, acceptedAt: null }).where(eq(tripInvite.id, existingInvite.id))
+        await db.transaction(async (tx) => {
+            const [locked] = await tx.select({ id: trip.id }).from(trip).where(eq(trip.id, tripId)).for('update')
+            if (!locked) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+            await tx.update(tripInvite).set({ role, invitedBy, acceptedAt: null }).where(eq(tripInvite.id, existingInvite.id))
+            await touchTrip(tx, tripId)
+        })
         return { kind: 'invite', inviteId: existingInvite.id }
     }
     const inviteId = crypto.randomUUID()
-    await db.insert(tripInvite).values({ id: inviteId, tripId, email: normalized, role, invitedBy })
+    await db.transaction(async (tx) => {
+        const [locked] = await tx.select({ id: trip.id }).from(trip).where(eq(trip.id, tripId)).for('update')
+        if (!locked) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+        await tx.insert(tripInvite).values({ id: inviteId, tripId, email: normalized, role, invitedBy })
+        await touchTrip(tx, tripId)
+    })
     return { kind: 'invite', inviteId }
 }
 
 export const updateMemberRole = async (tripId: string, userId: string, role: AssignableRole) => {
-    const ownerId = await findOwnerId(tripId)
-    if (ownerId === userId) throw new ApiError('VALIDATION_ERROR', 'error.ownerRoleImmutable')
-    await getDb()
-        .update(tripMember)
-        .set({ role })
-        .where(and(eq(tripMember.tripId, tripId), eq(tripMember.userId, userId)))
+    await getDb().transaction(async (tx) => {
+        const [current] = await tx.select({ ownerId: trip.ownerId }).from(trip).where(eq(trip.id, tripId)).for('update')
+        if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+        if (current.ownerId === userId) throw new ApiError('VALIDATION_ERROR', 'error.ownerRoleImmutable')
+        await tx
+            .update(tripMember)
+            .set({ role })
+            .where(and(eq(tripMember.tripId, tripId), eq(tripMember.userId, userId)))
+        await touchTrip(tx, tripId)
+    })
 }
 
 export const removeMember = async (tripId: string, userId: string) => {
-    const ownerId = await findOwnerId(tripId)
-    if (ownerId === userId) throw new ApiError('VALIDATION_ERROR', 'error.ownerCannotRemove')
-    await getDb()
-        .delete(tripMember)
-        .where(and(eq(tripMember.tripId, tripId), eq(tripMember.userId, userId)))
+    await getDb().transaction(async (tx) => {
+        const [current] = await tx.select({ ownerId: trip.ownerId }).from(trip).where(eq(trip.id, tripId)).for('update')
+        if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+        if (current.ownerId === userId) throw new ApiError('VALIDATION_ERROR', 'error.ownerCannotRemove')
+        await tx.delete(tripMember).where(and(eq(tripMember.tripId, tripId), eq(tripMember.userId, userId)))
+        await touchTrip(tx, tripId)
+    })
 }
 
 export const removeInvite = async (tripId: string, inviteId: string) => {
-    await getDb()
-        .delete(tripInvite)
-        .where(and(eq(tripInvite.tripId, tripId), eq(tripInvite.id, inviteId)))
+    await getDb().transaction(async (tx) => {
+        const [locked] = await tx.select({ id: trip.id }).from(trip).where(eq(trip.id, tripId)).for('update')
+        if (!locked) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+        await tx.delete(tripInvite).where(and(eq(tripInvite.tripId, tripId), eq(tripInvite.id, inviteId)))
+        await touchTrip(tx, tripId)
+    })
 }
 
 export const findTripMemberUserIds = async (tripId: string) => {

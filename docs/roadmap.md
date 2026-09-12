@@ -89,7 +89,7 @@
 
 ## 10. SEO·GEO·JSON-LD·Vercel Analytics/Speed Insights
 
-- **SEO**: 라우트별 `generateMetadata`(title template·description·canonical·robots), `app/sitemap.ts`(정적 페이지 + 공개 트립 `/s/[slug]`), `app/robots.ts`, Open Graph·Twitter 카드(공개 트립은 `app/s/[slug]/opengraph-image.tsx` 로 동적 OG 이미지 — 제목·기간·목적지), `hreflang`/`lang='ko'` 유지, 시맨틱 헤딩 계층 점검, 이미지 `alt`.
+- **SEO**: 라우트별 `generateMetadata`(title template·description·canonical·robots), `app/sitemap.ts`(정적 페이지 + 공개 트립 `/s/[slug]`), `app/robots.ts`, Open Graph·Twitter 카드(공개 트립은 `app/[locale]/(shell)/s/[slug]/opengraph-image.tsx` 로 동적 OG 이미지 — 제목·기간·목적지), `hreflang`/`lang='ko'` 유지, 시맨틱 헤딩 계층 점검, 이미지 `alt`.
 - **GEO(생성형 엔진 최적화)**: 공개 트립·게시글을 AI 검색이 인용하기 쉽도록 명확한 요약 문단·구조화 목록·정확한 날짜/장소 표기, `llms.txt`(사이트 개요·주요 공개 URL) 제공, 본문 텍스트가 초기 HTML 에 포함되도록(현재 SSR 유지) 보장.
 - **JSON-LD**: `WebSite`·`Organization`(루트), 공개 트립은 `TouristTrip` + `itemListElement`(일정)·`Place`(목적지·숙소)·`Flight`(항공편) 조합, 게시판 글은 `Article`/`QAPage`(질문·채택 답변), 사용자 페이지는 `ProfilePage`. `<script type="application/ld+json">` 은 `</script>` 이스케이프 처리 후 주입(sanitize 예외 정책 유지).
 - **Vercel Analytics**: 이미 `@vercel/analytics` 를 루트 레이아웃에 마운트했다. 커스텀 이벤트(트립 생성·예시 생성·공유 링크 복사·즐겨찾기) 를 `track()` 으로 추가하고, 개인정보(이메일·트립 내용)는 이벤트에 넣지 않는다.

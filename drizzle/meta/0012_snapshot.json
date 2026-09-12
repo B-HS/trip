@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "3c159f58-0b4c-4a02-8320-b0055d83a469",
+  "id": "673f5fb7-27e9-4c9f-b3ff-142c24d8e346",
   "prevId": "abb61ecc-0265-402d-85b5-dbb9ca62dc62",
   "tables": {
     "trip_ai_conversation": {
@@ -122,6 +122,120 @@
           "name": "trip_ai_conversation_id",
           "columns": [
             "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "trip_ai_dispatch": {
+      "name": "trip_ai_dispatch",
+      "columns": {
+        "job_id": {
+          "name": "job_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('queued','sending','sent','failed')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'queued'"
+        },
+        "attempts": {
+          "name": "attempts",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "lease_id": {
+          "name": "lease_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lease_expires_at": {
+          "name": "lease_expires_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "next_attempt_at": {
+          "name": "next_attempt_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "last_error": {
+          "name": "last_error",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "last_attempt_at": {
+          "name": "last_attempt_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "ai_dispatch_status_idx": {
+          "name": "ai_dispatch_status_idx",
+          "columns": [
+            "status",
+            "next_attempt_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "trip_ai_dispatch_job_id_trip_ai_job_id_fk": {
+          "name": "trip_ai_dispatch_job_id_trip_ai_job_id_fk",
+          "tableFrom": "trip_ai_dispatch",
+          "tableTo": "trip_ai_job",
+          "columnsFrom": [
+            "job_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "trip_ai_dispatch_job_id": {
+          "name": "trip_ai_dispatch_job_id",
+          "columns": [
+            "job_id"
           ]
         }
       },
@@ -534,6 +648,13 @@
           "type": "json",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "base_trip_revision": {
+          "name": "base_trip_revision",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "base_trip_updated_at": {
@@ -2246,6 +2367,13 @@
             "claimed_at"
           ],
           "isUnique": false
+        },
+        "developer_api_idempotency_completed_idx": {
+          "name": "developer_api_idempotency_completed_idx",
+          "columns": [
+            "completed_at"
+          ],
+          "isUnique": false
         }
       },
       "foreignKeys": {
@@ -2623,6 +2751,14 @@
         },
         "like_count": {
           "name": "like_count",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "revision": {
+          "name": "revision",
           "type": "int",
           "primaryKey": false,
           "notNull": true,

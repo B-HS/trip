@@ -8,7 +8,7 @@
 
 - **메타데이터**: 루트 `metadata` 에 `title.template`("%s | Trip")·`metadataBase`(정책화한 `SITE_URL`)·기본 description·`robots`. 로컬 개발만 유효한 `NEXT_PUBLIC_APP_URL`을 사용하고 Vercel preview/production은 production canonical을 사용한다. 라우트별 `generateMetadata` 로 canonical·OG·Twitter 카드를 낸다. 로그인 전용 화면(`/trips/**`, `/settings/**`)은 `robots: { index: false }`.
 - **sitemap·robots**: `app/sitemap.ts`(정적 페이지 + 공개 트립 `/s/[slug]` + 게시판·게시글 + `/u/[username]`, `lastModified` 는 `updated_at`), `app/robots.ts`(비공개 경로 disallow, sitemap 링크). 공개 트립이 비공개로 바뀌면 다음 sitemap 생성에서 빠진다(`revalidate` 1시간).
-- **OG 이미지**: 공개 트립의 `app/(public)/s/[slug]/opengraph-image.tsx`가 `next/og` `ImageResponse`를 생성한다. 게시글·사용자 페이지는 현재 공통 Open Graph metadata/card를 사용하며 전용 동적 이미지 라우트가 있다고 주장하지 않는다.
+- **OG 이미지**: 공개 트립의 `app/[locale]/(shell)/s/[slug]/opengraph-image.tsx`가 `next/og` `ImageResponse`를 생성한다. 게시글·사용자 페이지는 현재 공통 Open Graph metadata/card를 사용하며 전용 동적 이미지 라우트가 있다고 주장하지 않는다.
 - **GEO**: 공개 트립 상단에 한 문단 요약(제목·기간·박/일·목적지·항공편 수)을 서버 렌더 HTML 로 포함한다. `app/llms.txt/route.ts` 가 사이트 개요와 주요 공개 URL 목록을 텍스트로 낸다. 본문은 계속 SSR(ADR-0010).
 - **JSON-LD**: `shared/lib/json-ld.ts` 가 객체를 만들고 `features/seo/json-ld-script.tsx` 가 `</script>` 를 `<\/script>` 로 이스케이프해 주입한다(sanitize 예외). 루트 `WebSite`·`Organization`, 공개 트립 `TouristTrip`(`itinerary` `ItemList` 안의 날짜별 `TouristAttraction` 과 목적지 `Place`), 게시글 `Article`/질문은 `QAPage`(채택 답변 `acceptedAnswer`), 사용자 페이지 `ProfilePage` 를 출력한다. TouristTrip 에 검증되지 않은 `touristDestination`/숙박·항공 관계는 넣지 않는다. 항공 시간은 TouristTrip의 공식 시간 속성으로만 표현한다.
 - **Analytics 이벤트**: `@vercel/analytics` `track()` 으로 `trip_created`·`trip_created_from_template`·`share_link_copied`·`favorite_toggled`·`trip_imported`·`post_created`·`ai_job_requested`. 속성은 종류·개수 같은 비식별 값만, 이메일·제목·본문은 넣지 않는다. 호출은 위젯(mutation 성공 콜백)에서.

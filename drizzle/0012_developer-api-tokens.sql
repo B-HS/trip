@@ -49,4 +49,28 @@ ALTER TABLE `trip_developer_api_rate_limit` ADD CONSTRAINT `trip_developer_api_r
 --> statement-breakpoint
 CREATE INDEX `developer_api_idempotency_claimed_idx` ON `trip_developer_api_idempotency` (`claimed_at`);
 --> statement-breakpoint
+CREATE INDEX `developer_api_idempotency_completed_idx` ON `trip_developer_api_idempotency` (`completed_at`);
+--> statement-breakpoint
 CREATE INDEX `developer_api_rate_limit_window_idx` ON `trip_developer_api_rate_limit` (`window_started_at`);
+--> statement-breakpoint
+CREATE TABLE `trip_ai_dispatch` (
+	`job_id` varchar(36) NOT NULL,
+	`status` enum('queued','sending','sent','failed') NOT NULL DEFAULT 'queued',
+	`attempts` int NOT NULL DEFAULT 0,
+	`lease_id` varchar(36),
+	`lease_expires_at` timestamp(3),
+	`next_attempt_at` timestamp(3),
+	`last_error` varchar(500),
+	`last_attempt_at` timestamp(3),
+	`created_at` timestamp(3) NOT NULL DEFAULT (now()),
+	`updated_at` timestamp(3) NOT NULL DEFAULT (now()),
+	CONSTRAINT `trip_ai_dispatch_job_id` PRIMARY KEY(`job_id`)
+);
+--> statement-breakpoint
+ALTER TABLE `trip_ai_proposal` ADD `base_trip_revision` int;
+--> statement-breakpoint
+ALTER TABLE `trip_trip` ADD `revision` int DEFAULT 0 NOT NULL;
+--> statement-breakpoint
+ALTER TABLE `trip_ai_dispatch` ADD CONSTRAINT `trip_ai_dispatch_job_id_trip_ai_job_id_fk` FOREIGN KEY (`job_id`) REFERENCES `trip_ai_job`(`id`) ON DELETE cascade ON UPDATE no action;
+--> statement-breakpoint
+CREATE INDEX `ai_dispatch_status_idx` ON `trip_ai_dispatch` (`status`,`next_attempt_at`);

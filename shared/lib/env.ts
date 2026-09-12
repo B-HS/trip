@@ -30,6 +30,7 @@ const envSchema = z.object({
     VERCEL_QUEUE_TOKEN: optionalText,
     VERCEL_QUEUE_URL: optionalUrl,
     VERCEL_ENV: optionalText,
+    CRON_SECRET: optionalText,
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 })
 

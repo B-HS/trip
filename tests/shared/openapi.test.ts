@@ -21,4 +21,7 @@ test('developer API OpenAPI document describes the implemented versioned routes'
     expect(openApiDocument.paths['/trips/{tripId}'].get.responses['200'].content['application/json'].schema.$ref).toBe(
         '#/components/schemas/TripDetailSuccess',
     )
+    expect(openApiDocument.paths['/token'].get.responses['429']).toBeDefined()
+    expect(openApiDocument.paths['/trips/{tripId}'].get.responses['429']).toBeDefined()
+    expect(openApiDocument.components.schemas.TripDetail.properties.revision).toBeDefined()
 })

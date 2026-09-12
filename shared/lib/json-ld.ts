@@ -37,6 +37,29 @@ const asTripDateTime = (date: string, time: string | null | undefined) => {
     return normalized === null ? null : `${date}T${normalized}`
 }
 
+export const buildFlightJsonLd = (flight: PublicTrip['flights'][number], trip: PublicTrip, url: string, index: number): JsonLdObject => {
+    const date = flight.direction === 'inbound' ? trip.endDate : trip.startDate
+    return {
+        '@type': 'Flight',
+        '@id': `${url}#flight-${flight.id ?? index}`,
+        ...(flight.flightNumber ? { flightNumber: flight.flightNumber } : {}),
+        ...(flight.label ? { name: flight.label } : {}),
+        'departureAirport': { '@type': 'Airport', 'identifier': flight.departCode },
+        'arrivalAirport': { '@type': 'Airport', 'identifier': flight.arriveCode },
+        ...(asTripDateTime(date, flight.departTime) ? { departureTime: asTripDateTime(date, flight.departTime) } : {}),
+        ...(asTripDateTime(date, flight.arriveTime) ? { arrivalTime: asTripDateTime(date, flight.arriveTime) } : {}),
+    }
+}
+
+export const buildLodgingJsonLd = (lodging: PublicTrip['lodgings'][number], url: string, index: number): JsonLdObject => ({
+    '@type': 'LodgingBusiness',
+    '@id': `${url}#lodging-${lodging.id ?? index}`,
+    'name': lodging.name,
+    ...(lodging.nameLocal ? { alternateName: lodging.nameLocal } : {}),
+    ...(lodging.address ? { address: { '@type': 'PostalAddress', 'streetAddress': lodging.address } } : {}),
+    ...(lodging.url ? { url: lodging.url } : {}),
+})
+
 export const buildTouristTripJsonLd = (trip: PublicTrip, url: string, description?: string | null): JsonLdObject => {
     const outbound = trip.flights.find((flight) => flight.direction === 'outbound') ?? trip.flights[0]
     const inbound = [...trip.flights].reverse().find((flight) => flight.direction === 'inbound') ?? trip.flights.at(-1)
@@ -61,6 +84,9 @@ export const buildTouristTripJsonLd = (trip: PublicTrip, url: string, descriptio
         })),
     ]
 
+    const flightNodes = trip.flights.map((flight, index) => buildFlightJsonLd(flight, trip, url, index))
+    const lodgingNodes = trip.lodgings.map((lodging, index) => buildLodgingJsonLd(lodging, url, index))
+
     return {
         '@context': context,
         '@type': 'TouristTrip',
@@ -70,6 +96,12 @@ export const buildTouristTripJsonLd = (trip: PublicTrip, url: string, descriptio
         ...(departureTime ? { departureTime } : {}),
         ...(arrivalTime ? { arrivalTime } : {}),
         'touristType': 'Travel itinerary',
+        ...(flightNodes.length || lodgingNodes.length
+            ? {
+                  'mentions': [...flightNodes, ...lodgingNodes].map((node) => ({ '@id': node['@id'] as string })),
+                  '@graph': [...flightNodes, ...lodgingNodes],
+              }
+            : {}),
         'itinerary': {
             '@type': 'ItemList',
             'numberOfItems': itineraryItems.length,

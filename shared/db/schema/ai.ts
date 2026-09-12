@@ -103,6 +103,30 @@ export const tripAiJob = tripTable(
     (table) => [index('ai_job_conversation_id_idx').on(table.conversationId), index('ai_job_status_idx').on(table.status)],
 )
 
+export const tripAiDispatch = tripTable(
+    'ai_dispatch',
+    {
+        jobId: varchar('job_id', { length: 36 })
+            .primaryKey()
+            .references(() => tripAiJob.id, { onDelete: 'cascade' }),
+        status: mysqlEnum('status', ['queued', 'sending', 'sent', 'failed'] as const)
+            .notNull()
+            .default('queued'),
+        attempts: int('attempts').notNull().default(0),
+        leaseId: varchar('lease_id', { length: 36 }),
+        leaseExpiresAt: timestamp('lease_expires_at', { fsp: 3 }),
+        nextAttemptAt: timestamp('next_attempt_at', { fsp: 3 }),
+        lastError: varchar('last_error', { length: 500 }),
+        lastAttemptAt: timestamp('last_attempt_at', { fsp: 3 }),
+        createdAt: createdAt(),
+        updatedAt: timestamp('updated_at', { fsp: 3 })
+            .defaultNow()
+            .$onUpdate(() => new Date())
+            .notNull(),
+    },
+    (table) => [index('ai_dispatch_status_idx').on(table.status, table.nextAttemptAt)],
+)
+
 export const tripAiUsage = tripTable(
     'ai_usage',
     {
@@ -133,6 +157,7 @@ export const tripAiProposal = tripTable(
             .references(() => trip.id, { onDelete: 'cascade' }),
         status: mysqlEnum('status', AI_PROPOSAL_STATUSES).notNull().default('pending'),
         changes: json('changes').notNull(),
+        baseTripRevision: int('base_trip_revision'),
         baseTripUpdatedAt: timestamp('base_trip_updated_at', { fsp: 3 }),
         leaseId: varchar('lease_id', { length: 36 }),
         leaseExpiresAt: timestamp('lease_expires_at', { fsp: 3 }),
