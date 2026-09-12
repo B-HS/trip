@@ -80,6 +80,10 @@ export const findPublicTripPage = async ({ sort, page }: { sort: ExploreSort; pa
 
 export const findRecentPublicTrips = async (limit: number) => findTripCards(publicTripCondition(), RECENT_ORDER, limit, FIRST_OFFSET)
 
+/** Lightweight public records used by the cached sitemap and llms.txt routes. */
+export const findPublicTripsForSitemap = async () =>
+    getDb().select({ shareSlug: trip.shareSlug, updatedAt: trip.updatedAt }).from(trip).where(publicTripCondition()).orderBy(desc(trip.updatedAt))
+
 export const findPublicTripsForHome = async (today: string) => {
     const base = publicTripCondition()
     const week = weekRange(today)

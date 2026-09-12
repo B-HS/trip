@@ -1,5 +1,5 @@
 import 'server-only'
-import { and, eq, inArray, sum } from 'drizzle-orm'
+import { and, eq, inArray, isNotNull, sum } from 'drizzle-orm'
 import type { ProfileSettings, PublicProfile } from '@/entities/profile/profile.type'
 import type { ProfileUpdateValues } from '@/entities/profile/profile.validate'
 import { findPublicTripCardPage, publicTripCondition } from '@/entities/trip/trip.repository.explore'
@@ -83,6 +83,14 @@ export const changeUsername = async (userId: string, username: string) => {
 
 export const findPublicTripsByOwner = async (userId: string, page: number) =>
     findPublicTripCardPage(and(publicTripCondition(), eq(trip.ownerId, userId)), page)
+
+/** Public profile records used by the cached sitemap. Banned or username-less users are omitted. */
+export const findPublicProfilesForSitemap = async () =>
+    getDb()
+        .select({ username: user.username, updatedAt: user.updatedAt })
+        .from(user)
+        .where(and(isNotNull(user.username), eq(user.banned, false)))
+        .orderBy(user.updatedAt)
 
 export const findLikedTrips = async (userId: string, page: number) =>
     findPublicTripCardPage(

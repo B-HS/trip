@@ -552,6 +552,13 @@
             "descriptionWithPeriod": "{destination} · {periodNote}",
             "descriptionDefault": "{destination} 旅行行程"
         },
+        "tripSummary": {
+            "heading": "公開旅行の概要",
+            "description": "{title}は、{destination}を{startDate}から{endDate}まで訪れる{period}の日程です。",
+            "destination": "目的地",
+            "dates": "日程",
+            "flights": "フライト"
+        },
         "sharedTripNotFound": {
             "title": "公開中の旅行が見つかりません"
         },

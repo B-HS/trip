@@ -17,7 +17,7 @@
 | 7 인증 확장 등                              | 부분                                      | 이름 제거 완료(ADR-0017), Tiptap·YouTube 구현 완료(ADR-0027, 화면 미연결 — 브라우저 실측은 로드맵 6 게시글 화면에서, ADR-0031), OAuth·이메일 인증·약관은 6단계 착수(ADR-0033 §2) |
 | 8 셀형 액션 UI                              | 완료                                      | ADR-0023                                                                                                                                                                         |
 | 9 몇박 며칠                                 | 완료                                      | ADR-0020, 마이그레이션 0002                                                                                                                                                      |
-| 10 SEO·GEO·JSON-LD·Analytics·Speed Insights | 미착수(설계 완료)                         | ADR-0030                                                                                                                                                                         |
+| 10 SEO·GEO·JSON-LD·Analytics·Speed Insights | 코드 구현(배포 후 지표 확인 대기)         | ADR-0030, 2026-09-12 Phase 8 구현 기록                                                                                                                                           |
 | 11 i18n ko·ja·en                            | 2차 구현 완료(배포 전)                    | ADR-0033 §4, ADR-0038, 5단계. 전체 UI·trip 도메인·locale 포맷·로그인 셸 전환                                                                                                     |
 | 12 출발 공항·지구본 상호작용                | 완료(4-4e)                                | ADR-0035, 마이그레이션 0007. 트립별 출발 공항(편집기 콤보박스·템플릿 JSON), `/trips` 지구본 드래그 회전·hover 툴팁·선 클릭 `?route=` 필터                                        |
 

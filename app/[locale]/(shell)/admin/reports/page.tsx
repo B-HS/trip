@@ -9,6 +9,7 @@ import { PAGE_PARAM } from '@/shared/constant/community'
 import { getQueryClient } from '@/shared/lib/query-client'
 import { requireUser } from '@/shared/lib/session'
 import { AdminReportsWidget } from '@/widgets/community/admin-reports-widget'
+import { createPageMetadata } from '@/shared/lib/metadata'
 
 type AdminReportsPageProps = {
     params: Promise<{ locale: string }>
@@ -18,7 +19,7 @@ type AdminReportsPageProps = {
 export const generateMetadata = async ({ params }: AdminReportsPageProps): Promise<Metadata> => {
     const { locale } = await params
     const t = await getTranslations({ locale, namespace: 'metadata.adminReports' })
-    return { title: t('title'), description: t('description') }
+    return createPageMetadata({ locale, path: '/admin/reports', title: t('title'), description: t('description'), indexable: false })
 }
 
 const AdminReportsPage = async ({ searchParams }: AdminReportsPageProps) => {

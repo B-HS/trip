@@ -1,11 +1,15 @@
 import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { notFound } from 'next/navigation'
-import { setRequestLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import type { Metadata, Viewport } from 'next'
 import type { FC, PropsWithChildren } from 'react'
 import { openGraphLocale, routing } from '@/i18n/routing'
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/shared/constant/site'
+import { JsonLdScript } from '@/features/seo/json-ld-script'
+import { buildOrganizationJsonLd, buildWebSiteJsonLd } from '@/shared/lib/json-ld'
+import { localizedAlternates, localizedUrl } from '@/shared/lib/seo'
+import { SITE_NAME, SITE_URL } from '@/shared/constant/site'
 import { QueryProvider } from '@/shared/lib/query-provider'
 import { MotionProvider } from '@/shared/ui/motion-provider'
 import { Toaster } from '@/shared/ui/sonner'
@@ -21,24 +25,23 @@ interface LocaleLayoutProps extends PropsWithChildren {
 
 export const generateMetadata = async ({ params }: LocaleLayoutProps): Promise<Metadata> => {
     const { locale } = await params
+    const t = await getTranslations({ locale, namespace: 'metadata.home' })
 
     return {
         title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
-        description: SITE_DESCRIPTION,
+        description: t('description'),
         metadataBase: new URL(SITE_URL),
         openGraph: {
             title: SITE_NAME,
-            description: SITE_DESCRIPTION,
+            description: t('description'),
             siteName: SITE_NAME,
-            url: SITE_URL,
+            url: localizedUrl('/', locale),
             locale: openGraphLocale(locale),
             type: 'website',
         },
-        twitter: { card: 'summary', title: SITE_NAME, description: SITE_DESCRIPTION },
+        twitter: { card: 'summary', title: SITE_NAME, description: t('description') },
         robots: { index: true, follow: true },
-        alternates: {
-            languages: { 'x-default': SITE_URL, 'ko': SITE_URL, 'en': `${SITE_URL}/en`, 'ja': `${SITE_URL}/ja` },
-        },
+        alternates: localizedAlternates('/', locale),
     }
 }
 
@@ -67,7 +70,9 @@ const RootLayout: FC<LocaleLayoutProps> = async ({ children, params }) => {
                         <Toaster position='bottom-right' />
                     </ThemeProvider>
                 </NextIntlClientProvider>
+                <JsonLdScript data={[buildWebSiteJsonLd(locale), buildOrganizationJsonLd()]} />
                 <Analytics />
+                <SpeedInsights />
             </body>
         </html>
     )

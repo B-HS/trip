@@ -23,3 +23,13 @@
 
 - 라우트별 개별 `<Head>` 관리: App Router 의 `generateMetadata` 로 충분.
 - 정적 OG 이미지 1장: 공개 트립마다 다른 정보를 담아야 한다.
+
+## 구현 기록 (2026-09-12)
+
+- `app/[locale]/layout.tsx` 에 locale별 `metadataBase`, title template, description, canonical/hreflang, `WebSite`/`Organization` JSON-LD를 두고 `SpeedInsights`를 함께 마운트했다. 로그인·가입·인증·트립 편집·설정·관리자 경로는 `noindex, nofollow`를 명시한다.
+- `app/sitemap.ts`는 정적 공개 경로와 공개 트립·삭제되지 않은 게시글·username이 있는 비차단 프로필을 1시간 캐시로 내보내며, 각 URL에 ko·en·ja·x-default alternates를 포함한다. `app/robots.ts`는 locale 프리픽스를 포함한 비공개 경로와 API를 차단한다.
+- 공개 트립은 `opengraph-image.tsx`에서 제목·목적지·기간을 포함한 1200×630 이미지를 생성하고, `llms.txt`는 실제 공개 트립 URL을 포함한 기계 판독용 개요를 제공한다. 공개 트립 요약은 서버 컴포넌트로 초기 HTML에 포함한다.
+- `shared/lib/json-ld.ts`의 빌더는 사용자 작성 값이 포함될 수 있는 JSON-LD를 `features/seo/json-ld-script.tsx`에서 `<`, `>`, `&`를 이스케이프해 주입한다. `QAPage`는 질문 게시판에만 사용하고, 댓글 본문을 추측해 `acceptedAnswer`를 만들지 않는다.
+- Analytics 이벤트에는 집계 가능한 source/boolean 값만 넣고 제목·본문·이메일·식별자·URL을 전달하지 않는다. Speed Insights 패키지 버전은 현재 공식 2.x 라인(현재 lockfile `2.0.0`)을 사용한다.
+
+검증에 참고한 1차 문서: [Next.js Metadata API](https://nextjs.org/docs/app/api-reference/functions/generate-metadata), [Next.js sitemap](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap), [Vercel Web Analytics](https://vercel.com/docs/analytics), [Vercel Speed Insights package](https://vercel.com/docs/speed-insights/package).

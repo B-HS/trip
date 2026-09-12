@@ -49,6 +49,7 @@ import { unwrapActionResult } from '@/shared/lib/action-result'
 import { likeToggleMutationOptions } from '@/shared/lib/like-mutation'
 import { translateMessage } from '@/shared/lib/message-key'
 import type { TripTemplateInput } from '@/shared/lib/trip-template'
+import { trackEvent } from '@/shared/lib/analytics'
 
 export const tripListQueryOptions = () => queryOptions({ queryKey: QUERY_KEY.TRIP.LIST, queryFn: fetchTripList })
 
@@ -80,6 +81,7 @@ export const useCreateTrip = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
             toast.success(t('toasts.tripCreated'))
+            trackEvent('trip_created', { source: 'blank' })
         },
         onError: (error) => toast.error(translateMessage(t, error.message)),
     })
@@ -93,6 +95,7 @@ export const useCreateTripFromTemplate = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
             toast.success(t('toasts.sampleTripCreated'))
+            trackEvent('trip_created_from_template')
         },
         onError: (error) => toast.error(translateMessage(t, error.message)),
     })
@@ -138,6 +141,9 @@ export const useToggleFavorite = () => {
             if (context?.previousList !== undefined) queryClient.setQueryData(QUERY_KEY.TRIP.LIST, context.previousList)
             if (context?.previousFavorites !== undefined) queryClient.setQueryData(QUERY_KEY.TRIP.FAVORITES, context.previousFavorites)
             toast.error(translateMessage(t, error.message))
+        },
+        onSuccess: (_result, variables) => {
+            trackEvent('favorite_toggled', { isFavorite: variables.isFavorite })
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
@@ -366,6 +372,7 @@ export const useImportTrip = (tripId: string) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.USER_STATE.TRIP(tripId) })
             queryClient.invalidateQueries({ queryKey: QUERY_KEY.TRIP.LIST })
             toast.success(t('toasts.tripImported'))
+            trackEvent('trip_imported')
         },
         onError: (error) => toast.error(translateMessage(t, error.message)),
     })

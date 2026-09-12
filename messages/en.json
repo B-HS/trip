@@ -552,6 +552,13 @@
             "descriptionWithPeriod": "{destination} · {periodNote}",
             "descriptionDefault": "{destination} trip itinerary"
         },
+        "tripSummary": {
+            "heading": "Public trip summary",
+            "description": "{title} is a {period} itinerary in {destination} from {startDate} to {endDate}.",
+            "destination": "Destination",
+            "dates": "Dates",
+            "flights": "Flights"
+        },
         "sharedTripNotFound": {
             "title": "Public trip not found"
         },

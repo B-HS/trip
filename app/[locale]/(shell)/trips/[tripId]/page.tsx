@@ -11,6 +11,7 @@ import { TRIP_VIEWS, type TripView } from '@/shared/constant/trip'
 import { getQueryClient } from '@/shared/lib/query-client'
 import { getServerSession, requireUser } from '@/shared/lib/session'
 import { TripViewerWidget } from '@/widgets/trip-viewer/trip-viewer-widget'
+import { createPageMetadata } from '@/shared/lib/metadata'
 
 type TripDetailPageProps = {
     params: Promise<{ locale: string; tripId: string }>
@@ -29,15 +30,15 @@ export const generateMetadata = async ({ params }: TripDetailPageProps): Promise
     const t = await getTranslations({ locale, namespace: 'metadata.tripDetail' })
     const fallbackTitle = t('fallbackTitle')
     const session = await getServerSession()
-    if (!session) return { title: fallbackTitle }
+    if (!session) return createPageMetadata({ locale, path: `/trips/${encodeURIComponent(tripId)}`, title: fallbackTitle, indexable: false })
     const role = await getTripRole(tripId, session.user.id)
-    if (!role) return { title: fallbackTitle }
+    if (!role) return createPageMetadata({ locale, path: `/trips/${encodeURIComponent(tripId)}`, title: fallbackTitle, indexable: false })
     const trip = await getTripDetail(tripId)
-    if (!trip) return { title: fallbackTitle }
+    if (!trip) return createPageMetadata({ locale, path: `/trips/${encodeURIComponent(tripId)}`, title: fallbackTitle, indexable: false })
     const description = trip.periodNote
         ? t('descriptionWithPeriod', { destination: trip.destination, periodNote: trip.periodNote })
         : t('descriptionDefault', { destination: trip.destination })
-    return { title: trip.title, description }
+    return createPageMetadata({ locale, path: `/trips/${encodeURIComponent(tripId)}`, title: trip.title, description, indexable: false })
 }
 
 const TripDetailPage = async ({ params, searchParams }: TripDetailPageProps) => {

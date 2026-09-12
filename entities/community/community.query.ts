@@ -26,6 +26,7 @@ import type { CommentCreateInput, PostCreateInput, PostUpdateInput, ReportCreate
 import { QUERY_KEY } from '@/shared/constant/query-key'
 import { unwrapActionResult } from '@/shared/lib/action-result'
 import { likeToggleMutationOptions } from '@/shared/lib/like-mutation'
+import { trackEvent } from '@/shared/lib/analytics'
 
 export const commentsQueryOptions = (postId: string) =>
     queryOptions({ queryKey: QUERY_KEY.COMMUNITY.COMMENTS(postId), queryFn: () => fetchComments(postId) })
@@ -98,7 +99,10 @@ export const useCreatePost = () => {
     const t = useTranslations()
     return useMutation({
         mutationFn: async (input: PostCreateInput) => unwrapActionResult(await createPostAction(input)),
-        onSuccess: () => toast.success(t('community.toast.postCreated')),
+        onSuccess: () => {
+            toast.success(t('community.toast.postCreated'))
+            trackEvent('post_created')
+        },
         onError: (error) => toast.error(translateMessage(t, error.message)),
     })
 }

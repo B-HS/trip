@@ -552,6 +552,13 @@
             "descriptionWithPeriod": "{destination} · {periodNote}",
             "descriptionDefault": "{destination} 여행 일정"
         },
+        "tripSummary": {
+            "heading": "공개 여행 요약",
+            "description": "{title}은(는) {destination}에서 {startDate}부터 {endDate}까지 진행하는 {period} 여행 일정입니다.",
+            "destination": "목적지",
+            "dates": "날짜",
+            "flights": "항공편"
+        },
         "sharedTripNotFound": {
             "title": "공개된 여행을 찾을 수 없습니다"
         },

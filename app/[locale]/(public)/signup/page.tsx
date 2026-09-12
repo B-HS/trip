@@ -6,6 +6,7 @@ import { Suspense } from 'react'
 import { AuthCard } from '@/features/auth/auth-card'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { SignupWidget } from '@/widgets/auth/signup-widget'
+import { createPageMetadata } from '@/shared/lib/metadata'
 
 type SignupPageProps = {
     params: Promise<{ locale: string }>
@@ -14,7 +15,7 @@ type SignupPageProps = {
 export const generateMetadata = async ({ params }: SignupPageProps): Promise<Metadata> => {
     const { locale } = await params
     const t = await getTranslations({ locale, namespace: 'metadata.signup' })
-    return { title: t('title'), description: t('description') }
+    return createPageMetadata({ locale, path: '/signup', title: t('title'), description: t('description'), indexable: false })
 }
 
 const SignupPage = () => {

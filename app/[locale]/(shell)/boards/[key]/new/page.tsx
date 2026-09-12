@@ -8,6 +8,7 @@ import { getQueryClient } from '@/shared/lib/query-client'
 import { getUploadConfig } from '@/shared/lib/r2'
 import { requireUser } from '@/shared/lib/session'
 import { PostFormWidget } from '@/widgets/community/post-form-widget'
+import { createPageMetadata } from '@/shared/lib/metadata'
 
 type NewPostPageProps = {
     params: Promise<{ locale: string; key: string }>
@@ -16,7 +17,14 @@ type NewPostPageProps = {
 export const generateMetadata = async ({ params }: NewPostPageProps): Promise<Metadata> => {
     const { locale } = await params
     const t = await getTranslations({ locale, namespace: 'metadata.postNew' })
-    return { title: t('title'), description: t('description') }
+    const { key } = await params
+    return createPageMetadata({
+        locale,
+        path: `/boards/${encodeURIComponent(key)}/new`,
+        title: t('title'),
+        description: t('description'),
+        indexable: false,
+    })
 }
 
 const NewPostPage = async ({ params }: NewPostPageProps) => {

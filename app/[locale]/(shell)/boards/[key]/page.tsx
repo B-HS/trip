@@ -6,6 +6,7 @@ import { findPostPage } from '@/entities/community/community.repository'
 import { postSearchSchema } from '@/entities/community/community.validate'
 import { getServerSession } from '@/shared/lib/session'
 import { BoardList } from '@/widgets/community/board-list'
+import { createPageMetadata } from '@/shared/lib/metadata'
 
 type BoardPageProps = {
     params: Promise<{ locale: string; key: string }>
@@ -16,7 +17,12 @@ export const generateMetadata = async ({ params }: BoardPageProps): Promise<Meta
     const { locale, key } = await params
     const t = await getTranslations({ locale, namespace: 'metadata.boardNotFound' })
     const board = await getBoardByKey(key)
-    return { title: board === null ? t('title') : board.name }
+    return createPageMetadata({
+        locale,
+        path: `/boards/${encodeURIComponent(key)}`,
+        title: board === null ? t('title') : board.name,
+        indexable: board !== null,
+    })
 }
 
 const BoardPage = async ({ params, searchParams }: BoardPageProps) => {

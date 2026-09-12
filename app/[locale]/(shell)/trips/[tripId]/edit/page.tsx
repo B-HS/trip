@@ -10,6 +10,7 @@ import { getQueryClient } from '@/shared/lib/query-client'
 import { getUploadConfig } from '@/shared/lib/r2'
 import { requireUser } from '@/shared/lib/session'
 import { TripEditorWidget } from '@/widgets/trip-editor/trip-editor-widget'
+import { createPageMetadata } from '@/shared/lib/metadata'
 
 type TripEditPageProps = {
     params: Promise<{ locale: string; tripId: string }>
@@ -19,7 +20,12 @@ export const generateMetadata = async ({ params }: TripEditPageProps) => {
     const { locale, tripId } = await params
     const t = await getTranslations({ locale, namespace: 'metadata.tripEdit' })
     const detail = await getTripDetail(tripId)
-    return { title: detail === null ? t('title') : t('titleWithTrip', { title: detail.title }) }
+    return createPageMetadata({
+        locale,
+        path: `/trips/${encodeURIComponent(tripId)}/edit`,
+        title: detail === null ? t('title') : t('titleWithTrip', { title: detail.title }),
+        indexable: false,
+    })
 }
 
 const TripEditPage = async ({ params }: TripEditPageProps) => {

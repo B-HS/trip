@@ -101,6 +101,16 @@ const findPostPageBy = async (condition: SQL | undefined, page: number) => {
 
 export const findBoards = async () => getDb().select().from(tripBoard).orderBy(asc(tripBoard.sortOrder), asc(tripBoard.createdAt))
 
+/** Lightweight public records used by the cached sitemap. Deleted posts never become crawl targets. */
+export const findPublicPostsForSitemap = async () =>
+    getDb()
+        .select({ id: tripPost.id, boardKey: tripBoard.key, updatedAt: tripPost.updatedAt })
+        .from(tripPost)
+        .innerJoin(tripBoard, eq(tripPost.boardId, tripBoard.id))
+        .innerJoin(user, eq(tripPost.authorId, user.id))
+        .where(and(isNull(tripPost.deletedAt), eq(user.banned, false)))
+        .orderBy(desc(tripPost.updatedAt))
+
 export const findBoardByKey = async (key: string) => {
     const [row] = await getDb().select().from(tripBoard).where(eq(tripBoard.key, key)).limit(1)
     return row ?? null

@@ -9,15 +9,22 @@ import { getQueryClient } from '@/shared/lib/query-client'
 import { getUploadConfig } from '@/shared/lib/r2'
 import { requireUser } from '@/shared/lib/session'
 import { PostFormWidget } from '@/widgets/community/post-form-widget'
+import { createPageMetadata } from '@/shared/lib/metadata'
 
 type EditPostPageProps = {
     params: Promise<{ locale: string; key: string; postId: string }>
 }
 
 export const generateMetadata = async ({ params }: EditPostPageProps): Promise<Metadata> => {
-    const { locale } = await params
+    const { locale, key, postId } = await params
     const t = await getTranslations({ locale, namespace: 'metadata.postEdit' })
-    return { title: t('title'), description: t('description') }
+    return createPageMetadata({
+        locale,
+        path: `/boards/${encodeURIComponent(key)}/${encodeURIComponent(postId)}/edit`,
+        title: t('title'),
+        description: t('description'),
+        indexable: false,
+    })
 }
 
 const EditPostPage = async ({ params }: EditPostPageProps) => {

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { exploreSearchSchema } from '@/entities/community/community.validate'
 import { ExploreList } from '@/widgets/community/explore-list'
+import { createPageMetadata } from '@/shared/lib/metadata'
 
 type ExplorePageProps = {
     params: Promise<{ locale: string }>
@@ -11,7 +12,7 @@ type ExplorePageProps = {
 export const generateMetadata = async ({ params }: ExplorePageProps): Promise<Metadata> => {
     const { locale } = await params
     const t = await getTranslations({ locale, namespace: 'metadata.explore' })
-    return { title: t('title'), description: t('description') }
+    return createPageMetadata({ locale, path: '/explore', title: t('title'), description: t('description') })
 }
 
 const ExplorePage = async ({ searchParams }: ExplorePageProps) => {

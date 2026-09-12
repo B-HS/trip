@@ -9,6 +9,7 @@ import { LoginWidget } from '@/widgets/auth/login-widget'
 import type { SocialProvider } from '@/shared/constant/auth'
 import { getAuthCapabilities } from '@/shared/lib/auth-capabilities'
 import { getEnv } from '@/shared/lib/env'
+import { createPageMetadata } from '@/shared/lib/metadata'
 
 type LoginPageProps = {
     params: Promise<{ locale: string }>
@@ -17,7 +18,7 @@ type LoginPageProps = {
 export const generateMetadata = async ({ params }: LoginPageProps): Promise<Metadata> => {
     const { locale } = await params
     const t = await getTranslations({ locale, namespace: 'metadata.login' })
-    return { title: t('title'), description: t('description') }
+    return createPageMetadata({ locale, path: '/login', title: t('title'), description: t('description'), indexable: false })
 }
 
 const LoginPage = () => {

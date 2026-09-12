@@ -3,13 +3,14 @@ import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { AuthCard } from '@/features/auth/auth-card'
 import { VerifyEmailWidget } from '@/widgets/auth/verify-email-widget'
+import { createPageMetadata } from '@/shared/lib/metadata'
 
 type VerifyEmailPageProps = { params: Promise<{ locale: string }>; searchParams: Promise<{ error?: string }> }
 
 export const generateMetadata = async ({ params }: VerifyEmailPageProps): Promise<Metadata> => {
     const { locale } = await params
     const t = await getTranslations({ locale, namespace: 'verification' })
-    return { title: t('title') }
+    return createPageMetadata({ locale, path: '/verify-email', title: t('title'), indexable: false })
 }
 
 const VerifyEmailPage = async ({ searchParams }: VerifyEmailPageProps) => {

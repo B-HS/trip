@@ -6,6 +6,7 @@ import { findProfileSettings } from '@/entities/profile/profile.repository'
 import { getUploadConfig } from '@/shared/lib/r2'
 import { requireUser } from '@/shared/lib/session'
 import { ProfileSettingsWidget } from '@/widgets/profile/profile-settings-widget'
+import { createPageMetadata } from '@/shared/lib/metadata'
 
 type ProfileSettingsPageProps = {
     params: Promise<{ locale: string }>
@@ -14,7 +15,7 @@ type ProfileSettingsPageProps = {
 export const generateMetadata = async ({ params }: ProfileSettingsPageProps): Promise<Metadata> => {
     const { locale } = await params
     const t = await getTranslations({ locale, namespace: 'metadata.profile' })
-    return { title: t('title'), description: t('description') }
+    return createPageMetadata({ locale, path: '/settings/profile', title: t('title'), description: t('description'), indexable: false })
 }
 
 const ProfileSettingsPage = async () => {
