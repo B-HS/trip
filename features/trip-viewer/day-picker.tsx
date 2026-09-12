@@ -1,9 +1,9 @@
 'use client'
 
 import dayjs from 'dayjs'
-import 'dayjs/locale/ko'
-import { ko } from 'date-fns/locale'
+import { enUS, ja, ko } from 'date-fns/locale'
 import { CalendarDaysIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 import { type FC, type KeyboardEvent, useEffect, useRef, useState } from 'react'
 import type { TripDayDetail } from '@/entities/trip/trip.type'
 import { formatMonthDay, formatRatio } from '@/features/trip-viewer/trip-viewer-format'
@@ -48,6 +48,9 @@ const readScrollState = (node: HTMLElement): ScrollState => {
 }
 
 export const DayPicker: FC<DayPickerProps> = ({ days, activeDayIndex, panelId, onSelect }) => {
+    const locale = useLocale()
+    const t = useTranslations('tripViewer')
+    const calendarLocale = locale === 'ja' ? ja : locale === 'en' ? enUS : ko
     const scrollRef = useRef<HTMLDivElement>(null)
     const activeButtonRef = useRef<HTMLButtonElement>(null)
     const [scrollState, setScrollState] = useState<ScrollState>(IDLE_SCROLL_STATE)
@@ -98,12 +101,12 @@ export const DayPicker: FC<DayPickerProps> = ({ days, activeDayIndex, panelId, o
     }, [activeDayIndex])
 
     return (
-        <nav className='flex flex-col bg-background' aria-label='여행 날짜' onKeyDown={handleKeyDown}>
+        <nav className='flex flex-col bg-background' aria-label={t('dayNavAria')} onKeyDown={handleKeyDown}>
             <div className='flex items-stretch gap-px'>
                 {isOverflowing && (
                     <button
                         type='button'
-                        aria-label='이전 날짜 보기'
+                        aria-label={t('prevDayAria')}
                         disabled={!scrollState.canScrollPrev}
                         className='flex w-9 shrink-0 items-center justify-center bg-card text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-40 disabled:hover:bg-card'
                         onClick={() => scrollByPage(-1)}>
@@ -140,7 +143,7 @@ export const DayPicker: FC<DayPickerProps> = ({ days, activeDayIndex, panelId, o
                 {isOverflowing && (
                     <button
                         type='button'
-                        aria-label='다음 날짜 보기'
+                        aria-label={t('nextDayAria')}
                         disabled={!scrollState.canScrollNext}
                         className='flex w-9 shrink-0 items-center justify-center bg-card text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-40 disabled:hover:bg-card'
                         onClick={() => scrollByPage(1)}>
@@ -151,7 +154,7 @@ export const DayPicker: FC<DayPickerProps> = ({ days, activeDayIndex, panelId, o
                     <PopoverTrigger asChild>
                         <button
                             type='button'
-                            aria-label='달력에서 날짜 선택'
+                            aria-label={t('pickDateAria')}
                             className='flex w-11 shrink-0 flex-col items-center justify-center gap-0.5 bg-card text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50'>
                             <CalendarDaysIcon aria-hidden className='size-4' />
                             <span className='font-mono text-2xs tabular-nums'>
@@ -162,7 +165,7 @@ export const DayPicker: FC<DayPickerProps> = ({ days, activeDayIndex, panelId, o
                     <PopoverContent align='end' className='w-auto rounded-none p-0'>
                         <Calendar
                             mode='single'
-                            locale={ko}
+                            locale={calendarLocale}
                             selected={activeDay ? dayjs(activeDay.date).toDate() : undefined}
                             defaultMonth={activeDay ? dayjs(activeDay.date).toDate() : firstDate ? dayjs(firstDate).toDate() : undefined}
                             disabled={(date) => !dayIndexByDate.has(dayjs(date).format(DATE_FORMAT))}

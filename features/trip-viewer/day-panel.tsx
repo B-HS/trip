@@ -2,6 +2,7 @@
 
 import { CalendarOffIcon } from 'lucide-react'
 import { AnimatePresence, motion, type Variants } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import type { FC } from 'react'
 import type { TripDayDetail, TripScheduleKind } from '@/entities/trip/trip.type'
 import { ScheduleRow } from '@/features/trip-viewer/schedule-row'
@@ -58,6 +59,7 @@ export const DayPanel: FC<DayPanelProps> = ({
     onRequestReset,
     onMemoChange,
 }) => {
+    const t = useTranslations('tripViewer')
     const kindById = toScheduleKindMap(scheduleKinds)
     const checkedIds = new Set(checkedItemIds)
     const completedCount = day.scheduleItems.filter((item) => checkedIds.has(item.id)).length
@@ -69,7 +71,7 @@ export const DayPanel: FC<DayPanelProps> = ({
                 <strong className='text-sm leading-snug font-medium break-keep'>
                     {route.origin} → {route.destination}
                 </strong>
-                <span className='font-mono text-sm font-medium whitespace-nowrap tabular-nums'>{route.minutes}분</span>
+                <span className='font-mono text-sm font-medium whitespace-nowrap tabular-nums'>{t('minutesUnit', { minutes: route.minutes })}</span>
             </div>
             {route.pathText && <p className='mt-2 text-sm break-keep'>{route.pathText}</p>}
             {route.formula && <p className='mt-2 font-mono text-xs break-keep text-muted-foreground'>{route.formula}</p>}
@@ -92,21 +94,21 @@ export const DayPanel: FC<DayPanelProps> = ({
                 <div className='flex flex-col gap-px bg-background sm:flex-row sm:items-stretch print:hidden'>
                     <div className='flex min-w-0 flex-1 items-center gap-2 bg-card px-3 py-2'>
                         <span aria-live='polite' className='font-mono text-xs whitespace-nowrap text-muted-foreground tabular-nums'>
-                            {formatRatio(completedCount, day.scheduleItems.length)} 완료
+                            {t('completedCount', { ratio: formatRatio(completedCount, day.scheduleItems.length) })}
                         </span>
                         <AnimatedProgress
                             className='max-w-45'
                             value={toPercent(completedCount, day.scheduleItems.length)}
-                            label={`${day.title} 일정 완료율`}
+                            label={t('dayProgressAria', { title: day.title })}
                         />
                     </div>
                     {isCheckable && (
                         <div className='flex gap-px bg-background'>
                             <Button type='button' variant='cell' size='cell' aria-pressed={isHideCompleted} onClick={onToggleHideCompleted}>
-                                {isHideCompleted ? '완료 표시' : '완료 숨기기'}
+                                {isHideCompleted ? t('showCompleted') : t('hideCompleted')}
                             </Button>
                             <Button type='button' variant='cell' size='cell' onClick={onRequestReset}>
-                                체크 초기화
+                                {t('resetChecks')}
                             </Button>
                         </div>
                     )}
@@ -119,10 +121,10 @@ export const DayPanel: FC<DayPanelProps> = ({
                         <TableHeader>
                             <TableRow>
                                 <TableHead scope='col' className='h-auto w-40 bg-muted p-2 text-xs font-medium text-muted-foreground'>
-                                    항목
+                                    {t('itemLabel')}
                                 </TableHead>
                                 <TableHead scope='col' className='h-auto bg-muted p-2 text-xs font-medium text-muted-foreground'>
-                                    확인된 내용
+                                    {t('verifiedLabel')}
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
@@ -147,13 +149,13 @@ export const DayPanel: FC<DayPanelProps> = ({
             {day.routes.length > 0 &&
                 (isPrintLayout ? (
                     <section className='flex flex-col gap-px bg-background'>
-                        <h3 className='bg-card px-4 py-3 text-sm font-medium'>이동시간 계산</h3>
+                        <h3 className='bg-card px-4 py-3 text-sm font-medium'>{t('travelTimeCalc')}</h3>
                         {routeBlocks}
                     </section>
                 ) : (
                     <Accordion type='single' collapsible defaultValue={isMobile ? undefined : ROUTES_ACCORDION_VALUE} className='bg-card'>
                         <AccordionItem value={ROUTES_ACCORDION_VALUE} className='border-b-0'>
-                            <AccordionTrigger className='px-4 py-3 text-sm font-medium hover:no-underline'>이동시간 계산</AccordionTrigger>
+                            <AccordionTrigger className='px-4 py-3 text-sm font-medium hover:no-underline'>{t('travelTimeCalc')}</AccordionTrigger>
                             <AccordionContent className='p-0'>
                                 <div className='flex flex-col gap-px bg-background'>{routeBlocks}</div>
                             </AccordionContent>
@@ -182,8 +184,8 @@ export const DayPanel: FC<DayPanelProps> = ({
                         <EmptyMedia variant='icon' className='rounded-none'>
                             <CalendarOffIcon aria-hidden />
                         </EmptyMedia>
-                        <EmptyTitle className='text-sm'>등록된 일정이 없습니다</EmptyTitle>
-                        <EmptyDescription className='text-xs'>이 날은 아직 비어 있습니다.</EmptyDescription>
+                        <EmptyTitle className='text-sm'>{t('emptyDayTitle')}</EmptyTitle>
+                        <EmptyDescription className='text-xs'>{t('emptyDayDescription')}</EmptyDescription>
                     </EmptyHeader>
                 </Empty>
             )}
@@ -213,13 +215,13 @@ export const DayPanel: FC<DayPanelProps> = ({
             {isCheckable && !isPrintLayout && (
                 <div className='flex flex-col gap-1.5 bg-card p-3 print:hidden'>
                     <label htmlFor={memoId} className='text-sm font-medium'>
-                        이날 메모
+                        {t('dayMemo')}
                     </label>
                     <Textarea
                         id={memoId}
                         rows={MEMO_ROWS}
                         value={memo}
-                        placeholder='예약번호, 식당, 준비물 등을 적어두세요'
+                        placeholder={t('dayMemoPlaceholder')}
                         className='min-h-19 rounded-none bg-background'
                         onChange={(event) => onMemoChange?.(event.target.value)}
                     />

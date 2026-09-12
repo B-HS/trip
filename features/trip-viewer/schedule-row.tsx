@@ -2,6 +2,7 @@
 
 import { ExternalLinkIcon } from 'lucide-react'
 import { motion, type Variants } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import type { FC } from 'react'
 import type { TripScheduleItem, TripScheduleKind } from '@/entities/trip/trip.type'
 import { SCHEDULE_KIND_BADGE_CLASS } from '@/features/trip-viewer/trip-viewer-kind'
@@ -35,6 +36,7 @@ type ScheduleRowProps = {
 }
 
 export const ScheduleRow: FC<ScheduleRowProps> = ({ item, kind, isCompleted, isCheckable, onToggle }) => {
+    const t = useTranslations('tripViewer')
     const checkboxId = `schedule-check-${item.id}`
     const bufferLabel = item.bufferNote ?? kind?.bufferLabel ?? null
     const content = (
@@ -68,7 +70,7 @@ export const ScheduleRow: FC<ScheduleRowProps> = ({ item, kind, isCompleted, isC
                                 id={checkboxId}
                                 className='mt-0.5 rounded-none'
                                 checked={isCompleted}
-                                aria-label={`${item.timeLabel} ${item.title} 완료`}
+                                aria-label={t('scheduleDoneAria', { time: item.timeLabel, title: item.title })}
                                 onCheckedChange={(checked) => onToggle?.(checked === true)}
                             />
                         )}
@@ -86,8 +88,8 @@ export const ScheduleRow: FC<ScheduleRowProps> = ({ item, kind, isCompleted, isC
                                 href={buildMapUrl(item.mapQuery)}
                                 target='_blank'
                                 rel='noopener noreferrer'
-                                aria-label={`${item.title} Google 지도에서 열기`}>
-                                지도 열기
+                                aria-label={t('mapOpenAria', { title: item.title })}>
+                                {t('openMap')}
                                 <ExternalLinkIcon aria-hidden />
                             </a>
                         </Button>

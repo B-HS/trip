@@ -1,6 +1,7 @@
 'use client'
 
 import type { FC, ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
 import type { TripInfoBlock, TripInfoSectionDetail } from '@/entities/trip/trip.type'
 import { DaySummaryTable, type DaySummaryRow } from '@/features/trip-viewer/day-summary-table'
 import { cn } from '@/shared/lib/utils'
@@ -37,6 +38,7 @@ type InfoPanelProps = {
 }
 
 export const InfoPanel: FC<InfoPanelProps> = ({ sections, days, isPrintLayout = false }) => {
+    const t = useTranslations('tripViewer')
     const renderBlocks = (blocks: readonly TripInfoBlock[]) =>
         groupInfoBlocks(blocks).map((group) => {
             if (group.kind === 'bullet-list')
@@ -65,7 +67,7 @@ export const InfoPanel: FC<InfoPanelProps> = ({ sections, days, isPrintLayout = 
 
     return (
         <section className={cn('flex flex-col gap-px', isPrintLayout && 'break-before-page')}>
-            <h2 className='bg-card p-3 text-base font-semibold tracking-tight'>여행 정보와 확인 사항</h2>
+            <h2 className='bg-card p-3 text-base font-semibold tracking-tight'>{t('infoTitle')}</h2>
             {isPrintLayout ? (
                 sections.map((section) => (
                     <section key={section.id} className='flex break-inside-avoid flex-col gap-3 bg-card p-3'>

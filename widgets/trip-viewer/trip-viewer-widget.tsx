@@ -3,6 +3,7 @@
 import dayjs from 'dayjs'
 import { PrinterIcon, TriangleAlertIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import { type FC, useEffect, useRef, useState } from 'react'
 import { useTripDetail } from '@/entities/trip/trip.query'
 import type { PublicTrip, TripDayDetail } from '@/entities/trip/trip.type'
@@ -44,10 +45,6 @@ const FIRST_DAY_INDEX = 0
 const FIRST_DAY_ORDINAL = 1
 const MEMO_DEBOUNCE_MS = 500
 const DAY_PANEL_ID = 'trip-day-panel'
-const MEMO_IDLE_LABEL = '입력하면 자동 저장됩니다.'
-const MEMO_SAVING_LABEL = '저장 중…'
-const MEMO_SAVED_LABEL = '저장됨'
-const PUBLIC_NOTICE = '공개 보기 · 편집·체크는 로그인한 멤버만 가능합니다.'
 
 type MemoStatus = 'saving' | 'saved'
 
@@ -67,13 +64,8 @@ const resolveTodayDayIndex = (days: readonly TripDayDetail[]) => {
     return index === -1 ? FIRST_DAY_INDEX : index
 }
 
-const resolveMemoLabel = (status: MemoStatus | undefined) => {
-    if (status === 'saving') return MEMO_SAVING_LABEL
-    if (status === 'saved') return MEMO_SAVED_LABEL
-    return MEMO_IDLE_LABEL
-}
-
 export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, initialTrip, initialView, initialDayOrdinal }) => {
+    const t = useTranslations('tripViewer')
     const memoTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
     const [selectedView, setSelectedView] = useState<TripView | null>(null)
@@ -106,6 +98,11 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
     const activeDayIndex = selectedDayIndex ?? (hasDayParam ? dayOrdinal - FIRST_DAY_ORDINAL : fallbackDayIndex)
     const activeDay = days.at(activeDayIndex) ?? null
     const resetTargetDay = days.find((day) => day.id === resetTargetDayId) ?? null
+    const resolveMemoLabel = (status: MemoStatus | undefined) => {
+        if (status === 'saving') return t('memoSaving')
+        if (status === 'saved') return t('memoSaved')
+        return t('memoIdle')
+    }
 
     const replaceParam = (key: string, value: string) => {
         if (isMember) replaceSearchParam(key, value)
@@ -152,8 +149,8 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
                     <EmptyMedia variant='icon' className='rounded-none text-destructive'>
                         <TriangleAlertIcon aria-hidden />
                     </EmptyMedia>
-                    <EmptyTitle className='text-sm'>여행을 불러오지 못했습니다</EmptyTitle>
-                    <EmptyDescription className='text-xs'>요청이 실패했습니다. 잠시 후 다시 시도하세요.</EmptyDescription>
+                    <EmptyTitle className='text-sm'>{t('loadFailed')}</EmptyTitle>
+                    <EmptyDescription className='text-xs'>{t('requestFailed')}</EmptyDescription>
                 </EmptyHeader>
             </Empty>
         )
@@ -191,10 +188,10 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
                         <ViewTabs activeView={activeView} onSelect={handleSelectView} />
                         <Button type='button' variant='cell' size='cell' onClick={() => window.print()}>
                             <PrinterIcon aria-hidden />
-                            전체 일정 인쇄
+                            {t('printAll')}
                         </Button>
                     </div>
-                    {!isMember && <p className='bg-card p-3 text-xs text-muted-foreground'>{PUBLIC_NOTICE}</p>}
+                    {!isMember && <p className='bg-card p-3 text-xs text-muted-foreground'>{t('publicNotice')}</p>}
                     <div id={TRIP_VIEW_PANEL_ID} className='flex min-w-0 flex-1 flex-col gap-px'>
                         {activeView === 'itinerary' && days.length > 0 && (
                             <>
@@ -240,7 +237,7 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
                                     />
                                 )}
                                 {activeView === 'itinerary' && !activeDay && (
-                                    <p className='bg-card p-6 text-center text-sm text-muted-foreground'>등록된 날짜가 없습니다.</p>
+                                    <p className='bg-card p-6 text-center text-sm text-muted-foreground'>{t('noDays')}</p>
                                 )}
                                 {activeView === 'bookings' && (
                                     <BookingsPanel
@@ -287,17 +284,17 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
             <AlertDialog open={resetTargetDay !== null} onOpenChange={(open) => !open && setResetTargetDayId(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>이 날짜의 완료 체크를 모두 초기화할까요?</AlertDialogTitle>
+                        <AlertDialogTitle>{t('resetTitle')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            {`${resetTargetDay?.title ?? '선택한 날짜'}의 완료 표시가 모두 해제됩니다. 다른 날짜와 메모는 그대로 유지됩니다.`}
+                            {t('resetDescription', { title: resetTargetDay?.title ?? t('defaultDayTitle') })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className='gap-px bg-background sm:ml-auto sm:w-fit'>
                         <AlertDialogCancel variant='cell' size='cell'>
-                            취소
+                            {t('cancel')}
                         </AlertDialogCancel>
                         <AlertDialogAction variant='cellPrimary' size='cell' onClick={handleConfirmReset}>
-                            초기화
+                            {t('reset')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
