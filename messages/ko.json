@@ -27,7 +27,20 @@
         "actions": {
             "start": "시작하기",
             "login": "로그인",
-            "home": "홈"
+            "home": "홈",
+            "cancel": "취소",
+            "confirm": "확인",
+            "delete": "삭제",
+            "deleting": "삭제 중…",
+            "edit": "편집",
+            "open": "열기",
+            "save": "저장",
+            "saving": "저장 중…",
+            "retry": "다시 시도"
+        },
+        "themeToggle": {
+            "toLight": "라이트 모드로 전환",
+            "toDark": "다크 모드로 전환"
         },
         "footer": {
             "tagline": "Trip manager with structured data forms"
@@ -35,8 +48,8 @@
         "localeSwitcher": {
             "menuAria": "언어 선택",
             "names": {
-                "ko": "ko",
-                "en": "english",
+                "ko": "한국어",
+                "en": "English",
                 "ja": "日本語"
             }
         }
@@ -473,6 +486,90 @@
         }
     },
     "intro": {
+        "hero": {
+            "eyebrow": "여행 일정 노트",
+            "title": "흩어진 여행 계획을 한 화면에 모읍니다",
+            "description": "항공편과 숙소, 날짜별 일정, 구간 이동 시간, 예매 목록을 한 곳에 정리하고 동행과 함께 편집하세요. 여행 당일에는 화면을 열어 체크만 하면 됩니다.",
+            "globeNote": "예시로 표시한 경로입니다."
+        },
+        "features": {
+            "eyebrow": "기능",
+            "title": "여행 준비에 필요한 것만 담았습니다",
+            "description": "기록을 위한 도구가 아니라, 여행 당일에 실제로 열어보게 되는 화면을 목표로 만들었습니다.",
+            "items": {
+                "itinerary": {
+                    "title": "날짜별 일정과 이동시간 계산",
+                    "description": "하루치 일정을 시간순으로 쌓고 구간별 이동 시간을 더해, 다음 일정까지 여유가 되는지 바로 확인합니다."
+                },
+                "booking": {
+                    "title": "예매 체크리스트와 우선순위",
+                    "description": "티켓과 입장권을 우선순위로 정리하고 예매 링크와 진행 상태를 한 카드에서 관리합니다."
+                },
+                "info": {
+                    "title": "여행 정보 아코디언",
+                    "description": "교통 패스, 환전, 준비물처럼 자주 다시 보는 정보를 접었다 펼치는 섹션으로 보관합니다."
+                },
+                "share": {
+                    "title": "공동편집자 초대와 공개 링크",
+                    "description": "이메일로 동행을 초대해 함께 편집하고, 읽기 전용 공개 링크로 일정을 공유합니다."
+                },
+                "sync": {
+                    "title": "사용자별 완료 체크·메모 동기화",
+                    "description": "체크와 메모는 계정에 저장되어 휴대폰과 노트북 어디에서 열어도 같은 상태로 이어집니다."
+                },
+                "print": { "title": "전체 일정 인쇄", "description": "전체 일정을 인쇄용 레이아웃으로 정리해 종이로 들고 다닐 수 있습니다." }
+            }
+        },
+        "steps": {
+            "eyebrow": "사용 방법",
+            "title": "세 단계면 준비가 끝납니다",
+            "description": "처음 한 번만 채워 두면, 여행이 끝날 때까지 같은 화면을 계속 씁니다.",
+            "items": {
+                "create": {
+                    "title": "트립 만들기",
+                    "description": "여행 이름과 기간, 목적지를 입력하면 빈 일정표가 만들어집니다. 오사카 예시로 한 번에 채워 볼 수도 있습니다."
+                },
+                "fill": {
+                    "title": "날짜별 일정 채우기",
+                    "description": "항공편과 숙소를 등록하고 날짜마다 일정, 이동 경로, 예매 항목을 더합니다. 순서는 끌어서 바꿉니다."
+                },
+                "check": {
+                    "title": "여행 중 체크",
+                    "description": "현장에서는 끝난 일정을 체크하고 메모를 남깁니다. 같은 트립을 보는 동행에게도 그대로 이어집니다."
+                }
+            }
+        },
+        "showcase": {
+            "eyebrow": "여행 중 화면",
+            "title": "체크할수록 남은 일정이 또렷해집니다",
+            "description": "완료한 일정은 흐려지고 진행률이 함께 채워집니다. 아래는 실제 화면을 단순하게 옮긴 예시입니다.",
+            "dayLabel": "3일차",
+            "dayTitle": "교토 당일치기",
+            "progressLabel": "오늘 일정 진행률",
+            "completed": "완료",
+            "items": {
+                "depart": { "title": "난바역 출발", "note": "한큐 교토선 특급 승차" },
+                "arrive": { "title": "가와라마치 도착", "note": "코인로커에 큰 짐 보관" },
+                "temple": { "title": "기요미즈데라", "note": "니넨자카 방향으로 내려오기" },
+                "lunch": { "title": "니시키 시장 점심", "note": "도보 15분 이동, 여유 10분" },
+                "return": { "title": "교토역 복귀", "note": "돌아가는 열차 시간 확인" }
+            }
+        },
+        "cta": {
+            "title": "오늘 저녁 일정부터 정리해 보세요",
+            "description": "이메일과 비밀번호만 있으면 바로 첫 트립을 만들 수 있습니다.",
+            "note": "별도 인증 절차 없이 가입한 뒤 곧바로 사용할 수 있습니다."
+        },
+        "community": {
+            "tripsEyebrow": "공개 일정",
+            "tripsTitle": "공개된 여행 일정",
+            "tripsDescription": "다른 여행자가 공개한 일정을 그대로 열어 볼 수 있습니다.",
+            "tripsEmpty": "아직 공개된 여행이 없습니다.",
+            "postsEyebrow": "커뮤니티",
+            "postsTitle": "커뮤니티 최신 글",
+            "postsDescription": "자유·질문·후기 게시판에 올라온 새 글입니다.",
+            "postsEmpty": "아직 등록된 글이 없습니다."
+        },
         "notFound": {
             "primaryAction": "홈으로 가기",
             "secondaryAction": "내 여행 목록"
@@ -482,6 +579,7 @@
         "unauthorized": "로그인이 필요합니다.",
         "forbidden": "접근 권한이 없습니다.",
         "notFound": "찾을 수 없습니다.",
+        "invalidInput": "입력값이 올바르지 않습니다.",
         "uploadNotConfigured": "이미지 저장소가 설정되지 않았습니다.",
         "uploadDisabled": "저장소가 설정되지 않았습니다.",
         "internal": "처리 중 오류가 발생했습니다.",
@@ -514,7 +612,381 @@
         "withdrawnUser": "(탈퇴한 사용자)",
         "noTarget": "(대상 없음)"
     },
+    "toasts": {
+        "tripCreated": "여행을 만들었습니다.",
+        "sampleTripCreated": "예시 여행을 만들었습니다.",
+        "basicsSaved": "기본 정보를 저장했습니다.",
+        "flightsSaved": "항공편을 저장했습니다.",
+        "lodgingsSaved": "숙소를 저장했습니다.",
+        "sidebarSaved": "사이드바를 저장했습니다.",
+        "scheduleKindsSaved": "일정 종류를 저장했습니다.",
+        "daySaved": "일정을 저장했습니다.",
+        "dayDeleted": "날짜를 삭제했습니다.",
+        "dayOrderSaved": "날짜 순서를 저장했습니다.",
+        "bookingsSaved": "예매 목록을 저장했습니다.",
+        "infoSaved": "여행 정보를 저장했습니다.",
+        "tripDeleted": "여행을 삭제했습니다.",
+        "memberAdded": "멤버를 추가했습니다.",
+        "inviteSent": "초대를 보냈습니다. 가입하면 자동으로 참여합니다.",
+        "roleUpdated": "권한을 변경했습니다.",
+        "memberRemoved": "멤버를 삭제했습니다.",
+        "inviteCanceled": "초대를 취소했습니다.",
+        "saved": "저장했습니다.",
+        "tripImported": "JSON을 가져와 내용을 교체했습니다.",
+        "dayChecksReset": "이 날짜의 체크를 모두 해제했습니다."
+    },
+    "richEditor": {
+        "toolbar": {
+            "heading2": "제목 2",
+            "heading3": "제목 3",
+            "bold": "굵게",
+            "italic": "기울임",
+            "strike": "취소선",
+            "bulletList": "목록",
+            "orderedList": "번호 목록",
+            "blockquote": "인용",
+            "codeBlock": "코드 블록",
+            "link": "링크",
+            "image": "이미지",
+            "youtube": "YouTube",
+            "undo": "되돌리기",
+            "redo": "다시 실행"
+        },
+        "fileInput": "본문 이미지 파일 선택",
+        "uploadDisabled": "저장소가 설정되지 않았습니다.",
+        "uploading": "이미지를 올리는 중입니다.",
+        "cancel": "취소",
+        "confirm": "확인",
+        "link": {
+            "title": "링크",
+            "description": "선택한 글자에 연결할 주소를 넣습니다. 비워 두고 확인하면 링크를 해제합니다.",
+            "label": "링크 주소",
+            "placeholder": "https://",
+            "invalid": "링크는 http 또는 https 주소여야 합니다."
+        },
+        "youtube": {
+            "title": "YouTube",
+            "description": "YouTube 영상 주소를 넣으면 본문에 영상을 삽입합니다.",
+            "label": "영상 주소",
+            "placeholder": "https://www.youtube.com/watch?v=",
+            "invalid": "YouTube 영상 주소가 아닙니다."
+        }
+    },
+    "tripEditor": {
+        "tabs": {
+            "basics": "기본 정보",
+            "sidebar": "사이드바",
+            "travel": "항공·숙소",
+            "kinds": "일정 종류",
+            "days": "날짜별 일정",
+            "bookings": "예매",
+            "info": "여행 정보",
+            "share": "멤버·공유",
+            "export": "내보내기·가져오기"
+        },
+        "loadFailed": "여행을 불러오지 못했습니다.",
+        "requestFailed": "요청이 실패했습니다. 잠시 후 다시 시도하세요.",
+        "savePerTab": "탭마다 따로 저장합니다.",
+        "recentSaved": "최근 저장 {time}",
+        "view": "보기",
+        "newDay": "새 날짜",
+        "exportSuccess": "JSON 파일을 내보냈습니다.",
+        "saveHint": "변경한 내용은 탭별로 저장합니다.",
+        "undo": "되돌리기",
+        "drag": "순서 변경",
+        "airportSearch": "공항 검색",
+        "airportCode": "{code} 공항",
+        "airportEmpty": "일치하는 공항이 없습니다.",
+        "flights": {
+            "title": "항공편",
+            "description": "드래그해서 순서를 바꿀 수 있습니다.",
+            "add": "항공편 추가",
+            "empty": "등록된 항공편이 없습니다.",
+            "remove": "항공편 삭제",
+            "direction": "구분",
+            "directions": { "outbound": "출국", "inbound": "귀국" },
+            "label": "라벨",
+            "labelPlaceholder": "10.01 목 · 출국",
+            "departAirport": "출발 공항",
+            "departTime": "출발 시각",
+            "departTerminal": "출발 터미널",
+            "departTerminalPlaceholder": "제1여객터미널",
+            "flightNumber": "편명",
+            "arriveAirport": "도착 공항",
+            "arriveTime": "도착 시각",
+            "arriveTerminal": "도착 터미널",
+            "arriveTerminalPlaceholder": "제1터미널",
+            "note": "메모",
+            "notePlaceholder": "탑승 수속 마감 시각 등"
+        },
+        "lodgings": {
+            "title": "숙소",
+            "description": "모든 날의 출발점이 되는 숙소 정보입니다.",
+            "add": "숙소 추가",
+            "empty": "등록된 숙소가 없습니다.",
+            "remove": "숙소 삭제",
+            "name": "이름",
+            "localName": "현지 표기",
+            "checkIn": "체크인",
+            "checkOut": "체크아웃",
+            "address": "주소",
+            "link": "링크",
+            "access": "이동 안내",
+            "accessPlaceholder": "난바역 도보 5분",
+            "note": "메모"
+        },
+        "sidebar": {
+            "introTitle": "소개 문구",
+            "introDescription": "뷰어 사이드바의 기간 줄 아래에 보여 줍니다.",
+            "introLabel": "소개 문구",
+            "linksTitle": "링크",
+            "linksDescription": "사이드바 숙소 아래에 보여 주는 링크 목록입니다.",
+            "add": "링크 추가",
+            "empty": "등록된 링크가 없습니다.",
+            "remove": "링크 삭제",
+            "label": "라벨",
+            "url": "주소",
+            "description": "설명"
+        },
+        "infoSections": {
+            "title": "여행 정보",
+            "description": "뷰어의 아코디언 섹션입니다. 섹션과 블록 모두 순서를 바꿀 수 있습니다.",
+            "add": "섹션 추가",
+            "empty": "등록된 정보 섹션이 없습니다."
+        },
+        "basics": {
+            "overviewTitle": "여행 개요",
+            "overviewDescription": "목록과 뷰어 상단에 표시되는 정보입니다.",
+            "title": "제목",
+            "eyebrow": "윗줄 문구",
+            "eyebrowPlaceholder": "2박 3일 일정",
+            "destination": "목적지",
+            "departureAirport": "출발 공항",
+            "departureAirportHint": "고르지 않으면 기본 ICN 으로 계산합니다.",
+            "periodNote": "기간 문구",
+            "periodNotePlaceholder": "10.01 목 - 10.07 화",
+            "startDate": "시작일",
+            "endDate": "종료일",
+            "nights": "박",
+            "days": "일",
+            "autoLengthHint": "비우면 날짜로 계산합니다",
+            "verifiedOn": "확인 기준일",
+            "verifiedOnHint": "정보를 마지막으로 확인한 날짜입니다.",
+            "disclaimer": "주의 문구",
+            "disclaimerPlaceholder": "운행 정보는 변동될 수 있습니다.",
+            "destinationsTitle": "목적지",
+            "destinationsDescription": "여행하는 순서대로 나라를 추가하세요. 항공편이 없으면 지구본 경로에 사용됩니다.",
+            "addCountry": "나라 추가",
+            "destinationsEmpty": "등록된 목적지가 없습니다.",
+            "removeDestination": "목적지 삭제",
+            "country": "나라",
+            "city": "도시",
+            "cityPlaceholder": "오사카",
+            "noticesTitle": "안내 문구",
+            "noticesDescription": "뷰어의 범례·예매 소개·푸터에 그대로 표시됩니다.",
+            "bufferPolicy": "여유 시간 안내",
+            "bookingNote": "예매 안내",
+            "footerNote": "푸터 문구"
+        },
+        "dayList": {
+            "title": "날짜",
+            "add": "날짜 추가",
+            "empty": "등록된 날짜가 없습니다.",
+            "remove": "날짜 삭제",
+            "deleteTitle": "날짜를 삭제할까요?",
+            "deleteDefault": "이 날짜의 일정과 경로가 함께 삭제됩니다.",
+            "deleteDescription": "{day}의 일정과 경로가 함께 삭제됩니다.",
+            "cancel": "취소",
+            "delete": "삭제"
+        },
+        "infoSection": {
+            "title": "섹션 제목",
+            "defaultOpen": "기본 펼침",
+            "addBlock": "블록 추가",
+            "removeBlock": "블록 삭제",
+            "removeSection": "섹션 삭제",
+            "empty": "블록이 없습니다."
+        },
+        "infoBlock": {
+            "kind": "종류",
+            "kinds": { "paragraph": "문단", "bullet": "목록 항목", "heading": "소제목", "day_table": "전체 일정 표" },
+            "dayTableHint": "날짜별 일정으로 표를 자동 생성합니다. 별도 입력이 없습니다.",
+            "emphasis": "강조 문구",
+            "body": "본문",
+            "linkLabel": "링크 이름",
+            "linkUrl": "링크 주소"
+        },
+        "schedule": {
+            "time": "시각",
+            "content": "내용",
+            "kind": "구분",
+            "note": "메모",
+            "buffer": "여유 문구",
+            "mapQuery": "지도 검색어",
+            "mapPlaceholder": "난바역",
+            "mapPreview": "지도 미리보기"
+        },
+        "bookings": {
+            "title": "예매 체크리스트",
+            "description": "우선순위 순서대로 정렬하면 뷰어에 그대로 표시됩니다.",
+            "add": "예매 추가",
+            "empty": "등록된 예매 항목이 없습니다.",
+            "remove": "예매 항목 삭제",
+            "item": "항목",
+            "when": "시점",
+            "whenPlaceholder": "출발 2주 전",
+            "priority": "우선순위",
+            "priorities": { "p1": "우선순위 1", "p2": "우선순위 2", "p3": "우선순위 3", "onsite": "현장" },
+            "linkLabel": "링크 이름",
+            "linkLabelPlaceholder": "공식 예매처",
+            "linkUrl": "링크 주소",
+            "action": "할 일",
+            "actionPlaceholder": "오픈 시간에 맞춰 결제",
+            "status": "진행 상태",
+            "statusPlaceholder": "예매 완료"
+        },
+        "kinds": {
+            "title": "일정 종류",
+            "description": "타임라인 배지와 범례에 쓰며 순서는 범례에 반영됩니다.",
+            "add": "종류 추가",
+            "remove": "종류 삭제",
+            "name": "이름",
+            "namePlaceholder": "계획",
+            "legend": "범례 라벨",
+            "legendPlaceholder": "계획 일정",
+            "color": "색",
+            "colors": {
+                "muted": "기본 회색",
+                "success": "초록",
+                "warning": "노랑",
+                "destructive": "빨강",
+                "chart-1": "강조 1",
+                "chart-2": "강조 2",
+                "chart-3": "강조 3",
+                "chart-4": "강조 4",
+                "chart-5": "강조 5"
+            },
+            "buffer": "여유 문구",
+            "bufferPlaceholder": "마지막 10분 여유",
+            "deleteTitle": "'{name}' 종류를 삭제할까요?",
+            "deleteUsed": "이 종류를 쓰는 일정이 {count}건 있습니다. 대신할 종류를 고르면 저장할 때 함께 바꿉니다.",
+            "deleteUnused": "이 종류를 쓰는 일정이 없습니다. 저장할 때 목록에서 제거합니다.",
+            "replacement": "대체 종류",
+            "replacementPlaceholder": "대체 종류 선택",
+            "cancel": "취소",
+            "delete": "삭제"
+        },
+        "day": {
+            "saveHint": "이 날짜만 저장합니다.",
+            "headerDescription": "날짜 탭과 헤딩에 사용하는 값입니다.",
+            "date": "날짜",
+            "tabLabel": "탭 라벨",
+            "title": "제목",
+            "subtitle": "부제",
+            "bodyTitle": "본문",
+            "bodyDescription": "개요, 이동 계획, 마무리 문단입니다.",
+            "overview": "개요",
+            "planHeadline": "이동 계획 제목",
+            "closingHeadline": "마무리 제목",
+            "planNote": "이동 계획 본문",
+            "closingNote": "마무리 본문",
+            "summaryTitle": "전체 일정 표",
+            "summaryDescription": "여행 정보의 전체 일정 표에 들어가는 요약입니다.",
+            "morning": "오전",
+            "afternoon": "오후",
+            "evening": "저녁",
+            "factsTitle": "확인된 내용",
+            "addFact": "항목 추가",
+            "removeFact": "항목 삭제",
+            "factLabel": "항목",
+            "factValue": "내용",
+            "routesTitle": "이동 경로",
+            "addRoute": "경로 추가",
+            "removeRoute": "경로 삭제",
+            "origin": "출발",
+            "arrival": "도착",
+            "minutes": "소요(분)",
+            "formula": "계산식",
+            "formulaPlaceholder": "도보 8 + 지하철 12",
+            "routeDescription": "경로 설명",
+            "routePlaceholder": "난바역 → 미도스지선 → 우메다역",
+            "timelineTitle": "타임라인",
+            "addSchedule": "일정 추가",
+            "removeSchedule": "일정 삭제",
+            "notesTitle": "참고",
+            "addNote": "참고 추가",
+            "removeNote": "참고 삭제",
+            "leading": "앞 문장",
+            "linkLabel": "링크 이름",
+            "linkUrl": "링크 주소",
+            "trailing": "뒤 문장"
+        },
+        "attachments": {
+            "count": "첨부 {count}",
+            "addLink": "링크 추가",
+            "uploadImage": "이미지 업로드",
+            "uploadDisabled": "저장소가 설정되지 않았습니다.",
+            "label": "첨부 라벨",
+            "labelPlaceholder": "예매 확인 메일",
+            "imageUrl": "이미지 주소",
+            "url": "첨부 주소",
+            "remove": "첨부 삭제",
+            "fileInput": "첨부 이미지 파일 선택"
+        },
+        "share": {
+            "copySuccess": "공유 링크를 복사했습니다.",
+            "copyFailed": "링크를 복사하지 못했습니다.",
+            "invalidJson": "올바른 트립 JSON이 아닙니다.",
+            "saveHint": "공유 설정을 저장합니다.",
+            "publicLink": "공개 링크",
+            "publicLinkDescription": "공개하면 로그인 없이도 읽기 전용으로 볼 수 있습니다.",
+            "enablePublicLink": "공개 링크 사용",
+            "shareAddress": "공유 주소",
+            "slugHint": "영문 소문자, 숫자, 하이픈만 사용할 수 있습니다. 비워 두면 자동으로 만듭니다.",
+            "slugAfterSave": "저장하면 공유 주소가 만들어집니다.",
+            "copyLink": "링크 복사",
+            "openNewTab": "새 탭에서 열기",
+            "transferTitle": "내보내기·가져오기",
+            "transferDescription": "구조화된 JSON으로 내려받거나, 내보낸 JSON을 가져와 현재 내용을 교체할 수 있습니다.",
+            "exporting": "내보내는 중…",
+            "export": "JSON 내보내기",
+            "importing": "가져오는 중…",
+            "import": "JSON 가져오기",
+            "confirmTitle": "이 JSON으로 교체할까요?",
+            "importSummary": "{title} · 날짜 {days}개 · 예매 {bookings}개",
+            "replaceWarning": "현재 내용이 모두 교체됩니다. 체크·메모도 초기화됩니다.",
+            "cancel": "취소",
+            "confirmImport": "가져오기"
+        },
+        "members": {
+            "title": "멤버",
+            "description": "편집자는 내용을 수정할 수 있고, 열람자는 보기만 가능합니다.",
+            "name": "이름",
+            "email": "이메일",
+            "role": "권한",
+            "manage": "관리",
+            "roles": { "owner": "소유자", "editor": "편집자", "viewer": "열람자" },
+            "roleAria": "{name} 권한",
+            "removeAria": "{name} 삭제",
+            "inviteTitle": "초대",
+            "inviteDescription": "가입하지 않은 이메일로 초대하면 가입 시 자동으로 참여합니다.",
+            "saving": "저장 중…",
+            "invite": "초대",
+            "noInvites": "대기 중인 초대가 없습니다.",
+            "cancelInviteAria": "{email} 초대 취소",
+            "removeTitle": "멤버를 삭제할까요?",
+            "removeDefault": "이 멤버는 더 이상 여행을 볼 수 없습니다.",
+            "removeDescription": "{name} 님은 더 이상 이 여행을 볼 수 없습니다.",
+            "cancel": "취소",
+            "remove": "삭제"
+        }
+    },
     "tripViewer": {
+        "views": { "itinerary": "날짜별 일정", "bookings": "예매 체크", "info": "여행 정보" },
+        "bookingPriority": { "p1": "우선순위 1", "p2": "우선순위 2", "p3": "우선순위 3", "onsite": "현장" },
+        "globeEmpty": "경로가 표시되지 않은 지구본입니다.",
+        "globeDescription": "여행 경로 지구본. {routes}.",
+        "globeRoute": "{from}에서 {to}까지",
         "memoIdle": "입력하면 자동 저장됩니다.",
         "memoSaving": "저장 중…",
         "memoSaved": "저장됨",
@@ -602,6 +1074,8 @@
                 "title": "제목",
                 "destination": "목적지",
                 "country": "나라",
+                "countrySearch": "나라 검색",
+                "countryEmpty": "일치하는 나라가 없습니다.",
                 "countryHint": "여행하는 순서대로 나라와 도시를 추가하세요. 지구본 경로에 사용됩니다.",
                 "city": "도시",
                 "cityOptional": "도시 (선택)",
@@ -631,6 +1105,7 @@
         },
         "error": {
             "title": "트립 목록을 불러오지 못했습니다",
+            "description": "요청이 실패했습니다. 잠시 후 다시 시도하세요.",
             "retry": "다시 시도",
             "retrying": "다시 불러오는 중…"
         },
@@ -651,6 +1126,7 @@
             "done": "완료",
             "ongoing": "진행 중"
         },
+        "roles": { "owner": "소유자", "editor": "편집자", "viewer": "열람자" },
         "length": {
             "nightsDays": "{nights}박 {days}일"
         },

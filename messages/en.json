@@ -48,8 +48,8 @@
         "localeSwitcher": {
             "menuAria": "Select language",
             "names": {
-                "ko": "ko",
-                "en": "english",
+                "ko": "한국어",
+                "en": "English",
                 "ja": "日本語"
             }
         }
@@ -486,6 +486,93 @@
         }
     },
     "intro": {
+        "hero": {
+            "eyebrow": "Travel itinerary notes",
+            "title": "Bring scattered travel plans together",
+            "description": "Organize flights, lodging, daily schedules, travel times, and bookings in one place and edit them with your companions. On the day, just open the plan and check things off.",
+            "globeNote": "An example route is shown."
+        },
+        "features": {
+            "eyebrow": "Features",
+            "title": "Only what you need to prepare for a trip",
+            "description": "Built to be the screen you actually open while traveling, not just another place to keep notes.",
+            "items": {
+                "itinerary": {
+                    "title": "Daily itineraries and travel times",
+                    "description": "Arrange each day chronologically and total the time between stops to see whether you have enough breathing room."
+                },
+                "booking": {
+                    "title": "Prioritized booking checklist",
+                    "description": "Keep tickets and admission passes ordered by priority, with booking links and status together on one card."
+                },
+                "info": {
+                    "title": "Expandable travel information",
+                    "description": "Keep frequently revisited details such as transit passes, currency, and packing lists in expandable sections."
+                },
+                "share": {
+                    "title": "Collaborator invites and public links",
+                    "description": "Invite companions by email to edit together, or share the itinerary through a read-only public link."
+                },
+                "sync": {
+                    "title": "Per-user checks and memo sync",
+                    "description": "Checks and memos are saved to your account, so the same state follows you between phone and laptop."
+                },
+                "print": {
+                    "title": "Print the full itinerary",
+                    "description": "Lay out the full itinerary for printing so you can carry a paper copy."
+                }
+            }
+        },
+        "steps": {
+            "eyebrow": "How it works",
+            "title": "Ready in three steps",
+            "description": "Fill it in once, then keep using the same screen until the trip is over.",
+            "items": {
+                "create": {
+                    "title": "Create a trip",
+                    "description": "Enter a name, dates, and destinations to create a blank itinerary, or fill one instantly with the Osaka sample."
+                },
+                "fill": {
+                    "title": "Fill each day's itinerary",
+                    "description": "Add flights, lodging, schedules, routes, and bookings. Drag to change their order."
+                },
+                "check": {
+                    "title": "Check things off as you travel",
+                    "description": "Mark completed plans and leave memos on the go. Companions viewing the same trip stay in sync."
+                }
+            }
+        },
+        "showcase": {
+            "eyebrow": "On-trip view",
+            "title": "Every check makes what's left clearer",
+            "description": "Completed plans fade while progress fills up. This simplified example mirrors the actual screen.",
+            "dayLabel": "Day 3",
+            "dayTitle": "Kyoto day trip",
+            "progressLabel": "Today's itinerary progress",
+            "completed": "done",
+            "items": {
+                "depart": { "title": "Depart Namba Station", "note": "Take the Hankyu Kyoto Line limited express" },
+                "arrive": { "title": "Arrive at Kawaramachi", "note": "Store large bags in a coin locker" },
+                "temple": { "title": "Kiyomizu-dera", "note": "Walk down toward Ninenzaka" },
+                "lunch": { "title": "Lunch at Nishiki Market", "note": "15-minute walk with 10 minutes to spare" },
+                "return": { "title": "Return to Kyoto Station", "note": "Check the return train time" }
+            }
+        },
+        "cta": {
+            "title": "Start with tonight's plans",
+            "description": "All you need is an email and password to create your first trip.",
+            "note": "Sign up and start immediately—no separate verification step."
+        },
+        "community": {
+            "tripsEyebrow": "Public itineraries",
+            "tripsTitle": "Shared travel itineraries",
+            "tripsDescription": "Open itineraries published by other travelers.",
+            "tripsEmpty": "No public trips yet.",
+            "postsEyebrow": "Community",
+            "postsTitle": "Latest community posts",
+            "postsDescription": "New posts from the free, Q&A, and review boards.",
+            "postsEmpty": "No posts yet."
+        },
         "notFound": {
             "primaryAction": "Go home",
             "secondaryAction": "My trips"
@@ -495,6 +582,7 @@
         "unauthorized": "Login required.",
         "forbidden": "You don't have access.",
         "notFound": "Not found.",
+        "invalidInput": "The input is invalid.",
         "uploadNotConfigured": "Image storage is not configured.",
         "uploadDisabled": "Storage is not configured.",
         "internal": "An error occurred while processing.",
@@ -527,7 +615,381 @@
         "withdrawnUser": "(withdrawn user)",
         "noTarget": "(no target)"
     },
+    "toasts": {
+        "tripCreated": "Trip created.",
+        "sampleTripCreated": "Sample trip created.",
+        "basicsSaved": "Basic information saved.",
+        "flightsSaved": "Flights saved.",
+        "lodgingsSaved": "Lodging saved.",
+        "sidebarSaved": "Sidebar saved.",
+        "scheduleKindsSaved": "Schedule kinds saved.",
+        "daySaved": "Itinerary saved.",
+        "dayDeleted": "Date deleted.",
+        "dayOrderSaved": "Date order saved.",
+        "bookingsSaved": "Bookings saved.",
+        "infoSaved": "Travel information saved.",
+        "tripDeleted": "Trip deleted.",
+        "memberAdded": "Member added.",
+        "inviteSent": "Invitation sent. They will join automatically after signing up.",
+        "roleUpdated": "Role updated.",
+        "memberRemoved": "Member removed.",
+        "inviteCanceled": "Invitation canceled.",
+        "saved": "Saved.",
+        "tripImported": "Imported the JSON and replaced the trip content.",
+        "dayChecksReset": "All checks for this date were cleared."
+    },
+    "richEditor": {
+        "toolbar": {
+            "heading2": "Heading 2",
+            "heading3": "Heading 3",
+            "bold": "Bold",
+            "italic": "Italic",
+            "strike": "Strikethrough",
+            "bulletList": "Bulleted list",
+            "orderedList": "Numbered list",
+            "blockquote": "Quote",
+            "codeBlock": "Code block",
+            "link": "Link",
+            "image": "Image",
+            "youtube": "YouTube",
+            "undo": "Undo",
+            "redo": "Redo"
+        },
+        "fileInput": "Select an image for the content",
+        "uploadDisabled": "Image storage is not configured, so uploads are unavailable.",
+        "uploading": "Uploading image…",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "link": {
+            "title": "Link",
+            "description": "Enter the URL for the selected text. Confirm with an empty value to remove the link.",
+            "label": "Link URL",
+            "placeholder": "https://",
+            "invalid": "The link must use an http or https URL."
+        },
+        "youtube": {
+            "title": "YouTube",
+            "description": "Enter a YouTube video URL to embed it in the content.",
+            "label": "Video URL",
+            "placeholder": "https://www.youtube.com/watch?v=",
+            "invalid": "This is not a valid YouTube video URL."
+        }
+    },
+    "tripEditor": {
+        "tabs": {
+            "basics": "Basics",
+            "sidebar": "Sidebar",
+            "travel": "Flights & lodging",
+            "kinds": "Schedule kinds",
+            "days": "Daily itinerary",
+            "bookings": "Bookings",
+            "info": "Travel info",
+            "share": "Members & sharing",
+            "export": "Export & import"
+        },
+        "loadFailed": "Failed to load the trip.",
+        "requestFailed": "The request failed. Please try again shortly.",
+        "savePerTab": "Each tab is saved separately.",
+        "recentSaved": "Last saved {time}",
+        "view": "View",
+        "newDay": "New day",
+        "exportSuccess": "Exported the JSON file.",
+        "saveHint": "Changes are saved per tab.",
+        "undo": "Undo",
+        "drag": "Reorder",
+        "airportSearch": "Search airports",
+        "airportCode": "{code} Airport",
+        "airportEmpty": "No matching airport.",
+        "flights": {
+            "title": "Flights",
+            "description": "Drag to change the order.",
+            "add": "Add flight",
+            "empty": "No flights registered.",
+            "remove": "Remove flight",
+            "direction": "Direction",
+            "directions": { "outbound": "Outbound", "inbound": "Return" },
+            "label": "Label",
+            "labelPlaceholder": "Oct 1 · Outbound",
+            "departAirport": "Departure airport",
+            "departTime": "Departure time",
+            "departTerminal": "Departure terminal",
+            "departTerminalPlaceholder": "Terminal 1",
+            "flightNumber": "Flight number",
+            "arriveAirport": "Arrival airport",
+            "arriveTime": "Arrival time",
+            "arriveTerminal": "Arrival terminal",
+            "arriveTerminalPlaceholder": "Terminal 1",
+            "note": "Note",
+            "notePlaceholder": "Check-in deadline, etc."
+        },
+        "lodgings": {
+            "title": "Lodging",
+            "description": "Lodging used as the starting point for each day.",
+            "add": "Add lodging",
+            "empty": "No lodging registered.",
+            "remove": "Remove lodging",
+            "name": "Name",
+            "localName": "Local name",
+            "checkIn": "Check-in",
+            "checkOut": "Check-out",
+            "address": "Address",
+            "link": "Link",
+            "access": "Directions",
+            "accessPlaceholder": "5-minute walk from Namba Station",
+            "note": "Note"
+        },
+        "sidebar": {
+            "introTitle": "Introduction",
+            "introDescription": "Shown below the date range in the viewer sidebar.",
+            "introLabel": "Introduction",
+            "linksTitle": "Links",
+            "linksDescription": "Links shown below lodging in the sidebar.",
+            "add": "Add link",
+            "empty": "No links registered.",
+            "remove": "Remove link",
+            "label": "Label",
+            "url": "URL",
+            "description": "Description"
+        },
+        "infoSections": {
+            "title": "Travel information",
+            "description": "Accordion sections in the viewer. Sections and blocks can both be reordered.",
+            "add": "Add section",
+            "empty": "No information sections registered."
+        },
+        "basics": {
+            "overviewTitle": "Trip overview",
+            "overviewDescription": "Shown in the trip list and at the top of the viewer.",
+            "title": "Title",
+            "eyebrow": "Eyebrow",
+            "eyebrowPlaceholder": "3-day itinerary",
+            "destination": "Destination",
+            "departureAirport": "Departure airport",
+            "departureAirportHint": "Defaults to ICN when not selected.",
+            "periodNote": "Date-range label",
+            "periodNotePlaceholder": "Oct 1 – Oct 7",
+            "startDate": "Start date",
+            "endDate": "End date",
+            "nights": "Nights",
+            "days": "Days",
+            "autoLengthHint": "Leave blank to calculate from dates",
+            "verifiedOn": "Verified on",
+            "verifiedOnHint": "The date this information was last checked.",
+            "disclaimer": "Disclaimer",
+            "disclaimerPlaceholder": "Operating information is subject to change.",
+            "destinationsTitle": "Destinations",
+            "destinationsDescription": "Add countries in travel order. Used for the globe route when there are no flights.",
+            "addCountry": "Add country",
+            "destinationsEmpty": "No destinations registered.",
+            "removeDestination": "Remove destination",
+            "country": "Country",
+            "city": "City",
+            "cityPlaceholder": "Osaka",
+            "noticesTitle": "Viewer notes",
+            "noticesDescription": "Shown in the viewer legend, booking introduction, and footer.",
+            "bufferPolicy": "Buffer-time note",
+            "bookingNote": "Booking note",
+            "footerNote": "Footer note"
+        },
+        "dayList": {
+            "title": "Dates",
+            "add": "Add date",
+            "empty": "No dates registered.",
+            "remove": "Remove date",
+            "deleteTitle": "Delete this date?",
+            "deleteDefault": "This date's schedules and routes will be deleted together.",
+            "deleteDescription": "Schedules and routes for {day} will be deleted together.",
+            "cancel": "Cancel",
+            "delete": "Delete"
+        },
+        "infoSection": {
+            "title": "Section title",
+            "defaultOpen": "Open by default",
+            "addBlock": "Add block",
+            "removeBlock": "Remove block",
+            "removeSection": "Remove section",
+            "empty": "No blocks."
+        },
+        "infoBlock": {
+            "kind": "Kind",
+            "kinds": { "paragraph": "Paragraph", "bullet": "List item", "heading": "Subheading", "day_table": "Full itinerary table" },
+            "dayTableHint": "The table is generated from the daily itinerary; no separate input is needed.",
+            "emphasis": "Emphasis",
+            "body": "Body",
+            "linkLabel": "Link label",
+            "linkUrl": "Link URL"
+        },
+        "schedule": {
+            "time": "Time",
+            "content": "Details",
+            "kind": "Kind",
+            "note": "Note",
+            "buffer": "Buffer label",
+            "mapQuery": "Map search",
+            "mapPlaceholder": "Namba Station",
+            "mapPreview": "Preview map"
+        },
+        "bookings": {
+            "title": "Booking checklist",
+            "description": "The viewer preserves this priority order.",
+            "add": "Add booking",
+            "empty": "No bookings registered.",
+            "remove": "Remove booking",
+            "item": "Item",
+            "when": "When",
+            "whenPlaceholder": "2 weeks before departure",
+            "priority": "Priority",
+            "priorities": { "p1": "Priority 1", "p2": "Priority 2", "p3": "Priority 3", "onsite": "On site" },
+            "linkLabel": "Link label",
+            "linkLabelPlaceholder": "Official booking site",
+            "linkUrl": "Link URL",
+            "action": "Action",
+            "actionPlaceholder": "Pay when booking opens",
+            "status": "Status",
+            "statusPlaceholder": "Booked"
+        },
+        "kinds": {
+            "title": "Schedule kinds",
+            "description": "Used for timeline badges and the legend; order is preserved in the legend.",
+            "add": "Add kind",
+            "remove": "Remove kind",
+            "name": "Name",
+            "namePlaceholder": "Plan",
+            "legend": "Legend label",
+            "legendPlaceholder": "Planned itinerary",
+            "color": "Color",
+            "colors": {
+                "muted": "Neutral gray",
+                "success": "Green",
+                "warning": "Yellow",
+                "destructive": "Red",
+                "chart-1": "Accent 1",
+                "chart-2": "Accent 2",
+                "chart-3": "Accent 3",
+                "chart-4": "Accent 4",
+                "chart-5": "Accent 5"
+            },
+            "buffer": "Buffer label",
+            "bufferPlaceholder": "10 minutes to spare",
+            "deleteTitle": "Delete the '{name}' kind?",
+            "deleteUsed": "{count} schedules use this kind. Choose a replacement and they will be updated on save.",
+            "deleteUnused": "No schedules use this kind. It will be removed on save.",
+            "replacement": "Replacement kind",
+            "replacementPlaceholder": "Select a replacement",
+            "cancel": "Cancel",
+            "delete": "Delete"
+        },
+        "day": {
+            "saveHint": "Save this date only.",
+            "headerDescription": "Values used in the date tab and heading.",
+            "date": "Date",
+            "tabLabel": "Tab label",
+            "title": "Title",
+            "subtitle": "Subtitle",
+            "bodyTitle": "Body",
+            "bodyDescription": "Overview, travel plan, and closing paragraphs.",
+            "overview": "Overview",
+            "planHeadline": "Travel plan heading",
+            "closingHeadline": "Closing heading",
+            "planNote": "Travel plan body",
+            "closingNote": "Closing body",
+            "summaryTitle": "Full itinerary table",
+            "summaryDescription": "Summaries used in the full itinerary table.",
+            "morning": "Morning",
+            "afternoon": "Afternoon",
+            "evening": "Evening",
+            "factsTitle": "Verified details",
+            "addFact": "Add item",
+            "removeFact": "Remove item",
+            "factLabel": "Item",
+            "factValue": "Details",
+            "routesTitle": "Routes",
+            "addRoute": "Add route",
+            "removeRoute": "Remove route",
+            "origin": "From",
+            "arrival": "To",
+            "minutes": "Minutes",
+            "formula": "Calculation",
+            "formulaPlaceholder": "Walk 8 + subway 12",
+            "routeDescription": "Route description",
+            "routePlaceholder": "Namba Station → Midosuji Line → Umeda Station",
+            "timelineTitle": "Timeline",
+            "addSchedule": "Add schedule",
+            "removeSchedule": "Remove schedule",
+            "notesTitle": "References",
+            "addNote": "Add reference",
+            "removeNote": "Remove reference",
+            "leading": "Leading text",
+            "linkLabel": "Link label",
+            "linkUrl": "Link URL",
+            "trailing": "Trailing text"
+        },
+        "attachments": {
+            "count": "{count} attachments",
+            "addLink": "Add link",
+            "uploadImage": "Upload image",
+            "uploadDisabled": "Image storage is not configured, so uploads are unavailable.",
+            "label": "Attachment label",
+            "labelPlaceholder": "Booking confirmation email",
+            "imageUrl": "Image URL",
+            "url": "Attachment URL",
+            "remove": "Remove attachment",
+            "fileInput": "Select an attachment image"
+        },
+        "share": {
+            "copySuccess": "Copied the share link.",
+            "copyFailed": "Could not copy the link.",
+            "invalidJson": "This is not a valid trip JSON file.",
+            "saveHint": "Save sharing settings.",
+            "publicLink": "Public link",
+            "publicLinkDescription": "Anyone can view it read-only without logging in when public.",
+            "enablePublicLink": "Enable public link",
+            "shareAddress": "Share address",
+            "slugHint": "Use lowercase letters, numbers, and hyphens. Leave blank to generate one automatically.",
+            "slugAfterSave": "A share address will be created when you save.",
+            "copyLink": "Copy link",
+            "openNewTab": "Open in new tab",
+            "transferTitle": "Export & import",
+            "transferDescription": "Download structured JSON or import an exported file to replace the current content.",
+            "exporting": "Exporting…",
+            "export": "Export JSON",
+            "importing": "Importing…",
+            "import": "Import JSON",
+            "confirmTitle": "Replace with this JSON?",
+            "importSummary": "{title} · {days} dates · {bookings} bookings",
+            "replaceWarning": "All current content will be replaced. Checks and memos will also reset.",
+            "cancel": "Cancel",
+            "confirmImport": "Import"
+        },
+        "members": {
+            "title": "Members",
+            "description": "Editors can make changes, while viewers have read-only access.",
+            "name": "Name",
+            "email": "Email",
+            "role": "Role",
+            "manage": "Manage",
+            "roles": { "owner": "Owner", "editor": "Editor", "viewer": "Viewer" },
+            "roleAria": "Role for {name}",
+            "removeAria": "Remove {name}",
+            "inviteTitle": "Invite",
+            "inviteDescription": "If the email is not registered yet, they will join automatically after signing up.",
+            "saving": "Saving…",
+            "invite": "Invite",
+            "noInvites": "There are no pending invitations.",
+            "cancelInviteAria": "Cancel invitation for {email}",
+            "removeTitle": "Remove this member?",
+            "removeDefault": "This member will no longer be able to view the trip.",
+            "removeDescription": "{name} will no longer be able to view this trip.",
+            "cancel": "Cancel",
+            "remove": "Remove"
+        }
+    },
     "tripViewer": {
+        "views": { "itinerary": "Itinerary", "bookings": "Bookings", "info": "Travel info" },
+        "bookingPriority": { "p1": "Priority 1", "p2": "Priority 2", "p3": "Priority 3", "onsite": "On site" },
+        "globeEmpty": "A globe with no routes displayed.",
+        "globeDescription": "Travel route globe. {routes}.",
+        "globeRoute": "{from} to {to}",
         "memoIdle": "Auto-saves as you type.",
         "memoSaving": "Saving…",
         "memoSaved": "Saved",
@@ -615,6 +1077,8 @@
                 "title": "Title",
                 "destination": "Destination",
                 "country": "Country",
+                "countrySearch": "Search countries",
+                "countryEmpty": "No matching country.",
                 "countryHint": "Add countries and cities in travel order. Used for the globe route.",
                 "city": "City",
                 "cityOptional": "City (optional)",
@@ -644,6 +1108,7 @@
         },
         "error": {
             "title": "Failed to load the trip list",
+            "description": "The request failed. Please try again shortly.",
             "retry": "Try again",
             "retrying": "Reloading…"
         },
@@ -664,6 +1129,7 @@
             "done": "Done",
             "ongoing": "Ongoing"
         },
+        "roles": { "owner": "Owner", "editor": "Editor", "viewer": "Viewer" },
         "length": {
             "nightsDays": "{nights} nights {days} days"
         },

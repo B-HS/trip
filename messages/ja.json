@@ -48,8 +48,8 @@
         "localeSwitcher": {
             "menuAria": "言語を選択",
             "names": {
-                "ko": "ko",
-                "en": "english",
+                "ko": "한국어",
+                "en": "English",
                 "ja": "日本語"
             }
         }
@@ -486,6 +486,90 @@
         }
     },
     "intro": {
+        "hero": {
+            "eyebrow": "旅行日程ノート",
+            "title": "散らばった旅行計画をひとつの画面に",
+            "description": "航空便、宿泊、日別行程、区間の移動時間、予約一覧を一か所にまとめ、同行者と一緒に編集できます。旅行当日は画面を開いてチェックするだけです。",
+            "globeNote": "例として表示したルートです。"
+        },
+        "features": {
+            "eyebrow": "機能",
+            "title": "旅行準備に必要なものだけ",
+            "description": "記録するだけの道具ではなく、旅行当日に実際に開く画面を目指しました。",
+            "items": {
+                "itinerary": {
+                    "title": "日別行程と移動時間の計算",
+                    "description": "一日の予定を時系列に並べ、区間ごとの移動時間を足して次の予定まで余裕があるか確認できます。"
+                },
+                "booking": {
+                    "title": "予約チェックリストと優先度",
+                    "description": "チケットや入場券を優先度順に整理し、予約リンクと進行状況を一枚のカードで管理します。"
+                },
+                "info": {
+                    "title": "旅行情報のアコーディオン",
+                    "description": "交通パス、両替、持ち物など、よく見返す情報を開閉できるセクションに保存します。"
+                },
+                "share": {
+                    "title": "共同編集者の招待と公開リンク",
+                    "description": "同行者をメールで招待して一緒に編集し、読み取り専用の公開リンクで行程を共有します。"
+                },
+                "sync": {
+                    "title": "ユーザー別チェック・メモ同期",
+                    "description": "チェックとメモはアカウントに保存され、スマートフォンでもパソコンでも同じ状態が続きます。"
+                },
+                "print": { "title": "全行程を印刷", "description": "全行程を印刷用に整え、紙でも持ち歩けます。" }
+            }
+        },
+        "steps": {
+            "eyebrow": "使い方",
+            "title": "三つのステップで準備完了",
+            "description": "最初に一度入力すれば、旅行が終わるまで同じ画面を使い続けられます。",
+            "items": {
+                "create": {
+                    "title": "トリップを作る",
+                    "description": "旅行名、期間、目的地を入力すると空の行程表ができます。大阪のサンプルを一度に入れることもできます。"
+                },
+                "fill": {
+                    "title": "日別行程を入力",
+                    "description": "航空便と宿を登録し、各日に予定、移動ルート、予約項目を追加します。順番はドラッグで変更できます。"
+                },
+                "check": {
+                    "title": "旅行中にチェック",
+                    "description": "現地では終わった予定をチェックしてメモを残します。同じトリップを見る同行者にも同期されます。"
+                }
+            }
+        },
+        "showcase": {
+            "eyebrow": "旅行中の画面",
+            "title": "チェックするほど残りの予定が明確に",
+            "description": "完了した予定は薄くなり、進行率も更新されます。実際の画面を簡略化した例です。",
+            "dayLabel": "3日目",
+            "dayTitle": "京都日帰り",
+            "progressLabel": "今日の行程進行率",
+            "completed": "完了",
+            "items": {
+                "depart": { "title": "難波駅を出発", "note": "阪急京都線特急に乗車" },
+                "arrive": { "title": "河原町に到着", "note": "大きな荷物をコインロッカーへ" },
+                "temple": { "title": "清水寺", "note": "二年坂方面へ下る" },
+                "lunch": { "title": "錦市場で昼食", "note": "徒歩15分、余裕10分" },
+                "return": { "title": "京都駅へ戻る", "note": "帰りの列車時刻を確認" }
+            }
+        },
+        "cta": {
+            "title": "今夜の予定から整理しましょう",
+            "description": "メールアドレスとパスワードだけで最初のトリップを作れます。",
+            "note": "別途認証なしで、登録後すぐに利用できます。"
+        },
+        "community": {
+            "tripsEyebrow": "公開行程",
+            "tripsTitle": "公開された旅行行程",
+            "tripsDescription": "ほかの旅行者が公開した行程をそのまま開けます。",
+            "tripsEmpty": "公開された旅行はまだありません。",
+            "postsEyebrow": "コミュニティ",
+            "postsTitle": "コミュニティ最新投稿",
+            "postsDescription": "自由・質問・レビュー掲示板の新着投稿です。",
+            "postsEmpty": "投稿はまだありません。"
+        },
         "notFound": {
             "primaryAction": "ホームへ",
             "secondaryAction": "マイ旅行一覧"
@@ -495,6 +579,7 @@
         "unauthorized": "ログインが必要です。",
         "forbidden": "アクセス権限がありません。",
         "notFound": "見つかりません。",
+        "invalidInput": "入力内容が正しくありません。",
         "uploadNotConfigured": "画像ストレージが設定されていません。",
         "uploadDisabled": "ストレージが設定されていません。",
         "internal": "処理中にエラーが発生しました。",
@@ -527,7 +612,381 @@
         "withdrawnUser": "（退会したユーザー）",
         "noTarget": "（対象なし）"
     },
+    "toasts": {
+        "tripCreated": "旅行を作成しました。",
+        "sampleTripCreated": "サンプル旅行を作成しました。",
+        "basicsSaved": "基本情報を保存しました。",
+        "flightsSaved": "航空便を保存しました。",
+        "lodgingsSaved": "宿泊先を保存しました。",
+        "sidebarSaved": "サイドバーを保存しました。",
+        "scheduleKindsSaved": "行程の種類を保存しました。",
+        "daySaved": "行程を保存しました。",
+        "dayDeleted": "日付を削除しました。",
+        "dayOrderSaved": "日付の順序を保存しました。",
+        "bookingsSaved": "予約一覧を保存しました。",
+        "infoSaved": "旅行情報を保存しました。",
+        "tripDeleted": "旅行を削除しました。",
+        "memberAdded": "メンバーを追加しました。",
+        "inviteSent": "招待を送信しました。登録後に自動で参加します。",
+        "roleUpdated": "権限を変更しました。",
+        "memberRemoved": "メンバーを削除しました。",
+        "inviteCanceled": "招待を取り消しました。",
+        "saved": "保存しました。",
+        "tripImported": "JSONをインポートして内容を置き換えました。",
+        "dayChecksReset": "この日付のチェックをすべて解除しました。"
+    },
+    "richEditor": {
+        "toolbar": {
+            "heading2": "見出し2",
+            "heading3": "見出し3",
+            "bold": "太字",
+            "italic": "斜体",
+            "strike": "取り消し線",
+            "bulletList": "箇条書き",
+            "orderedList": "番号付きリスト",
+            "blockquote": "引用",
+            "codeBlock": "コードブロック",
+            "link": "リンク",
+            "image": "画像",
+            "youtube": "YouTube",
+            "undo": "元に戻す",
+            "redo": "やり直す"
+        },
+        "fileInput": "本文に挿入する画像ファイルを選択",
+        "uploadDisabled": "画像ストレージが設定されていないためアップロードできません。",
+        "uploading": "画像をアップロード中です。",
+        "cancel": "キャンセル",
+        "confirm": "確認",
+        "link": {
+            "title": "リンク",
+            "description": "選択した文字に設定するURLを入力します。空欄のまま確認するとリンクを解除します。",
+            "label": "リンクURL",
+            "placeholder": "https://",
+            "invalid": "リンクはhttpまたはhttpsのURLである必要があります。"
+        },
+        "youtube": {
+            "title": "YouTube",
+            "description": "YouTube動画のURLを入力すると本文に埋め込みます。",
+            "label": "動画URL",
+            "placeholder": "https://www.youtube.com/watch?v=",
+            "invalid": "有効なYouTube動画のURLではありません。"
+        }
+    },
+    "tripEditor": {
+        "tabs": {
+            "basics": "基本情報",
+            "sidebar": "サイドバー",
+            "travel": "航空・宿泊",
+            "kinds": "行程の種類",
+            "days": "日別行程",
+            "bookings": "予約",
+            "info": "旅行情報",
+            "share": "メンバー・共有",
+            "export": "エクスポート・インポート"
+        },
+        "loadFailed": "旅行を読み込めませんでした。",
+        "requestFailed": "リクエストに失敗しました。しばらくしてからもう一度お試しください。",
+        "savePerTab": "タブごとに保存します。",
+        "recentSaved": "最終保存 {time}",
+        "view": "表示",
+        "newDay": "新しい日付",
+        "exportSuccess": "JSONファイルをエクスポートしました。",
+        "saveHint": "変更内容はタブごとに保存します。",
+        "undo": "元に戻す",
+        "drag": "並べ替え",
+        "airportSearch": "空港を検索",
+        "airportCode": "{code}空港",
+        "airportEmpty": "一致する空港がありません。",
+        "flights": {
+            "title": "航空便",
+            "description": "ドラッグして順番を変更できます。",
+            "add": "航空便を追加",
+            "empty": "登録された航空便がありません。",
+            "remove": "航空便を削除",
+            "direction": "区分",
+            "directions": { "outbound": "往路", "inbound": "復路" },
+            "label": "ラベル",
+            "labelPlaceholder": "10/1 木 · 往路",
+            "departAirport": "出発空港",
+            "departTime": "出発時刻",
+            "departTerminal": "出発ターミナル",
+            "departTerminalPlaceholder": "第1ターミナル",
+            "flightNumber": "便名",
+            "arriveAirport": "到着空港",
+            "arriveTime": "到着時刻",
+            "arriveTerminal": "到着ターミナル",
+            "arriveTerminalPlaceholder": "第1ターミナル",
+            "note": "メモ",
+            "notePlaceholder": "チェックイン締切時刻など"
+        },
+        "lodgings": {
+            "title": "宿泊",
+            "description": "毎日の出発点となる宿泊情報です。",
+            "add": "宿泊を追加",
+            "empty": "登録された宿泊がありません。",
+            "remove": "宿泊を削除",
+            "name": "名前",
+            "localName": "現地表記",
+            "checkIn": "チェックイン",
+            "checkOut": "チェックアウト",
+            "address": "住所",
+            "link": "リンク",
+            "access": "アクセス",
+            "accessPlaceholder": "難波駅から徒歩5分",
+            "note": "メモ"
+        },
+        "sidebar": {
+            "introTitle": "紹介文",
+            "introDescription": "ビューアーのサイドバーで期間の下に表示します。",
+            "introLabel": "紹介文",
+            "linksTitle": "リンク",
+            "linksDescription": "サイドバーの宿泊情報の下に表示するリンクです。",
+            "add": "リンクを追加",
+            "empty": "登録されたリンクがありません。",
+            "remove": "リンクを削除",
+            "label": "ラベル",
+            "url": "URL",
+            "description": "説明"
+        },
+        "infoSections": {
+            "title": "旅行情報",
+            "description": "ビューアーのアコーディオンです。セクションとブロックの順番を変更できます。",
+            "add": "セクションを追加",
+            "empty": "登録された情報セクションがありません。"
+        },
+        "basics": {
+            "overviewTitle": "旅行概要",
+            "overviewDescription": "一覧とビューアー上部に表示される情報です。",
+            "title": "タイトル",
+            "eyebrow": "上段テキスト",
+            "eyebrowPlaceholder": "2泊3日の行程",
+            "destination": "目的地",
+            "departureAirport": "出発空港",
+            "departureAirportHint": "未選択の場合はICNを使用します。",
+            "periodNote": "期間表示",
+            "periodNotePlaceholder": "10/1 木 - 10/7 火",
+            "startDate": "開始日",
+            "endDate": "終了日",
+            "nights": "泊",
+            "days": "日",
+            "autoLengthHint": "空欄の場合は日付から計算します",
+            "verifiedOn": "確認基準日",
+            "verifiedOnHint": "情報を最後に確認した日付です。",
+            "disclaimer": "注意書き",
+            "disclaimerPlaceholder": "運行情報は変更される場合があります。",
+            "destinationsTitle": "目的地",
+            "destinationsDescription": "旅行順に国を追加してください。航空便がない場合に地球儀ルートへ使われます。",
+            "addCountry": "国を追加",
+            "destinationsEmpty": "登録された目的地がありません。",
+            "removeDestination": "目的地を削除",
+            "country": "国",
+            "city": "都市",
+            "cityPlaceholder": "大阪",
+            "noticesTitle": "案内文",
+            "noticesDescription": "ビューアーの凡例、予約案内、フッターに表示されます。",
+            "bufferPolicy": "余裕時間の案内",
+            "bookingNote": "予約案内",
+            "footerNote": "フッター文"
+        },
+        "dayList": {
+            "title": "日付",
+            "add": "日付を追加",
+            "empty": "登録された日付がありません。",
+            "remove": "日付を削除",
+            "deleteTitle": "この日付を削除しますか？",
+            "deleteDefault": "この日の行程とルートが一緒に削除されます。",
+            "deleteDescription": "{day}の行程とルートが一緒に削除されます。",
+            "cancel": "キャンセル",
+            "delete": "削除"
+        },
+        "infoSection": {
+            "title": "セクション名",
+            "defaultOpen": "初期状態で開く",
+            "addBlock": "ブロックを追加",
+            "removeBlock": "ブロックを削除",
+            "removeSection": "セクションを削除",
+            "empty": "ブロックがありません。"
+        },
+        "infoBlock": {
+            "kind": "種類",
+            "kinds": { "paragraph": "段落", "bullet": "リスト項目", "heading": "小見出し", "day_table": "全行程表" },
+            "dayTableHint": "日別行程から表を自動生成します。別途入力は不要です。",
+            "emphasis": "強調文",
+            "body": "本文",
+            "linkLabel": "リンク名",
+            "linkUrl": "リンクURL"
+        },
+        "schedule": {
+            "time": "時刻",
+            "content": "内容",
+            "kind": "区分",
+            "note": "メモ",
+            "buffer": "余裕表示",
+            "mapQuery": "地図検索語",
+            "mapPlaceholder": "難波駅",
+            "mapPreview": "地図をプレビュー"
+        },
+        "bookings": {
+            "title": "予約チェックリスト",
+            "description": "優先度順に並べるとビューアーにも同じ順で表示されます。",
+            "add": "予約を追加",
+            "empty": "登録された予約項目がありません。",
+            "remove": "予約項目を削除",
+            "item": "項目",
+            "when": "時期",
+            "whenPlaceholder": "出発2週間前",
+            "priority": "優先度",
+            "priorities": { "p1": "優先度1", "p2": "優先度2", "p3": "優先度3", "onsite": "現地" },
+            "linkLabel": "リンク名",
+            "linkLabelPlaceholder": "公式予約サイト",
+            "linkUrl": "リンクURL",
+            "action": "やること",
+            "actionPlaceholder": "受付開始時刻に決済",
+            "status": "進行状況",
+            "statusPlaceholder": "予約完了"
+        },
+        "kinds": {
+            "title": "行程の種類",
+            "description": "タイムラインのバッジと凡例に使い、順番は凡例に反映されます。",
+            "add": "種類を追加",
+            "remove": "種類を削除",
+            "name": "名前",
+            "namePlaceholder": "計画",
+            "legend": "凡例ラベル",
+            "legendPlaceholder": "計画行程",
+            "color": "色",
+            "colors": {
+                "muted": "標準グレー",
+                "success": "緑",
+                "warning": "黄",
+                "destructive": "赤",
+                "chart-1": "強調1",
+                "chart-2": "強調2",
+                "chart-3": "強調3",
+                "chart-4": "強調4",
+                "chart-5": "強調5"
+            },
+            "buffer": "余裕表示",
+            "bufferPlaceholder": "最後に10分の余裕",
+            "deleteTitle": "「{name}」を削除しますか？",
+            "deleteUsed": "この種類を使う行程が{count}件あります。代替種類を選ぶと保存時に変更されます。",
+            "deleteUnused": "この種類を使う行程はありません。保存時に一覧から削除します。",
+            "replacement": "代替種類",
+            "replacementPlaceholder": "代替種類を選択",
+            "cancel": "キャンセル",
+            "delete": "削除"
+        },
+        "day": {
+            "saveHint": "この日付だけ保存します。",
+            "headerDescription": "日付タブと見出しに使う値です。",
+            "date": "日付",
+            "tabLabel": "タブラベル",
+            "title": "タイトル",
+            "subtitle": "サブタイトル",
+            "bodyTitle": "本文",
+            "bodyDescription": "概要、移動計画、締めくくりの段落です。",
+            "overview": "概要",
+            "planHeadline": "移動計画の見出し",
+            "closingHeadline": "締めくくりの見出し",
+            "planNote": "移動計画の本文",
+            "closingNote": "締めくくりの本文",
+            "summaryTitle": "全行程表",
+            "summaryDescription": "旅行情報の全行程表に入る要約です。",
+            "morning": "午前",
+            "afternoon": "午後",
+            "evening": "夕方",
+            "factsTitle": "確認済み内容",
+            "addFact": "項目を追加",
+            "removeFact": "項目を削除",
+            "factLabel": "項目",
+            "factValue": "内容",
+            "routesTitle": "移動ルート",
+            "addRoute": "ルートを追加",
+            "removeRoute": "ルートを削除",
+            "origin": "出発",
+            "arrival": "到着",
+            "minutes": "所要時間（分）",
+            "formula": "計算式",
+            "formulaPlaceholder": "徒歩8 + 地下鉄12",
+            "routeDescription": "ルート説明",
+            "routePlaceholder": "難波駅 → 御堂筋線 → 梅田駅",
+            "timelineTitle": "タイムライン",
+            "addSchedule": "行程を追加",
+            "removeSchedule": "行程を削除",
+            "notesTitle": "参考",
+            "addNote": "参考を追加",
+            "removeNote": "参考を削除",
+            "leading": "前の文",
+            "linkLabel": "リンク名",
+            "linkUrl": "リンクURL",
+            "trailing": "後ろの文"
+        },
+        "attachments": {
+            "count": "添付 {count}",
+            "addLink": "リンクを追加",
+            "uploadImage": "画像をアップロード",
+            "uploadDisabled": "画像ストレージが設定されていないためアップロードできません。",
+            "label": "添付ラベル",
+            "labelPlaceholder": "予約確認メール",
+            "imageUrl": "画像URL",
+            "url": "添付URL",
+            "remove": "添付を削除",
+            "fileInput": "添付画像ファイルを選択"
+        },
+        "share": {
+            "copySuccess": "共有リンクをコピーしました。",
+            "copyFailed": "リンクをコピーできませんでした。",
+            "invalidJson": "有効なトリップJSONではありません。",
+            "saveHint": "共有設定を保存します。",
+            "publicLink": "公開リンク",
+            "publicLinkDescription": "公開するとログインなしで読み取り専用表示ができます。",
+            "enablePublicLink": "公開リンクを使用",
+            "shareAddress": "共有アドレス",
+            "slugHint": "英小文字、数字、ハイフンのみ使用できます。空欄の場合は自動生成します。",
+            "slugAfterSave": "保存すると共有アドレスが作成されます。",
+            "copyLink": "リンクをコピー",
+            "openNewTab": "新しいタブで開く",
+            "transferTitle": "エクスポート・インポート",
+            "transferDescription": "構造化JSONをダウンロードしたり、エクスポート済みJSONで現在の内容を置き換えたりできます。",
+            "exporting": "エクスポート中…",
+            "export": "JSONをエクスポート",
+            "importing": "インポート中…",
+            "import": "JSONをインポート",
+            "confirmTitle": "このJSONで置き換えますか？",
+            "importSummary": "{title} · 日付{days}件 · 予約{bookings}件",
+            "replaceWarning": "現在の内容はすべて置き換えられ、チェックとメモも初期化されます。",
+            "cancel": "キャンセル",
+            "confirmImport": "インポート"
+        },
+        "members": {
+            "title": "メンバー",
+            "description": "編集者は内容を変更でき、閲覧者は表示のみ可能です。",
+            "name": "名前",
+            "email": "メールアドレス",
+            "role": "権限",
+            "manage": "管理",
+            "roles": { "owner": "所有者", "editor": "編集者", "viewer": "閲覧者" },
+            "roleAria": "{name}の権限",
+            "removeAria": "{name}を削除",
+            "inviteTitle": "招待",
+            "inviteDescription": "未登録のメールアドレスを招待すると、登録時に自動で参加します。",
+            "saving": "保存中…",
+            "invite": "招待",
+            "noInvites": "保留中の招待はありません。",
+            "cancelInviteAria": "{email}への招待を取り消す",
+            "removeTitle": "メンバーを削除しますか？",
+            "removeDefault": "このメンバーは旅行を閲覧できなくなります。",
+            "removeDescription": "{name}はこの旅行を閲覧できなくなります。",
+            "cancel": "キャンセル",
+            "remove": "削除"
+        }
+    },
     "tripViewer": {
+        "views": { "itinerary": "日別行程", "bookings": "予約チェック", "info": "旅行情報" },
+        "bookingPriority": { "p1": "優先度1", "p2": "優先度2", "p3": "優先度3", "onsite": "現地" },
+        "globeEmpty": "ルートが表示されていない地球儀です。",
+        "globeDescription": "旅行ルートの地球儀。{routes}。",
+        "globeRoute": "{from}から{to}まで",
         "memoIdle": "入力すると自動保存されます。",
         "memoSaving": "保存中…",
         "memoSaved": "保存済み",
@@ -615,6 +1074,8 @@
                 "title": "タイトル",
                 "destination": "目的地",
                 "country": "国",
+                "countrySearch": "国を検索",
+                "countryEmpty": "一致する国がありません。",
                 "countryHint": "旅行する順番通りに国と都市を追加してください。地球儀ルートに使用されます。",
                 "city": "都市",
                 "cityOptional": "都市（任意）",
@@ -644,6 +1105,7 @@
         },
         "error": {
             "title": "トリップ一覧を読み込めませんでした",
+            "description": "リクエストに失敗しました。しばらくしてからもう一度お試しください。",
             "retry": "再試行",
             "retrying": "再読み込み中…"
         },
@@ -664,6 +1126,7 @@
             "done": "完了",
             "ongoing": "進行中"
         },
+        "roles": { "owner": "所有者", "editor": "編集者", "viewer": "閲覧者" },
         "length": {
             "nightsDays": "{nights}泊 {days}日"
         },
