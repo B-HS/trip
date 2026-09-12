@@ -2,7 +2,9 @@
 
 import { useTranslations } from 'next-intl'
 import { useState, type FC } from 'react'
+import { Link } from '@/i18n/navigation'
 import { clientFetch } from '@/shared/lib/fetch'
+import { DEVELOPERS_PATH } from '@/shared/constant/route'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import type { ApiTokenScope } from '@/shared/constant/developer-api'
@@ -71,6 +73,11 @@ export const DeveloperApiSettings: FC<Props> = ({ initialTokens }) => {
                 <p className='font-mono text-2xs tracking-widest text-muted-foreground uppercase'>API</p>
                 <h1 className='text-2xl font-semibold tracking-tight'>{t('title')}</h1>
                 <p className='text-xs text-muted-foreground'>{t('description')}</p>
+            </section>
+            <section className='flex flex-col gap-px bg-background'>
+                <Button variant='cell' size='cell' asChild>
+                    <Link href={DEVELOPERS_PATH}>{t('viewDocs')}</Link>
+                </Button>
             </section>
             <form className='flex flex-col gap-3 bg-card p-3' onSubmit={create}>
                 <label className='flex flex-col gap-1 text-xs font-medium' htmlFor='api-token-label'>

@@ -7,6 +7,7 @@
             "boardsAll": "掲示板すべて",
             "trips": "トリップ一覧",
             "newTrip": "新しいトリップ",
+            "developers": "開発者 API",
             "mainMenu": "メインメニュー",
             "favorites": "お気に入り",
             "favoritesEmpty": "一覧で☆を押すと追加されます",
@@ -21,6 +22,7 @@
             "profile": "マイプロフィール",
             "profileSettings": "プロフィール設定",
             "aiSettings": "AI設定",
+            "apiSettings": "API トークン",
             "signOut": "ログアウト",
             "theme": "テーマ",
             "reduceMotion": "モーションを減らす"
@@ -44,7 +46,8 @@
             "toDark": "ダークモードに切り替え"
         },
         "footer": {
-            "tagline": "Trip manager with structured data forms"
+            "tagline": "構造化データフォームで旅行を管理",
+            "navigation": "公開ページ"
         },
         "localeSwitcher": {
             "menuAria": "言語を選択",
@@ -1284,13 +1287,15 @@
         "copy": "トークンをコピー",
         "copied": "コピー済み",
         "empty": "開発者トークンはまだありません。",
-        "error": "開発者トークンを変更できませんでした。"
+        "error": "開発者トークンを変更できませんでした。",
+        "viewDocs": "API ドキュメントを見る"
     },
     "developerPortal": {
         "title": "落ち着いて役立つ旅行自動化を作る",
         "description": "旅行ツール、連携、AI エージェントのための明快な所有者限定 API です。読み取りから始め、計画を確認してから書き込みを追加します。",
         "openapi": "OpenAPI を見る",
         "getStarted": "始める",
+        "manageTokens": "API トークンを管理",
         "authenticationTitle": "認証",
         "authentication": "個人アクセストークンは一度だけ表示し、Authorization ヘッダーだけで送信します。URL にトークンを置かないでください。",
         "scopesTitle": "最小限の権限",

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
+import { DEVELOPERS_PATH, DEVELOPER_API_SETTINGS_PATH, LOGIN_PATH } from '@/shared/constant/route'
 import { createPageMetadata } from '@/shared/lib/metadata'
 
 type Props = { params: Promise<{ locale: string }> }
@@ -8,7 +9,7 @@ type Props = { params: Promise<{ locale: string }> }
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
     const { locale } = await params
     const t = await getTranslations({ locale, namespace: 'developerPortal' })
-    return createPageMetadata({ locale, path: '/developers', title: t('title'), description: t('description') })
+    return createPageMetadata({ locale, path: DEVELOPERS_PATH, title: t('title'), description: t('description') })
 }
 
 export default async function DevelopersPage() {
@@ -20,11 +21,18 @@ export default async function DevelopersPage() {
                 <h1 className='max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl'>{t('title')}</h1>
                 <p className='max-w-2xl text-base text-muted-foreground'>{t('description')}</p>
                 <div className='flex flex-wrap gap-px bg-background'>
-                    <a href='/api/v1/openapi.json' className='bg-primary px-4 py-3 text-sm text-primary-foreground'>
+                    <a
+                        href='/api/v1/openapi.json'
+                        className='bg-primary px-4 py-3 text-sm text-primary-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50'>
                         {t('openapi')}
                     </a>
-                    <Link href='/login' className='bg-card px-4 py-3 text-sm'>
+                    <Link href={LOGIN_PATH} className='bg-card px-4 py-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50'>
                         {t('getStarted')}
+                    </Link>
+                    <Link
+                        href={DEVELOPER_API_SETTINGS_PATH}
+                        className='bg-card px-4 py-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50'>
+                        {t('manageTokens')}
                     </Link>
                 </div>
             </section>

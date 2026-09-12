@@ -45,6 +45,16 @@ describe('PublicFrame', () => {
         expect(screen.getByRole('contentinfo').textContent).toContain('© 2026')
     })
 
+    test('바닥글에 개발자 API 공개 진입점을 표시한다', () => {
+        render(
+            <PublicFrame actions={null} year='2026'>
+                <p>본문</p>
+            </PublicFrame>,
+        )
+
+        expect(screen.getByRole('link', { name: '개발자 API' }).getAttribute('href')).toBe('/developers')
+    })
+
     test('공개 표면 클래스를 최상위에 유지한다', () => {
         const { container } = render(
             <PublicFrame actions={null} year='2026'>

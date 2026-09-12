@@ -7,6 +7,7 @@
             "boardsAll": "All boards",
             "trips": "My trips",
             "newTrip": "New trip",
+            "developers": "Developer API",
             "mainMenu": "Main menu",
             "favorites": "Favorites",
             "favoritesEmpty": "Star a trip in the list to add it here",
@@ -21,6 +22,7 @@
             "profile": "My profile",
             "profileSettings": "Profile settings",
             "aiSettings": "AI settings",
+            "apiSettings": "API tokens",
             "signOut": "Sign out",
             "theme": "Theme",
             "reduceMotion": "Reduce motion"
@@ -44,7 +46,8 @@
             "toDark": "Switch to dark mode"
         },
         "footer": {
-            "tagline": "Trip manager with structured data forms"
+            "tagline": "Trip manager with structured data forms",
+            "navigation": "Public pages"
         },
         "localeSwitcher": {
             "menuAria": "Select language",
@@ -1287,13 +1290,15 @@
         "copy": "Copy token",
         "copied": "Copied",
         "empty": "No developer tokens yet.",
-        "error": "Could not update developer tokens."
+        "error": "Could not update developer tokens.",
+        "viewDocs": "View API docs"
     },
     "developerPortal": {
         "title": "Build calm, useful travel automations",
         "description": "A clear, owner-scoped API for trip tools, integrations, and AI agents. Start with read access and add writes only when a person approves the plan.",
         "openapi": "View OpenAPI",
         "getStarted": "Get started",
+        "manageTokens": "Manage API tokens",
         "authenticationTitle": "Authentication",
         "authentication": "Personal access tokens are shown once and sent only in the Authorization header. Never place a token in a URL.",
         "scopesTitle": "Small permissions",

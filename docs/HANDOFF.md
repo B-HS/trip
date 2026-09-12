@@ -6,6 +6,8 @@
 
 `/api/v1` owner-scoped trip API와 `/api/v1/openapi.json`, `/developers`, `/settings/api` 토큰 lifecycle UI가 구현되었다(ADR-0041). Personal access token 원문은 한 번만 반환하고 SHA-256 hash만 저장하며, `trips:read`·`trips:write`·`token:inspect` scope와 bearer-only parsing, token별 read/write durable fixed-window limit, mutation idempotency key를 적용한다. 검증된 도메인 서비스와 `tripTemplateSchema`를 재사용하므로 멤버 트립·공개 링크로 권한이 확장되지 않는다.
 
+개발자 API discoverability도 완료했다. 공개 footer의 `/developers` 링크, 로그인 사용자 메뉴의 `/settings/api` 링크, 토큰 설정 화면의 API 문서 링크, 개발자 포털의 토큰 관리 링크를 모두 ko·en·ja locale-aware navigation으로 제공한다.
+
 `0010_trip-consent.sql` → `0011_ai.sql` → `0012_developer-api-tokens.sql` 순서와 journal/snapshot을 확인한 뒤 2026-09-12 운영 DB에 적용했다(이력 12행). 최초 0012 실행에서 MySQL 식별자 길이 제한으로 중단되어 짧은 FK 이름으로 안전하게 누락 부분을 보완하고 migration hash를 검증한 뒤 `bun run db:migrate` 재실행을 완료했다. 0012에는 AI dispatch outbox·trip revision·idempotency retention index가 포함된다. 운영 배포 후 `/api/v1/openapi.json`, 401/403/404/412/428/429 계약, 토큰 원문 로그 미노출, owner-only 결과를 smoke test한다.
 
 ## 1. 프로젝트 한 줄 정의

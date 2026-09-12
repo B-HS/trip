@@ -7,6 +7,7 @@
             "boardsAll": "게시판 전체",
             "trips": "트립 목록",
             "newTrip": "새 트립",
+            "developers": "개발자 API",
             "mainMenu": "주요 메뉴",
             "favorites": "즐겨찾기",
             "favoritesEmpty": "목록에서 별표를 눌러 추가하세요",
@@ -21,6 +22,7 @@
             "profile": "내 프로필",
             "profileSettings": "프로필 설정",
             "aiSettings": "AI 설정",
+            "apiSettings": "API 토큰",
             "signOut": "로그아웃",
             "theme": "테마",
             "reduceMotion": "모션 줄이기"
@@ -44,7 +46,8 @@
             "toDark": "다크 모드로 전환"
         },
         "footer": {
-            "tagline": "Trip manager with structured data forms"
+            "tagline": "구조화된 데이터 폼으로 여행을 관리하세요",
+            "navigation": "공개 페이지"
         },
         "localeSwitcher": {
             "menuAria": "언어 선택",
@@ -1284,13 +1287,15 @@
         "copy": "토큰 복사",
         "copied": "복사됨",
         "empty": "아직 개발자 토큰이 없습니다.",
-        "error": "개발자 토큰을 변경하지 못했습니다."
+        "error": "개발자 토큰을 변경하지 못했습니다.",
+        "viewDocs": "API 문서 보기"
     },
     "developerPortal": {
         "title": "차분하고 유용한 여행 자동화를 만드세요",
         "description": "트립 도구·통합·AI 에이전트를 위한 명확한 소유자 범위 API입니다. 읽기 권한으로 시작하고 사용자가 계획을 승인한 뒤 쓰기 권한을 추가하세요.",
         "openapi": "OpenAPI 보기",
         "getStarted": "시작하기",
+        "manageTokens": "API 토큰 관리",
         "authenticationTitle": "인증",
         "authentication": "개인용 액세스 토큰은 한 번만 표시하며 Authorization 헤더로만 보냅니다. URL에 토큰을 넣지 마세요.",
         "scopesTitle": "작은 권한",

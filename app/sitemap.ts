@@ -5,6 +5,7 @@ import { findPublicTripsForSitemap } from '@/entities/trip/trip.repository.explo
 import { routing } from '@/i18n/routing'
 import { localizedPath } from '@/shared/lib/seo'
 import { SITE_URL } from '@/shared/constant/site'
+import { DEVELOPERS_PATH } from '@/shared/constant/route'
 
 export const revalidate = 3600
 
@@ -51,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         { path: '/', changeFrequency: 'weekly', priority: 1 },
         { path: '/explore', changeFrequency: 'daily', priority: 0.8 },
         { path: '/boards', changeFrequency: 'daily', priority: 0.8 },
-        { path: '/developers', changeFrequency: 'weekly', priority: 0.6 },
+        { path: DEVELOPERS_PATH, changeFrequency: 'weekly', priority: 0.6 },
         { path: '/terms', changeFrequency: 'yearly', priority: 0.2 },
         { path: '/privacy', changeFrequency: 'yearly', priority: 0.2 },
     ]
