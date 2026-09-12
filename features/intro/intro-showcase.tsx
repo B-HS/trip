@@ -2,6 +2,7 @@
 
 import { Check } from 'lucide-react'
 import { motion, type Variants } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import type { FC } from 'react'
 import { cn } from '@/shared/lib/utils'
 import { INTRO_SHOWCASE } from '@/shared/constant/marketing'
@@ -48,25 +49,26 @@ const LABEL_VARIANTS: Variants = {
 }
 
 export const IntroShowcase: FC = () => {
+    const t = useTranslations('intro.showcase')
     const totalCount = INTRO_SHOWCASE.items.length
     const completedCount = INTRO_SHOWCASE.items.filter((item) => item.isCompleted).length
     const completedPercent = (completedCount / totalCount) * PERCENT_SCALE
 
     return (
         <section className='mx-auto w-full max-w-7xl px-6 py-16'>
-            <IntroSectionHeading eyebrow={INTRO_SHOWCASE.eyebrow} title={INTRO_SHOWCASE.title} description={INTRO_SHOWCASE.description} />
+            <IntroSectionHeading eyebrow={t('eyebrow')} title={t('title')} description={t('description')} />
             <Reveal className='mt-10 flex flex-col gap-px overflow-hidden rounded-md border border-border bg-border shadow-sm'>
                 <div className='flex flex-col gap-3 bg-card p-5'>
                     <div className='flex items-baseline justify-between gap-4'>
                         <div className='flex items-baseline gap-2'>
-                            <span className='text-2xs font-medium tracking-wide text-muted-foreground'>{INTRO_SHOWCASE.dayLabel}</span>
-                            <h3 className='text-sm font-medium'>{INTRO_SHOWCASE.dayTitle}</h3>
+                            <span className='text-2xs font-medium tracking-wide text-muted-foreground'>{t('dayLabel')}</span>
+                            <h3 className='text-sm font-medium'>{t('dayTitle')}</h3>
                         </div>
                         <p className='shrink-0 text-2xs text-muted-foreground'>
-                            <AnimatedNumber value={completedCount} /> / {totalCount} {INTRO_SHOWCASE.completedSuffix}
+                            <AnimatedNumber value={completedCount} /> / {totalCount} {t('completed')}
                         </p>
                     </div>
-                    <AnimatedProgress value={completedPercent} label={INTRO_SHOWCASE.progressLabel} />
+                    <AnimatedProgress value={completedPercent} label={t('progressLabel')} />
                 </div>
                 <motion.ul
                     className='flex flex-col gap-px bg-border'
@@ -89,7 +91,7 @@ export const IntroShowcase: FC = () => {
                             </span>
                             <div className='flex min-w-0 flex-1 flex-col gap-1'>
                                 <motion.span variants={item.isCompleted ? LABEL_VARIANTS : undefined} className='relative w-fit text-sm font-medium'>
-                                    {item.title}
+                                    {t(`items.${item.id}.title`)}
                                     {item.isCompleted && (
                                         <motion.span
                                             aria-hidden
@@ -97,9 +99,9 @@ export const IntroShowcase: FC = () => {
                                             className='absolute inset-x-0 top-1/2 h-px origin-left bg-foreground'
                                         />
                                     )}
-                                    {item.isCompleted && <span className='sr-only'> {INTRO_SHOWCASE.completedSuffix}</span>}
+                                    {item.isCompleted && <span className='sr-only'> {t('completed')}</span>}
                                 </motion.span>
-                                <span className='text-xs text-muted-foreground'>{item.note}</span>
+                                <span className='text-xs text-muted-foreground'>{t(`items.${item.id}.note`)}</span>
                             </div>
                             <span className='shrink-0 text-2xs text-muted-foreground tabular-nums'>{item.time}</span>
                         </motion.li>
