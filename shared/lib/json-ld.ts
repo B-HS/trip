@@ -90,6 +90,7 @@ export const buildTouristTripJsonLd = (trip: PublicTrip, url: string, descriptio
     return {
         '@context': context,
         '@type': 'TouristTrip',
+        '@id': url,
         'name': trip.title,
         url,
         'description': description ?? `${trip.destination} travel itinerary`,
@@ -98,7 +99,6 @@ export const buildTouristTripJsonLd = (trip: PublicTrip, url: string, descriptio
         'touristType': 'Travel itinerary',
         ...(flightNodes.length || lodgingNodes.length
             ? {
-                  'mentions': [...flightNodes, ...lodgingNodes].map((node) => ({ '@id': node['@id'] as string })),
                   '@graph': [...flightNodes, ...lodgingNodes],
               }
             : {}),

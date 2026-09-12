@@ -1,5 +1,5 @@
 import 'server-only'
-import { count, eq, inArray, sql, type SQL } from 'drizzle-orm'
+import { count, eq, inArray, lt, or, sql, type SQL } from 'drizzle-orm'
 import { getTripRole } from '@/entities/trip/trip.access'
 import { insertTemplateDays, lockTrip, removableIds, touchTrip } from '@/entities/trip/trip.repository.days'
 import { resolveTripRole } from '@/entities/trip/trip.role'
@@ -21,6 +21,7 @@ import { asAirportCode } from '@/shared/constant/airports'
 import { isCountryCode } from '@/shared/constant/countries'
 import { DEFAULT_SCHEDULE_KIND_KEY, getDefaultScheduleKinds } from '@/shared/constant/trip'
 import { getDb } from '@/shared/db/client'
+import { user } from '@/shared/db/schema/auth'
 import {
     trip,
     tripBooking,
@@ -49,15 +50,60 @@ const FALLBACK_SLUG_BASE = 'trip'
 type ReconcilableAttachment = Omit<BookingAttachmentValues, 'id' | 'uploadId'> & { id?: string; uploadId?: string | null }
 type ReconcilableBooking = Omit<BookingValues, 'attachments'> & { attachments: ReconcilableAttachment[] }
 
-const removeUploadedObjects = async (keys: string[]) => {
+/**
+ * Delete only uploads that are no longer referenced by a booking or profile.
+ * The object deletion runs while the upload row is locked so a concurrent
+ * attachment cannot race the purge. A failed object deletion rolls back the
+ * row deletion and the secured maintenance job can retry it later.
+ */
+export const purgeTripUploadObjects = async (keys: string[]) => {
     if (keys.length === 0 || getUploadConfig() === null) return
-    for (const key of keys) {
+    for (const key of [...new Set(keys)]) {
         try {
-            await deleteObject(key)
-        } catch (error) {
-            console.error(error)
+            await getDb().transaction(async (tx) => {
+                const uploads = await tx
+                    .select({ id: tripUpload.id, key: tripUpload.key, url: tripUpload.url })
+                    .from(tripUpload)
+                    .where(eq(tripUpload.key, key))
+                    .for('update')
+                if (uploads.length === 0) return
+                for (const upload of uploads) {
+                    const [attachment] = await tx
+                        .select({ id: tripBookingAttachment.id })
+                        .from(tripBookingAttachment)
+                        .where(eq(tripBookingAttachment.uploadId, upload.id))
+                        .limit(1)
+                    const [profile] = await tx
+                        .select({ id: user.id })
+                        .from(user)
+                        .where(or(eq(user.bannerUploadId, upload.id), eq(user.image, upload.url)))
+                        .limit(1)
+                    if (attachment || profile) return
+                }
+                await deleteObject(key)
+                await tx.delete(tripUpload).where(
+                    inArray(
+                        tripUpload.id,
+                        uploads.map((upload) => upload.id),
+                    ),
+                )
+            })
+        } catch {
+            // Keep the DB row when object deletion fails so maintenance can retry.
         }
     }
+}
+
+/** Retry old rows left by a post-commit deletion or an interrupted upload flow. */
+export const purgeOrphanedUploads = async (limit = 100) => {
+    if (getUploadConfig() === null) return { scanned: 0 }
+    const candidates = await getDb()
+        .select({ key: tripUpload.key })
+        .from(tripUpload)
+        .where(lt(tripUpload.createdAt, new Date(Date.now() - 24 * 60 * 60 * 1000)))
+        .limit(limit)
+    await purgeTripUploadObjects(candidates.map((row) => row.key))
+    return { scanned: candidates.length }
 }
 
 const toTripValues = (basics: TripBasicsValues) => ({
@@ -172,10 +218,21 @@ const findAttachmentUploadKeys = async (tx: TripTransaction, condition: SQL | un
     return rows.map((row) => row.key)
 }
 
+const findTripUploadKeys = async (tx: TripTransaction, tripId: string) => {
+    const rows = await tx
+        .select({ key: tripUpload.key })
+        .from(tripBookingAttachment)
+        .innerJoin(tripBooking, eq(tripBookingAttachment.bookingId, tripBooking.id))
+        .innerJoin(tripUpload, eq(tripBookingAttachment.uploadId, tripUpload.id))
+        .where(eq(tripBooking.tripId, tripId))
+    return rows.map((row) => row.key)
+}
+
 const reconcileBookingAttachments = async (tx: TripTransaction, bookingId: string, list: ReconcilableAttachment[]) => {
     const existing = await tx
-        .select({ id: tripBookingAttachment.id })
+        .select({ id: tripBookingAttachment.id, uploadId: tripBookingAttachment.uploadId, uploadKey: tripUpload.key })
         .from(tripBookingAttachment)
+        .leftJoin(tripUpload, eq(tripBookingAttachment.uploadId, tripUpload.id))
         .where(eq(tripBookingAttachment.bookingId, bookingId))
     const removable = removableIds(existing, list)
     const removedKeys = removable.length > 0 ? await findAttachmentUploadKeys(tx, inArray(tripBookingAttachment.id, removable)) : []
@@ -185,6 +242,8 @@ const reconcileBookingAttachments = async (tx: TripTransaction, bookingId: strin
         const values = { kind: item.kind, url: item.url, label: item.label, uploadId: item.uploadId ?? null, sortOrder: index }
         const id = item.id
         if (id !== undefined && existingIds.has(id)) {
+            const previous = existing.find((row) => row.id === id)
+            if (previous?.uploadKey && previous.uploadId !== values.uploadId) removedKeys.push(previous.uploadKey)
             await tx.update(tripBookingAttachment).set(values).where(eq(tripBookingAttachment.id, id))
             continue
         }
@@ -481,7 +540,7 @@ const replaceTripFromTemplateInTransaction = async (tx: TripTransaction, tripId:
 
 export const replaceTripFromTemplate = async (tripId: string, template: TripTemplate) => {
     const removedKeys = await getDb().transaction((tx) => replaceTripFromTemplateInTransaction(tx, tripId, template))
-    await removeUploadedObjects(removedKeys)
+    await purgeTripUploadObjects(removedKeys)
     return { id: tripId } satisfies CreatedTrip
 }
 
@@ -492,7 +551,7 @@ export const replaceTripFromTemplateIfUnchanged = async (tripId: string, templat
         if (current.updatedAt.toISOString() !== expectedUpdatedAt) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
         return replaceTripFromTemplateInTransaction(tx, tripId, template)
     })
-    await removeUploadedObjects(removedKeys)
+    await purgeTripUploadObjects(removedKeys)
     return { id: tripId } satisfies CreatedTrip
 }
 
@@ -505,8 +564,8 @@ export const replaceTripFromTemplateIfUnchangedInTransaction = async (
     const [current] = await tx.select({ updatedAt: trip.updatedAt }).from(trip).where(eq(trip.id, tripId)).for('update')
     if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
     if (current.updatedAt.toISOString() !== expectedUpdatedAt) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
-    await replaceTripFromTemplateInTransaction(tx, tripId, template)
-    return { id: tripId } satisfies CreatedTrip
+    const removedUploadKeys = await replaceTripFromTemplateInTransaction(tx, tripId, template)
+    return { id: tripId, removedUploadKeys } satisfies CreatedTrip & { removedUploadKeys: string[] }
 }
 
 export const replaceTripFromTemplateIfRevisionUnchangedInTransaction = async (
@@ -518,8 +577,8 @@ export const replaceTripFromTemplateIfRevisionUnchangedInTransaction = async (
     const [current] = await tx.select({ revision: trip.revision }).from(trip).where(eq(trip.id, tripId)).for('update')
     if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
     if (current.revision !== expectedRevision) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
-    await replaceTripFromTemplateInTransaction(tx, tripId, template)
-    return { id: tripId } satisfies CreatedTrip
+    const removedUploadKeys = await replaceTripFromTemplateInTransaction(tx, tripId, template)
+    return { id: tripId, removedUploadKeys } satisfies CreatedTrip & { removedUploadKeys: string[] }
 }
 
 export const saveTripBasics = async (tripId: string, basics: TripBasicsValues, destinations: DestinationValues[]) => {
@@ -532,25 +591,35 @@ export const saveTripBasics = async (tripId: string, basics: TripBasicsValues, d
 }
 
 export const deleteTrip = async (tripId: string) => {
-    await getDb().delete(trip).where(eq(trip.id, tripId))
+    const removedKeys = await getDb().transaction(async (tx) => {
+        const keys = await findTripUploadKeys(tx, tripId)
+        await tx.delete(trip).where(eq(trip.id, tripId))
+        return keys
+    })
+    await purgeTripUploadObjects(removedKeys)
 }
 
 export const deleteTripIfUnchanged = async (tripId: string, expectedUpdatedAt: string) => {
-    await getDb().transaction((tx) => deleteTripIfUnchangedInTransaction(tx, tripId, expectedUpdatedAt))
+    const removedKeys = await getDb().transaction((tx) => deleteTripIfUnchangedInTransaction(tx, tripId, expectedUpdatedAt))
+    await purgeTripUploadObjects(removedKeys)
 }
 
 export const deleteTripIfUnchangedInTransaction = async (tx: TripTransaction, tripId: string, expectedUpdatedAt: string) => {
     const [current] = await tx.select({ updatedAt: trip.updatedAt }).from(trip).where(eq(trip.id, tripId)).for('update')
     if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
     if (current.updatedAt.toISOString() !== expectedUpdatedAt) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
+    const keys = await findTripUploadKeys(tx, tripId)
     await tx.delete(trip).where(eq(trip.id, tripId))
+    return keys
 }
 
 export const deleteTripIfRevisionUnchangedInTransaction = async (tx: TripTransaction, tripId: string, expectedRevision: number) => {
     const [current] = await tx.select({ revision: trip.revision }).from(trip).where(eq(trip.id, tripId)).for('update')
     if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
     if (current.revision !== expectedRevision) throw new ApiError('PRECONDITION_FAILED', 'error.staleResource')
+    const keys = await findTripUploadKeys(tx, tripId)
     await tx.delete(trip).where(eq(trip.id, tripId))
+    return keys
 }
 
 export const saveFlights = async (tripId: string, list: FlightValues[]) => {
@@ -585,7 +654,7 @@ export const saveBookings = async (tripId: string, list: BookingValues[]) => {
         await touchTrip(tx, tripId)
         return keys
     })
-    await removeUploadedObjects(removedKeys)
+    await purgeTripUploadObjects(removedKeys)
 }
 
 export const saveInfoSections = async (tripId: string, list: InfoSectionValues[]) => {

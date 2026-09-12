@@ -27,6 +27,7 @@ describe('JSON-LD builders', () => {
         const result = buildTouristTripJsonLd(trip as never, 'https://trip.gumyo.net/s/kyoto')
 
         expect(result['@type']).toBe('TouristTrip')
+        expect(result['@id']).toBe('https://trip.gumyo.net/s/kyoto')
         const itinerary = result.itinerary as { itemListElement: Array<{ item: { '@type': string; 'name': string } }>; numberOfItems: number }
         expect(itinerary.itemListElement).toHaveLength(2)
         expect(itinerary.numberOfItems).toBe(2)
@@ -75,10 +76,7 @@ describe('JSON-LD builders', () => {
             'https://trip.gumyo.net/s/kyoto',
         )
 
-        expect(result.mentions).toEqual([
-            { '@id': 'https://trip.gumyo.net/s/kyoto#flight-flight-1' },
-            { '@id': 'https://trip.gumyo.net/s/kyoto#lodging-lodging-1' },
-        ])
+        expect(result).not.toHaveProperty('mentions')
         expect(result['@graph']).toEqual([
             expect.objectContaining({
                 '@type': 'Flight',
@@ -87,6 +85,8 @@ describe('JSON-LD builders', () => {
             }),
             expect.objectContaining({ '@type': 'LodgingBusiness', 'address': { '@type': 'PostalAddress', 'streetAddress': '1 Kyoto St' } }),
         ])
+        expect(result['@id']).toBe('https://trip.gumyo.net/s/kyoto')
+        expect(result).not.toHaveProperty('mentions')
     })
 
     test('uses Article for posts and QAPage only for questions', () => {

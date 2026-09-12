@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { etagForUpdatedAt, parsePage, requireConfirmation, requireIfMatch } from '@/shared/lib/developer-api-handler'
+import {
+    API_REQUEST_BODY_MAX_BYTES,
+    etagForUpdatedAt,
+    parseJson,
+    parsePage,
+    requireConfirmation,
+    requireIfMatch,
+} from '@/shared/lib/developer-api-handler'
 
 describe('developer API request safety helpers', () => {
     test('strictly validates pagination values', () => {
@@ -15,5 +22,36 @@ describe('developer API request safety helpers', () => {
         expect(() => requireIfMatch(request, updatedAt)).not.toThrow()
         expect(() => requireConfirmation(new Request('https://trip.test'), 'delete')).toThrow()
         expect(() => requireIfMatch(new Request('https://trip.test'), updatedAt)).toThrow()
+    })
+
+    test('caps chunked request bodies without buffering the entire stream', async () => {
+        const encoder = new TextEncoder()
+        const validChunks = ['{"title":"', 'Kyoto"}'].map((chunk) => encoder.encode(chunk))
+        const validRequest = new Request('https://trip.test', {
+            method: 'POST',
+            body: new ReadableStream({
+                start(controller) {
+                    for (const chunk of validChunks) controller.enqueue(chunk)
+                    controller.close()
+                },
+            }),
+            duplex: 'half',
+        } as RequestInit & { duplex: 'half' })
+        expect(validRequest.headers.get('content-length')).toBeNull()
+        await expect(parseJson(validRequest)).resolves.toEqual({ title: 'Kyoto' })
+
+        const oversized = encoder.encode(JSON.stringify({ value: 'x'.repeat(API_REQUEST_BODY_MAX_BYTES) }))
+        const oversizedRequest = new Request('https://trip.test', {
+            method: 'POST',
+            body: new ReadableStream({
+                start(controller) {
+                    controller.enqueue(oversized.subarray(0, 17))
+                    controller.enqueue(oversized.subarray(17))
+                    controller.close()
+                },
+            }),
+            duplex: 'half',
+        } as RequestInit & { duplex: 'half' })
+        await expect(parseJson(oversizedRequest)).rejects.toMatchObject({ code: 'PAYLOAD_TOO_LARGE' })
     })
 })

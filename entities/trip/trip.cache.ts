@@ -3,9 +3,9 @@ import { unstable_cache } from 'next/cache'
 import { findFavoriteTrips } from '@/entities/trip/trip.repository.favorites'
 import { findPublicTripBySlug, findTripDetail, findTripSummariesForUser } from '@/entities/trip/trip.repository'
 import { tripShareTag } from '@/entities/trip/trip.tag'
+import { PUBLIC_TRIP_CACHE_VERSION } from '@/shared/constant/cache'
 
 const PUBLIC_TRIP_REVALIDATE_SECONDS = 60 * 60
-const PUBLIC_TRIP_CACHE_VERSION = '4'
 
 export const getTripList = (userId: string) => findTripSummariesForUser(userId)
 

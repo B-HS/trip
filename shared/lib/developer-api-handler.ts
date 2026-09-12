@@ -6,7 +6,7 @@ import { requireDeveloperApiRequest, type AuthenticatedDeveloperToken } from '@/
 import { ApiError } from '@/shared/lib/api-response'
 import { createHash } from 'node:crypto'
 
-const API_REQUEST_BODY_MAX_BYTES = 1_000_000
+export const API_REQUEST_BODY_MAX_BYTES = 1_000_000
 const API_PAGE_MAX = 1_000_000
 
 const responseMeta = Symbol('developer-api-response')
@@ -54,14 +54,46 @@ export const rateHeaders = (rate: { limit: number; remaining: number; reset: num
 
 export const parseJson = async (request: Request) => {
     const contentLength = request.headers.get('content-length')
-    if (contentLength !== null && Number(contentLength) > API_REQUEST_BODY_MAX_BYTES) throw new ApiError('PAYLOAD_TOO_LARGE', 'error.requestTooLarge')
-    let raw: string
+    const declaredLength = contentLength === null ? null : Number(contentLength)
+    if (declaredLength !== null && Number.isFinite(declaredLength) && declaredLength > API_REQUEST_BODY_MAX_BYTES)
+        throw new ApiError('PAYLOAD_TOO_LARGE', 'error.requestTooLarge')
+
+    const body = request.body
+    if (body === null) throw new ApiError('VALIDATION_ERROR', 'error.invalidJson')
+
+    const reader = body.getReader()
+    const chunks: Uint8Array[] = []
+    let total = 0
     try {
-        raw = await request.text()
-    } catch {
+        while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            if (value === undefined) continue
+            total += value.byteLength
+            if (total > API_REQUEST_BODY_MAX_BYTES) {
+                try {
+                    await reader.cancel()
+                } catch {
+                    // The request is already rejected; cancellation is best effort.
+                }
+                throw new ApiError('PAYLOAD_TOO_LARGE', 'error.requestTooLarge')
+            }
+            chunks.push(value)
+        }
+    } catch (error) {
+        if (error instanceof ApiError) throw error
         throw new ApiError('VALIDATION_ERROR', 'error.invalidJson')
+    } finally {
+        reader.releaseLock()
     }
-    if (new TextEncoder().encode(raw).byteLength > API_REQUEST_BODY_MAX_BYTES) throw new ApiError('PAYLOAD_TOO_LARGE', 'error.requestTooLarge')
+
+    const bytes = new Uint8Array(total)
+    let offset = 0
+    for (const chunk of chunks) {
+        bytes.set(chunk, offset)
+        offset += chunk.byteLength
+    }
+    const raw = new TextDecoder().decode(bytes)
     try {
         return JSON.parse(raw) as unknown
     } catch {

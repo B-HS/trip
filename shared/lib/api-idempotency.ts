@@ -9,7 +9,7 @@ const PROCESSING_TTL_MS = 10 * 60 * 1000
 const COMPLETED_RETENTION_MS = 30 * 24 * 60 * 60 * 1000
 export type IdempotencyReplay = { response: unknown; status: number; headers?: Record<string, string> }
 export type IdempotencyClaim = { replay: IdempotencyReplay | null; claimNonce: string }
-export type IdempotentMutationResult<T> = { response: T; status?: number; headers?: Record<string, string> }
+export type IdempotentMutationResult<T> = { response: T; status?: number; headers?: Record<string, string>; afterCommit?: () => Promise<void> }
 
 const claimIdempotencyInTransaction = async (tx: TripTransaction, tokenId: string, key: string, requestHash: string): Promise<IdempotencyClaim> => {
     const staleBefore = new Date(Date.now() - PROCESSING_TTL_MS)
@@ -93,7 +93,7 @@ export const runIdempotentMutation = async <T>(
     requestHash: string,
     mutation: (tx: TripTransaction, claimNonce: string) => Promise<IdempotentMutationResult<T>>,
 ) => {
-    return getDb().transaction(async (tx) => {
+    const committed = await getDb().transaction(async (tx) => {
         const claim = await claimIdempotencyInTransaction(tx, tokenId, key, requestHash)
         if (claim.replay) return { replayed: true, ...claim.replay }
         const result = await mutation(tx, claim.claimNonce)
@@ -116,8 +116,10 @@ export const runIdempotentMutation = async <T>(
                     eq(developerApiIdempotency.status, 'processing'),
                 ),
             )
-        return { replayed: false, response: result.response, status, headers: result.headers }
+        return { replayed: false, response: result.response, status, headers: result.headers, afterCommit: result.afterCommit }
     })
+    if (!committed.replayed && committed.afterCommit) await committed.afterCommit()
+    return committed
 }
 
 export const completeIdempotency = async (

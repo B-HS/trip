@@ -63,7 +63,7 @@
 - 구현·리팩터링 완료 조건은 `docs/CONVENTIONS.md`를 정본으로 삼는다. typecheck·lint·prettier·전체 테스트·프로덕션 빌드를 통과하고, i18n 변경은 ko/en/ja 카탈로그 정합성과 대표 경로 스모크를 확인한다.
 - 자동 커밋·push ON. 커밋은 English lowercase Conventional Commits, AI 트레일러 금지, `git add -A` 금지, force push 금지. dev→prod 머지는 무플래그 `git merge` 후 push(가드 훅 오인 회피).
 - `.env*` 는 읽지·쓰지 않는다(사용자가 DATABASE_URL+BETTER_AUTH_* 발급 완료, 실DB 연결 정상).
-- 공용 DB: 컬럼 추가 전용은 선행 적용, 컬럼 삭제는 적용 직후 push·배포. `PUBLIC_TRIP_CACHE_VERSION='4'` — `PublicTrip` 형태 변경 시 올림.
+- 공용 DB: 컬럼 추가 전용은 선행 적용, 컬럼 삭제는 적용 직후 push·배포. `PUBLIC_TRIP_CACHE_VERSION='5'` — trip revision을 포함한 `PublicTrip` 형태 변경으로 올렸고, 이후 형태 변경 시 다시 올린다.
 
 ## 6. 미해결 질문 / 사용자 확인 필요 항목
 
@@ -75,13 +75,13 @@
 
 - Bun 1.4.2, Next 16.3.4(dev는 Turbopack, 프로덕션 빌드는 Webpack), next-intl 4.14.4, zod 4.5.4, drizzle mysql(`trip_` prefix), dev 서버 `:7777`.
 - task 위임: 카테고리는 `oh-my-opencode.jsonc` 고정으로 복원 전까지 `subagent_type=general` 사용 권장(카테고리 모델 매핑은 재시작 후 jsonc 반영).
-- 마이그레이션 상태: 0000~0008 적용(이력 9행), 0010 인증 동의 SQL 생성·미적용. `drizzle-kit push` 금지, `bun run db:generate`/`db:migrate`만.
+- 마이그레이션 상태: 0000~0008 적용(이력 9행), 인증 동의·AI·Developer API용 0010 → 0011 → 0012 SQL은 생성했으나 아직 운영 DB에 적용하지 않았다. 이는 이 릴리스의 precondition이다. `drizzle-kit push` 금지, `bun run db:generate`/`db:migrate`만.
 
 ## 8. 다음 세션 TODO (우선순위 순)
 
 1. 인증 확장 작업 트리를 커밋하고 dev→prod로 머지·push한다.
 2. 운영자가 `docs/env.md`의 OAuth·Email Worker 키를 주입하고 0010을 적용한 뒤 콜백·실제 수신 메일을 스모크한다.
-3. 운영 migration 0010→0011→0012 및 각 public/API/AI smoke.
+3. 0011/0012가 아직 적용되지 않았다는 precondition을 확인하고 운영 migration 0010→0011→0012 및 각 public/API/AI smoke를 진행한다.
 
 ## 9. 문서 지도
 

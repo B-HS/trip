@@ -3,6 +3,7 @@ import { assertTripAccess } from '@/entities/trip/trip.access'
 import {
     deleteTripIfRevisionUnchangedInTransaction,
     findTripDetail,
+    purgeTripUploadObjects,
     replaceTripFromTemplateIfRevisionUnchangedInTransaction,
 } from '@/entities/trip/trip.repository'
 import { assertDeveloperApiScope } from '@/shared/lib/developer-api-token'
@@ -59,7 +60,11 @@ export const PUT = async (request: Request, context: Context) =>
             const saved = await replaceTripFromTemplateIfRevisionUnchangedInTransaction(tx, tripId, template, current.revision)
             const [updated] = await tx.select({ revision: tripTable.revision }).from(tripTable).where(eq(tripTable.id, tripId)).limit(1)
             const responseHeaders: Record<string, string> = updated ? { ETag: etagForRevision(updated.revision) } : {}
-            return { response: saved, headers: responseHeaders }
+            return {
+                response: { id: saved.id },
+                headers: responseHeaders,
+                afterCommit: () => purgeTripUploadObjects(saved.removedUploadKeys),
+            }
         })
         return developerApiResponse(result.response, { status: result.status, headers: result.headers })
     })
@@ -76,9 +81,9 @@ export const DELETE = async (request: Request, context: Context) =>
             const current = await findTripDetail(tripId)
             if (!current) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
             requireIfMatch(request, current.revision)
-            await deleteTripIfRevisionUnchangedInTransaction(tx, tripId, current.revision)
+            const removedUploadKeys = await deleteTripIfRevisionUnchangedInTransaction(tx, tripId, current.revision)
             const response = { id: tripId, deleted: true }
-            return { response }
+            return { response, afterCommit: () => purgeTripUploadObjects(removedUploadKeys) }
         })
         return developerApiResponse(result.response, { status: result.status, headers: result.headers })
     })
