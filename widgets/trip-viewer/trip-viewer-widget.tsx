@@ -5,7 +5,7 @@ import { PrinterIcon, TriangleAlertIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { type FC, useEffect, useRef, useState } from 'react'
-import { useTripDetail } from '@/entities/trip/trip.query'
+import { useTripDetail, useUpdateShareSettings } from '@/entities/trip/trip.query'
 import { AiTripAssistant } from '@/widgets/ai/ai-trip-assistant'
 import type { PublicTrip, TripDayDetail } from '@/entities/trip/trip.type'
 import {
@@ -21,8 +21,10 @@ import { DayPicker } from '@/features/trip-viewer/day-picker'
 import { InfoPanel } from '@/features/trip-viewer/info-panel'
 import { TripLegend } from '@/features/trip-viewer/legend'
 import { TripFooter } from '@/features/trip-viewer/trip-footer'
+import { TripPrintLayout } from '@/features/trip-viewer/trip-print-layout'
 import { TripSidebar } from '@/features/trip-viewer/trip-sidebar'
 import { TripViewerSkeleton } from '@/features/trip-viewer/trip-viewer-skeleton'
+import { TripVisibilityToggle } from '@/features/trip-viewer/trip-visibility-toggle'
 import { TRIP_VIEW_PANEL_ID, ViewTabs } from '@/features/trip-viewer/view-tabs'
 import type { TripView } from '@/shared/constant/trip'
 import { FADE } from '@/shared/lib/motion'
@@ -85,9 +87,11 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, isAi
     const toggleBookingCheck = useToggleBookingCheck(tripId ?? '')
     const resetDayChecks = useResetDayChecks(tripId ?? '')
     const saveDayMemo = useSaveDayMemo(tripId ?? '')
+    const updateShareSettings = useUpdateShareSettings(tripId ?? '')
 
     const isMember = mode === 'member'
     const trip = isMember ? detailQuery.data : initialTrip
+    const isOwner = isMember && detailQuery.data?.viewerRole === 'owner'
     const days = trip?.days ?? []
     const checkedScheduleIds = userStateQuery.data?.scheduleCheckedIds ?? []
     const checkedBookingIds = userStateQuery.data?.bookingCheckedIds ?? []
@@ -139,6 +143,16 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, isAi
         setResetTargetDayId(null)
     }
 
+    const handleVisibilityChange = async (isPublic: boolean) => {
+        if (!isOwner || !tripId || updateShareSettings.isPending || !trip) return
+        try {
+            await updateShareSettings.mutateAsync({ isPublic, slug: trip.shareSlug ?? undefined })
+        } catch {
+            // The mutation owns the translated error toast. Keep the switch on
+            // the last confirmed query value until the server succeeds.
+        }
+    }
+
     useEffect(() => {
         const timers = memoTimersRef.current
         return () => Object.values(timers).forEach((timer) => clearTimeout(timer))
@@ -187,12 +201,21 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, isAi
                     <div className='md:sticky md:top-0'>{sidebar(false)}</div>
                 </div>
                 <div className='flex min-w-0 flex-col gap-px'>
-                    <div className='flex items-stretch justify-between gap-px bg-background'>
+                    <div className='flex flex-wrap items-stretch justify-between gap-px bg-background'>
                         <ViewTabs activeView={activeView} onSelect={handleSelectView} />
-                        <Button type='button' variant='cell' size='cell' onClick={() => window.print()}>
-                            <PrinterIcon aria-hidden />
-                            {t('printAll')}
-                        </Button>
+                        <div className='flex flex-wrap items-stretch gap-px bg-background'>
+                            <Button type='button' variant='cell' size='cell' onClick={() => window.print()}>
+                                <PrinterIcon aria-hidden />
+                                {t('printAll')}
+                            </Button>
+                            {isOwner && (
+                                <TripVisibilityToggle
+                                    isPublic={trip.isPublic}
+                                    isPending={updateShareSettings.isPending}
+                                    onChange={handleVisibilityChange}
+                                />
+                            )}
+                        </div>
                     </div>
                     {!isMember && <p className='bg-card p-3 text-xs text-muted-foreground'>{t('publicNotice')}</p>}
                     <div id={TRIP_VIEW_PANEL_ID} className='flex min-w-0 flex-1 flex-col gap-px'>
@@ -259,32 +282,12 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, isAi
                     <TripFooter footerNote={trip.footerNote} />
                 </div>
             </div>
-            <div className='hidden flex-col gap-px print:flex'>
-                {sidebar(true)}
-                {days.map((day, dayIndex) => (
-                    <DayPanel
-                        key={day.id}
-                        day={day}
-                        scheduleKinds={trip.scheduleKinds}
-                        dayIndex={dayIndex}
-                        panelId={`${DAY_PANEL_ID}-print-${day.id}`}
-                        checkedItemIds={checkedScheduleIds}
-                        isHideCompleted={false}
-                        isCheckable={false}
-                        isPrintLayout
-                    />
-                ))}
-                <BookingsPanel
-                    bookings={trip.bookings}
-                    bookingNote={trip.bookingNote}
-                    checkedIds={checkedBookingIds}
-                    isCheckable={false}
-                    isPrintLayout
-                />
-                <InfoPanel sections={trip.infoSections} days={days} isPrintLayout />
-                <TripFooter footerNote={trip.footerNote} />
-            </div>
-            {shouldRenderAiTripAssistant(mode, isAiEnabled, tripId) && <AiTripAssistant tripId={tripId} />}
+            <TripPrintLayout trip={trip} sidebar={sidebar(true)} checkedScheduleIds={checkedScheduleIds} checkedBookingIds={checkedBookingIds} />
+            {shouldRenderAiTripAssistant(mode, isAiEnabled, tripId) && (
+                <div className='print:hidden'>
+                    <AiTripAssistant tripId={tripId} />
+                </div>
+            )}
             <AlertDialog open={resetTargetDay !== null} onOpenChange={(open) => !open && setResetTargetDayId(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>

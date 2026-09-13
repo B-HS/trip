@@ -66,7 +66,7 @@ export const InfoPanel: FC<InfoPanelProps> = ({ sections, days, isPrintLayout = 
         })
 
     return (
-        <section className={cn('flex flex-col gap-px', isPrintLayout && 'break-before-page')}>
+        <section className={cn('trip-print-panel flex flex-col gap-px', isPrintLayout && 'print:gap-px')}>
             <h2 className='bg-card p-3 text-base font-semibold tracking-tight'>{t('infoTitle')}</h2>
             {isPrintLayout ? (
                 sections.map((section) => (

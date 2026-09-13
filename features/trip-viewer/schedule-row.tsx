@@ -41,30 +41,38 @@ export const ScheduleRow: FC<ScheduleRowProps> = ({ item, kind, isCompleted, isC
     const bufferLabel = item.bufferNote ?? kind?.bufferLabel ?? null
     const content = (
         <>
-            <strong className='block text-sm leading-snug font-medium break-keep'>{item.title}</strong>
-            {item.note && <span className='mt-1 block text-xs break-keep text-muted-foreground'>{item.note}</span>}
+            <strong className='block text-sm leading-snug font-medium break-keep print:text-xs'>{item.title}</strong>
+            {item.note && <span className='mt-1 block text-xs break-keep text-muted-foreground print:mt-0.5 print:text-2xs'>{item.note}</span>}
             {bufferLabel !== null && (
-                <span className='mt-1 inline-block bg-muted px-1.5 py-0.5 text-2xs font-medium text-muted-foreground'>{bufferLabel}</span>
+                <span className='mt-1 inline-block bg-muted px-1.5 py-0.5 text-2xs font-medium text-muted-foreground print:mt-0 print:px-1 print:py-0'>
+                    {bufferLabel}
+                </span>
             )}
         </>
     )
 
     return (
-        <motion.li layout variants={ROW_VARIANTS} exit='exit' className='list-none'>
+        <motion.li layout variants={ROW_VARIANTS} exit='exit' className='trip-print-schedule-row list-none break-inside-avoid'>
             <motion.div
-                className='grid grid-cols-1 gap-px sm:grid-cols-[7rem_minmax(0,1fr)]'
+                className='grid grid-cols-1 gap-px sm:grid-cols-[7rem_minmax(0,1fr)] print:grid-cols-[5rem_minmax(0,1fr)]'
                 animate={{ opacity: isCompleted ? COMPLETED_OPACITY : FULL_OPACITY }}
                 transition={ROW_TRANSITION}>
-                <div className='flex flex-col items-start gap-1.5 bg-card p-3'>
+                <div className='flex flex-col items-start gap-1.5 bg-card p-3 print:gap-1 print:p-2'>
                     <time className={cn('font-mono text-xs font-medium tabular-nums', isCompleted && 'line-through')}>{item.timeLabel}</time>
                     {kind !== undefined && (
-                        <Badge variant='secondary' className={cn(ROW_ACTION_CLASS, 'border-0', SCHEDULE_KIND_BADGE_CLASS[kind.colorToken])}>
+                        <Badge
+                            variant='secondary'
+                            className={cn(
+                                ROW_ACTION_CLASS,
+                                'border-0 print:h-5 print:min-w-12 print:px-1',
+                                SCHEDULE_KIND_BADGE_CLASS[kind.colorToken],
+                            )}>
                             {kind.label}
                         </Badge>
                     )}
                 </div>
                 <div className='flex min-w-0 gap-px bg-background'>
-                    <div className='flex min-w-0 flex-1 items-start gap-3 bg-card p-3'>
+                    <div className='flex min-w-0 flex-1 items-start gap-3 bg-card p-3 print:gap-2 print:p-2'>
                         {isCheckable && (
                             <Checkbox
                                 id={checkboxId}

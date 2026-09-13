@@ -338,11 +338,153 @@
 }
 
 @media print {
+    /*
+     * The CSS margin is intentionally 12mm. Home and office printers may
+     * reserve a larger hardware margin; choose "fit"/"shrink" in the print
+     * dialog when their printable area is smaller than the A4 content box.
+     */
+    @page {
+        size: A4 portrait;
+        margin: 12mm;
+    }
+
     html {
         scroll-behavior: auto;
+        background: white !important;
     }
     body {
-        background: white;
-        color: black;
+        background: white !important;
+        color: #111 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .trip-print-root {
+        display: flex !important;
+        flex-direction: column;
+        gap: 0;
+        width: 100%;
+    }
+
+    .trip-print-page {
+        box-sizing: border-box;
+        display: block;
+        width: 100%;
+        min-height: calc(297mm - 24mm);
+        overflow: visible;
+        break-after: page;
+        page-break-after: always;
+    }
+
+    .trip-print-page:last-child {
+        break-after: auto;
+        page-break-after: auto;
+    }
+
+    .trip-print-summary {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .trip-print-summary > aside {
+        max-width: 95mm;
+        padding: 0;
+    }
+
+    .trip-print-page-context {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8mm;
+        margin-bottom: 3mm;
+        border-bottom: 0.3mm solid #bbb;
+        padding-bottom: 2mm;
+        color: #444;
+        font-family: var(--font-mono);
+        font-size: 8pt;
+        line-height: 1.2;
+    }
+
+    .trip-print-day-content {
+        gap: 1px;
+    }
+
+    .trip-print-day-content > * {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .trip-print-day-content .trip-print-schedule,
+    .trip-print-day-content .trip-print-notes {
+        break-inside: auto;
+        page-break-inside: auto;
+    }
+
+    .trip-print-schedule-row,
+    .trip-print-facts tr,
+    .trip-print-route-block {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .trip-print-schedule-row [style*='transform'],
+    .trip-print-schedule-row {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    .trip-print-density-compact .trip-print-day-content,
+    .trip-print-density-tight .trip-print-day-content {
+        font-size: 9pt;
+    }
+
+    .trip-print-density-compact .trip-print-day-content > header {
+        padding: 1.5mm 2mm;
+    }
+
+    .trip-print-density-compact .trip-print-schedule-row > div > div,
+    .trip-print-density-compact .trip-print-route-block {
+        padding: 1.5mm 2mm;
+    }
+
+    .trip-print-density-tight .trip-print-day-content {
+        font-size: 8pt;
+        line-height: 1.25;
+    }
+
+    .trip-print-density-tight .trip-print-day-content > header {
+        gap: 1.5mm;
+        padding: 1mm 1.5mm;
+    }
+
+    .trip-print-density-tight .trip-print-schedule-row > div > div,
+    .trip-print-density-tight .trip-print-route-block,
+    .trip-print-density-tight .trip-print-facts td,
+    .trip-print-density-tight .trip-print-facts th {
+        padding: 1mm 1.5mm;
+    }
+
+    .trip-print-density-tight .trip-print-notes {
+        gap: 0.75mm;
+        padding: 1mm 1.5mm 1mm 5mm;
+    }
+
+    .trip-print-panel {
+        break-inside: auto;
+        page-break-inside: auto;
+    }
+
+    .trip-print-panel [data-slot='table-container'] {
+        overflow: visible;
+    }
+
+    a {
+        color: #111 !important;
+    }
+
+    [data-slot='badge'] {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 }

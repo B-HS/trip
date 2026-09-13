@@ -66,28 +66,30 @@ export const DayPanel: FC<DayPanelProps> = ({
     const visibleItems = isHideCompleted && !isPrintLayout ? day.scheduleItems.filter((item) => !checkedIds.has(item.id)) : day.scheduleItems
     const memoId = `day-memo-${day.id}`
     const routeBlocks = day.routes.map((route) => (
-        <div key={route.id} className='bg-card px-4 py-3'>
+        <div key={route.id} className='trip-print-route-block bg-card px-4 py-3'>
             <div className='flex items-baseline justify-between gap-3'>
-                <strong className='text-sm leading-snug font-medium break-keep'>
+                <strong className='text-sm leading-snug font-medium break-keep print:text-xs'>
                     {route.origin} → {route.destination}
                 </strong>
-                <span className='font-mono text-sm font-medium whitespace-nowrap tabular-nums'>{t('minutesUnit', { minutes: route.minutes })}</span>
+                <span className='font-mono text-sm font-medium whitespace-nowrap tabular-nums print:text-xs'>
+                    {t('minutesUnit', { minutes: route.minutes })}
+                </span>
             </div>
-            {route.pathText && <p className='mt-2 text-sm break-keep'>{route.pathText}</p>}
-            {route.formula && <p className='mt-2 font-mono text-xs break-keep text-muted-foreground'>{route.formula}</p>}
+            {route.pathText && <p className='mt-2 text-sm break-keep print:mt-1 print:text-xs'>{route.pathText}</p>}
+            {route.formula && <p className='mt-2 font-mono text-xs break-keep text-muted-foreground print:mt-1 print:text-2xs'>{route.formula}</p>}
         </div>
     ))
     const isMobile = useIsMobile()
 
     return (
-        <article id={panelId} className={cn('flex flex-col gap-px', isPrintLayout && 'break-before-page')}>
-            <header className='flex items-start gap-3 bg-card p-3'>
-                <span className='font-mono text-2xl leading-none font-semibold tracking-tighter text-muted-foreground'>
+        <article id={panelId} className={cn('trip-print-day-content flex flex-col gap-px', isPrintLayout && 'print:gap-px')}>
+            <header className='flex items-start gap-3 bg-card p-3 print:gap-2 print:p-2'>
+                <span className='font-mono text-2xl leading-none font-semibold tracking-tighter text-muted-foreground print:text-xl'>
                     {formatDayNumber(dayIndex)}
                 </span>
                 <div className='min-w-0'>
-                    <h2 className='text-base leading-snug font-semibold tracking-tight break-keep'>{day.title}</h2>
-                    {day.subtitle && <p className='mt-1 text-xs break-keep text-muted-foreground'>{day.subtitle}</p>}
+                    <h2 className='text-base leading-snug font-semibold tracking-tight break-keep print:text-sm'>{day.title}</h2>
+                    {day.subtitle && <p className='mt-1 text-xs break-keep text-muted-foreground print:mt-0.5 print:text-2xs'>{day.subtitle}</p>}
                 </div>
             </header>
             {!isPrintLayout && (
@@ -114,25 +116,31 @@ export const DayPanel: FC<DayPanelProps> = ({
                     )}
                 </div>
             )}
-            {day.overview && <p className='bg-card p-3 text-sm leading-relaxed break-keep'>{day.overview}</p>}
+            {day.overview && (
+                <p className='bg-card p-3 text-sm leading-relaxed break-keep print:p-2 print:text-xs print:leading-snug'>{day.overview}</p>
+            )}
             {day.facts.length > 0 && (
-                <div className='break-inside-avoid bg-card'>
-                    <Table className='text-xs'>
+                <div className='trip-print-facts break-inside-avoid bg-card'>
+                    <Table className='text-xs print:text-2xs'>
                         <TableHeader>
                             <TableRow>
-                                <TableHead scope='col' className='h-auto w-40 bg-muted p-2 text-xs font-medium text-muted-foreground'>
+                                <TableHead
+                                    scope='col'
+                                    className='h-auto w-40 bg-muted p-2 text-xs font-medium text-muted-foreground print:p-1 print:text-2xs'>
                                     {t('itemLabel')}
                                 </TableHead>
-                                <TableHead scope='col' className='h-auto bg-muted p-2 text-xs font-medium text-muted-foreground'>
+                                <TableHead
+                                    scope='col'
+                                    className='h-auto bg-muted p-2 text-xs font-medium text-muted-foreground print:p-1 print:text-2xs'>
                                     {t('verifiedLabel')}
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {day.facts.map((fact) => (
-                                <TableRow key={fact.id}>
-                                    <TableCell className='p-2 align-top whitespace-normal text-muted-foreground'>{fact.label}</TableCell>
-                                    <TableCell className='p-2 align-top whitespace-normal'>{fact.value}</TableCell>
+                                <TableRow key={fact.id} className='break-inside-avoid'>
+                                    <TableCell className='p-2 align-top whitespace-normal text-muted-foreground print:p-1'>{fact.label}</TableCell>
+                                    <TableCell className='p-2 align-top whitespace-normal print:p-1'>{fact.value}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -140,7 +148,7 @@ export const DayPanel: FC<DayPanelProps> = ({
                 </div>
             )}
             {(day.planHeadline || day.planNote) && (
-                <p className='bg-card p-3 text-sm leading-relaxed break-keep'>
+                <p className='bg-card p-3 text-sm leading-relaxed break-keep print:p-2 print:text-xs print:leading-snug'>
                     {day.planHeadline && <strong className='font-medium'>{day.planHeadline}</strong>}
                     {day.planHeadline && day.planNote && ' '}
                     {day.planNote}
@@ -149,7 +157,7 @@ export const DayPanel: FC<DayPanelProps> = ({
             {day.routes.length > 0 &&
                 (isPrintLayout ? (
                     <section className='flex flex-col gap-px bg-background'>
-                        <h3 className='bg-card px-4 py-3 text-sm font-medium'>{t('travelTimeCalc')}</h3>
+                        <h3 className='bg-card px-4 py-3 text-sm font-medium print:px-2 print:py-1 print:text-xs'>{t('travelTimeCalc')}</h3>
                         {routeBlocks}
                     </section>
                 ) : (
@@ -163,7 +171,7 @@ export const DayPanel: FC<DayPanelProps> = ({
                     </Accordion>
                 ))}
             {visibleItems.length > 0 && (
-                <motion.ol className='flex flex-col gap-px' variants={TIMELINE_VARIANTS} initial='hidden' animate='visible'>
+                <motion.ol className='trip-print-schedule flex flex-col gap-px' variants={TIMELINE_VARIANTS} initial='hidden' animate='visible'>
                     <AnimatePresence initial={false}>
                         {visibleItems.map((item) => (
                             <ScheduleRow
@@ -179,7 +187,7 @@ export const DayPanel: FC<DayPanelProps> = ({
                 </motion.ol>
             )}
             {day.scheduleItems.length === 0 && day.notes.length === 0 && (
-                <Empty className='rounded-none bg-card p-6'>
+                <Empty className='rounded-none bg-card p-6 print:p-2'>
                     <EmptyHeader>
                         <EmptyMedia variant='icon' className='rounded-none'>
                             <CalendarOffIcon aria-hidden />
@@ -190,14 +198,14 @@ export const DayPanel: FC<DayPanelProps> = ({
                 </Empty>
             )}
             {(day.closingHeadline || day.closingNote) && (
-                <p className='bg-card p-3 text-sm leading-relaxed break-keep'>
+                <p className='bg-card p-3 text-sm leading-relaxed break-keep print:p-2 print:text-xs print:leading-snug'>
                     {day.closingHeadline && <strong className='font-medium'>{day.closingHeadline}</strong>}
                     {day.closingHeadline && day.closingNote && ' '}
                     {day.closingNote}
                 </p>
             )}
             {day.notes.length > 0 && (
-                <ul className='flex list-disc flex-col gap-2 bg-card p-3 pl-8 text-sm leading-relaxed'>
+                <ul className='trip-print-notes flex list-disc flex-col gap-2 bg-card p-3 pl-8 text-sm leading-relaxed print:gap-1 print:p-2 print:pl-6 print:text-xs print:leading-snug'>
                     {day.notes.map((note) => (
                         <li key={note.id} className='break-keep'>
                             {note.leading}

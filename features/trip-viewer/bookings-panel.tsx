@@ -30,7 +30,7 @@ export const BookingsPanel: FC<BookingsPanelProps> = ({ bookings, bookingNote, c
     const completedCount = bookings.filter((booking) => checkedSet.has(booking.id)).length
 
     return (
-        <section className={cn('flex flex-col gap-px', isPrintLayout && 'break-before-page')}>
+        <section className={cn('trip-print-panel flex flex-col gap-px', isPrintLayout && 'print:gap-px')}>
             <h2 className='bg-card p-3 text-base font-semibold tracking-tight'>{t('bookingsTitle')}</h2>
             {bookingNote && <p className='bg-card p-3 text-sm leading-relaxed break-keep'>{bookingNote}</p>}
             <div className='flex flex-col gap-1 bg-card p-3'>
