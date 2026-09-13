@@ -21,8 +21,8 @@ export const INTRO_HERO = {
     primaryAction: { label: '시작하기', href: '/signup' },
     secondaryAction: { label: '로그인', href: '/login' },
     globeRoutes: [
-        { from: 'ICN', to: 'KIX' },
-        { from: 'KIX', to: 'ICN' },
+        { from: 'ICN', to: 'TPE' },
+        { from: 'TPE', to: 'ICN' },
     ],
     globeNote: '예시로 표시한 경로입니다.',
 } as const satisfies {
@@ -90,7 +90,7 @@ export const INTRO_STEPS = [
     {
         id: 'create',
         title: '트립 만들기',
-        description: '여행 이름과 기간, 목적지를 입력하면 빈 일정표가 만들어집니다. 오사카 예시로 한 번에 채워 볼 수도 있습니다.',
+        description: '여행 이름과 기간, 목적지를 입력하면 빈 일정표가 만들어집니다. 모델 예시로 한 번에 채워 볼 수도 있습니다.',
     },
     {
         id: 'fill',

@@ -12,7 +12,7 @@
 
 ## 1. 프로젝트 한 줄 정의
 
-정적 오사카 일정 HTML(`docs/osaka-trip-interactive.html`)을 로그인 기반 다중 트립 여행 노트 + 커뮤니티 앱(Next 16 + MySQL + better-auth + TanStack Query + motion + R3F 지구본 + Tiptap + next-intl)으로 재구현해 `trip.gumyo.net`(Vercel Pro, 브랜치 `prod`)에 배포하는 프로젝트.
+정적 오사카 일정 HTML(`docs/osaka-trip-interactive.html`)에서 시작한 로그인 기반 다중 트립 여행 노트 + 커뮤니티 앱(Next 16 + MySQL + better-auth + TanStack Query + motion + R3F 지구본 + Tiptap + next-intl)을 `trip.gumyo.net`(Vercel Pro, 브랜치 `prod`)에 배포하는 프로젝트. 현재 앱의 새 모델 예시 생성·시드는 오사카 원본이 아닌 `model-example.ts`의 타이베이 5일 일정이다.
 
 ## 2. 현재 목표
 

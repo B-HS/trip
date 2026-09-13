@@ -544,7 +544,7 @@
         },
         "tripNew": {
             "title": "新しいトリップ",
-            "description": "基本情報で空のトリップを作るか、大阪サンプルトリップで始められます。"
+            "description": "基本情報で空のトリップを作るか、モデル例のトリップで始められます。"
         },
         "tripEdit": {
             "title": "編集",
@@ -626,7 +626,7 @@
             "items": {
                 "create": {
                     "title": "トリップを作る",
-                    "description": "旅行名、期間、目的地を入力すると空の行程表ができます。大阪のサンプルを一度に入れることもできます。"
+                    "description": "旅行名、期間、目的地を入力すると空の行程表ができます。モデル例を一度に入力することもできます。"
                 },
                 "fill": {
                     "title": "日別行程を入力",
@@ -906,7 +906,7 @@
             "removeDestination": "目的地を削除",
             "country": "国",
             "city": "都市",
-            "cityPlaceholder": "大阪",
+            "cityPlaceholder": "都市名",
             "noticesTitle": "案内文",
             "noticesDescription": "ビューアーの凡例、予約案内、フッターに表示されます。",
             "bufferPolicy": "余裕時間の案内",
@@ -1181,7 +1181,7 @@
             "globeHint": "目的地や航空便を登録すると全体ルートが地球儀に表示されます。",
             "newTrip": "新しいトリップ",
             "creating": "作成中…",
-            "template": "大阪サンプルトリップを作る",
+            "template": "モデル例のトリップを作る",
             "removeRouteFilter": "{code} フィルターを解除",
             "stats": {
                 "count": "トリップ数",
@@ -1195,7 +1195,7 @@
             "description": "基本情報だけ先に作って編集器で行程を埋めるか、サンプルトリップで今すぐ始めましょう。",
             "blank": "空のトリップを作る",
             "templateTitle": "サンプルで始める",
-            "templateDescription": "原版大阪行程をそのまま移したサンプルです。作成後、編集器で日付と行程を自由に変えられます。",
+            "templateDescription": "台北を舞台にした、無理のない5日間のモデル行程です。作成後、実際の旅行に合わせて日付と行程を変更できます。",
             "days": "{n}日間",
             "schedules": "{n}件の行程",
             "routes": "{n}件の移動ルート",
@@ -1221,17 +1221,17 @@
                 "submitting": "作成中…"
             },
             "placeholders": {
-                "title": "大阪旅行ノート",
-                "destination": "大阪",
+                "title": "旅行モデル行程",
+                "destination": "目的地",
                 "periodNote": "6泊7日 · 予備日1日"
             }
         },
         "empty": {
             "title": "まだトリップがありません",
-            "description": "新しいトリップを作るか、大阪サンプルトリップで構造を先に眺めてください。",
+            "description": "新しいトリップを作るか、モデル例のトリップで構造を先に確認してください。",
             "newTrip": "新しいトリップ",
             "creating": "作成中…",
-            "template": "大阪サンプルトリップを作る"
+            "template": "モデル例のトリップを作る"
         },
         "error": {
             "title": "トリップ一覧を読み込めませんでした",

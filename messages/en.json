@@ -544,7 +544,7 @@
         },
         "tripNew": {
             "title": "New trip",
-            "description": "Create an empty trip with basic info, or start from the Osaka sample trip."
+            "description": "Create an empty trip with basic info, or start from the model example trip."
         },
         "tripEdit": {
             "title": "Edit",
@@ -629,7 +629,7 @@
             "items": {
                 "create": {
                     "title": "Create a trip",
-                    "description": "Enter a name, dates, and destinations to create a blank itinerary, or fill one instantly with the Osaka sample."
+                    "description": "Enter a name, dates, and destinations to create a blank itinerary, or fill one instantly with the model example."
                 },
                 "fill": {
                     "title": "Fill each day's itinerary",
@@ -909,7 +909,7 @@
             "removeDestination": "Remove destination",
             "country": "Country",
             "city": "City",
-            "cityPlaceholder": "Osaka",
+            "cityPlaceholder": "City name",
             "noticesTitle": "Viewer notes",
             "noticesDescription": "Shown in the viewer legend, booking introduction, and footer.",
             "bufferPolicy": "Buffer-time note",
@@ -1184,7 +1184,7 @@
             "globeHint": "Register destinations or flights and the full route appears on the globe.",
             "newTrip": "New trip",
             "creating": "Creating…",
-            "template": "Create the Osaka sample trip",
+            "template": "Create the model example trip",
             "removeRouteFilter": "Clear {code} filter",
             "stats": {
                 "count": "Trips",
@@ -1198,7 +1198,7 @@
             "description": "Create with the basics first and fill the itinerary in the editor, or start right away with the sample trip.",
             "blank": "Create a blank trip",
             "templateTitle": "Start with the sample",
-            "templateDescription": "A sample that mirrors the original Osaka itinerary. After creating, you can change dates and schedules in the editor.",
+            "templateDescription": "A balanced five-day Taipei model itinerary. After creating it, adapt the dates and schedules to your real trip.",
             "days": "{n} days",
             "schedules": "{n} schedules",
             "routes": "{n} routes",
@@ -1224,17 +1224,17 @@
                 "submitting": "Creating…"
             },
             "placeholders": {
-                "title": "Osaka travel notes",
-                "destination": "Osaka",
+                "title": "Travel model itinerary",
+                "destination": "Destination",
                 "periodNote": "6 nights 7 days · 1 spare day"
             }
         },
         "empty": {
             "title": "No trips yet",
-            "description": "Create a new trip or explore the structure with the Osaka sample trip.",
+            "description": "Create a new trip or explore the structure with the model example trip.",
             "newTrip": "New trip",
             "creating": "Creating…",
-            "template": "Create the Osaka sample trip"
+            "template": "Create the model example trip"
         },
         "error": {
             "title": "Failed to load the trip list",

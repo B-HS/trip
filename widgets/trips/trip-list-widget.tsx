@@ -13,7 +13,7 @@ import { TripCardsSkeleton } from '@/features/trips/trip-cards-skeleton'
 import { TripEmptyState } from '@/features/trips/trip-empty-state'
 import { TripErrorState } from '@/features/trips/trip-error-state'
 import { TripStatTiles, type TripStatTile } from '@/features/trips/trip-stat-tiles'
-import { OSAKA_TRIP_TEMPLATE } from '@/shared/constant/template/osaka'
+import { MODEL_EXAMPLE_TRIP_TEMPLATE } from '@/shared/constant/template/model-example'
 import { MOTION_EASE_STANDARD, MOTION_FADE_DURATION } from '@/shared/lib/motion'
 import { replaceSearchParam } from '@/shared/lib/search-param'
 import { formatTripDateRange } from '@/shared/lib/trip-date-range'
@@ -62,7 +62,8 @@ export const TripListWidget: FC<TripListWidgetProps> = ({ initialRoute = null })
         { label: t('list.stats.ongoing'), value: countOngoingTrips(trips, today) },
     ]
 
-    const handleCreateSample = () => createFromTemplate.mutate(OSAKA_TRIP_TEMPLATE, { onSuccess: (created) => router.push(`/trips/${created.id}`) })
+    const handleCreateSample = () =>
+        createFromTemplate.mutate(MODEL_EXAMPLE_TRIP_TEMPLATE, { onSuccess: (created) => router.push(`/trips/${created.id}`) })
 
     const handleSelectRoute = (key: string) => setSelectedRouteKey(key === selectedRouteKey ? null : key)
 

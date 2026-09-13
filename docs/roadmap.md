@@ -103,7 +103,7 @@
 ## 11. i18n — ko·ja·en (ADR-0033 §4)
 
 - next-intl, URL 프리픽스 `as-needed`(기본 ko 프리픽스 없음, `/ja/…`·`/en/…`), 쿠키로 선택 기억, 셸 사용자 메뉴·게스트 헤더의 언어 전환 셀.
-- 범위: UI 문구·검증 메시지·toast·메일 템플릿·메타데이터·약관. 날짜·숫자는 locale 포맷. 사용자 콘텐츠·오사카 템플릿 데이터는 원문 유지.
+- 범위: UI 문구·검증 메시지·toast·메일 템플릿·메타데이터·약관. 날짜·숫자는 locale 포맷. 사용자 콘텐츠·모델 예시 템플릿 데이터는 원문 유지.
 - 문구는 메시지 카탈로그(`messages/{ko,ja,en}.json`)로 관리하고 컴포넌트에 하드코딩하지 않는다. hreflang·locale 별 sitemap 은 로드맵 10 에서.
 - 2026-09-12 1차 완료·배포 후 2차 구현 완료(ADR-0038): intro/marketing·trips·trip-editor·trip-viewer·rich-editor·toast 카탈로그화, locale별 날짜·요일·기간·국가명, 생성 locale별 기본 일정 종류, 로그인 사용자 메뉴 전환. 강제 유지 규칙은 `docs/CONVENTIONS.md`.
 

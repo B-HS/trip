@@ -544,7 +544,7 @@
         },
         "tripNew": {
             "title": "새 트립",
-            "description": "기본 정보로 빈 트립을 만들거나 오사카 예시 트립으로 시작합니다."
+            "description": "기본 정보로 빈 트립을 만들거나 모델 예시 트립으로 시작합니다."
         },
         "tripEdit": {
             "title": "편집",
@@ -626,7 +626,7 @@
             "items": {
                 "create": {
                     "title": "트립 만들기",
-                    "description": "여행 이름과 기간, 목적지를 입력하면 빈 일정표가 만들어집니다. 오사카 예시로 한 번에 채워 볼 수도 있습니다."
+                    "description": "여행 이름과 기간, 목적지를 입력하면 빈 일정표가 만들어집니다. 모델 예시로 한 번에 채워 볼 수도 있습니다."
                 },
                 "fill": {
                     "title": "날짜별 일정 채우기",
@@ -906,7 +906,7 @@
             "removeDestination": "목적지 삭제",
             "country": "나라",
             "city": "도시",
-            "cityPlaceholder": "오사카",
+            "cityPlaceholder": "도시 이름",
             "noticesTitle": "안내 문구",
             "noticesDescription": "뷰어의 범례·예매 소개·푸터에 그대로 표시됩니다.",
             "bufferPolicy": "여유 시간 안내",
@@ -1181,7 +1181,7 @@
             "globeHint": "목적지나 항공편을 등록하면 전체 경로가 지구본에 표시됩니다.",
             "newTrip": "새 트립",
             "creating": "만드는 중…",
-            "template": "오사카 예시 트립 만들기",
+            "template": "모델 예시 트립 만들기",
             "removeRouteFilter": "{code} 필터 해제",
             "stats": {
                 "count": "트립 수",
@@ -1195,7 +1195,7 @@
             "description": "기본 정보만 먼저 만들고 편집기에서 일정을 채우거나, 예시 트립으로 바로 시작하세요.",
             "blank": "빈 트립 만들기",
             "templateTitle": "예시로 시작하기",
-            "templateDescription": "원본 오사카 일정을 그대로 옮긴 예시입니다. 만든 뒤 편집기에서 날짜와 일정을 원하는 대로 바꿀 수 있습니다.",
+            "templateDescription": "타이베이의 균형 잡힌 5일 모델 일정입니다. 만든 뒤 편집기에서 날짜와 일정을 실제 여행에 맞게 바꿀 수 있습니다.",
             "days": "{n}일",
             "schedules": "{n}개 일정",
             "routes": "{n}개 이동 경로",
@@ -1221,17 +1221,17 @@
                 "submitting": "만드는 중…"
             },
             "placeholders": {
-                "title": "오사카 여행 노트",
-                "destination": "오사카",
+                "title": "여행 모델 일정",
+                "destination": "여행지",
                 "periodNote": "6박 7일 · 예비일 하루"
             }
         },
         "empty": {
             "title": "아직 트립이 없습니다",
-            "description": "새 트립을 만들거나 오사카 예시 트립으로 구조를 먼저 살펴보세요.",
+            "description": "새 트립을 만들거나 모델 예시 트립으로 구조를 먼저 살펴보세요.",
             "newTrip": "새 트립",
             "creating": "만드는 중…",
-            "template": "오사카 예시 트립 만들기"
+            "template": "모델 예시 트립 만들기"
         },
         "error": {
             "title": "트립 목록을 불러오지 못했습니다",

@@ -7,7 +7,7 @@ import { useCreateTrip, useCreateTripFromTemplate } from '@/entities/trip/trip.q
 import type { TripCreateValues } from '@/entities/trip/trip.validate'
 import { TripCreateForm } from '@/features/trips/trip-create-form'
 import { TripTemplateCard } from '@/features/trips/trip-template-card'
-import { OSAKA_TRIP_TEMPLATE } from '@/shared/constant/template/osaka'
+import { MODEL_EXAMPLE_TRIP_TEMPLATE } from '@/shared/constant/template/model-example'
 import { FadeIn } from '@/shared/ui/motion/fade-in'
 
 const TEMPLATE_DELAY = 0.06
@@ -18,16 +18,16 @@ export const TripCreateWidget: FC = () => {
     const createTrip = useCreateTrip()
     const createFromTemplate = useCreateTripFromTemplate()
     const templateHighlights = [
-        t('days', { n: OSAKA_TRIP_TEMPLATE.days.length }),
-        t('schedules', { n: OSAKA_TRIP_TEMPLATE.days.reduce((total, day) => total + day.scheduleItems.length, 0) }),
-        t('routes', { n: OSAKA_TRIP_TEMPLATE.days.reduce((total, day) => total + day.routes.length, 0) }),
-        t('bookings', { n: OSAKA_TRIP_TEMPLATE.bookings.length }),
+        t('days', { n: MODEL_EXAMPLE_TRIP_TEMPLATE.days.length }),
+        t('schedules', { n: MODEL_EXAMPLE_TRIP_TEMPLATE.days.reduce((total, day) => total + day.scheduleItems.length, 0) }),
+        t('routes', { n: MODEL_EXAMPLE_TRIP_TEMPLATE.days.reduce((total, day) => total + day.routes.length, 0) }),
+        t('bookings', { n: MODEL_EXAMPLE_TRIP_TEMPLATE.bookings.length }),
     ]
 
     const handleCreate = (values: TripCreateValues) => createTrip.mutate(values, { onSuccess: (created) => router.push(`/trips/${created.id}/edit`) })
 
     const handleCreateFromTemplate = () =>
-        createFromTemplate.mutate(OSAKA_TRIP_TEMPLATE, { onSuccess: (created) => router.push(`/trips/${created.id}`) })
+        createFromTemplate.mutate(MODEL_EXAMPLE_TRIP_TEMPLATE, { onSuccess: (created) => router.push(`/trips/${created.id}`) })
 
     return (
         <div className='flex flex-col gap-px'>
@@ -44,7 +44,7 @@ export const TripCreateWidget: FC = () => {
                 <FadeIn as='section' className='flex flex-col gap-3 bg-card p-3' delay={TEMPLATE_DELAY}>
                     <h2 className='text-sm font-medium text-card-foreground'>{t('templateTitle')}</h2>
                     <TripTemplateCard
-                        title={OSAKA_TRIP_TEMPLATE.title}
+                        title={MODEL_EXAMPLE_TRIP_TEMPLATE.title}
                         description={t('templateDescription')}
                         highlights={templateHighlights}
                         isPending={createFromTemplate.isPending}

@@ -1,6 +1,6 @@
 import { and, eq } from 'drizzle-orm'
 import { createTripFromTemplate } from '@/entities/trip/trip.repository'
-import { OSAKA_TRIP_TEMPLATE } from '@/shared/constant/template/osaka'
+import { MODEL_EXAMPLE_TRIP_TEMPLATE } from '@/shared/constant/template/model-example'
 import { getDb } from '@/shared/db/client'
 import { user } from '@/shared/db/schema/auth'
 import { trip } from '@/shared/db/schema/trip'
@@ -22,7 +22,7 @@ const run = async () => {
         process.stdout.write(`먼저 ${email} 로 회원가입한 뒤 다시 실행하세요\n`)
         return EXIT_FAIL
     }
-    const template = tripTemplateSchema.parse(OSAKA_TRIP_TEMPLATE)
+    const template = tripTemplateSchema.parse(MODEL_EXAMPLE_TRIP_TEMPLATE)
     const [existing] = await db
         .select({ id: trip.id })
         .from(trip)
@@ -32,7 +32,7 @@ const run = async () => {
         return EXIT_OK
     }
     const created = await createTripFromTemplate(owner.id, template)
-    process.stdout.write(`오사카 예시 여행을 만들었습니다: ${created.id}\n`)
+    process.stdout.write(`모델 예시 여행을 만들었습니다: ${created.id}\n`)
     return EXIT_OK
 }
 

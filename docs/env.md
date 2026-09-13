@@ -11,7 +11,7 @@
 | `BETTER_AUTH_SECRET`                        | 필수            | better-auth 세션·토큰 서명 키                                                                     | `openssl rand -base64 32`                                                      | O           | O                 | X         |
 | `BETTER_AUTH_URL`                           | 필수            | 인증 서버의 기준 URL(`baseURL`). 소셜 콜백 주소의 기준이 된다                                     | 로컬은 `http://localhost:7777`, 배포는 `https://trip.gumyo.net`                | O           | O                 | X         |
 | `NEXT_PUBLIC_APP_URL`                       | 필수            | 브라우저 authClient 의 `baseURL`. `NEXT_PUBLIC_` 이라 클라이언트 번들에 인라인된다                | `BETTER_AUTH_URL` 과 **같은 오리진**으로 맞춘다                                | O           | O                 | **O**     |
-| `SEED_OWNER_EMAIL`                          | 선택            | `bun run db:seed` 가 오사카 예시 트립을 붙일 계정 이메일                                          | 이미 가입된 계정의 이메일. 비워 두면 `db:seed` 가 안내만 하고 끝난다           | O           | 불필요            | X         |
+| `SEED_OWNER_EMAIL`                          | 선택            | `bun run db:seed` 가 모델 예시 트립을 붙일 계정 이메일                                            | 이미 가입된 계정의 이메일. 비워 두면 `db:seed` 가 안내만 하고 끝난다           | O           | 불필요            | X         |
 | `R2_ACCOUNT_ID`                             | 선택(5개 묶음)  | R2 S3 엔드포인트 계정 ID                                                                          | Cloudflare 대시보드 → R2 개요 우측의 계정 ID                                   | O           | O                 | X         |
 | `R2_ACCESS_KEY_ID`                          | 선택(5개 묶음)  | R2 API 토큰의 Access Key ID                                                                       | Cloudflare → R2 → **Manage R2 API Tokens** → Object Read & Write 토큰 발급     | O           | O                 | X         |
 | `R2_SECRET_ACCESS_KEY`                      | 선택(5개 묶음)  | 위 토큰의 Secret Access Key                                                                       | 같은 화면에서 발급 시 **한 번만** 표시된다                                     | O           | O                 | X         |
@@ -47,7 +47,7 @@ BETTER_AUTH_SECRET=
 BETTER_AUTH_URL=http://localhost:7777
 # 필수 — 브라우저에 노출되는 앱 URL. BETTER_AUTH_URL 과 같은 오리진으로 맞춘다
 NEXT_PUBLIC_APP_URL=http://localhost:7777
-# 선택 — `bun run db:seed` 가 오사카 예시 트립을 붙일 소유자 이메일
+# 선택 — `bun run db:seed` 가 모델 예시 트립을 붙일 소유자 이메일
 SEED_OWNER_EMAIL=
 
 # 선택 — Cloudflare R2. 아래 5개를 모두 채워야 이미지 업로드가 열린다

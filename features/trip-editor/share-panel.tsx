@@ -121,7 +121,7 @@ export const SharePanel: FC<SharePanelProps> = ({
                             <Input
                                 id='share-slug'
                                 className={`${EDITOR_INPUT_CLASS} font-mono`}
-                                placeholder='osaka-2026'
+                                placeholder='model-trip-2026'
                                 aria-invalid={!!errors.slug}
                                 {...form.register('slug', EMPTY_TO_UNDEFINED)}
                             />
