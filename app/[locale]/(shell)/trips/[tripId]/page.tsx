@@ -45,6 +45,7 @@ export const generateMetadata = async ({ params }: TripDetailPageProps): Promise
 const TripDetailPage = async ({ params, searchParams }: TripDetailPageProps) => {
     const [{ tripId }, { view, day }] = await Promise.all([params, searchParams])
     const user = await requireUser()
+    if (!(await getTripRole(tripId, user.id))) notFound()
     const isAiEnabled = isAiCapabilityEnabled()
     const queryClient = getQueryClient()
     await prefetchTripDetail(queryClient, tripId, user.id)
@@ -56,6 +57,7 @@ const TripDetailPage = async ({ params, searchParams }: TripDetailPageProps) => 
                 tripId={tripId}
                 mode='member'
                 isAiEnabled={isAiEnabled}
+                printHref={`/trips/${encodeURIComponent(tripId)}/print`}
                 initialView={resolveView(view)}
                 initialDayOrdinal={resolveDayOrdinal(day)}
             />

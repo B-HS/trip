@@ -17,7 +17,11 @@ export const prefetchTripDetail = async (queryClient: QueryClient, tripId: strin
     queryClient.prefetchQuery({
         queryKey: QUERY_KEY.TRIP.DETAIL(tripId),
         queryFn: async () => {
-            const [detail, viewerRole] = await Promise.all([getTripDetail(tripId), getTripRole(tripId, userId)])
+            // Resolve membership before loading the full trip graph. This is a data
+            // boundary, not merely a UI check: non-members must never hydrate detail.
+            const viewerRole = await getTripRole(tripId, userId)
+            if (viewerRole === null) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
+            const detail = await getTripDetail(tripId)
             if (detail === null) throw new ApiError('NOT_FOUND', 'error.tripNotFound')
             return { ...detail, viewerRole }
         },

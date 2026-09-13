@@ -21,7 +21,6 @@ import { DayPicker } from '@/features/trip-viewer/day-picker'
 import { InfoPanel } from '@/features/trip-viewer/info-panel'
 import { TripLegend } from '@/features/trip-viewer/legend'
 import { TripFooter } from '@/features/trip-viewer/trip-footer'
-import { TripPrintLayout } from '@/features/trip-viewer/trip-print-layout'
 import { TripSidebar } from '@/features/trip-viewer/trip-sidebar'
 import { TripViewerSkeleton } from '@/features/trip-viewer/trip-viewer-skeleton'
 import { TripVisibilityToggle } from '@/features/trip-viewer/trip-visibility-toggle'
@@ -43,6 +42,7 @@ import { Button } from '@/shared/ui/button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty'
 import { useMounted } from '@/widgets/trip-viewer/use-mounted'
 import { shouldRenderAiTripAssistant } from '@/widgets/trip-viewer/ai-entrypoint'
+import { Link } from '@/i18n/navigation'
 
 const DEFAULT_VIEW: TripView = 'itinerary'
 const FIRST_DAY_INDEX = 0
@@ -59,6 +59,7 @@ type TripViewerWidgetProps = {
     mode: TripViewerMode
     isAiEnabled: boolean
     initialTrip?: PublicTrip
+    printHref?: string
     initialView?: TripView
     initialDayOrdinal?: number
 }
@@ -69,7 +70,15 @@ const resolveTodayDayIndex = (days: readonly TripDayDetail[]) => {
     return index === -1 ? FIRST_DAY_INDEX : index
 }
 
-export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, isAiEnabled, initialTrip, initialView, initialDayOrdinal }) => {
+export const TripViewerWidget: FC<TripViewerWidgetProps> = ({
+    tripId,
+    mode,
+    isAiEnabled,
+    initialTrip,
+    printHref,
+    initialView,
+    initialDayOrdinal,
+}) => {
     const t = useTranslations('tripViewer')
     const memoTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
@@ -172,7 +181,7 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, isAi
             </Empty>
         )
 
-    const sidebar = (isPrintLayout: boolean) => (
+    const sidebar = () => (
         <TripSidebar
             destinations={trip.destinations}
             eyebrow={trip.eyebrow}
@@ -190,7 +199,7 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, isAi
             sidebarLinks={trip.sidebarLinks}
             disclaimer={trip.disclaimer}
             verifiedOn={trip.verifiedOn}
-            isPrintLayout={isPrintLayout}
+            isPrintLayout={false}
         />
     )
 
@@ -198,15 +207,20 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, isAi
         <div className='flex w-full flex-1 flex-col gap-px bg-background'>
             <div className='grid flex-1 grid-cols-1 gap-px md:grid-cols-[16rem_minmax(0,1fr)] print:hidden'>
                 <div className='bg-muted'>
-                    <div className='md:sticky md:top-0'>{sidebar(false)}</div>
+                    <div className='md:sticky md:top-0'>{sidebar()}</div>
                 </div>
                 <div className='flex min-w-0 flex-col gap-px'>
                     <div className='flex flex-wrap items-stretch justify-between gap-px bg-background'>
                         <ViewTabs activeView={activeView} onSelect={handleSelectView} />
                         <div className='flex flex-wrap items-stretch gap-px bg-background'>
-                            <Button type='button' variant='cell' size='cell' onClick={() => window.print()}>
-                                <PrinterIcon aria-hidden />
-                                {t('printAll')}
+                            <Button variant='cell' size='cell' asChild>
+                                <Link
+                                    href={printHref ?? (tripId ? `/trips/${encodeURIComponent(tripId)}/print` : '/')}
+                                    target='_blank'
+                                    rel='noopener noreferrer'>
+                                    <PrinterIcon aria-hidden />
+                                    {t('printAll')}
+                                </Link>
                             </Button>
                             {isOwner && (
                                 <TripVisibilityToggle
@@ -282,7 +296,6 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, isAi
                     <TripFooter footerNote={trip.footerNote} />
                 </div>
             </div>
-            <TripPrintLayout trip={trip} sidebar={sidebar(true)} checkedScheduleIds={checkedScheduleIds} checkedBookingIds={checkedBookingIds} />
             {shouldRenderAiTripAssistant(mode, isAiEnabled, tripId) && (
                 <div className='print:hidden'>
                     <AiTripAssistant tripId={tripId} />
