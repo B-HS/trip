@@ -27,10 +27,27 @@ afterEach(cleanup)
 
 describe('UserMenu', () => {
     test('설정 메뉴에 API 토큰 관리 링크를 AI·프로필 설정과 함께 표시한다', () => {
-        render(<UserMenu name='지수' email='jisu@example.com' username='jisu' image={null} isCollapsed={false} onSignOut={() => {}} />)
+        render(<UserMenu name='지수' email='jisu@example.com' username='jisu' image={null} isCollapsed={false} isAiEnabled onSignOut={() => {}} />)
 
         expect(screen.getByRole('link', { name: '프로필 설정' }).getAttribute('href')).toBe('/settings/profile')
         expect(screen.getByRole('link', { name: 'AI 설정' }).getAttribute('href')).toBe('/settings/ai')
         expect(screen.getByRole('link', { name: 'API 토큰' }).getAttribute('href')).toBe('/settings/api')
+    })
+
+    test('AI capability가 꺼지면 AI 설정 링크와 라벨을 렌더링하지 않는다', () => {
+        render(
+            <UserMenu
+                name='지수'
+                email='jisu@example.com'
+                username='jisu'
+                image={null}
+                isCollapsed={false}
+                isAiEnabled={false}
+                onSignOut={() => {}}
+            />,
+        )
+
+        expect(screen.queryByRole('link', { name: 'AI 설정' })).toBeNull()
+        expect(screen.queryByText('AI 설정')).toBeNull()
     })
 })

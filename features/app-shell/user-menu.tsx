@@ -30,6 +30,7 @@ type UserMenuProps = {
     username: string | null
     image: string | null
     isCollapsed: boolean
+    isAiEnabled: boolean
     onSignOut: () => void
 }
 
@@ -53,7 +54,7 @@ const MotionPreferenceToggle: FC = () => {
     )
 }
 
-export const UserMenu: FC<UserMenuProps> = ({ name, email, username, image, isCollapsed, onSignOut }) => {
+export const UserMenu: FC<UserMenuProps> = ({ name, email, username, image, isCollapsed, isAiEnabled, onSignOut }) => {
     const t = useTranslations('common.userMenu')
     const tLocale = useTranslations('common.localeSwitcher')
     const locale = useLocale()
@@ -118,12 +119,14 @@ export const UserMenu: FC<UserMenuProps> = ({ name, email, username, image, isCo
                             {t('profileSettings')}
                         </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                        <Link href={AI_SETTINGS_PATH}>
-                            <BotIcon />
-                            {t('aiSettings')}
-                        </Link>
-                    </DropdownMenuItem>
+                    {isAiEnabled && (
+                        <DropdownMenuItem asChild>
+                            <Link href={AI_SETTINGS_PATH}>
+                                <BotIcon />
+                                {t('aiSettings')}
+                            </Link>
+                        </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem asChild>
                         <Link href={DEVELOPER_API_SETTINGS_PATH}>
                             <KeyRoundIcon />

@@ -37,6 +37,7 @@ export type AppShellUser = {
 
 type AppShellProps = PropsWithChildren<{
     user: AppShellUser
+    isAiEnabled: boolean
     defaultCollapsed?: boolean
 }>
 
@@ -64,7 +65,7 @@ const writeSidebarState = (isCollapsed: boolean) => {
     document.cookie = `${SIDEBAR_COOKIE_NAME}=${state}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE_SECONDS}; SameSite=Lax`
 }
 
-export const AppShell: FC<AppShellProps> = ({ user, defaultCollapsed = false, children }) => {
+export const AppShell: FC<AppShellProps> = ({ user, isAiEnabled, defaultCollapsed = false, children }) => {
     const t = useTranslations('common')
     const tKinds = useTranslations('community.boardKind')
     const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed)
@@ -120,6 +121,7 @@ export const AppShell: FC<AppShellProps> = ({ user, defaultCollapsed = false, ch
                                 activePath={pathname}
                                 isCollapsed={false}
                                 user={user}
+                                isAiEnabled={isAiEnabled}
                                 onNavigate={() => setIsNavOpen(false)}
                                 onSignOut={handleSignOut}
                             />
@@ -138,6 +140,7 @@ export const AppShell: FC<AppShellProps> = ({ user, defaultCollapsed = false, ch
                         activePath={pathname}
                         isCollapsed={isCollapsed}
                         user={user}
+                        isAiEnabled={isAiEnabled}
                         onToggleCollapsed={() => setIsCollapsed(!isCollapsed)}
                         onSignOut={handleSignOut}
                     />

@@ -53,7 +53,7 @@ const SharedTripPage = async ({ params }: SharedTripPageProps) => {
             <div className={cn('flex flex-1 flex-col gap-px', session === null && 'mx-auto w-full max-w-(--content-max-width) p-3')}>
                 <PublicTripActions trip={trip} slug={slug} isSignedIn={session !== null} />
                 <TripPublicSummary trip={trip} />
-                <TripViewerWidget mode='public' initialTrip={trip} />
+                <TripViewerWidget mode='public' isAiEnabled={false} initialTrip={trip} />
             </div>
         </HydrationBoundary>
     )

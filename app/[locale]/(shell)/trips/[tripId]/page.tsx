@@ -8,6 +8,7 @@ import { prefetchTripDetail } from '@/entities/trip/trip.prefetch'
 import type { TripDetail } from '@/entities/trip/trip.type'
 import { QUERY_KEY } from '@/shared/constant/query-key'
 import { TRIP_VIEWS, type TripView } from '@/shared/constant/trip'
+import { isAiCapabilityEnabled } from '@/shared/lib/ai-capabilities'
 import { getQueryClient } from '@/shared/lib/query-client'
 import { getServerSession, requireUser } from '@/shared/lib/session'
 import { TripViewerWidget } from '@/widgets/trip-viewer/trip-viewer-widget'
@@ -44,13 +45,20 @@ export const generateMetadata = async ({ params }: TripDetailPageProps): Promise
 const TripDetailPage = async ({ params, searchParams }: TripDetailPageProps) => {
     const [{ tripId }, { view, day }] = await Promise.all([params, searchParams])
     const user = await requireUser()
+    const isAiEnabled = isAiCapabilityEnabled()
     const queryClient = getQueryClient()
     await prefetchTripDetail(queryClient, tripId, user.id)
     if (!queryClient.getQueryData<TripDetail>(QUERY_KEY.TRIP.DETAIL(tripId))) notFound()
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
-            <TripViewerWidget tripId={tripId} mode='member' initialView={resolveView(view)} initialDayOrdinal={resolveDayOrdinal(day)} />
+            <TripViewerWidget
+                tripId={tripId}
+                mode='member'
+                isAiEnabled={isAiEnabled}
+                initialView={resolveView(view)}
+                initialDayOrdinal={resolveDayOrdinal(day)}
+            />
         </HydrationBoundary>
     )
 }

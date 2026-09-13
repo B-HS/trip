@@ -14,6 +14,7 @@ type NavRailProps<T extends string> = {
     favorites: RailFavorite[]
     activePath: string
     isCollapsed: boolean
+    isAiEnabled: boolean
     user: { name: string; email: string; username: string | null; image: string | null }
     onToggleCollapsed?: () => void
     onNavigate?: () => void
@@ -25,6 +26,7 @@ export const NavRail = <T extends string>({
     favorites,
     activePath,
     isCollapsed,
+    isAiEnabled,
     user,
     onToggleCollapsed,
     onNavigate,
@@ -71,6 +73,7 @@ export const NavRail = <T extends string>({
                 email={user.email}
                 username={user.username}
                 image={user.image}
+                isAiEnabled={isAiEnabled}
                 isCollapsed={isCollapsed}
                 onSignOut={onSignOut}
             />

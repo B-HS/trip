@@ -40,7 +40,9 @@ const USER = { name: '지수', email: 'jisu@example.com', username: 'jisu', imag
 const ACTIVE_MARKER_PATHS = ['/', '/boards', '/boards/qna', '/boards/qna/6f1c0f2a', '/boards/news']
 
 const renderRail = (activePath: string, isCollapsed: boolean) =>
-    render(<NavRail items={NAV_ITEMS} favorites={[]} activePath={activePath} isCollapsed={isCollapsed} user={USER} onSignOut={() => {}} />)
+    render(
+        <NavRail items={NAV_ITEMS} favorites={[]} activePath={activePath} isCollapsed={isCollapsed} isAiEnabled user={USER} onSignOut={() => {}} />,
+    )
 
 afterEach(cleanup)
 

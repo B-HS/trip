@@ -40,6 +40,7 @@ import {
 import { Button } from '@/shared/ui/button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty'
 import { useMounted } from '@/widgets/trip-viewer/use-mounted'
+import { shouldRenderAiTripAssistant } from '@/widgets/trip-viewer/ai-entrypoint'
 
 const DEFAULT_VIEW: TripView = 'itinerary'
 const FIRST_DAY_INDEX = 0
@@ -54,6 +55,7 @@ export type TripViewerMode = 'member' | 'public'
 type TripViewerWidgetProps = {
     tripId?: string
     mode: TripViewerMode
+    isAiEnabled: boolean
     initialTrip?: PublicTrip
     initialView?: TripView
     initialDayOrdinal?: number
@@ -65,7 +67,7 @@ const resolveTodayDayIndex = (days: readonly TripDayDetail[]) => {
     return index === -1 ? FIRST_DAY_INDEX : index
 }
 
-export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, initialTrip, initialView, initialDayOrdinal }) => {
+export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, isAiEnabled, initialTrip, initialView, initialDayOrdinal }) => {
     const t = useTranslations('tripViewer')
     const memoTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
@@ -282,7 +284,7 @@ export const TripViewerWidget: FC<TripViewerWidgetProps> = ({ tripId, mode, init
                 <InfoPanel sections={trip.infoSections} days={days} isPrintLayout />
                 <TripFooter footerNote={trip.footerNote} />
             </div>
-            {isMember && tripId && <AiTripAssistant tripId={tripId} />}
+            {shouldRenderAiTripAssistant(mode, isAiEnabled, tripId) && <AiTripAssistant tripId={tripId} />}
             <AlertDialog open={resetTargetDay !== null} onOpenChange={(open) => !open && setResetTargetDayId(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>

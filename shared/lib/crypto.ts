@@ -1,23 +1,21 @@
 import 'server-only'
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto'
+import { isAiEncryptionKeyValid } from '@/shared/lib/ai-capabilities'
 import { getEnv } from '@/shared/lib/env'
 
 const ALGORITHM = 'aes-256-gcm'
-const KEY_BYTES = 32
 const IV_BYTES = 12
 
 const getEncryptionKey = () => {
     const value = getEnv().APP_ENCRYPTION_KEY
-    if (!value) throw new Error('AI encryption is not configured')
+    if (!isAiEncryptionKeyValid(value)) throw new Error('AI encryption is not configured')
     const key = Buffer.from(value, 'base64')
-    if (key.length !== KEY_BYTES) throw new Error('AI encryption key must be a base64 encoded 32-byte value')
     return key
 }
 
 export const isEncryptionConfigured = () => {
     try {
-        getEncryptionKey()
-        return true
+        return isAiEncryptionKeyValid(getEnv().APP_ENCRYPTION_KEY)
     } catch {
         return false
     }

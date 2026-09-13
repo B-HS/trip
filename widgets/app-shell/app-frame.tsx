@@ -6,14 +6,17 @@ import { getQueryClient } from '@/shared/lib/query-client'
 import { AppShell, type AppShellUser } from '@/widgets/app-shell/app-shell'
 import { SIDEBAR_COOKIE_NAME, SIDEBAR_STATE_COLLAPSED } from '@/widgets/app-shell/app-shell.constant'
 
-export const AppFrame = async ({ user, children }: PropsWithChildren<{ user: AppShellUser }>) => {
+export const AppFrame = async ({ user, isAiEnabled, children }: PropsWithChildren<{ user: AppShellUser; isAiEnabled: boolean }>) => {
     const cookieStore = await cookies()
     const queryClient = getQueryClient()
     await prefetchFavoriteTrips(queryClient, user.id)
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
-            <AppShell user={user} defaultCollapsed={cookieStore.get(SIDEBAR_COOKIE_NAME)?.value === SIDEBAR_STATE_COLLAPSED}>
+            <AppShell
+                user={user}
+                isAiEnabled={isAiEnabled}
+                defaultCollapsed={cookieStore.get(SIDEBAR_COOKIE_NAME)?.value === SIDEBAR_STATE_COLLAPSED}>
                 {children}
             </AppShell>
         </HydrationBoundary>

@@ -57,7 +57,7 @@
 - ADR-0038: next-intl as-needed ko 기본, proxy 합성 순서(i18n 307 통과 → 로케일 제거 pathname 으로 인증 → `next=` 프리픽스 보존), 메시지 키 체계(`validation.`/`error.`/`auth.errors.`/`*.toast.` + `translateMessage`), typed routes 해제, trip 도메인 2차 완료.
 - ADR-0039: 설정이 있는 OAuth만 활성화하고, Email Worker가 있을 때만 이메일 인증을 요구하며, 가입 시 현재 법적 문서 버전을 동의 테이블에 기록한다.
 - 사용자 결정(2026-09-11): i18n path prefix+proxy 합성 / dayjs 서버측 per-request / zod errorMap+키 / Email Service 수용(trip.gumyo.net) / OAuth 키 없음→비활성+안내.
-- ADR-0040: Phase 7 구현은 Vercel Queues `send`/push callback, OpenAI·Anthropic·Ollama Cloud 공식 모델 API, AES-256-GCM 사용자 키, 10분 서버 캐시, 영속 AI 작업·usage, 승인형 `saveDay` diff 적용으로 고정했다. 운영에서는 `APP_ENCRYPTION_KEY`와 Queue 토큰을 주입해야 한다.
+- ADR-0040: Phase 7 구현은 Vercel Queues `send`/push callback, OpenAI·Anthropic·Ollama Cloud 공식 모델 API, AES-256-GCM 사용자 키, 10분 서버 캐시, 영속 AI 작업·usage, 승인형 `saveDay` diff 적용으로 고정했다. 유효한 `APP_ENCRYPTION_KEY`가 AI 전역 capability를 켜며, 없거나 잘못되면 AI 메뉴·트립 도우미를 숨기고 인증된 `/settings/ai`를 404 처리한다(비로그인 요청은 기존 보호 경계에서 로그인으로 이동). provider 키는 사용자 소유 DB 레코드이므로 process env에 넣지 않는다. 운영에서는 이 키와 Vercel Queues trigger/OIDC 또는 REST fallback 설정을 주입한다.
 - ADR-0041: Phase 9는 `/api/v1` bearer-only owner-scoped API, SHA-256 PAT 저장·1회 반환, scope·rate-limit·idempotency, OpenAPI 3.1, migration 0012로 고정했다.
 
 ## 5. 사용자 방향성 & 작업 규칙
