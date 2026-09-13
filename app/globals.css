@@ -434,6 +434,13 @@
         transform: none !important;
     }
 
+    /* Motion components can hydrate after print media is applied; keep every print item visible. */
+    .trip-print-root [style*='opacity'],
+    .trip-print-root [style*='transform'] {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
     .trip-print-density-compact .trip-print-day-content,
     .trip-print-density-tight .trip-print-day-content {
         font-size: 9pt;
