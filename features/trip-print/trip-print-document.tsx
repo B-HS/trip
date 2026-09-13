@@ -34,6 +34,15 @@ const printUrl = (value: string) => (
     </a>
 )
 
+const PrintInlineLink: FC<{ url: string; label: string | null }> = ({ url, label }) => (
+    <span className='inline-flex max-w-full flex-wrap items-baseline gap-x-1'>
+        <a className='break-all underline underline-offset-2' href={url}>
+            {label ?? url}
+        </a>
+        {label && <span className='break-all text-foreground/55'>({url})</span>}
+    </span>
+)
+
 const PrintSection: FC<{ title: string; eyebrow?: string; children: ReactNode; className?: string }> = ({ title, eyebrow, children, className }) => (
     <section className={cn('trip-print-section flex flex-col gap-2.5', className)}>
         <header className='flex items-baseline justify-between gap-3 border-b border-foreground/20 pb-1.5'>
@@ -54,7 +63,6 @@ const DestinationList: FC<{ trip: PublicTrip; locale: string }> = ({ trip, local
                 <span className='break-keep'>{destination.city ?? countryName(destination.countryCode, locale)}</span>
             </span>
         ))}
-        {trip.destinations.length === 0 && <span>{trip.destination}</span>}
     </div>
 )
 
@@ -93,6 +101,9 @@ const OverviewPage: FC<{ trip: PublicTrip; locale: string; labels: Labels; viewe
                         {trip.title}
                     </h1>
                     <DestinationList trip={trip} locale={locale} />
+                    <p className='max-w-[165mm] text-[11px] leading-relaxed break-keep text-foreground/65' data-print-destination='canonical'>
+                        {trip.destination}
+                    </p>
                 </header>
 
                 <div className='grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_42mm]'>
@@ -115,6 +126,13 @@ const OverviewPage: FC<{ trip: PublicTrip; locale: string; labels: Labels; viewe
                                 </span>
                             </div>
                         </div>
+                        <p className='font-mono text-[10px] tracking-wide text-foreground/55 tabular-nums'>
+                            {labels('travelSummary', {
+                                flights: trip.flights.length,
+                                lodgings: trip.lodgings.length,
+                                schedule: scheduleCount,
+                            })}
+                        </p>
                         {(trip.periodNote || trip.sidebarNote || trip.disclaimer || trip.verifiedOn || trip.bufferPolicy) && (
                             <div className='flex flex-col gap-1.5 text-xs leading-relaxed'>
                                 {trip.periodNote && <p>{trip.periodNote}</p>}
@@ -168,9 +186,14 @@ const OverviewPage: FC<{ trip: PublicTrip; locale: string; labels: Labels; viewe
 }
 
 const FlightCard: FC<{ flight: TripFlight; labels: Labels }> = ({ flight, labels }) => (
-    <article className='trip-print-card flex flex-col gap-2'>
+    <article className='trip-print-card flex flex-col gap-2 border border-foreground/15'>
         <div className='flex items-baseline justify-between gap-3'>
-            <strong className='min-w-0 text-xs font-semibold break-keep'>{flight.label}</strong>
+            <div className='flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1'>
+                <strong className='text-xs font-semibold break-keep'>{flight.label}</strong>
+                <span className='font-mono text-[9px] tracking-wide text-foreground/55 uppercase'>
+                    {labels(`flightDirection.${flight.direction}`)}
+                </span>
+            </div>
             {flight.flightNumber && <span className='shrink-0 font-mono text-[10px] text-foreground/60 tabular-nums'>{flight.flightNumber}</span>}
         </div>
         <div className='grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2'>
@@ -197,7 +220,7 @@ const FlightCard: FC<{ flight: TripFlight; labels: Labels }> = ({ flight, labels
 )
 
 const LodgingCard: FC<{ lodging: TripLodging; labels: Labels }> = ({ lodging, labels }) => (
-    <article className='trip-print-card flex flex-col gap-1.5'>
+    <article className='trip-print-card flex flex-col gap-1.5 border border-foreground/15'>
         <strong className='text-xs font-semibold break-keep'>{lodging.name}</strong>
         {lodging.nameLocal && <span className='text-[10px] text-foreground/60'>{lodging.nameLocal}</span>}
         {lodging.address && <p className='text-[10px] leading-relaxed break-keep'>{lodging.address}</p>}
@@ -223,7 +246,7 @@ const TravelDetailsPage: FC<{ trip: PublicTrip; labels: Labels }> = ({ trip, lab
             </header>
             {trip.flights.length > 0 && (
                 <PrintSection title={labels('flights')} eyebrow={labels('transport')}>
-                    <div className='grid gap-px bg-foreground/15 sm:grid-cols-2'>
+                    <div className='grid gap-2 sm:grid-cols-2'>
                         {trip.flights.map((flight) => (
                             <FlightCard key={flight.id} flight={flight} labels={labels} />
                         ))}
@@ -232,7 +255,7 @@ const TravelDetailsPage: FC<{ trip: PublicTrip; labels: Labels }> = ({ trip, lab
             )}
             {trip.lodgings.length > 0 && (
                 <PrintSection title={labels('lodgings')} eyebrow={labels('stay')}>
-                    <div className='grid gap-px bg-foreground/15 sm:grid-cols-2'>
+                    <div className='grid gap-2 sm:grid-cols-2'>
                         {trip.lodgings.map((lodging) => (
                             <LodgingCard key={lodging.id} lodging={lodging} labels={labels} />
                         ))}
@@ -319,6 +342,7 @@ const DayPage: FC<{ day: TripDayDetail; index: number; trip: PublicTrip; locale:
                     <div className='min-w-0 flex-1'>
                         <div className='flex flex-wrap items-baseline gap-x-2 gap-y-1'>
                             <h1 className='text-xl leading-tight font-semibold tracking-tight break-keep'>{day.title}</h1>
+                            <span className='font-mono text-[10px] text-foreground/55 tabular-nums'>{day.shortLabel}</span>
                             <time className='font-mono text-[10px] text-foreground/55 tabular-nums'>{formatDateWithWeekday(day.date, locale)}</time>
                         </div>
                         {day.subtitle && <p className='mt-0.5 text-xs leading-snug break-keep text-foreground/65'>{day.subtitle}</p>}
@@ -347,9 +371,9 @@ const DayPage: FC<{ day: TripDayDetail; index: number; trip: PublicTrip; locale:
                 )}
                 {day.routes.length > 0 && (
                     <PrintSection title={labels('travelTime')}>
-                        <div className='grid gap-px bg-foreground/15 sm:grid-cols-2'>
+                        <div className='grid gap-px sm:grid-cols-2'>
                             {day.routes.map((route) => (
-                                <div key={route.id} className='trip-print-card flex flex-col gap-1'>
+                                <div key={route.id} className='trip-print-card flex flex-col gap-1 border border-foreground/15'>
                                     <div className='flex items-baseline justify-between gap-2'>
                                         <strong className='text-[11px] font-medium break-keep'>
                                             {route.origin} → {route.destination}
@@ -395,11 +419,8 @@ const DayPage: FC<{ day: TripDayDetail; index: number; trip: PublicTrip; locale:
                             <li key={note.id} className='break-keep'>
                                 {note.leading}
                                 {note.leading && note.linkUrl && ' '}
-                                {note.linkUrl && note.linkLabel && (
-                                    <a className='underline' href={note.linkUrl}>
-                                        {note.linkLabel}
-                                    </a>
-                                )}
+                                {note.linkUrl && <PrintInlineLink url={note.linkUrl} label={note.linkLabel} />}
+                                {note.linkUrl && note.trailing && ' '}
                                 {note.trailing}
                             </li>
                         ))}
@@ -442,28 +463,16 @@ const renderInfoBlock = (block: TripInfoBlock, locale: string, labels: Labels, d
             <li key={block.id} className='break-keep'>
                 {block.emphasis && <strong className='font-medium'>{block.emphasis} </strong>}
                 {block.text}
-                {block.linkUrl && block.linkLabel && (
-                    <>
-                        {' '}
-                        <a className='underline' href={block.linkUrl}>
-                            {block.linkLabel}
-                        </a>
-                    </>
-                )}
+                {block.linkUrl && (block.emphasis || block.text) && ' '}
+                {block.linkUrl && <PrintInlineLink url={block.linkUrl} label={block.linkLabel} />}
             </li>
         )
     return (
         <p className='text-[10px] leading-relaxed break-keep'>
             {block.emphasis && <strong className='font-medium'>{block.emphasis} </strong>}
             {block.text}
-            {block.linkUrl && block.linkLabel && (
-                <>
-                    {' '}
-                    <a className='underline' href={block.linkUrl}>
-                        {block.linkLabel}
-                    </a>
-                </>
-            )}
+            {block.linkUrl && (block.emphasis || block.text) && ' '}
+            {block.linkUrl && <PrintInlineLink url={block.linkUrl} label={block.linkLabel} />}
         </p>
     )
 }
@@ -514,7 +523,7 @@ const InfoPage: FC<{ trip: PublicTrip; locale: string; labels: Labels }> = ({ tr
 )
 
 const BookingCard: FC<{ booking: TripBookingDetail; labels: Labels; checked: boolean }> = ({ booking, labels, checked }) => (
-    <article className='trip-print-card flex flex-col gap-1.5'>
+    <article className='trip-print-card flex flex-col gap-1.5 border border-foreground/15'>
         <div className='flex items-start justify-between gap-2'>
             <h3 className='text-xs leading-snug font-medium break-keep'>{booking.title}</h3>
             {checked && <span className='shrink-0 font-mono text-[9px] text-foreground/55'>{labels('done')}</span>}
@@ -562,7 +571,7 @@ const BookingPage: FC<{ trip: PublicTrip; labels: Labels; viewerState?: TripUser
                         {labels('bookingProgress', { checked: viewerState.bookingCheckedIds.length, total: trip.bookings.length })}
                     </p>
                 )}
-                <div className='grid gap-px bg-foreground/15 sm:grid-cols-2'>
+                <div className='grid gap-px sm:grid-cols-2'>
                     {trip.bookings.map((booking) => (
                         <BookingCard key={booking.id} booking={booking} labels={labels} checked={checkedSet.has(booking.id)} />
                     ))}

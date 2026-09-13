@@ -340,7 +340,21 @@
 .trip-print-surface {
     --trip-print-ink: #171717;
     --trip-print-muted: #6b6b6b;
+    --trip-print-line: #d6d4cf;
+    --trip-print-soft: #f3f2ee;
+    --background: #fff;
+    --card: #fff;
+    --card-foreground: var(--trip-print-ink);
+    --foreground: var(--trip-print-ink);
+    --muted: var(--trip-print-soft);
+    --muted-foreground: var(--trip-print-muted);
+    --border: var(--trip-print-line);
+    --input: var(--trip-print-line);
+    --primary: var(--trip-print-ink);
+    --primary-foreground: #fff;
     font-family: var(--font-sans);
+    color: var(--trip-print-ink);
+    background: #fff;
 }
 
 .trip-print-canvas {
@@ -411,24 +425,21 @@
         background: #fff !important;
     }
 
-    body,
-    .trip-print-surface {
+    body {
         background: #fff !important;
         color: #111 !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
-    .trip-print-surface :where(*) {
-        color: #111 !important;
+    .trip-print-surface {
+        background: var(--background) !important;
+        color: var(--trip-print-ink) !important;
     }
 
-    .trip-print-surface :where(.bg-card, .bg-background) {
-        background: #fff !important;
-    }
-
-    .trip-print-surface :where(.bg-muted) {
-        background: #f1f1f1 !important;
+    [data-page-transition='true'] {
+        opacity: 1 !important;
+        visibility: visible !important;
     }
 
     .trip-print-toolbar {
@@ -494,10 +505,11 @@
         font-size: 8pt;
         line-height: 1.25;
         gap: 1.5mm;
+        padding: 8mm 13mm 4mm;
     }
 
     .trip-print-density-tight .trip-print-card {
-        padding: 1.3mm 1.8mm;
+        padding: 0.8mm 1.6mm;
     }
 
     .trip-print-completed {

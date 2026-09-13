@@ -92,6 +92,6 @@
 ## 10. 전용 인쇄 문서 (2026-09-13)
 
 - `(print)` route group의 `/trips/[tripId]/print`·`/s/[slug]/print`가 AppShell/PublicFrame 없이 서버 렌더되는 A4 portrait 문서를 제공한다. 문서 본문은 `features/trip-print/trip-print-document.tsx`의 `TripPrintDocument`가 담당하고, toolbar는 화면에서만 보인다.
-- 상세 화면의 `전체 일정 인쇄`는 locale-aware 전용 경로를 새 탭으로 열며, owner-only 공개 설정 스위치는 바로 옆에 유지된다. 인쇄 문서는 overview·교통/숙소·각 날짜·조건부 예약/여행정보/푸터 부록을 빈 페이지 없이 순서대로 출력한다.
+- 상세 화면의 `전체 일정 인쇄`는 locale-aware 전용 경로를 새 탭으로 열며, owner-only 공개 설정 스위치는 바로 옆에 유지된다. 인쇄 문서는 overview → travel details(교통·숙소·참고 링크) → 각 날짜 → 조건부 예약/여행정보/푸터 부록 순서로 빈 페이지 없이 출력한다.
 - 공개 문서는 사용자 진행·메모를 읽지 않고, 인증 문서는 멤버십 확인 뒤에만 해당 사용자의 상태를 읽는다. 기존 상세 loader와 `prefetchTripDetail`도 멤버십 확인 전 전체 트립 데이터가 hydrate되지 않도록 보강했다.
 - `@page`와 page wrapper는 210mm × 297mm portrait를 사용하며, regular/compact/tight 밀도는 내용만 조절하고 극단적으로 긴 내용은 잘라내지 않는다. 대표 모델 트립 브라우저 PDF QA와 full test/build는 커밋 시점에 기록한다.

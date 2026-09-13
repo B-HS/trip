@@ -132,6 +132,15 @@ const TRIP = {
                     linkUrl: 'https://tickets.example.test',
                     trailing: '.',
                 },
+                {
+                    id: 'note-2',
+                    dayId: 'day-1',
+                    sortOrder: 1,
+                    leading: 'Official details',
+                    linkLabel: null,
+                    linkUrl: 'https://note-without-label.example.test',
+                    trailing: null,
+                },
             ],
         },
     ],
@@ -189,7 +198,17 @@ const TRIP = {
                     linkLabel: null,
                     linkUrl: null,
                 },
-                { id: 'block-3', sectionId: 'info-1', sortOrder: 2, kind: 'day_table', emphasis: null, text: null, linkLabel: null, linkUrl: null },
+                {
+                    id: 'block-4',
+                    sectionId: 'info-1',
+                    sortOrder: 2,
+                    kind: 'paragraph',
+                    emphasis: null,
+                    text: 'Official details',
+                    linkLabel: null,
+                    linkUrl: 'https://info-without-label.example.test',
+                },
+                { id: 'block-3', sectionId: 'info-1', sortOrder: 3, kind: 'day_table', emphasis: null, text: null, linkLabel: null, linkUrl: null },
             ],
         },
     ],
@@ -209,13 +228,47 @@ describe('TripPrintDocument', () => {
             'footer',
         ])
         expect(container.textContent).toContain('TW101')
+        expect(container.textContent).toContain('Outbound')
+        expect(container.textContent).toContain('09:00')
+        expect(container.textContent).toContain('터미널 2')
+        expect(container.textContent).toContain('10:45')
+        expect(container.textContent).toContain('터미널 1')
+        expect(container.textContent).toContain('Arrive early.')
         expect(container.textContent).toContain('No. 1, Taipei')
+        expect(container.textContent).toContain('Example Hotel')
+        expect(container.textContent).toContain('Near MRT.')
+        expect(container.textContent).toContain('15:00')
+        expect(container.textContent).toContain('11:00')
+        expect(container.textContent).toContain('Ask for a quiet room.')
         expect(container.textContent).toContain('https://hotel.example.test')
         expect(container.textContent).toContain('https://guide.example.test')
+        expect(container.textContent).toContain('Official guide')
         expect(container.textContent).toContain('https://booking.example.test')
         expect(container.textContent).toContain('https://www.google.com/maps/search/?api=1&query=Taipei%20Main%20Station')
         expect(container.textContent).toContain('Fixed time')
         expect(container.textContent).toContain('Ten-minute buffer')
+        expect(container.textContent).toContain('Taipei')
+        expect(container.querySelector('[data-print-destination="canonical"]')?.textContent).toBe('Taipei')
+        expect(container.textContent).toContain('출국')
+        expect(container.textContent).toContain('Day 1')
+        expect(container.textContent).toContain('Settle in')
+        expect(container.textContent).toContain('Arrive and check in.')
+        expect(container.textContent).toContain('Take the train.')
+        expect(container.textContent).toContain('Airport → Hotel')
+        expect(container.textContent).toContain('Airport MRT')
+        expect(container.textContent).toContain('Lunch')
+        expect(container.textContent).toContain('Noodles')
+        expect(container.textContent).toContain('Buffer')
+        expect(container.textContent).toContain('Close')
+        expect(container.textContent).toContain('Rest well.')
+        expect(container.textContent).toContain('Bring')
+        expect(container.textContent).toContain('tickets')
+        expect(container.querySelector('a[href="https://note-without-label.example.test"]')?.textContent).toBe(
+            'https://note-without-label.example.test',
+        )
+        expect(container.querySelector('a[href="https://info-without-label.example.test"]')?.textContent).toBe(
+            'https://info-without-label.example.test',
+        )
     })
 
     test('only authenticated documents include completion state and private memos', async () => {
