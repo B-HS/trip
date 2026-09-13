@@ -440,24 +440,41 @@ const DayPage: FC<{ day: TripDayDetail; index: number; trip: PublicTrip; locale:
 const renderInfoBlock = (block: TripInfoBlock, locale: string, labels: Labels, days: readonly TripDayDetail[]): ReactNode => {
     if (block.kind === 'day_table')
         return (
-            <div className='trip-print-info-table overflow-hidden'>
-                <div className='grid grid-cols-[25mm_repeat(3,minmax(0,1fr))] gap-px bg-foreground/15 text-[9px]'>
-                    <span className='bg-muted p-1.5 font-medium'>{labels('tableDate')}</span>
-                    <span className='bg-muted p-1.5 font-medium'>{labels('tableMorning')}</span>
-                    <span className='bg-muted p-1.5 font-medium'>{labels('tableAfternoon')}</span>
-                    <span className='bg-muted p-1.5 font-medium'>{labels('tableEvening')}</span>
-                    {days.map((day) => (
-                        <span key={`${day.id}-date`} className='contents'>
-                            <span className='bg-card p-1.5 font-mono tabular-nums'>{formatDateWithWeekday(day.date, locale)}</span>
-                            <span className='bg-card p-1.5 break-keep'>{day.morningSummary ?? '—'}</span>
-                            <span className='bg-card p-1.5 break-keep'>{day.afternoonSummary ?? '—'}</span>
-                            <span className='bg-card p-1.5 break-keep'>{day.eveningSummary ?? '—'}</span>
-                        </span>
-                    ))}
+            <div className='flex flex-col gap-2'>
+                <div className='trip-print-info-table overflow-hidden'>
+                    <div className='grid grid-cols-[25mm_repeat(3,minmax(0,1fr))] gap-px bg-foreground/15 text-[9px]'>
+                        <span className='bg-muted p-1.5 font-medium'>{labels('tableDate')}</span>
+                        <span className='bg-muted p-1.5 font-medium'>{labels('tableMorning')}</span>
+                        <span className='bg-muted p-1.5 font-medium'>{labels('tableAfternoon')}</span>
+                        <span className='bg-muted p-1.5 font-medium'>{labels('tableEvening')}</span>
+                        {days.map((day) => (
+                            <span key={`${day.id}-date`} className='contents'>
+                                <span className='bg-card p-1.5 font-mono tabular-nums'>{formatDateWithWeekday(day.date, locale)}</span>
+                                <span className='bg-card p-1.5 break-keep'>{day.morningSummary ?? '—'}</span>
+                                <span className='bg-card p-1.5 break-keep'>{day.afternoonSummary ?? '—'}</span>
+                                <span className='bg-card p-1.5 break-keep'>{day.eveningSummary ?? '—'}</span>
+                            </span>
+                        ))}
+                    </div>
                 </div>
+                {block.linkUrl && (
+                    <p className='text-[10px] leading-relaxed break-keep'>
+                        <PrintInlineLink url={block.linkUrl} label={block.linkLabel} />
+                    </p>
+                )}
             </div>
         )
-    if (block.kind === 'heading') return <h3 className='text-xs font-semibold tracking-tight break-keep'>{block.text ?? block.emphasis}</h3>
+    if (block.kind === 'heading')
+        return (
+            <div className='flex flex-col gap-1'>
+                <h3 className='text-xs font-semibold tracking-tight break-keep'>{block.text ?? block.emphasis}</h3>
+                {block.linkUrl && (
+                    <p className='text-[10px] leading-relaxed break-keep'>
+                        <PrintInlineLink url={block.linkUrl} label={block.linkLabel} />
+                    </p>
+                )}
+            </div>
+        )
     if (block.kind === 'bullet')
         return (
             <li key={block.id} className='break-keep'>

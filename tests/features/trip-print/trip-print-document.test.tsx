@@ -186,7 +186,7 @@ const TRIP = {
                     emphasis: 'Before you go',
                     text: null,
                     linkLabel: null,
-                    linkUrl: null,
+                    linkUrl: 'https://heading-without-label.example.test',
                 },
                 {
                     id: 'block-2',
@@ -208,7 +208,16 @@ const TRIP = {
                     linkLabel: null,
                     linkUrl: 'https://info-without-label.example.test',
                 },
-                { id: 'block-3', sectionId: 'info-1', sortOrder: 3, kind: 'day_table', emphasis: null, text: null, linkLabel: null, linkUrl: null },
+                {
+                    id: 'block-3',
+                    sectionId: 'info-1',
+                    sortOrder: 3,
+                    kind: 'day_table',
+                    emphasis: null,
+                    text: null,
+                    linkLabel: null,
+                    linkUrl: 'https://day-table-without-label.example.test',
+                },
             ],
         },
     ],
@@ -268,6 +277,12 @@ describe('TripPrintDocument', () => {
         )
         expect(container.querySelector('a[href="https://info-without-label.example.test"]')?.textContent).toBe(
             'https://info-without-label.example.test',
+        )
+        expect(container.querySelector('a[href="https://heading-without-label.example.test"]')?.textContent).toBe(
+            'https://heading-without-label.example.test',
+        )
+        expect(container.querySelector('a[href="https://day-table-without-label.example.test"]')?.textContent).toBe(
+            'https://day-table-without-label.example.test',
         )
     })
 
